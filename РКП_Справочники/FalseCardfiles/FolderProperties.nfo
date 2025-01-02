@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Properties Version="1">
+  <Property Name="Title" Value="Ложные картотеки"/>
+</Properties>
+<Items>
+  <Item Name="Справочники"/>
+  <Item Name="isTrashes"/>
+</Items>

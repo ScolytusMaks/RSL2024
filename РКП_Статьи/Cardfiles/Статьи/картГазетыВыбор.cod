@@ -1,0 +1,13 @@
+class inherited РКП_Статьи.Статьи.картГазеты "Выбор газеты";
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриСоздании(Context :Variant);
+    inherited шаблон_ПриСоздании(Context);
+    Self.Cardfile.CanEdit = false;
+  end;
+
+
+end

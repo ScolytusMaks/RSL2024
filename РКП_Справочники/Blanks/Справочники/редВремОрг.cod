@@ -1,0 +1,11 @@
+Class inherited Справочники.editBaseType1 "Временная организация" , editor спрВОрганизация;
+
+--{{ 2_Свойства
+
+inobject private
+
+  var Интерфейс :RI.Справочники.ВремОрг;
+
+--}}
+
+end

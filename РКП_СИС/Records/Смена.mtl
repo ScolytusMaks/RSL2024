@@ -1,0 +1,5 @@
+﻿  record Смена inherited СИС2.Базовая.БазоваяЗапись title "Информация о смене";
+    field НомерСменыВГоду :Integer title "Номер смены в году";
+    Indexed indCreateUser By CreateUser;
+    Indexed indCreateUserDate By CreateUser,CreateDate;
+  end;

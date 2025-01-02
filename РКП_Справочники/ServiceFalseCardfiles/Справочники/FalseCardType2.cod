@@ -1,0 +1,262 @@
+class inherited Справочники.FalseCardType_1. "";
+
+import СИС2 classes Константы, Исключения;
+import РКП_СИС Classes StringsFunctions, Functions, Recs, FilterMaker;
+import Classes Def;
+
+--{{ 2_Свойства
+
+inclass private
+
+  var КлассИнтерфейса :Class RI.Справочники.intBaseType2 := RI.Справочники.intBaseType2;
+
+  var ИменаСлужебныхПолей :String[] := ['DocId','ExtId','CreateDate','ModifyDate','UpdateDate','CreateUser','UpdateUser', 'Номер'];
+  stored var CustomSortingOn :Integer;
+
+inobject private
+
+  var ПоказатьСтандартноеМеню :Logical;
+  var SelectedRecord :BaseRefType2; -- Проброс выбранного значения
+
+inobject public
+
+  var SimilarFilter :String;
+  var SimilarDataViewsMode :Logical; -- Режим просмотра похожих данных
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inclass public
+
+  proc ПросмотрПохожихЗаписей (locFilter :String = nil; WinStyle :Window.WindowStyles = Kernel.Window.ModalWindow; addParam :Variant = nil);
+    var vForm: РКП_Справочники.Справочники.FalseCardType2;
+    vForm = Self.Create;
+    vForm.SimilarFilter = locFilter;
+    vForm.SimilarDataViewsMode = true;
+    #NoWarning;
+    vForm.ShowFormEx(nil, WinStyle);
+  end;
+
+
+inclass private
+
+-- 2_Обработчики событий шаблона0. --
+
+inobject private
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    КлассИнтерфейса.UpdateHashFieldsIfNeed;
+    КлассИнтерфейса.UpdateNumberFieldIfNeed;
+    inherited шаблон_ПриОткрытии(Create);
+  end;
+
+  func шаблон_ПриПоказеМеню(Object :Object; ByMouse :Logical) :Logical;
+    var locValuePosition :Variant[];
+    var Position :Variant;
+    var p :Integer;
+    if (CustomSortingOn in [0, 1]) then
+      if (Object is TemplateCardfile) and not ПоказатьСтандартноеМеню:
+        locValuePosition[1] = 'Вверх';
+        locValuePosition[2] = 'Вниз';
+        locValuePosition[3] = 'Стандартное меню';
+        p = PopupMenu(locValuePosition, Position);
+        if (p = 1) then
+          ПереместитьЗаписьВыше;
+        elsif (p = 2) then
+          ПереместитьЗаписьНиже;
+        elsif (p = 3) then
+          ПоказатьСтандартноеМеню = false;
+          Return true;
+          шаблон_ПриПоказеМеню(Object, ByMouse);
+        fi;
+      else
+        Return true;
+      fi;
+    else
+      Return true;
+    fi;
+  end;
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func Поле_Сортировка_ПриНажатии (Cell: TemplateCell; Action: Template.ClickTypes): Logical;
+    if (Cell.Contents = 'CustomSortingOn') then
+      if (CustomSortingOn in [0, 1]) then
+        CustomSortingOn = -1;
+        crdBuiltIn.Order = '';
+      else
+        CustomSortingOn = 1;
+        УстСортировкуЗаписейКартотеки;
+      fi;
+    fi;
+  end;
+
+  func Поле_Сортировка_ПриВыводе (Cell: TemplateCell; Value: Variant; Action: Template.OutputTypes; var Format: String): Variant;
+    if (Cell.Contents = 'CustomSortingOn') then
+      Result = CustomSortingOn in [0,1];
+    fi;
+  end;
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+  -- Override
+  proc кнДобавить_ПриНажатии(Sender :Button);
+    var cRec, vNewRec :РКП_Справочники.BaseRefType2;
+    vNewRec = КлассИнтерфейса.СвязанныйКлассЗаписей.Create;
+    if (crdBuiltIn <> nil) then
+      if (crdBuiltIn.Records[1] <> nil) and (crdBuiltIn.Current <> nil) then
+        cRec = crdBuiltIn.Current as РКП_Справочники.BaseRefType2;
+        vNewRec.Номер = cRec.Номер;
+      elsif (crdBuiltIn.Records[1] <> nil) and (crdBuiltIn.Current = nil) then
+        cRec = crdBuiltIn.Current as РКП_Справочники.BaseRefType2;
+        vNewRec.Номер = 1;
+      fi;
+    fi;
+    if (vNewRec <> nil) then
+      #NoWarning;
+      КлассИнтерфейса.БланкРедакторПоУмолчанию.ShowFormEx(vNewRec, Window.PopupWindow);
+    fi;
+  end;
+
+  func crdBuiltIn_OnCreateRecord (Sender :TemplateCardfile; var Record :РКП_Справочники.BaseRefType2) :Logical;
+    var cRec :РКП_Справочники.BaseRefType2;
+    var cNum :Integer;
+    if (Sender <> nil) then
+      if (Sender.Records[1] <> nil) and (Sender.Current <> nil) then
+        cRec = Sender.Current as РКП_Справочники.BaseRefType2;
+        cNum = cRec.Номер;
+        Record = Sender.Records[1].Create;
+        Record.Номер = cNum + 1;
+        Result = true;
+      fi;
+    fi;
+  end;
+
+  proc crdBuiltIn_OnRearrange(Sender :TemplateCardfile; Action :Cardfile.RearrangeActions; Column :CardfileColumn);
+    if (Action = Cardfile.SortByColumn) then
+      CustomSortingOn = -1;
+    fi;
+  end;
+
+-- 2_Дополнительные команды0. --
+
+-- 2_Вспомогательные методы0. --
+
+  proc УстРазмерОкна;
+    var minHeight, minWidth :Integer;
+    minHeight = Int(ScreenHeight / 2);
+    minWidth  = Int(ScreenWidth / 2);
+    if true in [SelectMode,SimilarDataViewsMode] then
+      if (Self.Window.Height < minHeight) then
+        Self.Window.Height = minHeight;
+      fi;
+      if (Self.Window.Width < minWidth) then
+        Self.Window.Width = minWidth;
+      fi;
+    fi;
+  end;
+
+  proc УстСортировкуЗаписейКартотеки;
+    if (CustomSortingOn in [0,1]):
+      crdBuiltIn.Order = 'Номер+';
+    fi;
+  end;
+
+  proc ИнициализироватьСтолбцыКартотеки;
+    inherited ИнициализироватьСтолбцыКартотеки;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'Номер';
+      Caption = 'Номер';
+      FieldType = Template.StringField;
+      Alignment = Template.CenterAlign;
+      Font.Size = crdBuiltIn.Font.Size;
+      MinWidth = 100;
+      Width = 100;
+      Visible = false;
+      CanEdit = false;
+    end;
+  end;
+
+  -- Override
+  proc УстановитьДоступностьОбъектовШаблона;
+    if SelectMode then
+      crdBuiltIn.CanInsert  = true;
+      crdBuiltIn.CanCopy    = true;
+      crdBuiltIn.CanEdit    = true;
+      crdBuiltIn.CanDelete  = true;
+    elsif SimilarDataViewsMode then
+      crdBuiltIn.CanInsert  = false;
+      crdBuiltIn.CanCopy    = false;
+      crdBuiltIn.CanEdit    = true;
+      crdBuiltIn.CanDelete  = true;
+      Self.Window.Caption = Self.Window.Caption + ' (похожие записи)';
+    fi;
+
+
+    кнЗакрыть.Enabled       = true;
+    кнВыбрать.Enabled       = SelectMode;
+    кнДобавить.Enabled      = crdBuiltIn.CanInsert;
+    кнДублировать.Enabled   = crdBuiltIn.CanCopy;
+    кнНоваяГруппа.Enabled   = crdBuiltIn.Hierarchical;
+    кнПреобразовать.Enabled = crdBuiltIn.CanGroupSignModify;
+    кнРедактировать.Enabled = crdBuiltIn.CanEdit;
+    кнУдалить.Enabled       = crdBuiltIn.CanDelete;
+  end;
+
+  func СоздатьФильтр :String;
+    var aFlt :String[];
+    AddInArray( aFlt, SimilarFilter );
+    AddInArray( aFlt, inherited СоздатьФильтр );
+    Result = MakeFilter(aFlt);
+  end;
+
+  proc ПереместитьЗаписьВыше;
+    var cRec, neighborRec :РКП_Справочники.BaseRefType2;
+    var aNom :Integer[];
+    if (crdBuiltIn.SelectedCount > 0) then
+      Message('При выделенных записях выполнение этой команды невозможно.' + br +
+              'Пожалуйста, снимите выделение.');
+    else
+      cRec = crdBuiltIn.Current;
+      if (cRec <> nil) then
+        neighborRec = КлассИнтерфейса.GetPrevByNumberRecord(cRec);
+        if (neighborRec <> nil) then
+          aNom[1] = neighborRec.Номер;
+          aNom[2] = cRec.Номер;
+          if (aNom[1] < aNom[2]) then
+            neighborRec.Номер = aNom[2]; RecordPostIfNeed(neighborRec);
+            cRec.Номер        = aNom[1]; RecordPostIfNeed(cRec);
+          else
+            КлассИнтерфейса.NumberingFrom(neighborRec, aNom[2]);
+          fi;
+        fi;
+      fi;
+    fi;
+  end;
+
+  proc ПереместитьЗаписьНиже;
+    var cRec, neighborRec :РКП_Справочники.BaseRefType2;
+    var aNom :Integer[];
+    if (crdBuiltIn.SelectedCount > 0) then
+      Message('При выделенных записях выполнение этой команды невозможно.' + br +
+              'Пожалуйста, снимите выделение.');
+    else
+      cRec = crdBuiltIn.Current;
+      if (cRec <> nil) then
+        neighborRec = КлассИнтерфейса.GetNextByNumberRecord(cRec);
+        if (neighborRec <> nil) then
+          aNom[1] = cRec.Номер;
+          aNom[2] = neighborRec.Номер;
+          if (aNom[1] < aNom[2]) then
+            neighborRec.Номер = aNom[1]; RecordPostIfNeed(neighborRec);
+            cRec.Номер        = aNom[2]; RecordPostIfNeed(cRec);
+          else
+            КлассИнтерфейса.NumberingFrom(cRec, aNom[1]);
+          fi;
+        fi;
+      fi;
+    fi;
+  end;
+
+
+end

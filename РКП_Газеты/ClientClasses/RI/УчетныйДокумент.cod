@@ -1,0 +1,106 @@
+class inherited РКП_СИС.RI.intBase "";
+
+import РКП_СИС Classes Functions, StringsFunctions, Recs, FilterMaker;
+
+inclass public
+
+  var ТекстРодительный :String = 'записи';
+
+
+inclass public
+
+  func СвязанныйКлассЗаписей: Class СИС2.Базовая.БазоваяЗапись;
+    Result = РКП_Газеты.УчетныйДокумент;
+  end;
+
+  func Create: RI.УчетныйДокумент;
+    Result = inherited Create;
+    Result.Record = РКП_Газеты.УчетныйДокумент.Create;
+  end;
+
+  func ОткрытьПоЗаписи synonym OpenRecord(aRec :РКП_Газеты.УчетныйДокумент): РКП_Газеты.RI.УчетныйДокумент;
+    Result = inherited Create;
+    Result.Record = aRec;
+  end;
+
+
+  func БланкРедакторПоУмолчанию: Class BlankForm;
+    Result = УчетГазет.редУчетныйДокумент;
+  end;
+
+  func КартотекаПоУмолчанию: Class CardForm;
+    Result = УчетГазет.картУчетныйДокумент;
+  end;
+
+inobject public
+
+  Record: РКП_Газеты.УчетныйДокумент;
+
+  proc ИнициализироватьПоУмолчанию synonym InitByDefault;
+    Init;
+--    with Self.Record do
+--      if (ДатаПоступления = nil) then
+--        ДатаПоступления = today;
+--      fi;
+--    end;
+  end;
+
+  proc Инициализировать synonym Init;
+    Assert(Record.State = Kernel.Record.Created);
+  end;
+
+  --proc PostExt(aRowTag :RI.ЕдиницаХранения[]); -- т.к. записи могут быть еще не отправлены на сервер данных, в метод передается массив интерфейсов, содержащих записи
+  --  var i, ii :Integer;
+  --  Self.Post;
+  --  ii = LengthOfArray(aRowTag);
+  --  for i = 1 .. ii do
+  --    aRowTag[i].Post;
+  --  od;
+  --end;
+
+inobject private
+
+  var ИнтерфейсыПозиций :RI.ЕдиницаХранения[]; -- поле, инициализируемое перед сохранением записи
+
+inobject public
+
+  proc SetPositionsData(aRowTag :RI.ЕдиницаХранения[]);
+    ИнтерфейсыПозиций = aRowTag;
+  end;
+
+  proc Записать synonym Post(аДиалоговыйРежим :Logical = false);
+    var i, ii, j :Integer;
+    var Tr :СИС2.SmartTransaction;
+    SetWorkLog(wsRecCreated, wsRecUpdated);
+    inherited Post(аДиалоговыйРежим);
+    Tr  = СИС2.SmartTransaction.CreateEx([РКП_Газеты.ЕдиницаХранения], 900);
+    ii = LengthOfArray(ИнтерфейсыПозиций);
+    for i = 1 .. ii do
+      if ИнтерфейсыПозиций[i].НомерНеВыбран then
+        ИнтерфейсыПозиций[i].Cancel;
+      else
+        j = j + 1;
+        ИнтерфейсыПозиций[i].Record.НомерПозиции = j;
+        ИнтерфейсыПозиций[i].Post;
+      fi;
+      Tr.NextStep;
+    od;
+    Tr.Apply;
+    ИнтерфейсыПозиций = nil;
+  end;
+
+  proc Отменить synonym Cancel;
+    var i, ii :Integer;
+    ii = LengthOfArray(ИнтерфейсыПозиций);
+    for i = 1 .. ii do
+      ИнтерфейсыПозиций[i].Cancel;
+    od;
+    inherited Cancel;
+  end;
+
+  proc ВыполнитьУдаление synonym DoDelete( const aCheckRefs :Logical );
+    ClearWorkLog(wsRecCreated, false);
+    inherited DoDelete(aCheckRefs);
+  end;
+
+end

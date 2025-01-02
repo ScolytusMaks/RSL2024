@@ -1,0 +1,180 @@
+class "";
+
+import РКП_СИС classes Functions, FilterMaker;
+
+inclass public
+
+  -- По записи газеты rNsp в таблице РКП_Газеты.ВыпускГазеты
+  -- создает группы первого уровня для каждого издания.
+  -- Группа должна быть единственной.
+  -- После создания (или идентификации ранее созданной группы)
+  -- выполняется включение групп (по годам) в эту группу
+  proc CreateGroupsByNsp (rNsp :РКП_Газеты.Газета);
+    var aFlt :String[];
+    var vNspIssueAllGroup :РКП_Газеты.НомерГазеты[];
+    var vNspIssueGroup :РКП_Газеты.НомерГазеты;
+    var vName :String;
+    AddInArray( aFlt, 'Газета=' + rNsp.DocIDStr );
+    AddInArray( aFlt, 'ФункцияГруппы=-2' );
+    AddInArray( aFlt, 'isGroup=-1' );
+    with Query.Create([РКП_Газеты.НомерГазеты]) do
+      Filter = MakeFilter(aFlt);
+      Select;
+      while not Eof do
+        AddInArray( vNspIssueAllGroup, Current );
+        Next;
+      od;
+    end;
+    if (vNspIssueAllGroup = nil) then
+      vNspIssueGroup = РКП_Газеты.НомерГазеты.Create;
+    else
+      vNspIssueGroup = vNspIssueAllGroup[1];
+    fi;
+    try
+      vName = rNsp.GetField('НазваниеЛГС');
+    finally
+      if (vName = nil) then
+        vName = rNsp.НазваниеОсн;
+      fi;
+    end;
+    vNspIssueGroup.Номер   = vName;
+    vNspIssueGroup.Газета  = rNsp;
+    vNspIssueGroup.isGroup = true;
+    vNspIssueGroup.ФункцияГруппы = -2;
+    РКП_СИС.Recs.RecordPostIfNeed(vNspIssueGroup);
+    FillNspGroup (rNsp, vNspIssueGroup);
+    DelExcessNspGroup (vNspIssueGroup, vNspIssueAllGroup);
+  end;
+
+
+  proc FillNspGroup (rNsp :РКП_Газеты.Газета; vGroup :РКП_Газеты.НомерГазеты);
+    var aFlt :String[];
+    var ST :СИС2.УмнаяТранзакция;
+    AddInArray( aFlt, 'Газета=' + rNsp.DocIDStr );
+    AddInArray( aFlt, 'ФункцияГруппы=-1' );
+    AddInArray( aFlt, 'isGroup=-1' );
+    with Query.Create([РКП_Газеты.НомерГазеты]) do
+      Filter = MakeFilter(aFlt);
+      Select;
+      ST = СИС2.SmartTransaction.CreateEx([РКП_Газеты.НомерГазеты], 900);
+      while not Eof do
+        try
+          Current.GroupDoc = vGroup;
+          РКП_СИС.Recs.RecordPostIfNeed(Current);
+        except
+        end;
+        ST.NextStep;
+        Next;
+      od;
+      ST.Apply;
+    end;
+  end;
+
+  proc DelExcessNspGroup (vGroup :РКП_Газеты.НомерГазеты; aGroup :РКП_Газеты.НомерГазеты[]);
+    var i, ii :Integer;
+    ii = LengthOfArray(aGroup);
+    for i = 1 .. ii do
+      if (aGroup[i] <> vGroup) then
+        РКП_СИС.Recs.RecordDeleteEx(aGroup[i], false);
+      fi;
+    od;
+  end;
+
+
+
+
+--  proc СоздатьГруппу(ФильтрГазеты:string);
+--  var srecord        :string;
+--  var ЗаписьГазеты,r :record;
+--  var Q2             :Query;
+--  var k2             :integer;
+--      srecord                           = SubStr(ФильтрГазеты,
+--                                                 Pos("{",ФильтрГазеты),
+--                                                 Pos("}",ФильтрГазеты)-
+--                                                 Pos("{",ФильтрГазеты)
+--                                                 +1);  --вычисление строкового представления ссылки на запись газеты
+--      ЗаписьГазеты                      = Газета.Open(srecord);--Превращение строки в запись
+--      --Собственно проверка наличия группы
+--      Q2          = Query.Create([РКП_Газеты.НомерГазеты]);
+--      Q2.Filter   = ФильтрГазеты+
+--                    " and ФункцияГруппы=-2"+
+--                    " and isGroup=-1";
+--      Q2.Select;
+--        if Q2.Count>1 then -- то удаление лишних без проверки ссылочной целостности???
+--        Q2.First;
+--          for k2 = 1..Q2.Count do
+--             BeginTransaction([РКП_Газеты.НомерГазеты]);
+--             Q2.Current.Delete(false);
+--             EndTransaction;
+--             Q2.Next;
+--          end;
+--        end;
+--      Q2.Close;
+--      -- Создание группы
+--      Q2          = Query.Create([РКП_Газеты.НомерГазеты]);
+--      Q2.Filter   = ФильтрГазеты+
+--                    " and ФункцияГруппы=-2"+
+--                    " and isGroup=-1";
+--      Q2.Select;
+--        if Q2.Count=0 then -- то создание такой группы
+--        Q2.First;
+--               BeginTransaction([РКП_Газеты.НомерГазеты]);
+--               r = РКП_Газеты.НомерГазеты.Create;
+--               r.Номер          = ЗаписьГазеты.НазваниеОсн;
+--               r.Газета         = ЗаписьГазеты;
+--               r.isGroup        = true;
+--               r.ФункцияГруппы  = -2;
+--               if (r.State = r.Edited) or (r.State = r.Created) then
+--                 r.Post;
+--               end;
+--               EndTransaction;
+--        end;
+--      Q2.Close;
+--      -- Корректировка названия
+--      Q2          = Query.Create([РКП_Газеты.НомерГазеты]);
+--      Q2.Filter   = ФильтрГазеты+
+--                    " and ФункцияГруппы=-2"+
+--                    " and isGroup=-1";
+--      Q2.Select;
+--        if Q2.Count=1 then
+--           Q2.First;
+--           r = Q2.Current;
+--           if r.Номер<>ЗаписьГазеты.НазваниеЛГС then
+--             BeginTransaction([РКП_Газеты.НомерГазеты]);
+--             r.Номер          = ЗаписьГазеты.НазваниеЛГС;
+--             if (r.State = r.Edited) or (r.State = r.Created) then
+--               r.Post;
+--             end;
+--             EndTransaction;
+--           end;
+--        else
+--          r = nil;
+--        end;
+--      Q2.Close;
+--      --Корректировка ссылок
+--      if r<>nil then
+--      Q2          = Query.Create([РКП_Газеты.НомерГазеты]);
+--      Q2.Filter   = ФильтрГазеты+
+--                    " and ФункцияГруппы=-1"+
+--                    " and isGroup=-1";
+--      Q2.Select;
+--        for k2 = 1..Q2.Count do
+--          --Hint("Обработка номеров...",k2,Q2.Count);
+--          if Q2.Current.GroupDoc <> r then
+--            BeginTransaction([РКП_Газеты.НомерГазеты]);
+--            Q2.Current.GroupDoc = r;
+--               if (Q2.Current.State = Q2.Current.Edited) or (Q2.Current.State = Q2.Current.Created) then
+--                 Q2.Current.Post;
+--               end;
+--            EndTransaction;
+--          end;
+--          Q2.Next;
+--        end;
+--      Q2.Close;
+--      end;
+--  end;
+
+
+inobject
+
+end

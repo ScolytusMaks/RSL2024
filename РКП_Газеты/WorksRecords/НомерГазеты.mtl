@@ -1,0 +1,40 @@
+hierarchical record НомерГазеты inherited AbstractRecord.БазоваяКИзданию title "Номер газеты";
+  field GroupPath                :String;
+  field ГодВыпуска               :Integer        title "Год выпуска";
+  field СерияНумерации           :Integer        title "Серия нумерации";
+  field Номер                    :String         title "Номер выпуска";
+  field ВаловыйНомер             :String         title "Валовый номер выпуска";
+  field ДатаВыхода               :Date           title "Дата выхода номера";
+  field ТочностьДатыВыхода       :Integer        title "Точность даты выхода номера";
+  field ЛожныйНомер              :Logical        title "Ложный номер";
+  field НеПолучен                :Logical        title "Не получен";
+  field ДатаПринятияНаХранение   :Date           title "Дата получения номера"; -- ="Дата регистрации"
+  field ПечатныеЛисты            :Numeric        title "Печатных листов";
+  field Тираж                    :Integer        title "Тираж выпуска";
+  field Комментарий              :String(MaxStr) title "Комментарий";
+  field ПринялНаХранение         :String         title "Принял на хранение"; -- ="Зарегистрировал"
+  field ПрекращениеИздания       :Logical        title "Прекращение издания";
+  field Цена                     :Numeric        title "Цена";
+  field ПринятоЭкземпляров       :Integer        title "Принято экземпляров";  -- Дублирующая информация
+  --= Поля для совместной работы отделов РГ и ЛГС =--
+  -- Урвень группы : 0 - это номер, -1 - это год выпуска, -2 - это само издание
+  field ФункцияГруппы            :Integer        title "";
+  field СозданОЛГС               :Logical        title "Создан отделом ЛГС до регистрации в отделе РГ";
+  field ДатаНачалаНомера         :Date           title "Дата начала";--в том случае, если номер "за 00.00.00-00.00.00"
+  field ТочностьДатыНачалаНомера :Integer        title "Точность даты выхода номера";
+  field ОписанОЛГС               :Logical        title "Полностью описан отделом ЛГС";
+  --===================================================--
+  Indexed indNewspaper By Газета;
+  Indexed indIssuesNumbers By Газета,СерияНумерации,Номер;
+  Indexed indIssuesForEdited By Газета,ГодВыпуска;
+  Indexed indIssuesPublishedTotal By Газета,ГодВыпуска,isGroup,СозданОЛГС,НеПолучен;
+  Indexed indStatBySafe By Газета,ДатаПринятияНаХранение,Тираж;
+  Indexed indStatByRelease By Газета,ГодВыпуска,Тираж;
+  --Indexed indStatByUser1 By ФункцияГруппы,НеПолучен,ПринялНаХранение,ДатаПринятияНаХранение;
+  --Indexed indStatByUser2 By ФункцияГруппы,НеПолучен,UpdateUser,UpdateDate;
+  --Indexed indStatLastFirs By Газета,НеПолучен,isGroup,СозданОЛГС;
+  --Indexed indGroup       By Газета,isGroup;
+  --Indexed indNotReceived By Газета,НеПолучен;
+  --Indexed indCreateLGS By Газета,СозданОЛГС;
+  RecordDescription Номер;
+end;

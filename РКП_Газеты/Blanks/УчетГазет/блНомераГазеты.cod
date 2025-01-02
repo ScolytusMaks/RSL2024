@@ -1,0 +1,1227 @@
+Class inherited СИС2.БазовыйБланк "Номера (выпуски) газет и МП" ;
+
+import СИС2 classes Константы, Исключения;
+import РКП_СИС classes Profile, StdCode, Recs, Functions, FilterMaker, Def, StringsFunctions;
+import classes Константы;
+
+--{{ 2_Свойства
+
+inclass private
+
+  stored var Прямое_Редактирование :Logical;
+  -- Сохранение пользовательской настройки картотеки между периодами жизни объектов
+  var DefaultLayout  :Variant[2] :=       [['DocId',                 10, false, 'ID',                         'ID'],
+                                           ['UpdateDate',            20, false, 'Дата изменения',             'Дата' + Br + 'изменения'],
+                                           ['ГодВыпуска',            16, false, 'Годвыпуска',                 'Год' + Br + 'выпуска'],
+                                           ['СерияНумерации',        20, true,  'Серия нумерации',            'Серия' + Br + 'нумерации'],
+                                           ['Номер',                 16, true,  'Номер',                      'Номер'],
+                                           ['ВаловыйНомер',          16, true,  'Валовый номер',              'Вал.' + Br + 'номер'],
+                                           ['ДатаВыхода',            16, true,  'Дата выхода',                'Дата' + Br + 'выхода'],
+                                           ['ЛожныйНомер',           14, true,  'Ложный номер',               'Ложный' + Br + 'номер'],
+                                           ['НеПолучен',             10, true,  'Не получен ОРГП',            'Не' + Br + 'получ.'],
+                                           ['ДатаПринятияНаХранение',14, true,  'Дата регистрации номера',    'Дата' + Br + 'рег.'],
+                                           ['Тираж',                 14, true,  'Тираж выпуска',              'Тираж'],
+                                           ['Комментарий',           22, true,  'Комментарий библиографа',    'Комментарий'],
+                                           ['ПринялНаХранение',      28, true,  'Зарегистрировал библиограф', 'Зарегистрировал'],
+                                           ['ПринятоЭкземпляров',    16, true,  'Принято экземпляров всего',  'Принято' + Br + 'экз.']
+                                          ];
+
+  stored var tabUserColLayout :String[];
+  stored var tabUserColVisible :Logical[];
+  stored var tabUserColWidth :Numeric[];
+  stored var tabUserOrder :String;
+  stored var frameInfoState :Integer; -- Состояние фрейма фреймИнфо: -1 : скрыт | 0 : по умолчанию (развернут)  | 1 : развернут
+
+
+
+inobject private
+
+  var Издание :РКП_Газеты.Газета;
+  var ГодВыпуска :Integer;
+  var ТипДопФильтра :DR.Номера.типДопФлт;
+  var UserName :String; -- имя пользователя
+  var DataReflection :DR.Номера;
+  var фреймТаблица :TemplateFrame;
+  var фреймУправление :TemplateFrame;
+  var фреймИнфо :TemplateFrame;
+  var фреймНомераНаХранении :TemplateFrame;
+  var секцНомерВыпуска :TemplateSection;
+  var секцНомераЗаголовки :TemplateSection;
+  var секцНомераДанные :TemplateSection;
+  var секцПоступления :TemplateSection;
+  var секцУправлениеИнфо :TemplateSection;
+  var секцПоступленияЗаголовок :TemplateSection;
+  var секцПоступленияВсего :TemplateSection;
+  var секцияСтатистика :TemplateSection;
+  var клУправлениеИнфо :TemplateCell := if(секцУправлениеИнфо <> nil, секцУправлениеИнфо.Cell[1,1], nil);
+
+
+  var КолЭкзВсего :Integer;
+  var КолЭкзОб :Integer;
+  var ПрямРед :Logical = УчетГазет.блНомераГазеты.Прямое_Редактирование;
+  var ПоказатьСтандартноеМеню :Logical;
+  var ВсегоЗаписей :Integer;
+  var ВсегоТираж :Integer;
+
+  var DefaultFldNames :String[] = ПолучитьВсеИменаПолей;
+  var strgDefaultFldNames :String[]; -- кэш
+
+  proc Button1_OnClick(Sender :Button);
+    ClearTrace;
+    Trace(Str(Template.Selection.BeginRow.Number) + ' - ' + Str(Template.Selection.EndRow.Number) );
+  end;
+
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inclass public
+
+  func OpenExt synonym ОткрытьРасш(locDataReflection :DR.Номера; локТипДопФильтра :DR.Номера.типДопФлт) :Integer;
+    var vFrm :РКП_Газеты.УчетГазет.блНомераГазеты;
+    vFrm = РКП_Газеты.УчетГазет.блНомераГазеты.Create;
+    vFrm.DataReflection = locDataReflection;
+    vFrm.Издание = locDataReflection.Издание;
+    vFrm.ГодВыпуска = locDataReflection.ГодВыпуска;
+    vFrm.ТипДопФильтра = локТипДопФильтра;
+    #NoWarning;
+    if (CmOk = vFrm.ShowEx(nil, Kernel.Window.ModalWindow)) then
+      Return cmOk;
+    fi;
+  end;
+
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриСоздании(Context :Variant);
+    inherited шаблон_ПриСоздании(Context);
+    if OPPIAccess then
+      Template.HelpContext =  'РКП_Газеты.РГБ.УчетФактическихПоступлений.РеестрНомеров.htm';
+    else
+      Template.HelpContext =  'РКП_Газеты.РГБ.Регистрация.РеестрНомеров.htm';
+    fi;
+  end;
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    var aCnd :Logical[];
+    AddInArray( aCnd, (Self.Издание <> nil) );
+    AddInArray( aCnd, (Self.ГодВыпуска > 0) );
+    AddInArray( aCnd, (Self.DataReflection <> nil) );
+    if (false in aCnd) then
+      Message('Недопустимый способ открытия формы!');
+      Close;
+    else
+      if OPPIAccess then
+        Прямое_Редактирование = false;
+      fi;
+      --inherited шаблон_ПриОткрытии(Create);
+      КолЭкзОб = РКП_Справочники.Справочники.КОЭ.КоличествоДляГазеты(Self.Издание, Self.ГодВыпуска);
+      --crdBuiltIn.SetFocus;
+    fi;
+    if (frameInfoState = -1) then
+      if (клУправлениеИнфо <> nil) then
+        if (frameInfoState = -1) then
+          клУправлениеИнфо.Contents = SymbolCollapsed;
+        else
+          клУправлениеИнфо.Contents = SymbolExpanded;
+        fi;
+      fi;
+    else
+      клУправлениеИнфо.Contents = SymbolCollapsed;
+    fi;
+    Модифицировать_ИнфоПанель;
+    inherited шаблон_ПриОткрытии(Create);
+    УстановитьРаскладкуТаблицы;
+    Модифицировать_Таблицу;
+    ФокусНаПоследнийВыпуск;
+  end;
+
+  proc шаблон_ПриПеремещении;
+    var rIssue :РКП_Газеты.НомерГазеты;
+    var cInt :РКП_Газеты.RI.НомерГазеты;
+    var aRec :РКП_Газеты.ЕдиницаХранения[];
+    var r, rr :Integer;
+    inherited шаблон_ПриПеремещении;
+    фреймТаблица.Update;
+    --
+    if (клУправлениеИнфо <> nil) and (клУправлениеИнфо.Contents = SymbolExpanded) then
+      секцНомерВыпуска.Tag = nil;
+      секцПоступления.Visible = false;
+      секцПоступления.RowsCount = 1;
+      КолЭкзВсего = 0;
+      if (Template.CurrentCell <> nil) and (Template.CurrentCell.Owner = секцНомераДанные) then
+        if (CellRow(Template.CurrentCell).Tag is РКП_Газеты.НомерГазеты) then
+          rIssue = (CellRow(Template.CurrentCell).Tag as РКП_Газеты.НомерГазеты);
+        elsif (CellRow(Template.CurrentCell).Tag is РКП_Газеты.RI.НомерГазеты) then
+          rIssue = (CellRow(Template.CurrentCell).Tag as РКП_Газеты.RI.НомерГазеты).Record;
+        fi;
+        if (rIssue <> nil) then
+          секцНомерВыпуска.Tag = rIssue;
+          cInt = РКП_Газеты.RI.НомерГазеты.OpenRecord(rIssue);
+          aRec = cInt.ПолучитьЕдХран(КолЭкзВсего);
+          if (aRec <> nil) then
+            секцПоступления.Visible = true;
+            rr = LengthOfArray(aRec);
+            if ( rr > 1 ) then
+              CloneFirstRows(секцПоступления, rr);
+            fi;
+            for r = 1 .. rr do
+              секцПоступления.Row[r].Tag = aRec[r];
+            od;
+          fi;
+        fi;
+      fi;
+      фреймНомераНаХранении.Update;
+    fi;
+  end;
+
+  func шаблон_ПриПоказеМеню(Object :Object; ByMouse :Logical) :Logical;
+    var locValuePosition :Variant[];
+    var Position :Variant;
+    var p :Integer;
+    if (Object is TemplateCell) then
+      if ((Object as TemplateCell).Owner = секцНомераЗаголовки) then
+        if not ПоказатьСтандартноеМеню then
+          locValuePosition[1] = 'Скрыть столбец';
+          locValuePosition[2] = 'Столбец влево';
+          locValuePosition[3] = 'Столбец вправо';
+          --locValuePosition[4] = 'Настроить видимость';
+          locValuePosition[4] = 'Восстановить раскладку';
+          --locValuePosition[6] = 'Восстановить сортировку';
+          locValuePosition[5] = 'Стандартное меню';
+          p = PopupMenu(locValuePosition, Position);
+          if (p = 1) then    СкрытьСтолбецТаблицы(Object);
+          elsif (p = 2) then СтолбецТаблицыВлево(Object);
+          elsif (p = 3) then СтолбецТаблицыВправо(Object);
+          --elsif (p = 6) then
+          elsif (p = 4) then ВосстановитьРаскладкуТаблицы;
+          elsif (p = 5) then
+            ПоказатьСтандартноеМеню = false;
+            Return true;
+            шаблон_ПриПоказеМеню(Object, ByMouse);
+          fi;
+        else
+          Return true;
+          шаблон_ПриПоказеМеню(Object, ByMouse);
+        fi;
+      else
+        Return true;
+      fi;
+    else
+      Return true;
+    fi;
+  end;
+
+  proc СкрытьСтолбецТаблицы(Object :Object);
+    var locColumn :TemplateColumn;
+    locColumn = CellColumn(Object as TemplateCell);
+    locColumn.Visible = false;
+    секц_ПриОформлении_НомераЗаголовки(секцНомераЗаголовки, Template.VisibilityColumn, locColumn);
+  end;
+
+  proc СтолбецТаблицыВлево(Object :Object);
+    var curColNumber, prvColNumber, k :Integer;
+    var curColName, prvColName :String;
+    var curColVisible, prvColVisible :Logical;
+    var curColWidth, prvColWidth :Numeric;
+    СохранитьРаскладкуТаблицы;
+    curColNumber = (Object as TemplateCell).Column;
+    for k = (curColNumber - 1) .. 1 step - 1 do
+      if tabUserColVisible[k] then
+        prvColNumber = k;
+        Break;
+      fi;
+    od;
+    if (curColNumber > prvColNumber) and (prvColNumber > 0) then
+      curColName    = tabUserColLayout[curColNumber];
+      curColVisible = tabUserColVisible[curColNumber];
+      curColWidth   = tabUserColWidth[curColNumber];
+      prvColName    = tabUserColLayout[prvColNumber];
+      prvColVisible = tabUserColVisible[prvColNumber];
+      prvColWidth   = tabUserColWidth[prvColNumber];
+      --
+      tabUserColLayout[curColNumber]  = prvColName;
+      tabUserColVisible[curColNumber] = prvColVisible;
+      tabUserColWidth[curColNumber]   = prvColWidth;
+      tabUserColLayout[prvColNumber]  = curColName;
+      tabUserColVisible[prvColNumber] = curColVisible;
+      tabUserColWidth[prvColNumber]   = curColWidth;
+      УстановитьРаскладкуТаблицы;
+    fi;
+  end;
+
+  proc СтолбецТаблицыВправо(Object :Object);
+    var curColNumber, nxtColNumber, k :Integer;
+    var curColName, nxtColName :String;
+    var curColVisible, nxtColVisible :Logical;
+    var curColWidth, nxtColWidth :Numeric;
+    СохранитьРаскладкуТаблицы;
+    curColNumber = (Object as TemplateCell).Column;
+    for k = (curColNumber + 1) .. LengthOfArray(tabUserColLayout) do
+      if tabUserColVisible[k] then
+        nxtColNumber = k;
+        Break;
+      fi;
+    od;
+    if (curColNumber < nxtColNumber) then
+      curColName    = tabUserColLayout[curColNumber];
+      curColVisible = tabUserColVisible[curColNumber];
+      curColWidth   = tabUserColWidth[curColNumber];
+      nxtColName    = tabUserColLayout[nxtColNumber];
+      nxtColVisible = tabUserColVisible[nxtColNumber];
+      nxtColWidth   = tabUserColWidth[nxtColNumber];
+      --
+      tabUserColLayout[curColNumber]  = nxtColName;
+      tabUserColVisible[curColNumber] = nxtColVisible;
+      tabUserColWidth[curColNumber]   = nxtColWidth;
+      tabUserColLayout[nxtColNumber]  = curColName;
+      tabUserColVisible[nxtColNumber] = curColVisible;
+      tabUserColWidth[nxtColNumber]   = curColWidth;
+      УстановитьРаскладкуТаблицы;
+    fi;
+  end;
+
+  proc НастроитьВидимостьТаблицы;
+  end;
+
+  proc шаблон_ПриЗакрытии(Destroy :Logical);
+    var k :Integer;
+    var rIssue :РКП_Газеты.НомерГазеты;
+    var RI :РКП_Газеты.RI.НомерГазеты;
+    var ST :СИС2.SmartTransaction;
+    if секцНомераДанные.Visible then
+      ST = СИС2.SmartTransaction.CreateEx([РКП_Газеты.НомерГазеты,ВыпускГазеты,ПоступлениеГазеты], 1000);
+      for k = 1 .. секцНомераДанные.RowsCount do
+        rIssue = nil;
+        RI = nil;
+        if (секцНомераДанные.Row[k].Tag is РКП_Газеты.НомерГазеты) then
+          rIssue = (секцНомераДанные.Row[k].Tag as РКП_Газеты.НомерГазеты);
+          if RecordEdited(rIssue) then
+            RI = РКП_Газеты.RI.НомерГазеты.OpenRecord(rIssue);
+          else
+            RI = nil;
+          fi;
+        elsif (секцНомераДанные.Row[k].Tag is РКП_Газеты.RI.НомерГазеты) then
+          RI = (секцНомераДанные.Row[k].Tag as РКП_Газеты.RI.НомерГазеты);
+        fi;
+        if (RI <> nil) then
+          RI.Post;
+        fi;
+        ST.NextStep;
+      od;
+      ST.Apply;
+    fi;
+    inherited шаблон_ПриЗакрытии(Destroy);
+  end;
+
+
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+
+
+
+
+  func Поле_ПриВыводе_ЗаголовокОкнаФормы(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    var vNspName, vIssYear, vIssContent :String;
+    if (Self.Издание <> nil) and (Self.ГодВыпуска > 0) then
+      vNspName = Self.Издание.НазваниеОсн;
+      vIssYear = Str(Self.ГодВыпуска);
+      if (Self.ТипДопФильтра = DR.Номера.допФлтНеРег) then
+        vIssContent = 'не полученные номера';
+      elsif (Self.ТипДопФильтра = DR.Номера.допФлтВсе) then
+        vIssContent = 'все номера';
+      elsif (Self.ТипДопФильтра = DR.Номера.допФлтРег) then
+        vIssContent = 'полученные номера';
+      elsif (Self.ТипДопФильтра = DR.Номера.допФлтЛГС) then
+        vIssContent = 'номера, обработанные сектором ЛГС';
+      fi;
+      Return vNspName + Br + vIssYear + Br + '<s-><s->' + vIssContent;
+    fi;
+  end;
+
+
+  func Поле_ПриВыводе_ПрямРед(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    Return ПрямРед;
+  end;
+
+  func Поле_ПриВыводе_НомерГазеты(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+     
+    Result = Value; 
+  end;
+
+  func Поле_ПриВыводе_Данные(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    var vFldName :String;
+    var rIssue :РКП_Газеты.НомерГазеты;
+    if (CellRow(Cell).Tag is РКП_Газеты.НомерГазеты) then
+      rIssue = (CellRow(Cell).Tag as РКП_Газеты.НомерГазеты);
+    elsif (CellRow(Cell).Tag is РКП_Газеты.RI.НомерГазеты) then
+      rIssue = (CellRow(Cell).Tag as РКП_Газеты.RI.НомерГазеты).Record;
+    fi;
+    if (rIssue <> nil) then
+      vFldName = CellColumn(Cell).Name;
+      if (vFldName in DefaultFldNames) then
+        try
+        Result = rIssue.GetField(vFldName);
+        except
+        end;
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриВыводе_Поступление(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    var locRowTag :РКП_Газеты.ЕдиницаХранения;
+
+    func GetRowTag (Cell :TemplateCell) :РКП_Газеты.ЕдиницаХранения;
+      var locRow :TemplateRow;
+      locRow = Cell.Owner.Row[Cell.Row];
+      if (locRow.Tag is РКП_Газеты.ЕдиницаХранения) then
+        Return (locRow.Tag as РКП_Газеты.ЕдиницаХранения);
+      fi;
+    end;
+
+    locRowTag = GetRowTag(Cell);
+    if (locRowTag <> nil) then
+      if (Cell.Contents = 'КолЭкз') then
+        Return locRowTag.Количество as Integer;
+      elsif (Cell.Contents = 'ДатаПоступления') then
+        Return locRowTag.ДатаПоступления as Date;
+      fi;
+    fi;
+  end;
+
+  func Поле_ВсегоЗаписей_ПриВыводе(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    --with crdBuiltIn.Query do
+    --  Result = Count;
+    --end;
+  end;
+
+  func Поле_ВсегоТираж_ПриВыводе(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    --if (crdBuiltIn.Query.Filter <> nil) then
+    --  with crdBuiltIn.Query do
+    --    Result = CalcAggregates('Sum(Тираж)');
+    --  end;
+    --fi;
+  end;
+
+
+
+  func Поле_ПриНажатии_ПрямРед(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    Прямое_Редактирование = not Прямое_Редактирование;
+    Модифицировать_Таблицу;
+  end;
+
+  func Поле_ПриНажатии_ДопИнфо(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    if (Cell in [клУправлениеИнфо]) then
+      if Cell.Contents = SymbolCollapsed then
+        Cell.Contents = SymbolExpanded;
+        шаблон_ПриПеремещении;
+      elsif Cell.Contents = SymbolExpanded then
+        Cell.Contents = SymbolCollapsed;
+      fi;
+      Модифицировать_ИнфоПанель;
+      --if Cell.Contents = SymbolExpanded then
+      --fi;
+    fi;
+  end;
+
+  func Поле_ПриНажатии_Данные(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var rIssue :РКП_Газеты.НомерГазеты;
+    --var RI :РКП_Газеты.RI.НомерГазеты;
+    if (CellRow(Cell).Tag is РКП_Газеты.НомерГазеты) then
+      rIssue = (CellRow(Cell).Tag as РКП_Газеты.НомерГазеты);
+    elsif (CellRow(Cell).Tag is РКП_Газеты.RI.НомерГазеты) then
+      rIssue = (CellRow(Cell).Tag as РКП_Газеты.RI.НомерГазеты).Record;
+    fi;
+    if (not Прямое_Редактирование) then
+      if (rIssue <> nil) and (Action in [Template.DoubleClick,Template.EnterPressed]) then
+        if cmOk = РКП_Газеты.УчетГазет.редНомерГазеты.OpenRecordExt(rIssue) then
+          Template.BeginModify;
+          фреймТаблица.Update;
+          Template.EndModify;
+          #Warning 'Здесь должен выполняться пересчет статистики для вывода';
+        fi;
+      fi;
+    else
+      if (rIssue <> nil) then
+        if (CellColumn(Cell).Name = 'ЛожныйНомер') then
+          Изменить_ЛожныйНомер(rIssue);
+        elsif (CellColumn(Cell).Name = 'НеПолучен') then
+          Изменить_НеПолучен(rIssue);
+        else
+          Return true;
+        fi;
+      fi;
+    fi;
+  end;
+
+  proc Изменить_ЛожныйНомер(rIssue :РКП_Газеты.НомерГазеты);
+    var newValue :Logical;
+    newValue = not rIssue.ЛожныйНомер;
+    if (not РКП_Газеты.RI.НомерГазеты.ПроверитьУникальностьВыпуска(rIssue, 'ЛожныйНомер', newValue)) then
+      Message('Вводимое значение недопустимо!');
+    else
+      РКП_СИС.Recs.RecordModify(rIssue);
+      rIssue.ЛожныйНомер = newValue;
+    fi;
+  end;
+
+  proc Изменить_НеПолучен(rIssue :РКП_Газеты.НомерГазеты);
+    var newValue :Logical;
+    var Тираж_ :Integer;
+    newValue = not rIssue.НеПолучен;
+    if newValue then
+      Recs.RecordModify(rIssue);
+      rIssue.НеПолучен = newValue;
+    else
+      if РКП_Газеты.RI.НомерГазеты.ПроверитьУникальностьВыпуска(rIssue, 'НеПолучен', newValue) then
+        if (rIssue.Тираж = 0) then
+          if cmOk = Input(Тираж_, 'Введите тираж выпуска') then
+            if (Тираж_ > 0) then
+              RecordModify(rIssue);
+              rIssue.НеПолучен              = newValue;
+              rIssue.Тираж                  = Тираж_;
+              rIssue.ДатаПринятияНаХранение = Today;
+              rIssue.ПринялНаХранение       = Self.UserName;
+            else
+              Message('Нулевой тираж возможен только у не поступивших номеров!');
+            fi;
+          else
+            Message('Нулевой тираж возможен только у не поступивших номеров!');
+          fi;
+        else
+          RecordModify(rIssue);
+          rIssue.НеПолучен              = newValue;
+          rIssue.ДатаПринятияНаХранение = Today;
+          rIssue.ПринялНаХранение       = Self.UserName;
+        fi;
+      else
+        Message('Вводимое значение недопустимо!');
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриВходе_Данные(Cell :TemplateCell; Index :Integer; Action :Template.EnterTypes) :Logical;
+    var vFldName :String;
+    var rIssue :РКП_Газеты.НомерГазеты;
+    if (CellRow(Cell).Tag is РКП_Газеты.НомерГазеты) then
+      rIssue = (CellRow(Cell).Tag as РКП_Газеты.НомерГазеты);
+    elsif (CellRow(Cell).Tag is РКП_Газеты.RI.НомерГазеты) then
+      rIssue = (CellRow(Cell).Tag as РКП_Газеты.RI.НомерГазеты).Record;
+    fi;
+    if (rIssue <> nil) then
+      vFldName = CellColumn(Cell).Name;
+      if (vFldName in DefaultFldNames) and (not Cell.ReadOnly) then
+        try
+          if Action = Template.Clear then
+            rIssue.SetField(vFldName, nil);
+          else
+            Return true;
+          fi;
+        except
+        end;
+      fi;
+    fi;
+  end;
+
+
+  func Поле_ПриПроверке_Данные(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    var vFldName :String;
+    var rIssue :РКП_Газеты.НомерГазеты;
+    if Прямое_Редактирование and (not Cell.ReadOnly) then
+      if (CellRow(Cell).Tag is РКП_Газеты.НомерГазеты) then
+        rIssue = (CellRow(Cell).Tag as РКП_Газеты.НомерГазеты);
+      elsif (CellRow(Cell).Tag is РКП_Газеты.RI.НомерГазеты) then
+        rIssue = (CellRow(Cell).Tag as РКП_Газеты.RI.НомерГазеты).Record;
+      fi;
+      if (rIssue <> nil) then
+        vFldName = CellColumn(Cell).Name;
+        if (vFldName = 'СерияНумерации') then   Return Проверить_СериюНумерации(rIssue, Value as Integer);
+        elsif (vFldName = 'Номер') then         Return Проверить_Номер(rIssue, Value as String);
+        elsif (vFldName = 'ВаловыйНомер') then  Return Проверить_ВаловыйНомер(rIssue, Value as String);
+        elsif (vFldName = 'ДатаВыхода') then    Return Проверить_ДатуВыхода(rIssue, Value as Date);
+        elsif (vFldName = 'Тираж') then         Return Проверить_Тираж(rIssue, Value as Integer);
+        elsif (vFldName = 'Комментарий') then   Return Проверить_Комментарий(rIssue, Value as String);
+        fi;
+      fi;
+    fi;
+  end;
+
+  func Проверить_СериюНумерации(rIssue :РКП_Газеты.НомерГазеты; Value :Integer) :Logical;
+    if (rIssue.Номер = UnnumberedIssue) then
+      RecordModify(rIssue);
+      rIssue.СерияНумерации = Value;
+      Return true;
+    else
+      Result = РКП_Газеты.RI.НомерГазеты.ПроверитьУникальностьВыпуска(rIssue, 'СерияНумерации', Value);
+      if (not Result) then
+        Message('Вводимое значение недопустимо!');
+      else
+        RecordModify(rIssue);
+        rIssue.СерияНумерации = Value;
+        Return true;
+      fi;
+    fi;
+  end;
+
+  func Проверить_Номер(rIssue :РКП_Газеты.НомерГазеты; Value :String) :Logical;
+    var sValue :String;
+    Value = Trim(Value);
+    if (Value = nil) then
+      RecordModify(rIssue);
+      rIssue.Номер = nil;
+      Return true;
+    else
+      sValue = FixCode10(Value);
+      Result = РКП_Газеты.RI.НомерГазеты.ПроверитьУникальностьВыпуска(rIssue, 'Номер', sValue);
+      if (РКП_Газеты.RI.НомерГазеты.ПроверитьУникальностьВыпуска(rIssue, 'Номер', sValue)) then
+        RecordModify(rIssue);
+        rIssue.Номер = sValue;
+        Return true;
+      else
+        Message('Вводимое значение недопустимо!');
+      fi;
+    fi;
+  end;
+
+  func Проверить_ВаловыйНомер(rIssue :РКП_Газеты.НомерГазеты; Value :String) :Logical;
+    var sValue :String;
+    Value = Trim(Value);
+    if (Value <> nil) then
+      sValue = FixCode10(Value);
+    fi;
+    if (rIssue.ВаловыйНомер <> sValue) then
+      RecordModify(rIssue);
+      rIssue.ВаловыйНомер = sValue;
+      Return true;
+    fi;
+  end;
+
+  func Проверить_ДатуВыхода(rIssue :РКП_Газеты.НомерГазеты; Value :Date) :Logical;
+    var vChoice :Integer;
+    if (Value = nil) then
+      RecordModify(rIssue);
+      rIssue.ДатаВыхода = Value;
+      Return true;
+    else
+      if (Year(Value) <> Self.ГодВыпуска) then
+        vChoice = Enquiry('Подтверждение',
+                          'Дата выхода номера не лежит в пределах ' + Str(ГодВыпуска) + ' года!' + Br +
+                          'Пожалуйста, подтвердите или измените значение.',
+                          ['Да, всё верно', 'Отмена']);
+        if (vChoice = 1) then
+          RecordModify(rIssue);
+          rIssue.ДатаВыхода = Value;
+          Return true;
+        fi;
+      else
+        RecordModify(rIssue);
+        rIssue.ДатаВыхода = Value;
+        Return true;
+      fi;
+    fi;
+  end;
+
+  func Проверить_Тираж(rIssue :РКП_Газеты.НомерГазеты; Value :Integer) :Logical;
+    if (Value < 1) then
+      if (not rIssue.НеПолучен) then
+        Message('Нулевой тираж возможен только у не поступивших номеров!');
+      else
+        RecordModify(rIssue);
+        rIssue.Тираж = Value;
+        Return true;
+      fi;
+    else
+      RecordModify(rIssue);
+      rIssue.Тираж = Value;
+      Return true;
+    fi;
+  end;
+
+  func Проверить_Комментарий(rIssue :РКП_Газеты.НомерГазеты; Value :String) :Logical;
+    RecordModify(rIssue);
+    rIssue.Комментарий = Value;
+    Return true;
+  end;
+
+
+
+  proc Поле_ПриРисовании_Данные(Cell :TemplateCell; Selected :Logical; var Color :Integer; var FieldColor :Integer; Font :Font);
+    if Cell.ReadOnly then
+      inherited ПриРисовании_КакПолеВывода(Cell, Selected, Color, FieldColor, Font);
+    else
+      if Cell.Button then
+        inherited ПриРисовании_КакПолеВыбора(Cell, Selected, Color, FieldColor, Font);
+      else
+        if Cell.CellFormat = Template.LogicalField then
+          inherited ПриРисовании_КакПолеВывода(Cell, Selected, Color, FieldColor, Font);
+        else
+          inherited ПриРисовании_КакПолеВвода(Cell, Selected, Color, FieldColor, Font);
+        fi;
+      fi;
+    fi;
+    try
+      if (CellRow(Template.CurrentCell).Owner = секцНомераДанные) then
+        Font.Bold = (Template.CurrentCell.Row = Cell.Row);
+        if Font.Bold then
+          Font.Size = 9;
+        else
+          Font.Size = 8;
+        fi;
+      fi;
+    except
+    end;
+  end;
+
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+  proc секц_ПриОформлении_НомераЗаголовки(Section :TemplateSection; Action :Template.RearrangeActions; SectionObject :Object);
+    var iCol :Integer;
+    Self.Template.BeginModify;
+    if (Action = Template.ResizeColumn) then
+      if (SectionObject is TemplateColumn) then
+        iCol = (SectionObject as TemplateColumn).Number;
+        секцНомераДанные.Column[iCol].Width = (SectionObject as TemplateColumn).Width;
+      fi;
+    elsif (Action = Template.VisibilityColumn ) then
+      if (SectionObject is TemplateColumn) then
+        iCol = (SectionObject as TemplateColumn).Number;
+        секцНомераДанные.Column[iCol].Visible = (SectionObject as TemplateColumn).Visible;
+      fi;
+    fi;
+    фреймТаблица.Update;
+    СохранитьРаскладкуТаблицы;
+    Self.Template.EndModify;
+  end;
+
+  proc кнДобавить_ПриНажатии(Sender :Button);
+    ДобавлениеЗаписей;
+  end;
+
+  proc кнРедактировать_ПриНажатии(Sender :Button);
+    var rIssue :РКП_Газеты.НомерГазеты;
+    if (Template.CurrentCell <> nil) then
+      if (Template.CurrentCell.Owner = секцНомераДанные) then
+        if (CellRow(Template.CurrentCell).Tag is РКП_Газеты.НомерГазеты) then
+          rIssue = (CellRow(Template.CurrentCell).Tag as РКП_Газеты.НомерГазеты);
+        elsif (CellRow(Template.CurrentCell).Tag is РКП_Газеты.RI.НомерГазеты) then
+          rIssue = (CellRow(Template.CurrentCell).Tag as РКП_Газеты.RI.НомерГазеты).Record;
+        fi;
+        if (rIssue <> nil) then
+          if cmOk = РКП_Газеты.УчетГазет.редНомерГазеты.OpenRecordExt(rIssue) then
+            #Warning 'Возможно, здесь что-то должно выполняться...';
+          fi;
+        fi;
+      fi;
+    fi;
+  end;
+
+  proc кнУдалить_ПриНажатии(Sender :Button);
+    УдалениеЗаписей;
+  end;
+
+-- 2_Дополнительные команды0. --
+
+  func cmdCreateRecords_OnExecute(Command :Command) :Logical;
+    if (CellRow(Template.CurrentCell).Owner = секцНомераДанные) then
+      ДобавлениеЗаписей;
+    else
+      Message('Для того, чтобы добавлять записи, установите селектор в таблицу с данными.');
+    fi;
+  end;
+
+  func cmdDeleteRecord_OnExecute(Command :Command) :Logical;
+    if (CellRow(Template.CurrentCell).Owner = секцНомераДанные) then
+      if Template.CurrentCell.ReadOnly then
+        УдалениеЗаписей;
+      fi;
+    fi;
+  end;
+
+
+
+
+-- 2_Вспомогательные методы0. --
+
+  proc СохранитьРаскладкуТаблицы;
+    var k :Integer;
+    tabUserColLayout  = nil;
+    tabUserColVisible = nil;
+    tabUserColWidth   = nil;
+    for k = 1 .. секцНомераЗаголовки.ColumnsCount do
+      tabUserColLayout[k]  = SubStr(секцНомераЗаголовки.Column[k].Name, 2);
+      tabUserColVisible[k] = секцНомераЗаголовки.Column[k].Visible;
+      tabUserColWidth[k]   = секцНомераЗаголовки.Column[k].Width;
+    od;
+  end;
+
+
+  proc УстРазмерОкна;
+    var minHeight, minWidth :Integer;
+    minHeight = Int(ScreenHeight / 3);
+    minWidth  = Int(ScreenWidth / 4);
+    if (Self.Window.Height < minHeight) then
+      Self.Window.Height = minHeight;
+    fi;
+    if (Self.Window.Width < minWidth) then
+      Self.Window.Width = minWidth;
+    fi;
+  end;
+
+  func ПолучитьФильтр :String;
+    --var aFlt :String[];
+    if (Self.Издание <> nil) and (Self.ГодВыпуска > 0) then
+      with FltMaker.CreateExt do
+        AddCondition( 'Газета=' + Self.Издание.DocIDStr );
+        AddCondition( 'ГодВыпуска=' + Str(Self.ГодВыпуска) );
+        AddCondition( 'isGroup=0' );
+        if (Self.ТипДопФильтра = DR.Номера.допФлтНеРег) then
+          AddCondition( 'НеПолучен' );
+        elsif (Self.ТипДопФильтра = DR.Номера.допФлтРег) then
+          AddCondition( 'not НеПолучен' );
+        fi;
+        if (Self.ТипДопФильтра = DR.Номера.допФлтЛГС) then
+          AddCondition( 'СозданОЛГС' );  --AddCondition( '(СозданОЛГС and НеПолучен)' );
+        else
+          CompressConditionsToOne;
+          AddCondition( 'not(СозданОЛГС and НеПолучен)' );
+        fi;
+        Result = GetFilter;
+        -- дополнительный фильтр для того, чтобы измененные записи оставались видимыми после того,
+        -- как перестанут удовлетворять основному фильтру
+        --CompressConditionsToOne;
+        --AddCondition( 'DocId in ' + ToStr(Self.DataReflection.IdRecArray(Self.ТипДопФильтра)) );
+        --Result = GetFilter(byOr);
+      end;
+    else
+      Return 'false';
+    fi;
+  end;
+
+
+  proc МодифицироватьШаблон;
+    var aRec :РКП_Газеты.НомерГазеты[];
+    var k :Integer;
+    with Query.Create([РКП_Газеты.НомерГазеты]) do
+      Filter = ПолучитьФильтр;
+      Order = 'ГодВыпуска;СерияНумерации;Номер';
+      Select;
+      while not Eof do
+        AddInArray(aRec, Current);
+        Next;
+      od;
+    end;
+    Template.BeginModify;
+      if (aRec = nil) then
+        секцНомераДанные.RowsCount = 1;
+        секцНомераДанные.Visible = false;
+      else
+        секцНомераДанные.RowsCount = 1;
+        секцНомераДанные.Visible = true;
+        Модифицировать_Таблицу;
+        CloneFirstRows(секцНомераДанные, LengthOfArray(aRec) );
+        for k = 1 .. LengthOfArray(aRec) do
+          секцНомераДанные.Row[k].Tag = aRec[k];
+        od;
+      fi;
+      фреймТаблица.FreezeArea(0, 0, 0, секцНомераЗаголовки.Row[1].Height);
+    Template.EndModify;
+  end;
+
+  proc Модифицировать_ИнфоПанель;
+    var ww, wh :Integer;
+    if (клУправлениеИнфо <> nil) then
+      ww = Self.Window.Width;
+      wh = Self.Window.Height;
+      Self.Template.BeginModify;
+      секцНомерВыпуска.Visible         = (клУправлениеИнфо.Contents = SymbolExpanded);
+      секцПоступленияЗаголовок.Visible = (клУправлениеИнфо.Contents = SymbolExpanded);
+      секцПоступления.Visible          = (клУправлениеИнфо.Contents = SymbolExpanded);
+      секцПоступленияВсего.Visible     = (клУправлениеИнфо.Contents = SymbolExpanded);
+      Self.Window.Width  = ww + 2;
+      Self.Window.Height = wh + 2;
+      Self.Template.EndModify;
+    fi;
+  end;
+
+  proc Модифицировать_Таблицу;
+    var c, cc, r, rr  :Integer;
+    var vFldName :String;
+    cc = секцНомераДанные.ColumnsCount;
+    rr = секцНомераДанные.RowsCount;
+    for c = 1 .. cc do
+      vFldName = секцНомераДанные.Column[c].Name;
+      if (vFldName in DefaultFldNames) then
+        for r = 1 .. rr do
+          --секцНомераДанные.Cell[c,r].FieldType = Template.LogicalField;
+          --секцНомераДанные.Cell[c,r].FieldType = Template.CommonField;
+          with секцНомераДанные.Cell[c,r] do  --секцНомераДанные.Cell[c,r].ReFieldTypes = Template.LogicalField
+            Button = false;
+            Enabled = false;
+            ReadOnly = true;
+            if (vFldName in ['DocId']) then
+              CellFormat = Template.StringFormat;
+              Alignment  = Template.RightAlign;
+            elsif (vFldName in ['UpdateDate']) then
+              CellFormat = Template.DateFormat;
+              FieldFormat = 'dd.mm.yyyy hh:mm:ss';
+              Alignment  = Template.CenterAlign;
+            elsif (vFldName in ['ГодВыпуска']) then
+              CellFormat = Template.NumericFormat;
+              FieldFormat = '0000;; ';
+              Alignment  = Template.CenterAlign;
+              Alignment  = Template.CenterAlign;
+            elsif (vFldName in ['СерияНумерации']) then
+              CellFormat = Template.EnumFormat;
+              List.Clear;
+              List.Add('0');
+              List.Add('1');
+              List.Add('2');
+              List.Add('3');
+              List.Add('4');
+              List.Add('5');
+              List.Add('6');
+              List.Add('7');
+              List.Add('8');
+              List.Add('9');
+              Button = true;
+              Alignment  = Template.CenterAlign;
+              Enabled = Прямое_Редактирование;
+              ReadOnly = not Прямое_Редактирование;
+            elsif (vFldName in ['Номер']) then
+              CellFormat = Template.StringFormat;
+              Alignment  = Template.LeftAlign;
+              Enabled = Прямое_Редактирование;
+              ReadOnly = not Прямое_Редактирование;
+            elsif (vFldName in ['ВаловыйНомер']) then
+              CellFormat = Template.StringFormat;
+              Alignment  = Template.LeftAlign;
+              Enabled = Прямое_Редактирование;
+              ReadOnly = not Прямое_Редактирование;
+            elsif (vFldName in ['ДатаВыхода']) then
+              CellFormat = Template.DateFormat;
+              FieldFormat = 'dd.mm.yy';
+              Alignment  = Template.CenterAlign;
+              Enabled = Прямое_Редактирование;
+              ReadOnly = not Прямое_Редактирование;
+            elsif (vFldName in ['ЛожныйНомер']) then
+              CellFormat = Template.LogicalFormat;
+              Alignment  = Template.CenterAlign;
+              Enabled = Прямое_Редактирование;
+            elsif (vFldName in ['НеПолучен']) then
+              CellFormat = Template.LogicalFormat;
+              Alignment  = Template.CenterAlign;
+              Enabled = Прямое_Редактирование;
+            elsif (vFldName in ['ДатаПринятияНаХранение']) then
+              CellFormat = Template.DateFormat;
+              FieldFormat = 'dd.mm.yy';
+              Alignment  = Template.CenterAlign;
+            elsif (vFldName in ['Тираж']) then
+              CellFormat = Template.NumericFormat;
+              FieldFormat = ' ##0;;-';
+              Alignment  = Template.RightAlign;
+              Enabled = Прямое_Редактирование;
+              ReadOnly = not Прямое_Редактирование;
+            elsif (vFldName in ['Комментарий']) then
+              CellFormat = Template.StringFormat;
+              Alignment  = Template.LeftAlign;
+              Enabled = Прямое_Редактирование;
+              ReadOnly = not Прямое_Редактирование;
+            elsif (vFldName in ['ПринялНаХранение']) then
+              CellFormat = Template.StringFormat;
+              Alignment  = Template.LeftAlign;
+            elsif (vFldName in ['ПринятоЭкземпляров']) then
+              CellFormat = Template.NumericFormat;
+              FieldFormat = ' ##0;;-';
+              Alignment  = Template.RightAlign;
+            else
+              CellFormat = Template.CommonFormat;
+              Alignment  = Template.LeftAlign;
+            fi;
+          end;
+        od;
+      fi;
+    od;
+  end;
+
+  proc ФокусНаПоследнийВыпуск(НаПоследнийВведенный :Logical = false);
+    var vFlt :String;
+    var foundRec :РКП_Газеты.НомерГазеты;
+    var c, r :Integer;
+    var rIssue :РКП_Газеты.НомерГазеты;
+    vFlt  = ПолучитьФильтр;
+    if (vFlt <> nil) then
+      if НаПоследнийВведенный then
+        foundRec = РКП_СИС.Recs.FindRecord(РКП_Газеты.НомерГазеты, vFlt, 'DocId-');
+      else
+        foundRec = РКП_СИС.Recs.FindRecord(РКП_Газеты.НомерГазеты, vFlt, 'ГодВыпуска-;СерияНумерации-;Номер-');
+      fi;
+      if (foundRec <> nil) and (секцНомераДанные.Visible) then
+        for c = 1 .. секцНомераДанные.ColumnsCount do
+          if секцНомераДанные.Column[c].Name = 'Номер' then
+            Break;
+          fi;
+        od;
+        if (c = 0) then
+          for c = 1 .. секцНомераДанные.ColumnsCount do
+            if секцНомераДанные.Column[c].Visible then
+              Break;
+            fi;
+          od;
+        fi;
+        if (c > 0) then
+          for r = 1 .. секцНомераДанные.RowsCount do
+            if (секцНомераДанные.Row[r].Tag is РКП_Газеты.НомерГазеты) then
+              rIssue = (секцНомераДанные.Row[r].Tag as РКП_Газеты.НомерГазеты);
+            elsif (секцНомераДанные.Row[r].Tag is РКП_Газеты.RI.НомерГазеты) then
+              rIssue = (секцНомераДанные.Row[r].Tag as РКП_Газеты.RI.НомерГазеты).Record;
+            fi;
+            if (rIssue = foundRec) then
+              секцНомераДанные.Cell[c,r].SetFocus;
+            fi;
+          od;
+        fi;
+      fi;
+    fi;
+  end;
+
+
+
+  proc УстановитьРаскладкуТаблицы;
+    var k, i :Integer;
+    if (tabUserColLayout  = nil) then
+      ВосстановитьРаскладкуТаблицы;
+    else
+      for k = 1 .. секцНомераЗаголовки.ColumnsCount do -- для предотвращения конфликтов имен
+        секцНомераЗаголовки.Column[k].Name = СИС2.SysUtils.GetGUID(false);
+        секцНомераДанные.Column[k].Name    = СИС2.SysUtils.GetGUID(false);
+      od;
+      for k = 1 .. LengthOfArray(tabUserColLayout) do
+        секцНомераЗаголовки.Column[k].Name     = 'h' + tabUserColLayout[k];
+        i = SearchInArray(DefaultLayout, tabUserColLayout[k], [1]);
+        секцНомераЗаголовки.Column[k].Caption   = if( (i > 0), DefaultLayout[i,4] as String, '?');
+        секцНомераЗаголовки.Column[k].Width     = tabUserColWidth[k];
+        секцНомераЗаголовки.Column[k].Visible   = tabUserColVisible[k];
+        секцНомераЗаголовки.Cell[k, 1].Contents =  if( (i > 0), DefaultLayout[i,5] as String, '?');
+        секцНомераДанные.Column[k].Name         = tabUserColLayout[k];
+        секцНомераДанные.Column[k].Width        = tabUserColWidth[k];
+        секцНомераДанные.Column[k].Visible      = tabUserColVisible[k];
+      od;
+      Модифицировать_Таблицу;
+    fi;
+  end;
+
+  proc ВосстановитьРаскладкуТаблицы;
+    var k :Integer;
+    --УдалитьВсеСтолбцыКартотеки;
+    tabUserColLayout  = nil;
+    tabUserColVisible = nil;
+    tabUserColWidth   = nil;
+    --ИнициализироватьСтолбцыКартотеки;
+    for k = 1 .. LengthOfArray(DefaultLayout) do
+      секцНомераЗаголовки.Column[k].Name      = 'h' + DefaultLayout[k,1] as String;
+      секцНомераЗаголовки.Column[k].Caption   = DefaultLayout[k,4] as String;
+      секцНомераЗаголовки.Column[k].Width     = DefaultLayout[k,2] as Numeric;
+      секцНомераЗаголовки.Column[k].Visible   = DefaultLayout[k,3] as Logical;
+      секцНомераЗаголовки.Cell[k, 1].Contents = DefaultLayout[k,5] as String;
+      секцНомераДанные.Column[k].Name         = DefaultLayout[k,1] as String;
+      секцНомераДанные.Column[k].Width        = DefaultLayout[k,2] as Numeric;
+      секцНомераДанные.Column[k].Visible      = DefaultLayout[k,3] as Logical;
+    od;
+  end;
+
+  func ПолучитьВсеИменаПолей :String[];
+    var i :Integer;
+    if (strgDefaultFldNames = nil) then
+      for i = 1 .. LengthOfArray(DefaultLayout) do
+        AddInArray(strgDefaultFldNames, DefaultLayout[i,1] as String);
+      od;
+    fi;
+    Return strgDefaultFldNames;
+  end;
+
+
+  proc ДобавлениеЗаписей;
+    var vChoice :Integer;
+    var vTitle, vRequest: String;
+    var aBtnFace :String[];
+    var newRec :РКП_Газеты.НомерГазеты;
+    if (Self.Издание <> nil) and (Self.ГодВыпуска > 0) then
+      if OPPIAccess then
+        vChoice = 2;
+      else
+        vTitle   = 'Подтверждение';
+        vRequest = 'Выберите способ ввода номеров';
+        aBtnFace[1] = 'Списком';
+        aBtnFace[2] = 'По одному';
+        aBtnFace[3] = 'Отмена';
+        vChoice = Enquiry(vTitle, vRequest, aBtnFace, 1);
+      fi;
+      if (vChoice = 1) then
+        with РКП_Газеты.УчетГазет.блВводНомеровСписком.Create do
+          ЗаписьИздания    = Self.Издание;
+          Издание          = Self.Издание.НазваниеОсн;
+          ГодВыпуска       = Self.ГодВыпуска;
+          ПринялНаХранение = Self.UserName;
+          #NoWarning;
+          if cmOk = ShowEx(nil, Window.ModalWindow)then
+            МодифицироватьШаблон;
+            ФокусНаПоследнийВыпуск(true);
+          fi;
+        end;
+      elsif (vChoice = 2) then
+        newRec = РКП_Газеты.НомерГазеты.Create;
+        newRec.Газета                 = Издание;
+        newRec.ГодВыпуска             = ГодВыпуска;
+        if (Self.ТипДопФильтра = DR.Номера.допФлтНеРег) then
+          newRec.НеПолучен = true;
+        elsif (Self.ТипДопФильтра = DR.Номера.допФлтВсе) then
+          if OPPIAccess then
+            newRec.НеПолучен = true;
+          else
+            newRec.ДатаПринятияНаХранение = Today;
+            newRec.ПринялНаХранение       = Self.UserName;
+          fi;
+        elsif (Self.ТипДопФильтра = DR.Номера.допФлтРег) then
+          newRec.ДатаПринятияНаХранение = Today;
+          newRec.ПринялНаХранение       = Self.UserName;
+        elsif (Self.ТипДопФильтра = DR.Номера.допФлтЛГС) then
+          newRec.НеПолучен = true;
+          newRec.СозданОЛГС = true;
+        fi;
+        if cmOk = РКП_Газеты.УчетГазет.редНомерГазеты.ShowFormEx(newRec, Kernel.Window.ModalWindow) then
+          МодифицироватьШаблон;
+          ФокусНаПоследнийВыпуск(true);
+        fi;
+      fi;
+    fi;
+  end;
+
+  proc УдалениеЗаписей;
+    var vRI :РКП_Газеты.RI.НомерГазеты;
+    var vTplRng :TemplateRange;
+    var rS, rF, r, j, jj :Integer;
+    var rIssueS, rIssueF :РКП_Газеты.НомерГазеты;
+    var vTxt :String;
+    var ST :СИС2.SmartTransaction;
+    var rYear :РКП_Газеты.ВыпускГазеты;
+    ---
+    try
+      rYear = FindRecord(РКП_Газеты.ВыпускГазеты, 'Газета=' + Str(Издание) + ' and ГодВыпуска=' + Str(ГодВыпуска));
+      if (rYear <> nil) and (rYear.КомплектПолучен) then
+        Message('Удаление номера (номеров) для года, за который получен весь комплект, невозможно!');
+        Return;
+      fi;
+    except
+    end;
+    ---
+    if (Template.CurrentCell <> nil) then
+      if (Template.CurrentCell.Owner = секцНомераДанные) then
+        if (Self.Template.Selection = nil) then
+          vRI = GetIssueWrapByCell(Template.CurrentCell);
+          if (vRI <> nil) then
+            try
+              ST = СИС2.SmartTransaction.CreateEx([РКП_Газеты.ИсторияГазеты,РКП_Газеты.НомерГазеты], 1000);
+              vRI.Delete(false);
+            except
+              ST.Cancel;
+            end;
+            ST.Apply;
+            МодифицироватьШаблон;
+            ФокусНаПоследнийВыпуск(true);
+          fi;
+        else
+          vTplRng = Self.Template.Selection;
+          if (vTplRng.BeginRow = vTplRng.EndRow) then
+            rIssueS = GetIssueByRow(vTplRng.BeginRow);
+
+            vTxt = 'Номер ' + Trim(rIssueS.Номер);
+            vTxt = vTxt + ' будет удален.' + Br + Br;
+            vTxt = vTxt + 'Продолжить?';
+            if (cmOk = EnqOkCancel(vTxt)) then
+              vRI = GetIssueWrapByRow(vTplRng.EndRow);
+              try
+                ST = СИС2.SmartTransaction.CreateEx([РКП_Газеты.ИсторияГазеты,РКП_Газеты.НомерГазеты], 1000);
+                vRI.Delete(false);
+              except
+                ST.Cancel;
+              end;
+              ST.Apply;
+              МодифицироватьШаблон;
+              ФокусНаПоследнийВыпуск(true);
+            fi;
+          else
+            if (vTplRng.Style in [Template.LineBlock, Template.BoxBlock]) then
+              rS = Min([vTplRng.BeginRow.Number,vTplRng.EndRow.Number]);
+              rIssueS = GetIssueByRow(секцНомераДанные.Row[rS]);
+              rF = Max([vTplRng.BeginRow.Number,vTplRng.EndRow.Number]);
+              rIssueF = GetIssueByRow(секцНомераДанные.Row[rF]);
+              vTxt = 'Номера в выделенной области с № ';
+              vTxt = vTxt + Trim(rIssueS.Номер) + ' по ';
+              vTxt = vTxt + Trim(rIssueF.Номер) + Br;
+              vTxt = vTxt + 'будут удалены.' + Br + Br;
+              vTxt = vTxt + 'Продолжить?';
+              if (cmOk = EnqOkCancel(vTxt)) then
+                try
+                  ST = СИС2.SmartTransaction.CreateEx([РКП_Газеты.ИсторияГазеты,РКП_Газеты.НомерГазеты], 1000);
+                  jj = (rS - rF + 1);
+                  for r = rF .. rS step -1 do
+                    j = j + 1;
+                    Hint('Удаление...', j, jj);
+                    vRI = GetIssueWrapByRow(секцНомераДанные.Row[r]);
+                    vRI.Delete(false);
+                  od;
+                except
+                  ST.Cancel;
+                end;
+                ST.Apply;
+                МодифицироватьШаблон;
+                ФокусНаПоследнийВыпуск(true);
+              fi;
+            else
+              vTxt = 'Для удаления нескольких номеров необходимо выделить строковый или прямоугольный блок.';
+              vTxt = vTxt + Br;
+              vTxt = vTxt + 'Для выделения строкового блока используйте левую кнопку "мыши" с удержанной клавишей "Ctrl".';
+              vTxt = vTxt + Br;
+              vTxt = vTxt + 'Для выделения прямоугольного блока используйте клавиши "стрелки" с удержанной клавишей "Shift".';
+              Message(vTxt);
+            fi;
+          fi;
+        fi;
+      fi;
+    fi;
+  end;
+
+  func GetIssueWrapByCell(vCell :TemplateCell) :РКП_Газеты.RI.НомерГазеты;
+    var rIssue :РКП_Газеты.НомерГазеты;
+    if (CellRow(vCell).Tag is РКП_Газеты.НомерГазеты) then
+      rIssue = CellRow(vCell).Tag as РКП_Газеты.НомерГазеты;
+      Result = РКП_Газеты.RI.НомерГазеты.OpenRecord(rIssue);
+    elsif (CellRow(vCell).Tag is РКП_Газеты.RI.НомерГазеты) then
+      Result = CellRow(vCell).Tag as РКП_Газеты.RI.НомерГазеты;
+    fi;
+  end;
+
+  func GetIssueWrapByRow(vRow :TemplateRow) :РКП_Газеты.RI.НомерГазеты;
+    var rIssue :РКП_Газеты.НомерГазеты;
+    if (vRow.Tag is РКП_Газеты.НомерГазеты) then
+      rIssue = vRow.Tag as РКП_Газеты.НомерГазеты;
+      Result = РКП_Газеты.RI.НомерГазеты.OpenRecord(rIssue);
+    elsif (vRow.Tag is РКП_Газеты.RI.НомерГазеты) then
+      Result = vRow.Tag as РКП_Газеты.RI.НомерГазеты;
+    fi;
+  end;
+
+  func GetIssueByRow(vRow :TemplateRow) :РКП_Газеты.НомерГазеты;
+    if (vRow.Tag is РКП_Газеты.НомерГазеты) then
+      Result = vRow.Tag as РКП_Газеты.НомерГазеты;
+    elsif (vRow.Tag is РКП_Газеты.RI.НомерГазеты) then
+      Result = (vRow.Tag as РКП_Газеты.RI.НомерГазеты).Record;
+    fi;
+  end;
+
+
+end

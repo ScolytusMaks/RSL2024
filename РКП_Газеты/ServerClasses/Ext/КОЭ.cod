@@ -1,0 +1,29 @@
+extends РКП_Справочники.Справочники.КОЭ;
+
+inclass public
+
+  func КоличествоДляГазеты(локИздание :РКП_Газеты.Газета; локГод :Integer) :Integer;
+    var локТР :РКП_Справочники.спрТерриторияРаспространения;
+    var vValue2 :Integer[2];
+    var vValue :Integer[];
+    var i, ii, locY :Integer;
+    if (Repository = nil) then
+      CreateRepository;
+    fi;
+    if (локИздание <> nil) and (локГод > 0) then
+      локТР = локИздание.ТерриторияРаспространения;
+      vValue2 = Repository.GetField(локТР.ExtID) as Integer[2];
+      ii = LengthOfArray(vValue2);
+      for i = ii .. 1 step -1 do
+        vValue = vValue2[i] as Integer[];
+        locY = vValue[1];
+        if (locY <= локГод) then
+          Result = vValue[2];
+          Break;
+        fi;
+      od;
+    fi;
+  end;
+
+
+end

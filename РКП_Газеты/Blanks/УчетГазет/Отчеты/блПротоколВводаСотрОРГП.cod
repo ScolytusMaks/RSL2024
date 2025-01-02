@@ -1,0 +1,257 @@
+class inherited – ѕ_—»—.блќтчетќ–аботеЅазовый "ќтчет о работе библиографа (ќ–√ѕ)";
+
+import – ѕ_—»— classes StdCode, Recs, Functions, FilterMaker, Def, StringsFunctions, RI.intBase;
+
+--{{ 2_—войства
+
+inobject private
+
+  var  омпетенции¬ќтчете :tCompetence[] := [кмпќ–√ѕзав, кмпќ–√ѕсотр];
+
+  var Ќомер—мены√аз        :Integer[];
+  var ƒата—мены√аз         :Date[];
+  var ѕрин€то√азет         :Integer[];
+  var ¬сего¬ведено√азет    :Integer;
+
+  var Ќомер—меныЌом        :Integer[];
+  var ƒата—меныЌом         :Date[];
+  var ѕрин€тоЌомеров       :Integer[];
+  var ¬сего¬веденоЌомеров  :Integer;
+
+  var Ќомер—мены≈д’рн      :Integer[];
+  var ƒата—мены≈д’рн       :Date[];
+  var ѕрин€то≈д’рн         :Integer[];
+  var ¬сего¬ведено≈д’рн    :Integer;
+
+  var Ќомер—мены”чƒок      :Integer[];
+  var ƒата—мены”чƒок       :Date[];
+  var ѕрин€то”чƒок         :Integer[];
+  var ¬сего¬ведено”чƒок    :Integer;
+
+  var секц√азеты           :TemplateSection;
+  var секцЌомера           :TemplateSection;
+  var секц≈д’рн            :TemplateSection;
+  var секц”чƒок            :TemplateSection;
+
+  var —отрудник synonym UserName :String := SessionInfo.UserName;
+  var —отрудникѕолн»м€           :String := if((SessionInfo.UserRecord <> nil), (SessionInfo.UserRecord as Kernel.Settings.User).FullName, Self.UserName);
+
+--}}
+
+-- 2_ онструкторы, визуализаторы0. --
+
+inclass public
+
+
+
+inobject private
+
+-- 2_ќбработчики событий шаблона0. --
+
+  proc шаблон_ѕриќткрытии(Create :Logical);
+    inherited шаблон_ѕриќткрытии(Create);
+    ѕостроитьќтчет;
+  end;
+
+
+-- 2_ќбработчики событий клеток шаблона0. --
+
+  func ѕоле_ѕри¬ыводе_«аголовокќкна‘ормы(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    Result = 'ѕротокол ввода данных сотрудника' + Br +
+             —отрудникѕолн»м€ + Br +
+             '<s-><s->за период с ' + Str(ƒатаЌ) + ' по  ' + Str(ƒата ) + ' включительно';
+  end;
+
+
+-- 2_ќбработчики событий прочих объектов шаблона0. --
+
+
+-- 2_ƒополнительные команды0. --
+
+
+-- 2_¬спомогательные методы0. --
+
+  func ѕостроитьќтчет :Logical;
+    var aUserName :String[];
+    var aResult :Variant[2]; --[[UserName, FullName, vCreateCount, vUpdateCount]]
+    var aWorkShift :Variant[2]; -- номера смен [[vDate, vNumber]]
+    var i :Integer;
+    Result = inherited ѕостроитьќтчет;
+    if Result then
+      Ќомер—мены√аз          = nil; Ќомер—меныЌом          = nil; Ќомер—мены≈д’рн        = nil;  Ќомер—мены”чƒок        = nil;
+      ƒата—мены√аз           = nil; ƒата—меныЌом           = nil; ƒата—мены≈д’рн         = nil;  ƒата—мены”чƒок         = nil;
+      ѕрин€то√азет           = nil; ѕрин€тоЌомеров         = nil; ѕрин€то≈д’рн           = nil;  ѕрин€то”чƒок           = nil;
+      ¬сего¬ведено√азет      = nil; ¬сего¬веденоЌомеров    = nil; ¬сего¬ведено≈д’рн      = nil;  ¬сего¬ведено”чƒок      = nil;
+      секц√азеты.FramesCount = nil; секцЌомера.FramesCount = nil; секц≈д’рн.FramesCount  = nil;  секц”чƒок.FramesCount  = nil;
+      if (Self.UserName <> nil) then
+        aWorkShift = ѕолучитьЌомера—мен;
+        --
+        aResult = ѕолучить¬ыборку(aUserName, '√азета');
+        ѕроставитьЌомера—мен(aResult, aWorkShift);
+        for i = 1 .. LengthOfArray(aResult) do
+          Ќомер—мены√аз[i]  = aResult[i,2] as Integer;
+          ƒата—мены√аз[i]   = aResult[i,1] as Date;
+          ѕрин€то√азет[i]   = aResult[i,3] as Integer;
+          ¬сего¬ведено√азет = ¬сего¬ведено√азет + ѕрин€то√азет[i];
+        od;
+        секц√азеты.FramesCount = LengthOfArray(aResult);
+        --
+        aResult = ѕолучить¬ыборку(aUserName, 'Ќомер√азеты');
+        ѕроставитьЌомера—мен(aResult, aWorkShift);
+        for i = 1 .. LengthOfArray(aResult) do
+          Ќомер—меныЌом[i]    = aResult[i,2] as Integer;
+          ƒата—меныЌом[i]     = aResult[i,1] as Date;
+          ѕрин€тоЌомеров[i]   = aResult[i,3] as Integer;
+          ¬сего¬веденоЌомеров = ¬сего¬веденоЌомеров + ѕрин€тоЌомеров[i];
+        od;
+        секцЌомера.FramesCount = LengthOfArray(aResult);
+        --
+        aResult = ѕолучить¬ыборку(aUserName, '≈диница’ранени€');
+        ѕроставитьЌомера—мен(aResult, aWorkShift);
+        for i = 1 .. LengthOfArray(aResult) do
+          Ќомер—мены≈д’рн[i] = aResult[i,2] as Integer;
+          ƒата—мены≈д’рн[i]  = aResult[i,1] as Date;
+          ѕрин€то≈д’рн[i]    = aResult[i,3] as Integer;
+          ¬сего¬ведено≈д’рн  = ¬сего¬ведено≈д’рн + ѕрин€то≈д’рн[i];
+        od;
+        секц≈д’рн.FramesCount = LengthOfArray(aResult);
+        --
+        aResult = ѕолучить¬ыборку(aUserName, '”четныйƒокумент');
+        ѕроставитьЌомера—мен(aResult, aWorkShift);
+        for i = 1 .. LengthOfArray(aResult) do
+          Ќомер—мены”чƒок[i] = aResult[i,2] as Integer;
+          ƒата—мены”чƒок[i]  = aResult[i,1] as Date;
+          ѕрин€то”чƒок[i]    = aResult[i,3] as Integer;
+          ¬сего¬ведено”чƒок  = ¬сего¬ведено”чƒок + ѕрин€то”чƒок[i];
+        od;
+        секц”чƒок.FramesCount = LengthOfArray(aResult);
+      fi;
+    fi;
+  end;
+
+  func ѕолучитьЌомера—мен :Variant[2]; --[[vDate, vNumber]]
+    var aFlt :String[];
+    var cResult :Variant[];
+    var cRec :– ѕ_—»—.—мена;
+    var vActionDate  :Date;
+    with Query.Create([– ѕ_—»—.—мена]) do
+      AddInArray( aFlt, ѕолучить‘ильтрƒат );
+      AddInArray( aFlt, ѕолучить‘ильтрѕользовател€ );
+      Filter = MakeFilter(aFlt);
+      Select;
+      while not Eof do
+        cRec = Current as – ѕ_—»—.—мена;
+        vActionDate = cRec.CreateDate;
+        vActionDate = Dat(Day(vActionDate), Mon(vActionDate), Year(vActionDate));
+        cResult = [vActionDate, cRec.Ќомер—мены¬√оду] as Variant[];
+        AddInArray( Result, cResult);
+        Next;
+      od;
+    end;
+    SortArray(Result, [1]);
+  end;
+
+  func ѕолучить‘ильтр«апросаЋога(  ор»м€ ласса«аписей :String ) :String;
+    var aFlt :String[];
+    AddInArray( aFlt, ѕолучить‘ильтрѕользовател€ );
+    AddInArray( aFlt, ѕолучить‘ильтр омпетенций );
+    AddInArray( aFlt, ѕолучить‘ильтрƒат );
+    AddInArray( aFlt, ѕолучить‘ильтр ласса«аписей( ор»м€ ласса«аписей) );
+    Result = MakeFilter( aFlt );
+  end;
+
+  func ѕолучить‘ильтр омпетенций :String;
+    var i :Integer;
+    var aFlt :String[];
+    for i = 1 .. LengthOfArray( омпетенции¬ќтчете) do
+      AddInArray( aFlt, 'Match(Competencies, "*|' + Str( омпетенции¬ќтчете[i]) + '|*")' );
+    od;
+    Result = MakeFilter( aFlt, byOr );
+  end;
+
+  func ѕолучить‘ильтрƒат :String;
+    var aFlt :String[];
+    AddInArray( aFlt, 'CreateDate>=' + Str(ƒатаЌ) );
+    AddInArray( aFlt, 'CreateDate<' + Str(ƒата  + 1) );
+    Result = MakeFilter( aFlt );
+  end;
+
+  func ѕолучить‘ильтрѕользовател€ :String;
+    Return 'CreateUser="' + Self.UserName + '"';
+  end;
+
+  func ѕолучить‘ильтр ласса«аписей(  ор»м€ ласса«аписей :String ) :String;
+    if ( ор»м€ ласса«аписей = '√азета')             then Result = 'RClass="– ѕ_√азеты.√азета"';
+    elsif ( ор»м€ ласса«аписей = 'Ќомер√азеты')     then Result = 'RClass="– ѕ_√азеты.Ќомер√азеты"';
+    elsif ( ор»м€ ласса«аписей = '≈диница’ранени€') then Result = 'RClass="– ѕ_√азеты.≈диница’ранени€"';
+    elsif ( ор»м€ ласса«аписей = '”четныйƒокумент') then Result = 'RClass="– ѕ_√азеты.”четныйƒокумент"';
+    fi;
+  end;
+
+  func ѕолучить¬ыборку(aUserName :String[];  ор»м€ ласса«аписей :String ) :Variant[2];  --[[vActionDate, nil, vCreateCount]]
+    var vActionDate  :Date;
+    var vCreateCount, i :Integer;
+    var cResult :Variant[];
+    var cRec :– ѕ_—»—.Ћог–абот;
+    var rNsp :– ѕ_√азеты.√азета;
+    if (Self.UserName <> nil) then
+      with Query.Create([– ѕ_—»—.Ћог–абот]) do
+        Filter = ѕолучить‘ильтр«апросаЋога( ор»м€ ласса«аписей);
+        Select;
+        while not Eof do
+          cRec = Current as – ѕ_—»—.Ћог–абот;
+          vActionDate = cRec.CreateDate;
+          vActionDate = Dat(Day(vActionDate), Mon(vActionDate), Year(vActionDate));
+          i = SearchInArray(Result, vActionDate, [1], false);
+          if (i > 0) then
+            cResult = Result[i];
+          else
+            i = LengthOfArray(Result) + 1;
+            cResult = [vActionDate, 0, 0];
+          fi;
+          if ( ор»м€ ласса«аписей = '√азета') then -- исключение отсылок
+            if (cRec.ActionType = wsRecCreated) and (cRec.StoredValL = false) then
+              vCreateCount = (cResult[3] as Integer) + 1;
+              Result[i] = [vActionDate, 0, vCreateCount];
+            fi;
+          elsif ( ор»м€ ласса«аписей = 'Ќомер√азеты') then -- только "прин€тые номера"
+            if (cRec.ActionType = wsAccepted) then
+              vCreateCount = (cResult[3] as Integer) + 1;
+              Result[i] = [vActionDate, 0, vCreateCount];
+            fi;
+          elsif ( ор»м€ ласса«аписей = '≈диница’ранени€') then -- только "подшитые" в учетный документ
+            if (cRec.ActionType = wsAccepted) then
+              vCreateCount = (cResult[3] as Integer) + cRec.StoredValI; -- суммируетс€ количество номеров
+              Result[i] = [vActionDate, 0, vCreateCount];
+            fi;
+          elsif ( ор»м€ ласса«аписей = '”четныйƒокумент') then -- все
+            if (cRec.ActionType = wsRecCreated) and (cRec.StoredValL = false) then
+              vCreateCount = (cResult[3] as Integer) + 1;
+              Result[i] = [vActionDate, 0, vCreateCount];
+            fi;
+          fi;
+          Next;
+        od;
+      end;
+      SortArray(Result, [1]);
+    fi;
+  end;
+
+  proc ѕроставитьЌомера—мен(var aResult :Variant[2]; aWorkShift :Variant[2]);
+    --var aWorkShift :Variant[2]; -- номера смен [[vDate, vNumber]]
+    var i, j :Integer;
+    var cResult :Variant[];
+    var vActionDate  :Date;
+    aWorkShift = ѕолучитьЌомера—мен;
+    for i = 1 .. LengthOfArray(aResult) do
+      cResult = aResult[i] as Variant[];
+      vActionDate = cResult[1] as Date;
+      j = SearchInArray(aWorkShift, vActionDate, [1], true);
+      if (j > 0) then
+        aResult[i,2] = aWorkShift[j,2] as Integer;
+      fi;
+    od;
+  end;
+
+
+end

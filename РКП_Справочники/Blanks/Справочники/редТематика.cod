@@ -1,0 +1,38 @@
+Class inherited Справочники.editBaseType3 "Тематика / Читательский адрес / Целевое назначение" , editor спрТематика;
+
+
+--{{ 2_Свойства
+
+inobject private
+
+  var Интерфейс :RI.Справочники.Тематика;
+--}}
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+
+  proc шаблон_ПриОткрытии( aCreate :Logical );
+    var locCell :TemplateCell;
+    inherited  шаблон_ПриОткрытии(aCreate);
+    locCell = Template.CellByField['ЦельАнализа'];
+    UpdateFieldList(locCell, Def.ContentsCategory);
+  end;
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  proc Поле_ПриВыходе_ЦельАнализа(Cell :TemplateCell; Index :Integer);
+    if (Cell.Contents in Интерфейс.ХешируемыеПоля) then
+      Hash = Интерфейс.GetHashByRecord(Self.Record);
+    fi;
+  end;
+
+  proc Поле_ПриВыходе_Код(Cell :TemplateCell; Index :Integer);
+    if (Cell.Contents in Интерфейс.ХешируемыеПоля) then
+      Hash = Интерфейс.GetHashByRecord(Self.Record);
+    fi;
+  end;
+
+
+end

@@ -1,0 +1,44 @@
+class  'Расчет статистических показателей';
+
+import СИС2 classes Константы;
+import РКП_СИС classes Recs, StringsFunctions, StdCode, Functions, FilterMaker;
+
+inclass public
+
+  func ВведеноСтатейЗаСмену(Оператор :String; ДатаСмены :Date) :Integer;
+    var aFlt :String[];
+    AddInArray( aFlt, 'isGroup=0' );
+    AddInArray( aFlt, 'CreateUser="' + Оператор + '"' );
+    AddInArray( aFlt, 'CreateDate>=' + Str(ДатаСмены) );
+    AddInArray( aFlt, 'CreateDate<' + Str(ДатаСмены + 1) );
+    with Query.Create([РКП_Статьи.Роспись]) do
+      Filter = MakeFilter(aFlt);
+      Return Count;
+    end;
+  end;
+
+  func ВведеноСтатейЗаПериод(Оператор :String; ДатаНачала, ДатаОкончания :Date) :Integer; -- (включительно)
+    var aFlt :String[];
+    AddInArray( aFlt, 'isGroup=0' );
+    AddInArray( aFlt, 'CreateUser="' + Оператор + '"' );
+    AddInArray( aFlt, 'CreateDate>=' + Str(ДатаНачала) );
+    AddInArray( aFlt, 'CreateDate<' + Str(ДатаОкончания + 1) );
+    with Query.Create([РКП_Статьи.Роспись]) do
+      Filter = MakeFilter(aFlt);
+      Return Count;
+    end;
+  end;
+
+  func РедактированоСтатейЗаПериод(Оператор :String; ДатаНачала, ДатаОкончания :Date) :Integer; -- (включительно)
+    var aFlt :String[];
+    AddInArray( aFlt, 'isGroup=0' );
+    AddInArray( aFlt, 'UpdateUser="' + Оператор + '"' );
+    AddInArray( aFlt, 'UpdateDate>=' + Str(ДатаНачала) );
+    AddInArray( aFlt, 'UpdateDate<' + Str(ДатаОкончания + 1) );
+    with Query.Create([РКП_Статьи.Роспись]) do
+      Filter = MakeFilter(aFlt);
+      Return Count;
+    end;
+  end;
+
+end

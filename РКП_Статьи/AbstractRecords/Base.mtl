@@ -1,0 +1,10 @@
+group "Базовые";
+
+  abstract record BaseRecord inherited СИС2.Базовая.БазоваяЗапись  title "";
+  end;
+
+  abstract hierarchical record BaseHierarchicalRecord inherited BaseRecord title "";
+    field GroupPath  :String(MaxIndexedStr);
+  end;
+
+end;

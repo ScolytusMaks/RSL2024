@@ -1,0 +1,547 @@
+class inherited МашинаРеквизитов.Базовые.картСИнтерфейсом "Статьи";
+
+import РКП_СИС Classes Profile, Constants, StringsFunctions, StdCode, Functions, Recs, FilterMaker;
+
+--{{ 2_Свойства
+inclass public
+
+  var КлассИнтерфейса :Class МашинаРеквизитов.Базовые.интЗапись = РКП_Статьи.RI.Роспись;
+
+inclass private
+
+  stored var ГодВыпуска             :Integer; -- ГодЛетописи
+  stored var НомерВыпуска           :Integer; -- ВыпускЛетописи
+  stored var ВариантПростогоФильтра :Integer;
+  stored var ГодГазеты              :Integer;
+
+inobject private
+
+  var ФрагментНазвания   :String;
+  var НомерГазеты        :String;
+  var ДатаВыпускаПК      :Date;
+  var Смена              :РКП_СИС.Смена := ПолучитьЗаписьСмены;
+  var НачалоСмены        :Date          := if((Смена <> nil), Смена.CreateDate, nil);
+  var Оператор           :String        := if((SessionInfo.UserRecord <> nil), (SessionInfo.UserRecord as Kernel.Settings.User).FullName, nil);
+  var СтатейЗаСмену      :Integer;
+  var ВведеноСтатей      :Integer; -- Статистика кол-ва записей, попадающих под фильтр
+  var НазначеноВКарточки :Integer; -- Статистика кол-ва записей, попадающих под фильтр
+
+  var фреймФильтрЛГС         :TemplateFrame;
+  var фреймФильтрПК          :TemplateFrame;
+  var фреймФильтрНомеров     :TemplateFrame;
+  var фреймСтатистика        :TemplateFrame;
+  var фреймИнформацияОСмене  :TemplateFrame;
+  var фреймБибЗапись1        :TemplateFrame;
+  var фреймБибЗапись2        :TemplateFrame;
+  var секцСтатистикаФильтра1 :TemplateSection;
+  var секцСтатистикаФильтра2 :TemplateSection;
+  var секцИнфОСмене1         :TemplateSection;
+  var секцИнфОСмене2         :TemplateSection;
+  var секцИнфОСмене3         :TemplateSection;
+  var секцУДК1               :TemplateSection;
+  var секцУДК2               :TemplateSection;
+  var секцСтатья1            :TemplateSection;
+  var секцСтатья2            :TemplateSection;
+  var клУпрИнфОСтат          :TemplateCell   := секцСтатистикаФильтра1.Cell[1,1];
+  var клУпрИнфОСмене         :TemplateCell   := секцИнфОСмене1.Cell[1,1];
+  var клУпрИнфУДК            :TemplateCell   := секцУДК1.Cell[1,1];
+  var клУпрИнфСтатья         :TemplateCell   := секцСтатья1.Cell[1,1];
+  var стлбГод                :CardfileColumn := Self.CardFile.ColumnByField['ГодЛетописи'];
+  var стлбВып                :CardfileColumn := Self.CardFile.ColumnByField['ВыпускЛетописи'];
+  var стлбГаз                :CardfileColumn := Self.CardFile.ColumnByField['НазваниеОсн'];
+  var стлбСт                 :CardfileColumn := Self.CardFile.ColumnByField['НазваниеСтатьи'];
+
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inclass public
+
+
+-- 2_Обработчики событий шаблона0. --
+
+inobject private
+
+  proc шаблон_ПриСоздании(Context :Variant);
+    ВключитьИерархию;
+    inherited шаблон_ПриСоздании(Context);
+    Self.Cardfile.CanInsert = (FullAccess or GLGSAccess);
+    Self.Cardfile.CanDelete = (FullAccess or GLGSAccess);
+    Self.Cardfile.CanCopy = false;
+    фреймФильтрПК.Visible = false;
+    фреймФильтрПК.UseSplitter = false;
+  end;
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    клУпрИнфОСтат.Contents  = SymbolCollapsed;
+    клУпрИнфОСмене.Contents = SymbolCollapsed;
+    клУпрИнфУДК.Contents    = SymbolCollapsed;
+    клУпрИнфСтатья.Contents = SymbolCollapsed;
+    inherited шаблон_ПриОткрытии(Create);
+    Self.Window.Icon.LoadFromFile(BaseInfo.ProjectByName['РКП_Газеты'].Folder + 'Attachments\Icons\inbox_document_text.ico');
+    Смена = ПолучитьЗаписьСмены;
+    РасчетСтатистикиПоФильтру;
+  end;
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func Поле_ПриНажатии_ДопИнфо(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    if (Cell in [клУпрИнфОСтат, клУпрИнфОСмене, клУпрИнфУДК, клУпрИнфСтатья]) then
+      if (Cell.Contents = SymbolCollapsed) then
+        Cell.Contents = SymbolExpanded;
+      elsif (Cell.Contents = SymbolExpanded) then
+        Cell.Contents = SymbolCollapsed;
+      fi;
+      МодифицироватьШаблон;
+      if (Cell.Contents = SymbolExpanded) then
+        ВычислитьЧислоСтатейЗаСмену;
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриНажатии_ПринятоЗаПериод(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    #NoWarning;
+    РКП_Статьи.Статьи.Отчеты.блПротоколВводаСотрГЛГС.ShowFormEx( , Kernel.Window.ModalWindow);
+  end;
+
+  func Поле_ПриВходе(Cell :TemplateCell; Index :Integer; Action :Template.EnterTypes) :Logical;
+    Result = True; 
+  end;
+
+  func Поле_ПриПроверке_ГодВыпускаЛГС(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    if (Value <> nil) then
+      Return ВыпЛГС.СоздатьЗаписьГод(Value); -- проверка введенного значения здесь
+    else
+      Return true;
+    fi;
+  end;
+
+  func Поле_ПриПроверке_НомерВыпускаЛГС(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    if (Value <> nil) then
+      Result = ВыпЛГС.СоздатьЗаписьВыпуск(ГодВыпуска, Value); -- проверка введенного значения здесь
+    else
+      Return true;
+    fi;
+  end;
+
+  func Поле_ПриПроверке_ДатаВыпускаПК(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    if (Year(Value as Date) >= ГодВыпускаПервойГазеты) then
+      Return true;
+    elsif (Value = nil) then
+      Return true;
+    else
+      Message('Пожалуйста, проверьте введенное значение!');
+    fi;
+  end;
+
+  func Поле_ПриПроверке_ГодВыпускаГазеты(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    if (Value as Integer >= ГодВыпускаПервойГазеты) then
+      Return true;
+    elsif (Value = nil) then
+      Return true;
+    else
+      Message('Пожалуйста, проверьте введенное значение!');
+    fi;
+  end;
+
+  func Поле_ПриПроверке_НомерГазеты(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    var aFlt, aTxt :String[];
+    var cGroup :РКП_Статьи.Роспись;
+    var VarRG :String; -- преобразование номера по правилам ОРГ
+    var rIssue :РКП_Газеты.НомерГазеты;
+    var rStat :РКП_Газеты.ВыпускГазеты;
+    var vCountIssue :Integer;
+    --Result = true;
+    if (ГодГазеты = nil) and (Value <> nil) then
+      Message('Пожалуйста, укажите год, в котором выпущен номер газеты!');
+      Return false;
+    fi;
+    cGroup = Self.Cardfile.CurrentGroup;
+    if (cGroup <> nil) and (ГодГазеты <> nil) and (Value <> nil) then -- условие на ненулевую группу
+      VarRG = СтандартРГ(Value);
+      aFlt = nil;
+      AddInArray( aFlt, 'Газета=' + cGroup.Газета.DocIDStr );
+      AddInArray( aFlt, 'ФункцияГруппы=0' );
+      AddInArray( aFlt, 'ГодВыпуска=' + Str(ГодГазеты) );
+      AddInArray( aFlt, 'Match(Номер,"*' + FixCode10(VarRG) + '*")' );
+      #NoWarning;
+      FindRecordExt(РКП_Газеты.НомерГазеты, MakeFilter(aFlt), , vCountIssue);
+      if (vCountIssue = 0) then2 --0 2_Выпусков с таким номером НЕТ0 => создается запись о новом выпуске
+        aTxt[1] = 'В базе данных отдела регистрации газет № ' + NoSpace(VarRG) + ' за ' + Str(ГодГазеты) + ' год газеты "' + cGroup.Газета.НазваниеЛГС +'" нет.';
+        aTxt[2] = 'Продолжить?';
+        if (cmOk = EnqOkCancel(ArrayToText(aTxt)) ) then
+          -- создание записи "номер газеты" с меткам ГЛГС
+          rIssue            = РКП_Газеты.НомерГазеты.Create;
+          rIssue.Газета     = cGroup.Газета;
+          rIssue.ГодВыпуска = ГодГазеты;
+          rIssue.Номер      = РКП_СИС.StdCode.FixCode10(VarRG);
+          rIssue.НеПолучен  = true;
+          rIssue.СозданОЛГС = true;
+          rIssue.Post;
+          -- поиск / создание записи "статистика выпуска газеты"
+          aFlt = nil;
+          AddInArray( aFlt, 'Газета=' + cGroup.Газета.DocIDStr );
+          AddInArray( aFlt, 'ГодВыпуска=' + Str(ГодГазеты) );
+          rStat = FindRecord(РКП_Газеты.ВыпускГазеты, MakeFilter(aFlt));
+          if (rStat = nil) then 2--0 Если отсутствует запись о статистике выпуска газеты, то такую запись необходимо тут же создать
+            rStat            = РКП_Газеты.ВыпускГазеты.Create;
+            rStat.Газета     = cGroup.Газета;
+            rStat.ГодВыпуска = ГодГазеты;
+            rStat.Post;
+          fi;
+          Return true;
+        else -- отказ от создания номера в базе рг
+          Return false;
+        fi;
+      elsif (vCountIssue = 1) then2 --0 2_Выпуск ЕДИНСТВЕННЫЙ0 => идеальная ситуация в плане взаимодействия отделов
+        Return true;
+      elsif (vCountIssue > 1) then 2--0 2_Выпусков0 2 МНОГО0 => необходимо вмешательство оператора ввода: надо выбрать номер
+        Message('В базе данных отдела регистрации газет обнаружено несколько похожих №№ ' + НомерГазеты + ' за ' + Str(ГодГазеты) + ' год газеты "' + cGroup.Газета.НазваниеЛГС +'"!');
+        Return true;
+      fi;
+    else
+      if (ФрагментНазвания <> 'Все') then
+        if (Value <> nil) then
+          Message('Пожалуйста, откройте папку с название газеты!');
+          Result = false;
+        else
+          Result = true;
+        fi;
+      fi;
+    fi; -- условие на ненулевую группу
+  end;
+
+  proc Поле_ПриВыходе_Фильтр(Cell :TemplateCell; Index :Integer);
+    var cGroup :РКП_Статьи.Роспись;
+    var cNsp :РКП_Газеты.Газета;
+    cGroup = Self.Cardfile.CurrentGroup;
+    if (cGroup<> nil) then -- условие на ненулевую группу
+      cNsp = cGroup.Газета;
+      if (cNsp <> nil) then -- условие на ненулевую газету
+        РКП_Газеты.ГруппаНомеров.ПоГодам.CreateGroupsByYears(cNsp);
+        РКП_Газеты.ГруппаНомеров.ПоГазете.CreateGroupsByNsp(cNsp);
+      fi;
+    fi;
+    ОбновитьФильтр;
+  end;
+
+  func Поле_ПриВыводе_ОписаниеУДК(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    var cRecord :РКП_Статьи.Роспись;
+    cRecord = Self.Cardfile.Current;
+    if (cRecord <> nil) then
+      if (cRecord.ИндексУДК.Count > 0) then
+        Return cRecord.ИндексУДК.Items[1].РубрикаУДК.Наим;
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриВыводе_ОписаниеСтатьи(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    var cRecord :РКП_Статьи.Роспись;
+    cRecord = Self.Cardfile.Current;
+    if (cRecord <> nil) then
+      Return '<b+>' + cRecord.Заголовок + '<b->' + Br + cRecord.ОписаниеСтатьи;
+    fi;
+  end;
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+  proc кнДобавить_ПриНажатии(Sender :Button);
+    var r0,r1,r2,rg       : record;
+    var Q1                : Query;
+    var sr                : string;
+    var k2                : integer;
+    var МестоИздания_     : string;
+    var Qn                : Query;
+    var Rn                : record;
+    var fltn :String;
+    var i                 : integer;
+    var CardForSelect     : CardForm;
+    var Решение           : integer;
+    var aFlt :String[];
+    r0                  = cardfile.CurrentGroup;
+    if r0<>nil                  then     --При условии, что оператор - внутри группы звписей
+    if r0.Газета=nil            then     --Если группа создана импортом, то надо открыть диалог привязки с БД РГ
+      CardForSelect                     = РКП_Статьи.Статьи2.0картГазетыВыбор.Create;
+      CardForSelect.ФрагментНазвания    = r0.НазваниеОсн;
+      Решение                           = CardForSelect.ShowEx(rg,"",Window.ModalWindow);
+        if Решение<>CmOk        then    --отказ от выбора
+          return;
+        else
+          r0.Газета                     = rg;
+          rg.НазваниеЛГС                = r0.НазваниеОсн;
+          rg.РосписьСтатей              = true;
+          if  rg.State = rg.Edited      then
+          rg.Post;
+          end;
+        end;
+    end;
+    r1                  = Роспись.Create;
+    r1.Газета           = r0.Газета;
+    r1.НазваниеОсн      = r0.Газета.НазваниеЛГС;
+    r1.Подзаголовок     = r0.Газета.Подзаголовок;
+    r1.РегНомер         = r0.Газета.РегНомер;
+    r1.ISSN             = r0.Газета.ISSN;   
+    r1.КодИздания       = r0.Газета.КодИздания;
+    --Вычисление места издания
+    r1.МестоИздания     ='';
+    sr                  = SubStr(Str(r0.Газета), 
+                                 Pos(":",Str(r0.Газета))+1,Pos("}",Str(r0.Газета))-
+                                 Pos(":",Str(r0.Газета))-1);
+    Q1                  = Query.Create([РКП_Газеты.Газета]);
+    Q1.Filter           = "DocId = "+sr;
+    Q1.LoadingFields    = "МестаИздания";
+    Q1.Select;
+    r2                  = Q1.Current;
+    r1.МестоИздания     = "";
+    for k2 = 1..r2.МестаИздания.Count do
+      if    k2 = 1 then
+      МестоИздания_     = r2.МестаИздания.Items[k2].МестоИздания.Наим;
+      else
+      МестоИздания_     = МестоИздания_+" ; "+r2.МестаИздания.Items[k2].МестоИздания.Наим;
+      end;
+    end;
+    r1.МестоИздания      = МестоИздания_;
+    Q1.Close;
+    --Попытка определить параметры номера газеты
+    --..............................................................
+    if (ГодГазеты >= ГодВыпускаПервойГазеты) and (НомерГазеты <> nil) then
+      -- определение количества номеров, попадающих под условия выборки
+      -- параметры считывются только при единственном номере,
+      -- в противном случае обработка не происходит и выводится соотв.предупреждение
+      Qn = Query.Create([РКП_Газеты.НомерГазеты]);
+      Qn.Filter = 'Газета=' + Str(r0.Газета) + ' and ФункцияГруппы=0' +
+                  ' and ГодВыпуска=' + Str(ГодГазеты) +
+                  ' and Match(Номер,"*' + РКП_СИС.StdCode.FixCode10(НомерГазеты) + '*")';
+      if (Qn.Count = 0) then
+        Message('В базе данных сектора регистрации газет № ' + НомерГазеты +
+                ' за ' + Str(ГодГазеты) + ' год' +
+                ' газеты "' + r0.Газета.НазваниеЛГС +'" нет.' + Chr(13) +
+                'Пожалуйста, укажите номер газеты в карточке описания статьи!');
+      elsif (Qn.Count > 1) then
+        Message('В базе данных сектора регистрации газет обнаружено несколько похожих №№ ' + НомерГазеты +
+                ' за ' + Str(ГодГазеты) + ' год' +
+                ' газеты "' + r0.Газета.НазваниеЛГС + '>.' + Chr(13) +
+                'Пожалуйста, выберите номер газеты из списка!');
+        AddInArray( aFlt, 'ГодВыпуска=' + Str(ГодГазеты) + ' and  Match("Номер","*' + НомерГазеты + '*")' );
+        AddInArray( aFlt, 'Номер="' + Str(ГодГазеты) + '" and ФункцияГруппы=-1' );
+        AddInArray( aFlt, 'ФункцияГруппы=-2' );
+        fltn = MakeFilter(aFlt, byOr);
+        if (cmOk = РКП_Газеты.УчетГазет.картНомераВыбор.ВыполнитьВыбор(r0.Газета, fltn, Rn) ) then
+        else
+          Message('Номер не выбран. Соответствующие поля в карточке описания статьи заполнены не будут!');
+        fi;
+        --fltn            = "(Газета="+Str(r0.Газета)+" and ГодВыпуска="+Str(ГодГазеты)+" and  Match('Номер','*"+НомерГазеты+"*')) or "+
+        --                  "(Газета="+Str(r0.Газета)+" and Номер='"+Str(ГодГазеты)+"' and ФункцияГруппы=-1) or "+
+        --                  "(Газета="+Str(r0.Газета)+" and ФункцияГруппы=-2)";
+        --fltg            = "Газета="+Str(r0.Газета);
+        --Rn              = РКП_Газеты.Выбор.ВыборатьНомер(fltg,fltn);
+        --  if Rn =  nil                          then
+        --    Message("Номер не выбран. Соответствующие поля в карточке описания статьи заполнены не будут!");
+        --  end;
+      elsif (Qn.Count = 1) then
+        Rn = Qn.Current;
+      fi;
+    end;
+    --..............................................................
+    --End Попытка определить параметры номера газеты
+    if  Rn <> nil                               then
+      i                 = r1.НомераГазеты.Add;
+      r1.НомераГазеты.Items[i].НомерГазеты              = Rn;
+      r1.НомераГазеты.Items[i].ГодВыпуска               = ГодГазеты;
+      r1.НомераГазеты.Items[i].Номер                    = РКП_СИС.StdCode.NoSpace(Rn.Номер);
+      r1.НомераГазеты.Items[i].ДатаВыхода               = Rn.ДатаВыхода;
+      r1.НомераГазеты.Items[i].ТочностьДатыВыхода       = Rn.ТочностьДатыВыхода;
+      r1.ДатаНачалаНомера                               = Rn.ДатаНачалаНомера;
+      r1.ТочностьДатыНачалаНомера                       = Rn.ТочностьДатыНачалаНомера;
+      if  Rn.ДатаВыхода = nil                   or 
+          Rn.ДатаНачалаНомера = nil             then
+        Message("Пожалуйста, уточните даты выхода номера газеты!");
+      end;
+    else
+      i                 = r1.НомераГазеты.Add;
+      r1.НомераГазеты.Items[i].ГодВыпуска               = ГодГазеты;
+        Message("Пожалуйста, уточните описание номера газеты!");
+    end;
+    --Заготовка описания статьи
+    r1.НазваниеСтатьи   = "Новая статья...";
+    if ГодВыпуска>1231 then
+      r1.ГодЛетописи    = ГодВыпуска;
+    else
+      r1.ГодЛетописи    = Year(today(true));
+    end;
+    r1.ВыпускЛетописи   = НомерВыпуска;
+    r1.GroupDoc         = r0;
+    --*****r1.Post;
+    OpenBlankEditor('РКП_Статьи.Статьи.редСтатья',r1);
+    else
+      Message('Для добавления статьи откройте, пожалуйста, папку с названием издания!');
+    end;
+  end;
+
+  proc кнУдалить_ПриНажатии(Sender :Button);
+    var r0 :record;
+    r0 = Self.Cardfile.Current;
+    if (r0 <> nil) then
+      if (r0.isGroup = false) then
+        try
+          r0.Delete;
+        except
+        end;
+      fi;
+    fi;
+  end;
+
+-- 2_Обработчики событий картотеки0. --
+
+  proc картотека_ПриПеремещении(Record :Record);
+    var cArticle :РКП_Статьи.Роспись;
+    inherited картотека_ПриПеремещении(Record);
+    if (not nil in [стлбГод, стлбВып, стлбГаз, стлбСт]) then
+      cArticle = Self.Cardfile.Current;
+      if (cArticle = nil) then
+        стлбГод.Visible = true;
+        стлбВып.Visible = true;
+        стлбСт.Visible  = true;
+        стлбГаз.Visible = false;
+      else
+        СтлбГод.Visible = not cArticle.isGroup;
+        СтлбВып.Visible = not cArticle.isGroup;
+        СтлбСт.Visible  = not cArticle.isGroup;
+        СтлбГаз.Visible = cArticle.isGroup;
+      fi;
+    fi;
+    РасчетСтатистикиПоФильтру;
+    ВычислитьЧислоСтатейЗаСмену;
+    фреймБибЗапись1.Update;
+    фреймБибЗапись2.Update;
+  end;
+
+
+-- 2_Обработчики столбцов (полей) картотеки0. --
+
+  func картПоле_ПриВыводе_НазваниеСтатьи(Column :CardfileColumn; Rec :Record; Action :Template.OutputTypes; var Format :String) :Variant;
+    var vValue :String;
+    vValue = (Rec as РКП_Статьи.Роспись).НазваниеСтатьи;
+    Result = ExtractWords(vValue, 1, 12);
+    if (WordsCount(vValue) > 12) and (Result <> nil) then
+      Result = Result + ' ...';
+    fi;
+  end;
+
+-- 2_Вспомогательные методы0. --
+
+  -- Поиск и при необходимости - создание
+  -- записи с информацией о смене
+  func ПолучитьЗаписьСмены :РКП_СИС.Смена;
+    var UN :String;
+    var aFlt :String[];
+
+    func СменВГоду :Integer;
+      with Query.Create([РКП_СИС.Смена]) do
+        Filter = 'CreateUser="' + UN + '" and Year(CreateDate)=' + Str(Year(Today));
+        Return Count;
+      end;
+    end;
+
+    if (SessionInfo.UserRecord <> nil) then
+      UN = (SessionInfo.UserRecord as Kernel.Settings.User).Name;
+      Оператор = (SessionInfo.UserRecord as Kernel.Settings.User).FullName;
+      AddInArray( aFlt, 'CreateUser="' + UN + '"');
+      AddInArray( aFlt, 'Day(CreateDate)=' + Str(Day(Today)) );
+      AddInArray( aFlt, 'Mon(CreateDate)=' + Str(Mon(Today)) );
+      AddInArray( aFlt, 'Year(CreateDate)=' + Str(Year(Today)) );
+      Result = FindRecord(РКП_СИС.Смена, MakeFilter(aFlt) );
+      if (Result = nil) then
+        Result = РКП_СИС.Смена.Create;
+        Result.НомерСменыВГоду = СменВГоду + 1;
+        Result.Post;
+      fi;
+    fi;
+  end;
+
+  proc ВычислитьЧислоСтатейЗаСмену;
+    if (клУпрИнфОСмене.Contents = SymbolExpanded) then
+      if (SessionInfo.UserRecord <> nil) then
+        СтатейЗаСмену = РКП_Статьи.Стат.ВведеноСтатейЗаСмену(SessionInfo.UserRecord.Name ,Today);
+      fi;
+    fi;
+  end;
+
+  proc РасчетСтатистикиПоФильтру;
+    var aFlt :String[];
+    -- статей всего
+    AddInArray( aFlt, Self.Cardfile.Filter );
+    AddInArray( aFlt, 'isGroup=0' );
+    #NoWarning 2;
+    FindRecordExt(РКП_Статьи.Роспись, MakeFilter(aFlt), , ВведеноСтатей);
+    -- в т.ч. карточек
+    AddInArray( aFlt, 'ДатаКарточек<>nil' );
+    FindRecordExt(РКП_Статьи.Роспись, MakeFilter(aFlt), , НазначеноВКарточки);
+  end;
+
+  func ПолучитьФильтрКартотеки (var locTreeFilter :String = nil) :String;
+    var aFlt :String[];
+    AddInArray( aFlt, ПолучитьФильтр_ГодЛетописи );
+    AddInArray( aFlt, ПолучитьФильтр_ВыпускЛетописи );
+    AddInArray( aFlt, ПолучитьФильтр_ДатаВыпускаПК );
+    AddInArray( aFlt, ПолучитьФильтр_НазваниеГазеты );
+    AddInArray( aFlt, ПолучитьФильтр_ГодГазеты );
+    AddInArray( aFlt, ПолучитьФильтр_НомерГазеты );
+    Result = MakeFilter(aFlt);
+    locTreeFilter = ПолучитьФильтр_НазваниеГазеты;
+  end;
+
+  func ПолучитьФильтр_ГодЛетописи :String;
+    if ГодВыпуска > 0 then
+      Return 'ГодЛетописи=' + Str(ГодВыпуска);
+    fi;
+  end;
+
+  func ПолучитьФильтр_ВыпускЛетописи :String;
+    if НомерВыпуска > 0 then
+      Return 'ВыпускЛетописи=' + Str(НомерВыпуска);
+    fi;
+  end;
+
+  func ПолучитьФильтр_ДатаВыпускаПК :String;
+    if ДатаВыпускаПК <> nil then
+      Return 'ДатаКарточек=' + Str(ДатаВыпускаПК);
+    fi;
+  end;
+
+  func ПолучитьФильтр_НазваниеГазеты :String;
+    if (ФрагментНазвания <> nil) and (ФрагментНазвания <> 'Все') then
+      if (ВариантПростогоФильтра = 1) then
+        Return 'Match(НазваниеОсн,"*' + ФрагментНазвания + '*")';
+      else
+        Return 'Match(НазваниеОсн,"' + ФрагментНазвания + '*")';
+      fi;
+    fi;
+  end;
+
+  func ПолучитьФильтр_ГодГазеты :String;
+    if ГодГазеты > 0 then
+      Return 'НомераГазеты.Exists(ГодВыпуска=' + Str(ГодГазеты) + ')';
+    fi;
+  end;
+
+  func ПолучитьФильтр_НомерГазеты :String;
+    if (НомерГазеты <> nil) and (НомерГазеты <> 'Все') then
+      Return 'НомераГазеты.Exists(Номер="' + НомерГазеты + '")';
+    fi;
+  end;
+
+  proc ВключитьИерархию; -- перекрыть в возможных наследниках
+    ОтключитьИерархию = false;
+  end;
+
+  proc МодифицироватьШаблон;
+    inherited МодифицироватьШаблон;
+    секцСтатистикаФильтра2.Visible = (клУпрИнфОСтат.Contents  = SymbolExpanded);
+    секцИнфОСмене2.Visible         = (клУпрИнфОСмене.Contents = SymbolExpanded);
+    секцИнфОСмене3.Visible         = (клУпрИнфОСмене.Contents = SymbolExpanded);
+    секцУДК2.Visible               = (клУпрИнфУДК.Contents    = SymbolExpanded);
+    секцСтатья2.Visible            = (клУпрИнфСтатья.Contents = SymbolExpanded);
+  end;
+
+end

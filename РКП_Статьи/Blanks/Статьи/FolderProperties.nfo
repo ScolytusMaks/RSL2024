@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Properties Version="1"/>
+<Items>
+  <Item Name="редГруппаСтатей"/>
+  <Item Name="редСтатья"/>
+  <Item Name="редГазета"/>
+  <Item Name="Запросы"/>
+  <Item Name="Отчеты"/>
+  <Item Name="блТестRtf"/>
+  <Item Name="блТестRtf2"/>
+  <Item Name="редВыпускЛГС"/>
+  <Item Name="редВыпускЛГС_00"/>
+  <Item Name="редВыпускЛГС_01"/>
+  <Item Name="редВыпускЛГС_02"/>
+  <Item Name="редВыпускЛГС_03"/>
+  <Item Name="редВыпускЛГС_04"/>
+  <Item Name="редВыпускЛГС_05"/>
+  <Item Name="редВыпускЛГС_06"/>
+  <Item Name="редВыпускЛГС_07"/>
+  <Item Name="редвыпускЛГС_08"/>
+  <Item Name="редВыпускЛГС_09"/>
+  <Item Name="редВыпускПК"/>
+  <Item Name="редВыпускПК_01"/>
+  <Item Name="редВыпускПК_02"/>
+  <Item Name="редВыпускПК_02_в1"/>
+  <Item Name="редВыпускПК_03"/>
+</Items>

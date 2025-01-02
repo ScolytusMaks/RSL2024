@@ -1,0 +1,57 @@
+class inherited Справочники.FalseCardType2 "Территории распространения";
+
+import РКП_СИС Classes Profile, StringsFunctions, Functions, Recs, FilterMaker;
+import Classes Def;
+
+
+--{{ 2_Свойства
+
+inclass private
+
+  var КлассИнтерфейса :Class RI.Справочники.ТерриторияРаспространения := RI.Справочники.ТерриторияРаспространения;
+
+inobject private
+
+  var SelectedRecord :спрТерриторияРаспространения; -- Проброс выбранного значения
+
+--}}
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+-- 2_Вспомогательные методы0. --
+
+  proc ИнициализироватьКартотеку;
+    inherited ИнициализироватьКартотеку;
+    crdBuiltIn.CanInsert = true in [DevAccess, AdmAccess, FullAccess, (кмпОРГПзав in Компетенции)];
+    crdBuiltIn.CanDelete = true in [DevAccess, AdmAccess, FullAccess, (кмпОРГПзав in Компетенции)];
+  end;
+
+  proc ИнициализироватьСтолбцыКартотеки;
+    inherited ИнициализироватьСтолбцыКартотеки;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'Наим';
+      Caption = 'Наименование';
+      FieldType = Template.StringField;
+      Alignment = Template.LeftAlign;
+      Font.Size = crdBuiltIn.Font.Size;
+      MinWidth = 100;
+      Width = 0;
+      CanEdit = false;
+    end;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'НеПрименяется';
+      Caption = 'Не применяется';
+      Hint = 'Более не применяется';
+      FieldType = Template.LogicalField;
+      Alignment = Template.CenterAlign;
+      MinWidth = 160;
+      Width = 160;
+      Visible = false;
+      CanEdit = false;
+    end;
+  end;
+
+
+end

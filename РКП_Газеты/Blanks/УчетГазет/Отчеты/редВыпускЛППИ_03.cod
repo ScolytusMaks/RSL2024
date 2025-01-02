@@ -1,0 +1,111 @@
+class inherited ”чет√азет.ќтчеты.–ед¬ыпускЋѕѕ»_02 "";
+
+inclass
+
+inobject
+
+--------------------------------------------------------------------------------
+--{ ќбработчики событий бланка
+var —трокаяз”казател€[]:string;
+
+ proc јнализязыков»зданий;
+    var Q                       : Query;
+    var k                       : integer;
+    var Qg                      : Query;
+    var kg                      : integer;
+    var j                       : integer;
+    var h                       : integer;
+    var Ќазваниеќсн             : string;
+    —трокаяз”казател€   = nil;
+    Q                   = Query.Create([– ѕ_—правочники.—прязык»здани€]);
+    Q.Filter            = "√осяз–‘=false";
+    Q.Order             = "Ќаим";
+    Q.Select;
+    Q.First;
+    for k = 1..Q.Count  do
+    Hint("”казатель €зыков...",k,Q.Count);
+      Qg                = Query.Create([– ѕ_√азеты.√азета]);
+      --Qg.Filter         = "(ѕризнакќтсылки=false and √одЋетописи="+Str(√одЋетописи)+") ";
+      Qg.Filter         = "(√одЋетописи="+Str(√одЋетописи)+") ";
+      Qg.Filter         = Qg.Filter+" and языки.Exists(язык.DocId="+Str(Q.Current.DocId)+")";
+      Qg.Select;
+      if Qg.Count>0     then
+        j               = j+1;
+        —трокаяз”казател€[j]    = "|";
+        j               = j+1;
+        —трокаяз”казател€[j]    = "/*"+Q.Current.Ќаим+"*/";
+        j               = j+1;
+        —трокаяз”казател€[j]    = "|";
+        Qg.First;
+        for kg = 1..Qg.Count                    do
+          for h = 1..Qg.Current.языки.Count     do
+            if Qg.Current.языки.Items[h].язык.√осяз–‘=false     then
+              j                         = j+1;
+              Ќазваниеќсн=Qg.Current.Ќазваниеќсн;
+              if Pos(" = ",Ќазваниеќсн)>0 then
+                Ќазваниеќсн     = SubStr(Ќазваниеќсн,Pos(" = ",Ќазваниеќсн)+3,Length(Ќазваниеќсн))+
+                                  " = "+
+                                  SubStr(Ќазваниеќсн,1,Pos(" = ",Ќазваниеќсн)-1);
+              end;
+              if Qg.Current.ѕризнакќтсылки=false                then
+              —трокаяз”казател€[j]      = "    "+Ќазваниеќсн;
+                if Qg.Current.ћеста»здани€.Count>0              then
+                —трокаяз”казател€[j]    = —трокаяз”казател€[j]+". "+Qg.Current.ћеста»здани€.Items[1].ћесто»здани€.Ќаим;
+                end;
+              —трокаяз”казател€[j]      = —трокаяз”казател€[j]+" "+Str(Qg.Current.Ќомер¬Ћетописи);
+              else
+              if  Qg.Current.ќтсылка<>nil  and Qg.Current.ќтсылка.√одЋетописи=√одЋетописи        then
+              —трокаяз”казател€[j]      = "    "+SubStr(Ќазваниеќсн,1,Pos('. - ',Ќазваниеќсн)-1);
+--                if Qg.Current.ћеста»здани€.Count>1              then
+                if Qg.Current.ћеста»здани€.Count>0              then
+                —трокаяз”казател€[j]    = —трокаяз”казател€[j]+". "+Qg.Current.ћеста»здани€.Items[1].ћесто»здани€.Ќаим;
+                end;
+              —трокаяз”казател€[j]      = —трокаяз”казател€[j]+" "+Str(Qg.Current.ќтсылка.Ќомер¬Ћетописи);
+              end;
+              end;
+            end;
+          end;
+        Qg.Next;
+        end;
+      end;
+      Qg.Close;
+      Q.Next;
+    end;
+    Q.Close;
+ end;
+
+
+
+  proc —озданиеяз”казател€;
+    var k       : integer;
+    var Ћѕѕ»    : TextFile;
+    јнализязыков»зданий;
+    -------
+    if    ExistFolder(ѕапкаЋѕѕ») = false                        then
+      CreateFolder(ѕапкаЋѕѕ»);
+    end;
+    if  ExistFile(ѕапкаЋѕѕ»+"\яз”казатель.txt") = true     then
+      RemoveFile(ѕапкаЋѕѕ»+"\яз”казатель.txt");
+    end;
+    Ћѕѕ»        = TextFile.Create(ѕапкаЋѕѕ»+"\яз”казатель.txt",fmCreate);
+    ------
+    Ћѕѕ».WriteLn("");
+    Ћѕѕ».WriteLn("” ј«ј“≈Ћ№ √ј«≈“, »«ƒјёў»’—я Ќј я«џ ј’ Ќј–ќƒќ¬");
+    Ћѕѕ».WriteLn("–ќ——»…— ќ… ‘≈ƒ≈–ј÷»» ( –ќћ≈ –”—— ќ√ќ)");
+    Ћѕѕ».WriteLn("» Ќј »Ќќ—“–јЌЌџ’ я«џ ј’");
+    Ћѕѕ».WriteLn("");
+    for k=1..LengthOfArray(—трокаяз”казател€)                   do
+      Hint("‘ормирование файла...",k,LengthOfArray(—трокаяз”казател€));
+      if —трокаяз”казател€[k]<>""                               and
+         —трокаяз”казател€[k]<>"|"                              then
+      Ћѕѕ».WriteLn(—трокаяз”казател€[k]);
+      end;
+      if —трокаяз”казател€[k]="|"                               then
+      Ћѕѕ».WriteLn("");
+      end;
+    end;
+    end;
+
+--}
+
+end

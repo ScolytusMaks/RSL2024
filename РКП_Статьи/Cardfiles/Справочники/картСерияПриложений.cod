@@ -1,0 +1,59 @@
+class inherited РКП_Справочники.Справочники.CardBaseType1 "Серии статей";
+
+  import СИС2 classes Константы, Исключения;
+  import РКП_СИС Classes Functions, FilterMaker;
+
+inclass private
+
+  var КлассИнтерфейса :Class РКП_Справочники.RI.Справочники.intBaseType1 = RI.Справочники.СерияПриложений;
+
+inobject private
+
+  var ГлавнаяГазета :РКП_Газеты.Газета;
+
+  func ПолучитьФильтрКартотеки (var locTreeFilter :String = nil) :String;
+    var aFlt :String[];
+    AddInArray( aFlt, ПолучитьФильтрПоФрагменту );
+    if (ГлавнаяГазета <> nil) then
+      AddInArray( aFlt, 'Газета=' + ГлавнаяГазета.DocIDStr );
+    fi;
+    Result = MakeFilter(aFlt);
+  end;
+
+  func картотека_ПриСозданииЗаписи(var Record :Record) :Logical;
+    var Газета_, Приложение_ :РКП_Газеты.Газета;
+    var CardForSelect :CardForm;
+    var Решение1, Решение2 :Integer;
+    if (ГлавнаяГазета <> nil) then
+      ПараметрыНовойЗаписи[1] = ['Газета', ГлавнаяГазета];
+    fi;
+    Result = inherited картотека_ПриСозданииЗаписи(Record);
+    if Result then
+      if (ГлавнаяГазета <> nil) then
+        Record.Газета = ГлавнаяГазета;
+        Return true;
+      else
+        Message('Пожалуйста, выберте газету, включенную в список сектора ЛГС!');
+        CardForSelect = РКП_Статьи.Статьи.картГазетыВыбор.Create;
+        Решение1 = CardForSelect.ShowEx(Газета_, 'РосписьСтатей', Window.ModalWindow);
+        if (Решение1 = CmOk) then
+          Message('Пожалуйста, выберте приложение к газете!');
+          CardForSelect = РКП_Статьи.Статьи.картГазетыВыборПрил.Create;
+          CardForSelect.ФрагментПодзаголовка = 'прил';
+          Решение2 = CardForSelect.ShowEx(Приложение_, '', Window.ModalWindow);
+          Record = РКП_Статьи.СпрСерияПриложений.Create;
+          Record.Газета = Газета_;
+          if (Решение2 = CmOk) then
+            Record.Приложение = Приложение_;
+            Record.Наим       = Приложение_.НазваниеОсн;
+          fi;
+          Return true;
+        else
+          Return false;
+        fi;
+      fi;
+    fi;
+  end;
+
+
+end

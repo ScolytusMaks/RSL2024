@@ -1,0 +1,13 @@
+class inherited УчетГазет.Запросы.блОтборГазет "Запрос: условия отбора газет";
+
+inobject
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    inherited шаблон_ПриОткрытии(Create);
+  end;
+
+  proc КнОК_ПриНажатии(Sender :Button);
+    Close(cmOk);
+  end;
+
+end

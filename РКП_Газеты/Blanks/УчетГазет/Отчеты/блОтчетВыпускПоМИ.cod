@@ -1,0 +1,571 @@
+class inherited РКП_Газеты.УчетГазет.Отчеты.блОтчетСтатРГБазовый2 "Выпуск газет по месту издания";
+
+import СИС2 classes Функции, СтроковыеФункции;
+import РКП_Справочники classes Def;
+
+inobject private
+
+--{{ 2_Свойства
+
+  var ОтступСтр2 :String := RepStr(' ', 8);
+--}}
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func ПолеСодержаниеСтрокиПриНажатии(Cell :TemplateCell;Action :Template.ClickTypes) :Logical;
+    var aRequestData :Variant[];
+    with РКП_Газеты.УчетГазет.Отчеты.блОтчетУточнение1 do
+      aRequestData[дзОписание]                 = 'по месту издания "' + Trim(СодержаниеСтроки[Cell.Frame]) + '"';
+      aRequestData[дзФильтрУточнения]          = ФильтрПоступлений[Cell.Frame];
+      aRequestData[дзДатаН]                    = ДатаН;
+      aRequestData[дзДатаК]                    = ДатаК;
+      aRequestData[дзЗаГод]                    = ЗаГод;
+      aRequestData[дзПериодЗапроса]            = ПериодЗапроса;
+      aRequestData[дзОкруг]                    = Округ;
+      aRequestData[дзФильтрМестаИздания]       = ФильтрМестаИздания;
+      aRequestData[дзПравилоРасчетаСтатистики] = ПравилоРасчетаСтатистики;
+      ShowPopupForm(aRequestData);
+    end;
+  end;
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+-- 2_Вспомогательные методы0. --
+
+  proc 2_ПостроениеОтчета0.;
+    inherited ПостроениеОтчета;
+    if ПериодОтчетаКорректный then
+      ПостроениеОтчета_СозданиеПозиций;
+      ПостроениеОтчета_РасчетПозиций;
+      ПостроениеОтчета_РасчетИтогов;
+    fi;
+  end;
+
+  proc ПостроениеОтчета_СозданиеПозиций;
+    var d, dd :Integer;
+    var aDistrict, aRFSubject, aUndefinedPlace :РКП_Справочники.СпрГеография[];
+    var z :Integer; -- RL счетчик строк отчета
+    var IssueFilterByDistrict, IssueFilterBySubject :string;
+    var GeoFilterByDistrict :string;
+    var s, ss :Integer;
+    var u, uu :Integer;
+    aDistrict = ПолучитьФедеральныеОкруга;
+    dd = LengthOfArray(aDistrict);
+    for d = 1 .. dd do
+      Hint('Формирование строк для ' + aDistrict[d].Наим + ' федерального округа...', d, dd);
+      z = z + 1;
+      секцПозиции.InsertFrame(z);
+      InsertInArray(Сепаратор, z, true);
+      InsertInArray(КатегорияМеста, z, 1);
+      InsertInArray(СодержаниеСтроки, z, aDistrict[d].Наим);
+      InsertInArray(ЗаписьСтроки, z, aDistrict[d]);
+      IssueFilterByDistrict = ПолучитьФильтрПоступлений(aDistrict[d]);
+      GeoFilterByDistrict = ПолучитьФильтрМест(aDistrict[d]);
+      InsertInArray(ФильтрПоступлений, z, IssueFilterByDistrict);
+      aRFSubject = ПолучитьСубъектыРФ(GeoFilterByDistrict);
+      -- цикл по субъектам РФ внутри региона
+      ss = LengthOfArray(aRFSubject);
+      for s = 1 .. ss do
+        z = z + 1;
+        секцПозиции.InsertFrame(z);
+        if (ФильтрМестаИздания <> nil) then
+          if (Округ = aRFSubject[s]) then
+            InsertInArray(Сепаратор, z, true);
+          fi;
+        fi;
+        InsertInArray(СодержаниеСтроки, z, ОтступСтр2 + aRFSubject[s].Наим);
+        InsertInArray(ЗаписьСтроки, z, aRFSubject[s]);
+        InsertInArray(УровеньПодчиненности, z, РКП_СИС.Recs.RecordsLevel(aRFSubject[s]));
+        InsertInArray(КатегорияМеста, z, aRFSubject[s].Категория);
+        if  aRFSubject[s].Категория in ктрАвтономныеСубъектыРФ then
+          IssueFilterBySubject = ПолучитьФильтрПоступлений_АвтономныеСубъектыРФ(aRFSubject[s]);
+        else
+          IssueFilterBySubject = ПолучитьФильтрПоступлений_КромеАвтономныхСубъектовРФ(aRFSubject[s]);
+        fi;
+        InsertInArray(ФильтрПоступлений, z, IssueFilterBySubject);
+
+      od; -- окончание цикла по субъектам РФ внутри региона
+    od; -- окончание цикла по федеральным округам
+    Hint(' ');
+    --Добавление строки без места
+    aUndefinedPlace = ПолучитьНеопределенныеТерритории;
+    uu = LengthOfArray(aUndefinedPlace);
+    for u = 1 .. uu do
+      z = z + 1;
+      секцПозиции.InsertFrame(z);
+      InsertInArray(СодержаниеСтроки, z, aUndefinedPlace[u].Наим);
+      InsertInArray(ЗаписьСтроки, z, aUndefinedPlace[u]);
+      InsertInArray(УровеньПодчиненности, z, РКП_СИС.Recs.RecordsLevel(aUndefinedPlace[u]));
+      InsertInArray(КатегорияМеста, z, aUndefinedPlace[u].Категория);
+      InsertInArray(ФильтрПоступлений, z, '(МестоИздания=nil or МестоИздания=' + Str(aUndefinedPlace[u]) + ')');
+    od;
+  end;
+
+  func ПолучитьФедеральныеОкруга :РКП_Справочники.СпрГеография[];
+    with Query.Create([РКП_Справочники.СпрГеография]) do
+      Filter = 'Категория=' + Str(ктрФедеральныйОкруг);
+      Order = 'Наим';
+      Select;
+      while not Eof do
+        AddInArray(Result, Current as РКП_Справочники.СпрГеография);
+        Next;
+      od;
+    end;
+  end;
+
+  func ПолучитьФильтрПоступлений (rGeo :РКП_Справочники.СпрГеография) :String;
+    Return 'МестоИздания.GroupDoc is ' + rGeo.DocIdStr + ' or МестоИздания.DocId=' + Str(rGeo.DocId);
+  end;
+
+  func ПолучитьФильтрПоступлений_АвтономныеСубъектыРФ (rGeo :РКП_Справочники.СпрГеография) :String;
+    var aFlt, aFltOr :String[];
+    aFlt[1] = ПолучитьФильтрПоступлений(rGeo);
+    aFlt[2] = ФильтрПоступлений_АвтономныеСубъектыРФ;
+    aFltOr[1] = СложитьСтрокиФильтраПоИ(aFlt);
+    aFltOr[2] = 'МестоИздания=' + Str(rGeo);
+    Result = СложитьСтрокиФильтраПоИли(aFltOr);
+  end;
+
+  func ФильтрПоступлений_АвтономныеСубъектыРФ :String;
+    var aFlt :String[];
+    aFlt[1] = 'МестоИздания.Категория in ' + ToStr(ктрАвтономныеСубъектыРФ);
+    aFlt[2] = 'МестоИздания.GroupDoc.Категория in ' + ToStr(ктрАвтономныеСубъектыРФ);
+    aFlt[3] = 'МестоИздания.GroupDoc.GroupDoc.Категория in ' + ToStr(ктрАвтономныеСубъектыРФ);
+    Result = СложитьСтрокиФильтраПоИли(aFlt);
+  end;
+
+  func ПолучитьФильтрПоступлений_КромеАвтономныхСубъектовРФ (rGeo :РКП_Справочники.СпрГеография) :String;
+    var aFlt, aFltOr :String[];
+    aFlt[1] = ПолучитьФильтрПоступлений(rGeo);
+    aFlt[2] = ФильтрПоступлений_КромеАвтономныхСубъектовРФ;
+    aFltOr[1] = СложитьСтрокиФильтраПоИ(aFlt);
+    aFltOr[2] = 'МестоИздания=' + Str(rGeo);
+    Result = СложитьСтрокиФильтраПоИли(aFltOr);
+  end;
+
+  func ФильтрПоступлений_КромеАвтономныхСубъектовРФ :String;
+    var aFlt :String[];
+    aFlt[1] = 'МестоИздания.Категория>' + Str(ктрФедеральныйОкруг);
+    aFlt[2] = 'not (МестоИздания.Категория in ' + ToStr(ктрАвтономныеСубъектыРФ) + ')';
+    aFlt[3] = 'not (МестоИздания.GroupDoc.Категория in ' + ToStr(ктрАвтономныеСубъектыРФ) + ')';
+    aFlt[4] = 'not (МестоИздания.GroupDoc.GroupDoc.Категория in ' + ToStr(ктрАвтономныеСубъектыРФ) + ')';
+    Result = СложитьСтрокиФильтраПоИ(aFlt);
+  end;
+
+  func ПолучитьФильтрМест (rGeo :РКП_Справочники.СпрГеография) :String;
+    Return 'GroupDoc is ' + rGeo.DocIdStr + ' or DocId=' + Str(rGeo.DocId);
+  end;
+
+  func ПолучитьСубъектыРФ(DistrictFlt :String) :РКП_Справочники.СпрГеография[];
+    var aFlt :String[];
+    with Query.Create([РКП_Справочники.СпрГеография]) do
+      aFlt[1] = DistrictFlt;
+      aFlt[2] = 'Категория in ' + ToStr(ктрСубъектыРФ);
+      Filter = СложитьСтрокиФильтраПоИ(aFlt);
+      Order = 'Наим';
+      Select;
+      while not Eof do
+        AddInArray(Result, Current as РКП_Справочники.СпрГеография);
+        Next;
+      od;
+    end;
+  end;
+
+  func ПолучитьНеопределенныеТерритории :РКП_Справочники.СпрГеография[];
+    with Query.Create([РКП_Справочники.СпрГеография]) do
+      Filter = 'Категория = ' + ToStr(ктрНеОпределено);
+      Select;
+      while not Eof do
+        AddInArray(Result, Current as РКП_Справочники.СпрГеография);
+        Next;
+      od;
+    end;
+  end;
+
+
+  proc ПостроениеОтчета_РасчетИтогов;
+    var ВсегоГазет_: integer;
+    var ВсегоНомеров_: integer;
+    var ВсегоРазовыйТираж_: numeric;
+    var ВсегоГодовойТираж_: numeric;
+    var k, kk, j :Integer;
+    ВсегоГазет_        = nil;
+    ВсегоНомеров_      = nil;
+    ВсегоРазовыйТираж_ = nil;
+    ВсегоГодовойТираж_ = nil;
+    kk = секцПозиции.Count;
+    for k = 1 .. kk do
+      j = kk + 1 -k;
+      -- вычисление промежуточного и общего итогов
+      if (not Сепаратор[j]) or (КатегорияМеста[j] = ктрНеОпределено) then
+        -- накопление промежуточных значений
+        ВсегоГазет_        = ВсегоГазет_        + КолГазет[j];
+        ВсегоНомеров_      = ВсегоНомеров_      + КолНомеров[j];
+        ВсегоРазовыйТираж_ = ВсегоРазовыйТираж_ + РазовыйТираж[j];
+        ВсегоГодовойТираж_ = ВсегоГодовойТираж_ + ГодовойТираж[j];
+        -- накопление итоговых значений
+        ВсегоГазет         = ВсегоГазет         + КолГазет[j];
+        ВсегоНомеров       = ВсегоНомеров       + КолНомеров[j];
+        ВсегоРазовыйТираж  = ВсегоРазовыйТираж  + РазовыйТираж[j];
+        ВсегоГодовойТираж  = ВсегоГодовойТираж  + ГодовойТираж[j];
+      fi;
+      -- присвоение промежуточных итогов
+      if Сепаратор[j] then
+        КолГазет[j]     = ВсегоГазет_;
+        КолНомеров[j]   = ВсегоНомеров_;
+        РазовыйТираж[j] = ВсегоРазовыйТираж_;
+        ГодовойТираж[j] = ВсегоГодовойТираж_;
+      fi;
+      -- очистка промежуточных итогов, если следующая строка - не последняя и не сепаратор,
+      -- а текущая - сепаратор или без места
+      if (j > 1) then -- следующая строка - не последняя
+        if (not Сепаратор[j-1]) then -- следующая строка - не сепаратор
+          if Сепаратор[j] or (КатегорияМеста[j] = ктрНеОпределено) then
+            ВсегоГазет_        = nil;
+            ВсегоНомеров_      = nil;
+            ВсегоРазовыйТираж_ = nil;
+            ВсегоГодовойТираж_ = nil;
+          fi;
+        fi;
+      fi;
+      -- снятие признака сепаратора для предотвращения удаления строки
+      if  Сепаратор[j] then
+        Сепаратор[j] = false;
+      fi;
+    od;
+    УдалитьПустыеСтроки; --Удаление строк, не содержащих значений
+  end;
+
+
+ --= OLD =--
+
+--  proc РасчетПозиции_ЗаПроизвольныйПериод(vLine :Integer; aHint :Variant[]);
+--    var aFlt :String[];
+--    var aResult :Variant[];
+--    var j, jj :Integer;
+--    if (Округ = nil) then
+--      aFlt[1] = 'ГодПоступления=' + Str(Year(ДатаН));
+--      aFlt[2] = ФильтрПоступлений[vLine];
+--      aFlt[3] = 'НомеровПолучено>0';
+--    else
+--      aFlt[1] = 'ГодПоступления=' + Str(Year(ДатаН));
+--      aFlt[2] = ФильтрПоступлений[vLine];
+--      aFlt[3] = ФильтрМестаИздания;
+--      aFlt[4] = 'НомеровПолучено>0';
+--    fi;
+--    with Query.Create([РКП_Газеты.ПоступлениеГазеты]) do
+--      Filter = СложитьСтрокиФильтраПоИ(aFlt);
+--      LoadingFieldsMode = СИС2.Константы.mdNone;
+--      LoadingFields = 'Газета';
+--      Select;
+--      jj = Count;
+--      while not Eof do
+--        j = j + 1;
+--        Hint(aHint[1] as string + ' [ ' + Str(j) + '/' + Str(jj) + ' ]' , aHint[2] as integer, aHint[3] as integer);
+--        if (ПравилоРасчетаСтатистики = Константы.статПравилоПоПоступлению) then
+--          aResult = ПолучитьСтатистикуПоступлений_ПоНомерам((Current as РКП_Газеты.ПоступлениеГазеты).Газета);
+--        else
+--          aResult = ПолучитьСтатистикуВыпуска_ПоНомерам((Current as РКП_Газеты.ПоступлениеГазеты).Газета);
+--        fi;
+--        КолГазет[vLine]       = КолГазет[vLine]     + aResult[1] as Integer;
+--        КолНомеров[vLine]     = КолНомеров[vLine]   + aResult[2] as Integer;
+--        РазовыйТираж[vLine]   = РазовыйТираж[vLine] + aResult[3] as Numeric;
+--        ГодовойТираж[vLine]   = ГодовойТираж[vLine] + aResult[4] as Numeric;
+--        Next;
+--      od;
+--    end;
+--  end;
+
+
+--  func ПолучитьСтатистикуВыпуска_ПоНомерам (vNewspaper :РКП_Газеты.Газета) :Variant[];
+--    var aFlt :String[];
+--    var aResult :Variant[];
+--    with Query.Create([РКП_Газеты.НомерГазеты]) do
+--      aFlt[1] = 'Газета=' + vNewspaper.DocIDStr;
+--      aFlt[2] = 'ГодВыпуска=' + Str(ЗаГод);
+--      aFlt[3] = 'isGroup=0';
+--      aFlt[4] = 'not(СозданОЛГС and НеПолучен)';
+--      --aFlt[5] = 'not ЛожныйНомер';
+--      Filter = СложитьСтрокиФильтраПоИ(aFlt);
+--      aResult = CalcAggregates('Count,Sum(Тираж)') as Variant[];
+--      if ((aResult[1] as Integer) > 0) then
+--        Result[1] = 1;
+--        Result[2] = aResult[1] as Integer;
+--        Result[3] = ((aResult[2] as Numeric) / 1000) / (aResult[1] as Integer);
+--        Result[4] = (aResult[2] as Numeric) / 1000;
+--      else
+--        Result[1] = 0;
+--        Result[2] = 0;
+--        Result[3] = 0.0;
+--        Result[4] = 0.0;
+--      fi;
+--    end;
+--  end;
+
+
+--  proc ПостроитьОтчет(Sender :Button);
+--    var Q1,Q2,Q                   : query;
+--    var k,k1,z,k2,j,kk            : integer;
+--    var ФильтрПоступлений1        : string;
+--    var ФильтрМест1               : string;
+--    var ФильтрПоступлений2        : string;
+--    var DocID1,DocID2             : string;
+--    var ОтступСтр2                : string;
+--    var QResult                   : Variant[];
+--    var УровеньПодчиненности_     : integer;
+--    var КатегорияОбъекта_         : integer;
+--    var ВсегоГазет_               : integer;
+--    var ВсегоНомеров_             : integer;
+--    var ВсегоРазовыйТираж_        : numeric;
+--    var ВсегоГодовойТираж_        : numeric;
+--    inherited ПостроитьОтчет(Sender);
+--    ОтступСтр2          = RepStr(" ",8);
+--      if  ПериодОтчетаКорректный then
+--      -- Построение списка федеральных округов
+--        Q1                        = Query.Create([РКП_Справочники.СпрГеография]);
+--        Q1.Order                  = "Наим";
+--        Q1.Filter                 = "Категория=1";
+--        Q1.Select;
+--        Q1.First;
+--        for k1 =  1..Q1.Count      do     -- цикл по регионам РФ
+--           z      = z+1;
+--           секцПозиции.InsertFrame(z);
+--           InsertInArray(Сепаратор,z,true);
+--           InsertInArray(КатегорияМеста,z,1);
+--           InsertInArray(СодержаниеСтроки,z,Q1.Current.Наим);
+--           InsertInArray(ЗаписьСтроки,z,Q1.Current);
+--           DocID1 = Str(Q1.Current.DocID);
+--           ФильтрПоступлений1 = "МестоИздания.GroupDoc.GroupDoc.GroupDoc.GroupDoc.DocID = "+DocID1+" or "+
+--                                "МестоИздания.GroupDoc.GroupDoc.GroupDoc.DocID = "+DocID1+" or "+
+--                                "МестоИздания.GroupDoc.GroupDoc.DocID = "+DocID1+" or "+
+--                                "МестоИздания.GroupDoc.DocID = "+DocID1+" or "+
+--                                "МестоИздания.DocID = "+DocID1;
+--           ФильтрМест1        = "GroupDoc.GroupDoc.GroupDoc.GroupDoc.DocID = "+DocID1+" or "+
+--                                "GroupDoc.GroupDoc.GroupDoc.DocID = "+DocID1+" or "+
+--                                "GroupDoc.GroupDoc.DocID = "+DocID1+" or "+
+--                                "GroupDoc.DocID = "+DocID1+" or "+
+--                                "DocID = "+DocID1;
+--           InsertInArray(ФильтрПоступлений,z,ФильтрПоступлений1);
+--      -- Построение списка ВНУТРИ федерального округа
+--             Q2                   = Query.Create([РКП_Справочники.СпрГеография]);
+--             Q2.Order             = "Наим";
+--             Q2.Filter            = "("+ФильтрМест1+") and (Категория>1 and Категория<8)";
+--             Q2.Select;
+--             Q2.First;
+--             for k2 =  1..Q2.Count      do     -- цикл по субъектам РФ внутри региона
+--               z                  = z+1;
+--               секцПозиции.InsertFrame(z);
+--               if ФильтрМестаИздания<>nil                 then
+--                 if Округ.DocID=Q2.Current.DocID          then
+--                   InsertInArray(Сепаратор,z,true);
+--                 end;
+--               end;
+--               InsertInArray(СодержаниеСтроки,z,ОтступСтр2+Q2.Current.Наим);
+--               InsertInArray(ЗаписьСтроки,z,Q2.Current);
+--               УровеньПодчиненности_      = РКП_СИС.Гео.УровеньВложенности(Q2.Current);
+--               InsertInArray(УровеньПодчиненности,z,УровеньПодчиненности_);
+--               КатегорияОбъекта_          = Q2.Current.Категория;
+--               InsertInArray(КатегорияМеста,z,КатегорияОбъекта_);
+--               DocID2             = Str(Q2.Current.DocID);
+--               if    КатегорияОбъекта_=5                  or
+--                     КатегорияОбъекта_=6                  or
+--                     КатегорияОбъекта_=7                  then
+--                   ФильтрПоступлений2 = "(МестоИздания.GroupDoc.GroupDoc.GroupDoc.GroupDoc.GroupDoc.DocID = "+DocID2+" or "+
+--                                        " МестоИздания.GroupDoc.GroupDoc.GroupDoc.GroupDoc.DocID = "+DocID2+" or "+
+--                                        " МестоИздания.GroupDoc.GroupDoc.GroupDoc.DocID = "+DocID2+" or "+
+--                                        " МестоИздания.GroupDoc.GroupDoc.DocID = "+DocID2+" or "+
+--                                        " МестоИздания.GroupDoc.DocID = "+DocID2+" or "+
+--                                        " МестоИздания.DocID = "+DocID2+") and "+
+--                                        "(МестоИздания.Категория>1) and ("+
+--                                        " МестоИздания.GroupDoc.GroupDoc.Категория=5 or"+
+--                                        " МестоИздания.GroupDoc.Категория=5 or"+
+--                                        " МестоИздания.Категория=5 or"+
+--                                        " МестоИздания.GroupDoc.GroupDoc.Категория=6 or"+
+--                                        " МестоИздания.GroupDoc.Категория=6 or"+
+--                                        " МестоИздания.Категория=6 or"+
+--                                        " МестоИздания.GroupDoc.GroupDoc.Категория=7 or"+
+--                                        " МестоИздания.GroupDoc.Категория=7 or"+
+--                                        " МестоИздания.Категория=7"+
+--                                        ")"2+" or МестоИздания.DocID = "+DocID20;
+--               else
+--                   ФильтрПоступлений2 = "(МестоИздания.GroupDoc.GroupDoc.GroupDoc.GroupDoc.GroupDoc.DocID = "+DocID2+" or "+
+--                                        " МестоИздания.GroupDoc.GroupDoc.GroupDoc.GroupDoc.DocID = "+DocID2+" or "+
+--                                        " МестоИздания.GroupDoc.GroupDoc.GroupDoc.DocID = "+DocID2+" or "+
+--                                        " МестоИздания.GroupDoc.GroupDoc.DocID = "+DocID2+" or "+
+--                                        " МестоИздания.GroupDoc.DocID = "+DocID2+" or "+
+--                                        " МестоИздания.DocID = "+DocID2+") and "+
+--                                        "(МестоИздания.Категория>1) and ("+
+--                                        " МестоИздания.GroupDoc.GroupDoc.Категория<>5 and"+
+--                                        " МестоИздания.GroupDoc.Категория<>5 and"+
+--                                        " МестоИздания.Категория<>5 and"+
+--                                        " МестоИздания.GroupDoc.GroupDoc.Категория<>6 and"+
+--                                        " МестоИздания.GroupDoc.Категория<>6 and"+
+--                                        " МестоИздания.Категория<>6 and"+
+--                                        " МестоИздания.GroupDoc.GroupDoc.Категория<>7 and"+
+--                                        " МестоИздания.GroupDoc.Категория<>7 and"+
+--                                        " МестоИздания.Категория<>7 "+
+--                                        ")"+2" or МестоИздания.DocID = "+DocID2;
+--               end;
+--               InsertInArray(ФильтрПоступлений,z,ФильтрПоступлений2);
+--               Q2.Next;
+--             end;
+--           Q2.Close;
+------    -- Добавление позиции - абстрактно внутри субъекта
+------         z                      = z+1;
+------         секцПозиции.InsertFrame(z);
+------         InsertInArray(КатегорияМеста,z,Q1.Current.Категория);
+------         InsertInArray(СодержаниеСтроки,z,ОтступСтр2+Q1.Current.Наим+"*");
+------         InsertInArray(ЗаписьСтроки,z,Q1.Current);
+------         УровеньПодчиненности_      = РКП_СИС.Гео.УровеньВложенности(Q1.Current);
+------         InsertInArray(УровеньПодчиненности,z,УровеньПодчиненности_);
+------         DocID2             = Str(Q1.Current.DocID);
+------         ФильтрПоступлений2 = "(МестоИздания.DocID = "+DocID2+")";
+------         InsertInArray(ФильтрПоступлений,z,ФильтрПоступлений2);
+--      -- Завершение построения списка ВНУТРИ федерального округа
+--           Q1.Next;
+--        end;                              -- цикл по регионам РФ
+--        Q1.Close;
+--      --Добавление строки без места
+--        Q2                   = Query.Create([РКП_Справочники.СпрГеография]);
+--        Q2.Order             = "Наим";
+--        Q2.Filter            = "(Категория=0)";
+--        Q2.Select;
+--        Q2.First;
+--        for k2 =  1..Q2.Count      do     --
+--          z                  = z+1;
+--          секцПозиции.InsertFrame(z);
+--          InsertInArray(СодержаниеСтроки,z,Q2.Current.Наим);
+--          InsertInArray(ЗаписьСтроки,z,Q2.Current);
+--          УровеньПодчиненности_      = РКП_СИС.Гео.УровеньВложенности(Q2.Current);
+--          InsertInArray(УровеньПодчиненности,z,УровеньПодчиненности_);
+--          КатегорияОбъекта_          = Q2.Current.Категория;
+--          InsertInArray(КатегорияМеста,z,КатегорияОбъекта_);
+--          DocID2             = Str(Q2.Current.DocID);
+--          ФильтрПоступлений2 = "(МестоИздания=nil or МестоИздания.DocID = "+DocID2+")";
+--          InsertInArray(ФильтрПоступлений,z,ФильтрПоступлений2);
+--          Q2.Next;
+--        end;
+--        Q2.Close;
+--      --Расчет позиций
+--      for k = 1..секцПозиции.Count        do
+--        Hint("Расчет строки <"+СодержаниеСтроки[k]+">",k,секцПозиции.Count);
+--        if Сепаратор[k]=false     then
+--        if  ФильтрПоступлений[k] <> nil   then
+--        if        ЗаДату4 = true          then
+--        --========== расчет за год ==========--
+--        QResult                   = nil;
+--        Q                         = Query.Create([РКП_Газеты.ПоступлениеГазеты]);
+--        if Округ = nil            then
+--          Q.Filter                = "ГодПоступления="+Str(Year(ДатаН))+
+--                                    " and ("+ФильтрПоступлений[k]+")"+
+--                                    " and НомеровПолучено>0";
+--        else
+--          Q.Filter                = "ГодПоступления="+Str(Year(ДатаН))+
+--                                    " and ("+ФильтрПоступлений[k]+")"+
+--                                    " and ("+ФильтрМестаИздания+")"+
+--                                    " and НомеровПолучено>0";
+--        end;
+--        Q.LoadingFields           = "ГодовойТираж;НомеровПолучено;СреднийРазовыйТираж";
+--        Q.Select;
+--        QResult                   = Q.CalcAggregates("Count,Sum(НомеровПолучено),Sum(СреднийРазовыйТираж),Sum(ГодовойТираж)") as Variant[];
+--        КолГазет[k]               = QResult[1];
+--        КолНомеров[k]             = QResult[2];
+--        РазовыйТираж[k]           = QResult[3];
+--        ГодовойТираж[k]           = QResult[4];
+--        Q.Close;
+--        else
+--        --========== расчет за произвольный период ==========--
+--        Q                         = Query.Create([РКП_Газеты.ПоступлениеГазеты]);
+--        if Округ = nil            then
+--        Q.Filter                  = "ГодПоступления="+Str(Year(ДатаН))+
+--                                    " and ("+ФильтрПоступлений[k]+")"+
+--                                    " and НомеровПолучено>0";
+--        else
+--        Q.Filter                  = "ГодПоступления="+Str(Year(ДатаН))+
+--                                    " and ("+ФильтрПоступлений[k]+")"+
+--                                    " and ("+ФильтрМестаИздания+")"+
+--                                    " and НомеровПолучено>0";
+--        end;
+--        Q.LoadingFields           = "Газета";
+--        Q.Select;
+--        Q.First;
+--          for j = 1..Q.Count      do
+--            Q1                    =  Query.Create([РКП_Газеты.НомерГазеты]);
+--            Q1.Filter             = "Газета="+Str(Q.Current.Газета)+
+--                                    " and ДатаПринятияНаХранение>="+Str(ДатаН,"dd.mm.yyyy")+
+--                                    " and ДатаПринятияНаХранение<"+Str(ДатаК+1,"dd.mm.yyyy")+
+--                                    " and isGroup=0";
+--            Q1.Select;
+--            QResult               = Q1.CalcAggregates("Count,Sum(Тираж)") as Variant[];
+--             if  QResult[1]>0    then
+--                КолГазет[k]       = КолГазет[k]     + 1;
+--                КолНомеров[k]     = КолНомеров[k]   + QResult[1];
+--                РазовыйТираж[k]   = РазовыйТираж[k] + (QResult[2]/1000)/QResult[1];
+--                ГодовойТираж[k]   = ГодовойТираж[k] + QResult[2]/1000;
+--              end;
+--            Q.Next;
+--          end;
+--        end;
+--        end;
+--        end;
+--      end;
+
+--      --Вычисление итогов
+--      ВсегоГазет_             = nil;
+--      ВсегоНомеров_           = nil;
+--      ВсегоРазовыйТираж_      = nil;
+--      ВсегоГодовойТираж_      = nil;
+--      kk = секцПозиции.Count;
+--      for k = 1..kk                                       do
+--        j=kk+1-k;
+--        --вычисление промежуточного и общего итогов
+--        if    Сепаратор[j]=false or КатегорияМеста[j]=0   then
+--        --накопление промежуточных значений
+--          ВсегоГазет_             = ВсегоГазет_           + КолГазет[j]     ;
+--          ВсегоНомеров_           = ВсегоНомеров_         + КолНомеров[j]   ;
+--          ВсегоРазовыйТираж_      = ВсегоРазовыйТираж_    + РазовыйТираж[j] ;
+--          ВсегоГодовойТираж_      = ВсегоГодовойТираж_    + ГодовойТираж[j] ;
+--        --накопление итоговых значений
+--          ВсегоГазет              = ВсегоГазет            + КолГазет[j]     ;
+--          ВсегоНомеров            = ВсегоНомеров          + КолНомеров[j]   ;
+--          ВсегоРазовыйТираж       = ВсегоРазовыйТираж     + РазовыйТираж[j] ;
+--          ВсегоГодовойТираж       = ВсегоГодовойТираж     + ГодовойТираж[j] ;
+--        end;
+--        --присвоение промежуточных итогов
+--        if Сепаратор[j]=true                              then
+--          КолГазет[j]             = ВсегоГазет_           ;
+--          КолНомеров[j]           = ВсегоНомеров_         ;
+--          РазовыйТираж[j]         = ВсегоРазовыйТираж_    ;
+--          ГодовойТираж[j]         = ВсегоГодовойТираж_    ;
+--        end;
+--        --очистка промежуточных итогов, если следующая строка - не последняя и не сепаратор,
+--        --а текущая - сепаратор или без места
+--        if  j>1                                           then --следующая строка - не последняя
+--          if Сепаратор[j-1]=false                         then --следующая строка - не сепаратор
+--            if Сепаратор[j]=true or КатегорияМеста[j]=0   then
+--              ВсегоГазет_         = nil;
+--              ВсегоНомеров_       = nil;
+--              ВсегоРазовыйТираж_  = nil;
+--              ВсегоГодовойТираж_  = nil;
+--            end;
+--          end;
+--        end;
+--        --снятие признака сепаратора для предотвращения удаления строки
+--        if  Сепаратор[j]=true                             then
+--          Сепаратор[j]            = false;
+--        end;
+--      end;
+--      --Удаление строк, не содержащих значений
+--      УдалитьПустыеСтроки;
+--    else
+--      Message("Не заданы или неправильно заданы условия поcтроения отчета!");
+--    end;
+--  end;
+
+
+
+end

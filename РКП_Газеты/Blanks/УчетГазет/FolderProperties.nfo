@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Properties Version="1"/>
+<Items>
+  <Item Name="Справочники"/>
+  <Item Name="Запросы"/>
+  <Item Name="Отчеты"/>
+  <Item Name="Экспорт"/>
+  <Item Name="редГазета"/>
+  <Item Name="редНомерГазеты"/>
+  <Item Name="редВыпускГазеты"/>
+  <Item Name="блГодоваяСтатистикаВыпуска"/>
+  <Item Name="редГодоваяСтатистикаВыпуска"/>
+  <Item Name="редГодоваяСтатистикаПоступлений"/>
+  <Item Name="блВводНомеровСписком"/>
+  <Item Name="блВводПериодичности"/>
+  <Item Name="блИстория"/>
+  <Item Name="редУчетныйДокумент"/>
+  <Item Name="редЕдиницаХранения"/>
+  <Item Name="редНомер"/>
+</Items>

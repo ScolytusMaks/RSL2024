@@ -1,0 +1,220 @@
+﻿-- Обработка фамилии, имени, отчества
+-- Возврат значений
+-- Дано: ФИО или ИОФ. Надо: разложить на составляющие
+
+class "Декомпозитор ФИО";
+
+import classes StringsFunctions;
+
+inclass public
+
+  func CreateExt (aRawFullName :String) :NameSplitterSrv;
+    Result = inherited Create;
+    Result.RawFullName = aRawFullName;
+  end;
+
+inclass private
+
+  type tWordsStatus synonym типСостояниеСлова = (wsError=-1, wsAbsent, wsShort, wsFull);
+
+inobject public
+
+  func Surname synonym Фамилия :String;
+    if not SplitCompleted then
+      Make;
+    fi;
+    if SplitCompleted then
+      Return vSurname;
+    fi;
+  end;
+
+  func FirstName synonym Имя :String;
+    if not SplitCompleted then
+      Make;
+    fi;
+    if SplitCompleted then
+      Return vFirstName;
+    fi;
+  end;
+
+  func Patronymic synonym Отчество :String;
+    if not SplitCompleted then
+      Make;
+    fi;
+    if SplitCompleted then
+      Return vPatronymic;
+    fi;
+  end;
+
+  func Initials synonym Инициалы :String;
+    if not SplitCompleted then
+      Make;
+    fi;
+    if SplitCompleted then
+      Return vInitials;
+    fi;
+  end;
+
+
+inobject private
+
+  var RawFullName       :String;
+  var ExtractedWord     :String[];
+  var WordsStatus       :tWordsStatus[];
+  var WordsOrder        :Integer[];
+  var WordsOrderDefined :Logical;
+
+
+
+  var vSurname    :String;
+  var vFirstName  :String;
+  var vPatronymic :String;
+  var vInitials   :String;
+
+  var SplitCompleted :Logical;
+  var vErrMessage :String;
+
+inobject public
+
+  func Make :Logical;
+    SplitFullName;
+    SetWordStatus;
+    if WordsCount(RawFullName, ' ')    = 3 then DoSplit3;
+    elsif WordsCount(RawFullName, ' ') = 2 then DoSplit2;
+    elsif WordsCount(RawFullName, ' ') = 1 then DoSplit1;
+    elsif WordsCount(RawFullName, ' ') = 0 then -- ничего
+    else
+      vErrMessage = 'Фамилия (Фамилия Имя.)(Фамилия Имя. Отчестово.) не может состоять более, чем из трех слов. ' +
+                    'Сложные фамилии записываются через дефис БЕЗ ПРОБЕЛОВ! Между И. и О. ДОЛЖЕН быть пробел!' + Br +
+                    'Пожалуйста, исправьте ошибку!';
+      DisplayErrMessage;
+    fi;
+    if WordsOrderDefined then
+      vSurname    = ExtractedWord[WordsOrder[1]];
+      vFirstName  = ExtractedWord[WordsOrder[2]];
+      vPatronymic = ExtractedWord[WordsOrder[3]];
+      SetInitials;
+      SplitCompleted = true;
+    fi;
+    Return SplitCompleted;
+  end;
+
+inobject private
+
+  proc SplitFullName;
+    RawFullName = Trim(RawFullName);
+    ExtractedWord[1] = WithCapitalLetter( ExtractWord(RawFullName, 1, ' ') );
+    ExtractedWord[2] = WithCapitalLetter( ExtractWord(RawFullName, 2, ' ') );
+    ExtractedWord[3] = WithCapitalLetter( ExtractWord(RawFullName, 3, ' ') );
+  end;
+
+  proc SetWordStatus;
+    WordsStatus[1] = DefineWordsStatus(ExtractedWord[1]);
+    WordsStatus[2] = DefineWordsStatus(ExtractedWord[2]);
+    WordsStatus[3] = DefineWordsStatus(ExtractedWord[3]);
+  end;
+
+  proc DoSplit3;
+    if (WordsStatus = [wsShort, wsShort, wsFull]) then -- И. О. Фамилия
+      WordsOrder = [3,1,2];
+      WordsOrderDefined = true;
+    elsif WordsStatus = [wsShort, wsFull, wsFull] then -- И. Отчество Фамилия
+      vErrMessage = 'Вероятно, некорректная форма записи ("И." "Отчество" "Фамилия").' + Br + 'Пожалуйста, исправьте ошибку!';
+      DisplayErrMessage;
+    elsif WordsStatus = [wsFull, wsFull, wsFull] then -- Имя Отчество Фамилия или Фамилия Имя Отчестово (значение корректно, но определить порядок нельзя)
+      ChooseWordOrder3;
+    elsif WordsStatus = [wsFull, wsShort, wsShort] then -- Фамилия И.О.
+      SetDefaultWordOrder;
+    elsif WordsStatus = [wsFull, wsFull, wsShort] then -- Фамилия Имя О.
+      SetDefaultWordOrder;
+    else -- Ошибка ввода
+      vErrMessage = 'Вероятно, отсутствует точка в сокращении Имени или Отчества.' + Br + 'Пожалуйста, исправьте ошибку!';
+      DisplayErrMessage;
+    fi;
+  end;
+
+  proc DoSplit2;
+    if (WordsStatus = [wsShort, wsFull, wsAbsent]) then -- И. Фамилия
+      WordsOrder = [2,1,3];
+      WordsOrderDefined = true;
+    elsif (WordsStatus = [wsFull, wsShort, wsAbsent]) then -- Фамилия И.
+      SetDefaultWordOrder;
+    elsif (WordsStatus = [wsFull, wsFull, wsAbsent]) then -- Фамилия Имя или Имя Фамилия
+      ChooseWordOrder2;
+    elsif (WordsStatus = [wsFull, wsError, wsAbsent]) then -- Фамилия И.0. (И.О. без пробела)
+      vErrMessage = 'Вероятно, отсутствует пробел в "И.О.".' + Br + 'Пожалуйста, исправьте ошибку!';
+      DisplayErrMessage;
+    else -- Ошибка ввода
+      vErrMessage = 'Вероятно, отсутствует точка в сокращении Имени.' + Br + 'Пожалуйста, исправьте ошибку!';
+      DisplayErrMessage;
+    fi;
+  end;
+
+  proc DoSplit1;
+    if (WordsStatus = [wsFull, wsAbsent, wsAbsent]) then -- Только Фамилия
+      SetDefaultWordOrder;
+    elsif (WordsStatus = [wsShort, wsAbsent, wsAbsent]) then -- Например "Ф."
+      vErrMessage = 'Использование точки в фамилии недопустимо!' + Br + 'Пожалуйста, исправьте ошибку!';
+      DisplayErrMessage;
+    fi;
+  end;
+
+  -- Определить порядок слов (интерактивность в клиентском классе)
+  proc ChooseWordOrder3;
+    SetDefaultWordOrder;
+  end;
+
+  -- Определить порядок слов (интерактивность в клиентском классе)
+  proc ChooseWordOrder2;
+    SetDefaultWordOrder;
+  end;
+
+  -- Определить порядок слов по умолчанию
+  proc SetDefaultWordOrder;
+    WordsOrderDefined = true;
+    WordsOrder = [1, 2, 3];
+  end;
+
+  proc SetInitials;
+    if WordsStatus[2] in [wsShort, wsFull] then
+      vInitials = SubStr(vFirstName, 1, 1) + '.';
+      if WordsStatus[3] in [wsShort, wsFull] then
+        vInitials = vInitials + ' ' + SubStr(vPatronymic, 1, 1) + '.';
+      fi;
+    fi;
+  end;
+
+  proc DisplayErrMessage;
+    SetError(0, vErrMessage, , System.itError);
+  end;
+
+inclass private
+
+  -- Определить статус извлеченных слов
+  func DefineWordsStatus (aWord :String) :tWordsStatus;
+    var aTest :Logical[];
+    if (aWord = nil) then
+      Return wsAbsent;
+    else
+      aTest[1] = NameIsFull(aWord);
+      aTest[2] = NameIsShort(aWord);
+      if (aTest[1] and not aTest[2]) then
+        Return wsFull;
+      elsif (not aTest[1] and aTest[2]) then
+        Return wsShort;
+      else
+        Return wsError;
+      fi;
+    fi;
+  end;
+
+  func NameIsFull (aWord :String) :Logical;
+    Return (Pos('.', aWord) = 0 and Length(aWord) > 1);
+  end;
+
+  func NameIsShort(aWord :String) :Logical;
+    Return (Pos('.', aWord) > 1 and Length(aWord) = 2 );
+  end;
+
+
+end

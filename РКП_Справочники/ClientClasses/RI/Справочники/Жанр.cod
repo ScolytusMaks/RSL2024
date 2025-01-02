@@ -1,0 +1,29 @@
+class inherited RI.Справочники.intBaseType2 'Интерфейс записи (справочник, тип 2)';
+
+import РКП_СИС Classes Functions, Recs;
+
+inclass public
+
+  func СвязанныйКлассЗаписей: Class BaseRefType2;
+    Result = РКП_Справочники.спрЖанр;
+  end;
+
+  func Create: RI.Справочники.Жанр;
+    Result = inherited Create;
+    Result.Record = РКП_Справочники.спрЖанр.Create;
+  end;
+
+  func ОткрытьПоЗаписи synonym OpenRecord(locRecord: спрЖанр): RI.Справочники.Жанр;
+    Result = inherited Create;
+    Result.Record = locRecord;
+  end;
+
+  func БланкРедакторПоУмолчанию: Class РКП_Справочники.Справочники.editBaseType2;
+    Result = РКП_Справочники.Справочники.редЖанр;
+  end;
+
+inobject public
+
+  Record: РКП_Справочники.спрЖанр;
+
+end

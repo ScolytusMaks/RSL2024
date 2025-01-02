@@ -1,0 +1,3 @@
+record спрязыкќригинала inherited BaseRefType1 title "язык оригинала";
+  field ЌаимЅибл :String     title "—окращенное (библиографическое) наименование"; -- в Ћѕѕ»
+end;

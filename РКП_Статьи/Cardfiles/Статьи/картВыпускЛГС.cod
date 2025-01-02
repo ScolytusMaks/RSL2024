@@ -1,0 +1,17 @@
+Class inherited СИС2.картБазовая "Выпуски ЛГС";
+
+InClass Public
+
+InObject Private
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    inherited шаблон_ПриОткрытии(Create);
+    Self.CardFile.TreeRoot      = "Год выпуска";
+  end;
+
+--------------------------------------------------------------------------------
+--{ Обработчики событий картотеки
+
+--}
+
+end

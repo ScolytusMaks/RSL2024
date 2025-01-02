@@ -1,0 +1,134 @@
+class inherited СИС2.БазовыйБланк "Базовый статистический отчет";
+
+inobject private
+
+--{{ 2_Свойства
+
+  var фреймУправление :TemplateFrame;
+  var секцПозиции     :TemplateSection;
+  var секцСПО         :TemplateSection;
+  var секцВарианты    :TemplateSection;
+  var Библиограф      :String;
+  var Пользователь    :String;
+  var ДатаН           :Date;
+  var ДатаК           :Date;
+  var ЗаДату          :Integer;
+  var ЗаДату1         :Logical;
+  var ЗаДату2         :Logical;
+  var ЗаДату3         :Logical;
+  var ЗаДату4         :Logical;
+  var ЗаДату5         :Logical;
+  var ЗаДату6         :Logical;
+  var ОтчетСоздан     :Date;
+  var ПериодЗапроса   :String;
+
+
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inclass public
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриСоздании(Context :Variant);
+    inherited шаблон_ПриСоздании(Context);
+    ЗагрузитьФреймУправление;
+  end;
+
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    inherited шаблон_ПриОткрытии(Create);
+  end;
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func СменаВариантаПериода(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    ЗаДату1 = false;
+    ЗаДату2 = false;
+    ЗаДату3 = false;
+    ЗаДату4 = false;
+    ЗаДату5 = false;
+    ЗаДату6 = false;
+    ЗаДату  = nil;
+    секцСПО.Row[1].Visible = false;
+    секцСПО.Row[2].Visible = false;
+    секцВарианты.CellByField['ЗаДату1'].Font.Bold = false;
+    секцВарианты.CellByField['ЗаДату2'].Font.Bold = false;
+    секцВарианты.CellByField['ЗаДату3'].Font.Bold = false;
+    секцВарианты.CellByField['ЗаДату4'].Font.Bold = false;
+    секцВарианты.CellByField['ЗаДату5'].Font.Bold = false;
+    секцВарианты.CellByField['ЗаДату6'].Font.Bold = false;
+    if (Cell.Contents = 'ЗаДату1') then
+      ЗаДату  = 0;
+      ЗаДату1 = true;
+      секцВарианты.CellByField['ЗаДату1'].Font.Bold = true;
+      ДатаН = РКП_СИС.СтандартныйПериод.НачалоГода(today);
+      ДатаК = today;
+    elsif (Cell.Contents = 'ЗаДату2') then
+      ЗаДату  = 1;
+      ЗаДату2 = true;
+      секцВарианты.CellByField['ЗаДату2'].Font.Bold = true;
+      ДатаН   = РКП_СИС.СтандартныйПериод.НачалоМесяца(today);
+      ДатаК   = today;
+    elsif (Cell.Contents = 'ЗаДату3') then
+      ЗаДату  = 2;
+      ЗаДату3 = true;
+      секцВарианты.CellByField['ЗаДату3'].Font.Bold = true;
+      ДатаН   = РКП_СИС.СтандартныйПериод.НачалоКвартала(today);
+      ДатаК   = today;
+    elsif (Cell.Contents = 'ЗаДату4') then
+      ЗаДату  = 3;
+      ЗаДату4 = true;
+      секцВарианты.CellByField['ЗаДату4'].Font.Bold = true;
+      ДатаН = РКП_СИС.СтандартныйПериод.НачалоГода(today);
+      ДатаК = today;
+    elsif (Cell.Contents = 'ЗаДату5') then
+      секцСПО.Row[1].Visible = true;
+      секцСПО.Row[2].Visible = true;
+      ЗаДату  = 4;
+      ЗаДату5 = true;
+      секцВарианты.CellByField['ЗаДату5'].Font.Bold = true;
+      ДатаН = today;
+      ДатаК = today;
+    elsif (Cell.Contents = 'ЗаДату6') then
+      ЗаДату  = 5;
+      ЗаДату6 = true;
+      секцВарианты.CellByField['ЗаДату6'].Font.Bold = true;
+      ДатаН = РКП_СИС.СтандартныйПериод.НачалоНедели(today);
+      ДатаК = today;
+    fi;
+  end;
+
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+  proc ПостроитьОтчет(Sender :Button);
+    var vRec :Kernel.Settings.User;
+    ОтчетСоздан = Now;
+    vRec = SessionInfo.UserRecord;
+    if (vRec <> nil) then
+      Библиограф   = vRec.FullName;
+      Пользователь = vRec.Name;
+    fi;
+  end;
+
+  proc ПостроитьОтчет2(Sender :Button);
+    Message('Метод устарел.');
+  end;
+
+-- 2_Дополнительные команды0. --
+
+
+-- 2_Вспомогательные методы0. --
+
+  proc ЗагрузитьФреймУправление;
+    var locFrmDonor :УчетГазет.Отчеты.блОтчетСтатРГБазовый1;
+    locFrmDonor = УчетГазет.Отчеты.блОтчетСтатРГБазовый1.Create;
+    Self.фреймУправление.Clear;
+    Self.фреймУправление.Assign(locFrmDonor.фреймУправление);
+  end;
+
+end

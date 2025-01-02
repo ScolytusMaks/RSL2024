@@ -1,0 +1,107 @@
+class inherited МашинаРеквизитов.Базовые.картСИнтерфейсом "Учетные документы";
+
+--{{ 2_Свойства
+
+inclass private
+
+  var КлассИнтерфейса :Class МашинаРеквизитов.Базовые.интЗапись = РКП_Газеты.RI.УчетныйДокумент;
+
+  stored var Завершенные :Integer;
+  stored var МоиЗаписи :Integer;
+--}}
+
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inclass public
+
+  func ВыполнитьВыбор (var локРезультатВыбора: РКП_Газеты.УчетныйДокумент; локДопФильтр: string = ''; локТолькоВыбор: logical = true): Integer;
+    var locForm: УчетГазет.картУчетныйДокумент;
+    locForm = УчетГазет.картУчетныйДокумент.Create;
+    if локТолькоВыбор:
+      locForm.SetField('Запретить_Добавление', true);
+      locForm.SetField('Запретить_ДобавлениеГрупп', true);
+      locForm.SetField('Запретить_Дублирование', true);
+      locForm.SetField('Запретить_Удаление', true);
+      locForm.SetField('Запретить_Перенос', true);
+      locForm.SetField('Запретить_Копирование', true);
+      locForm.SetField('Запретить_Преобразование', true);
+    fi;
+    if CmOk = locForm.ShowEx(локРезультатВыбора, локДопФильтр, Kernel.Window.ModalWindow):
+      Return CmOk;
+    fi;
+  end;
+
+
+inobject private
+
+import РКП_СИС Classes Functions, FilterMaker;
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    inherited шаблон_ПриОткрытии(Create);
+    Self.Window.Icon.LoadFromFile(BaseInfo.ProjectByName[Self.ClassProject].Folder + 'Attachments\Icons\inbox_document_text.ico');
+  end;
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+
+  func Поле_ПриВыводе_Завершенные(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    Return (Завершенные in [1]);
+  end;
+
+  func Поле_ПриВыводе_МоиЗаписи(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    Return (МоиЗаписи in [0,1]);
+  end;
+
+  func Поле_ПриНажатии_Завершенные(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    if (Завершенные in [-1,0]) then
+      Завершенные = 1;
+    else
+      Завершенные = -1;
+    fi;
+    ОбновитьФильтр;
+  end;
+
+  func Поле_ПриНажатии_МоиЗаписи(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    if (МоиЗаписи in [0,1]) then
+      МоиЗаписи = -1;
+    else
+      МоиЗаписи = 1;
+    fi;
+    ОбновитьФильтр;
+  end;
+
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+
+-- 2_Обработчики событий картотеки0. --
+
+
+-- 2_Обработчики столбцов (полей) картотеки0. --
+
+
+-- 2_Дополнительные команды0. --
+
+
+-- 2_Вспомогательные методы0. --
+
+  func ПолучитьФильтрКартотеки (var locTreeFilter :String = nil) :String;
+    var aFlt :String[];
+    AddInArray( aFlt, ПолучитьФильтрПоказатьЗавершенные );
+    AddInArray( aFlt, ПолучитьФильтрТолькоМоиЗаписи );
+    Result = MakeFilter(aFlt);
+  end;
+
+  func ПолучитьФильтрПоказатьЗавершенные :String;
+    Result = if(Завершенные in [1], nil, 'not Завершен');
+  end;
+
+  func ПолучитьФильтрТолькоМоиЗаписи :String;
+    Result = if(МоиЗаписи in [0,1], 'CreateUser="' + SessionInfo.UserRecord.Name + '"', nil);
+  end;
+
+
+end

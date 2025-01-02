@@ -1,0 +1,66 @@
+﻿class inherited СИС2.Функции "";
+
+inclass public
+
+  func InsertInSortedArray (var aArray :Variant[];  const aValue :Variant = nil; const aDubl :Logical = False; var aEltExists :Logical = False) :Integer;
+    Return ВставитьЗначениеВУпорядоченныйМассив(aArray, aValue, aDubl, aEltExists);
+  end;
+
+
+  func ТранспонироватьМассив2 (ИсходныйМассив: Variant[2]): Variant[2];
+    CopyArray2ToTransp(ИсходныйМассив, result);
+  end;
+
+  func CopyArray2ToTransp(var Array2: Variant[2]; var ResultArray2: Variant[2]; var delta: integer[] = nil): integer;
+    if LengthOfArray(ResultArray2) = 0:
+      Result = CopyNotNillArray2ToTransp(Array2, ResultArray2, delta);
+    else
+      Result = CopyAllArray2ToTransp(Array2, ResultArray2, delta);
+    fi;
+  end;
+
+  func CopyNotNillArray2ToTransp(var Array2: Variant[2]; var ResultArray2: Variant[2]; var delta: integer[] = nil): integer;
+    var row, rowdelta, col, y: Integer;
+    y = LengthOfArray(Array2);
+    for row = y .. 1 step -1 do
+      rowdelta = row + delta[2];
+      col = NextArrItem(Array2[row],0);
+      if result<=0 and col>0:
+        result = rowdelta;
+      fi;
+      while col > 0 do
+        ResultArray2[col + delta[1], rowdelta] = Array2[row, col];
+        col = NextArrItem(Array2[row],col);
+      od;
+    od;
+  end;
+
+  func CopyAllArray2ToTransp(var Array2: Variant[2]; var ResultArray2: Variant[2]; var delta: integer[] = nil): integer;
+    var row, rowdelta, col, y, x: Integer;
+    y = LengthOfArray(Array2);
+    for row = y .. 1 step -1 do
+      rowdelta = row + delta[2];
+      x = LengthOfArray(Array2[row]);
+      if result<=0 and x>0:
+        result = rowdelta;
+      fi;
+      for col = 1 .. x do
+          ResultArray2[col + delta[1], rowdelta] = Array2[row, col];
+      od;
+    od;
+  end;
+
+  -- Возвращает пересечение одномерных массивов
+  func GetArrayIntersection synonym ПолучитьПересечениеМассивов (var ArrayA, ArrayB :Variant[]) :Variant[];
+    var e, ee :Integer;
+    ee = LengthOfArray(ArrayA);
+    for e = 1 .. ee do
+      if (ArrayA[e] in ArrayB) then
+        AddInArray(Result, ArrayA[e], true);
+      fi;
+    od;
+  end;
+
+
+
+end

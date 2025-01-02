@@ -1,0 +1,11 @@
+record ИсторияГазеты inherited AbstractRecord.БазоваяКИзданию title "История издания";
+  field НомерПоля         :Integer        title "Условный номер поля";
+  field НомерИзменений    :Integer        title "Номер изменений";
+  field СНомера           :НомерГазеты    title "С номера"; -- (с номера газеты)
+  field Значение          :String(MaxStr) title "Значение";
+  field Справ :inherited Record           title "Справочник";
+  field ГруппаУчредителей :Boolean        title "Группа учредителей";
+  field ТипИздания        :Integer        title "Тип издания";
+  Indexed indNewspaper By Газета;
+  Indexed indNewspaperFieldNumber By Газета,НомерПоля;
+end;

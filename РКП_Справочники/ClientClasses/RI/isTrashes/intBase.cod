@@ -1,0 +1,213 @@
+class inherited МашинаРеквизитов.Базовые.интЗаписьКодИмя "";
+
+import РКП_СИС Classes Functions, Recs;
+
+inclass public
+
+  var ТекстРодительный :String = 'записи справочника';
+
+  var ИмяПоляКодСортировки :String = 'КодСортировки';
+  var ИмяПоляНеПрименяется :String = 'НеПрименяется';
+  var ОбязательныеПоля     :String[] = ['Код','КодСортировки','Имя'];
+
+inobject public
+
+  func TestCodeValue(SourceValue :String; var CorrectCode, CorrectValue :String) :Logical;
+    var vRec :спрТематика;
+    var aFlt :String[];
+    var vFilter :String;
+    if (Self.Record.GetField(ИмяПоляНеПрименяется) as logical):
+      CorrectCode = StdCode.NoSpace(SourceValue) + '-';
+    else
+      if ( Pos('-', SourceValue) = Length(SourceValue) ) then
+        SourceValue = SubStr(SourceValue, 1, Length(SourceValue) - 1 );
+      fi;
+      CorrectCode = StdCode.NoSpace(SourceValue);
+    fi;
+    AddInArray( aFlt, 'Код="' + CorrectCode + '"');
+    AddInArray( aFlt, 'DocId<>' + Str(Record.DocID));
+    vFilter = РКП_СИС.FilterMaker.MakeFilter(aFlt);
+    vRec = FindRecord( Self.Record.ClassInfo.ClassRef, vFilter );
+    if (vRec = nil) then
+      CorrectValue = DefaultFixCode(SourceValue);
+      Result = true;
+    else
+      Message('Введенный код уже используется.');
+    fi;
+  end;
+
+inclass public
+
+  func СвязанныйКлассЗаписей: Class СИС2.Базовая.БазоваяЗапись;
+    Result = BaseRef;
+  end;
+
+  func КартотекаДляВыбора (addParam :Variant = nil) :Class CardForm;
+    Result = КартотекаПоУмолчанию;
+  end;
+
+  func DefaultFixCode (SourceValue :String) :String;
+    Result = StdCode.FixCode10(SourceValue);
+  end;
+
+  -- Последний номер (поле сортировки) записи
+  func GetLastRecNumber :Integer;
+    with Query.Create([СвязанныйКлассЗаписей]) do
+      LoadingFieldsMode = СИС2.Константы.mdNone;
+      LoadingFields = 'Номер';
+      Order = 'Номер-';
+      PacketSize = 2;
+      Select;
+      if (Current <> nil):
+        Result = Current.Номер;
+      fi;
+    end;
+  end;
+
+  -- Последний номер (поле сортировки) записи по коду УДК
+  func GetLastRecNumberByCode(vFieldName, vCode :String) :Integer;
+    with Query.Create([СвязанныйКлассЗаписей]) do
+      LoadingFieldsMode = СИС2.Константы.mdNone;
+      LoadingFields = vFieldName;
+      Order = vFieldName + '-';
+      Select;
+      while not Eof do
+        if (Current.GetField(vFieldName) < vCode) then
+          Result = Current.Номер;
+          Break;
+        fi;
+        Next;
+      od;
+    end;
+  end;
+
+  -- Нумеровать записи, начиная с StartRecord и номера StartNumber
+  proc NumberingFrom (StartRecord :СИС2.Базовая.БазоваяЗапись; StartNumber :Integer);
+    var aRec :СИС2.Базовая.БазоваяЗапись[];
+    var TakeNext :Logical;
+    var r, rr :Integer;
+    with Query.Create([СвязанныйКлассЗаписей]) do
+      LoadingFieldsMode = СИС2.Константы.mdNone;
+      LoadingFields = 'Номер';
+      Order = 'Номер';
+      Select;
+      while not Eof do
+        if not TakeNext and (Current = StartRecord) then
+          TakeNext = true;
+        fi;
+        if TakeNext then
+          РКП_СИС.Functions.AddInArray(aRec,  Current);
+        fi;
+        Next;
+      od;
+      --
+      rr = LengthOfArray(aRec);
+      for r = 1 .. rr do
+        aRec[r].SetField('Номер', (StartNumber - 1 + r) );
+        РКП_СИС.Recs.RecordPostIfNeed(aRec[r]);
+      od;
+    end;
+  end;
+
+  func GetNextByNumberRecord (cRecord :СИС2.Базовая.БазоваяЗапись) :СИС2.Базовая.БазоваяЗапись;
+    var vGetNext :Logical;
+    with Query.Create([СвязанныйКлассЗаписей]) do
+      LoadingFieldsMode = СИС2.Константы.mdNone;
+      Order = 'Номер';
+      Select;
+      while not Eof do
+        if vGetNext then
+          Result = Current;
+          Break;
+        fi;
+        if (cRecord = Current) then
+          vGetNext = true;
+        fi;
+        Next;
+      od;
+    end;
+  end;
+
+  func GetPrevByNumberRecord (cRecord :СИС2.Базовая.БазоваяЗапись) :СИС2.Базовая.БазоваяЗапись;
+    var vGetNext :Logical;
+    with Query.Create([СвязанныйКлассЗаписей]) do
+      LoadingFieldsMode = СИС2.Константы.mdNone;
+      Order = 'Номер-';
+      Select;
+      while not Eof do
+        if vGetNext then
+          Result = Current;
+          Break;
+        fi;
+        if (cRecord = Current) then
+          vGetNext = true;
+        fi;
+        Next;
+      od;
+    end;
+  end;
+
+  func GetNextNumberByNumberRecord (cRecord :СИС2.Базовая.БазоваяЗапись) :Integer;
+    var vRec :СИС2.Базовая.БазоваяЗапись;
+    vRec = GetNextByNumberRecord(cRecord);
+    if (vRec <> nil) then
+      Result = vRec.GetField('Номер');
+    else
+      Result = -1;
+    fi;
+  end;
+
+  func GetPrevNumberByNumberRecord (cRecord :СИС2.Базовая.БазоваяЗапись) :Integer;
+    var vRec :СИС2.Базовая.БазоваяЗапись;
+    vRec = GetPrevByNumberRecord(cRecord);
+    if (vRec <> nil) then
+      Result = vRec.GetField('Номер');
+    else
+      Result = -1;
+    fi;
+  end;
+
+  func NameToCode(Original :String; var NoActual :Logical; var aCode :String[]; Hashing :Logical = true) :String;
+    var p, pp, n, j :Integer;
+    var smb, Code, tmpS :String;
+    pp = Length(Original);
+    p = pp;
+    for p = pp .. 1 step -1 do
+      smb = SubStr(Original, p, 1);
+      if not smb in [' '] then
+        if smb in ['.','/','\','(',')',',',';','[',']','{','}','=','+','!','?','<','>','*','@','#','_','%',':','&','-'] then
+          if (p < pp) then
+            smb = '.';
+          else
+            smb = '';
+          fi;
+        fi;
+        Code = smb + Code;
+      fi;
+    od;
+    if NoActual then
+      Code = Code + '-';
+    fi;
+    if not(Code in aCode) then
+      СИС2.Функции.AddInArray(aCode, Code);
+      Result = Code;
+    else
+      for j = 1 .. LengthOfArray(aCode) do
+        if aCode[j] = Code then
+          n = n + 1;
+        fi;
+      od;
+      СИС2.Функции.AddInArray(aCode, Code);
+      Code = Code + RepStr('-', n);
+      NoActual = true;
+      Result = Code;
+    fi;
+    -- хэширование
+    if Hashing then
+      AddCRC32(tmpS, Result);
+      Result = tmpS;
+    fi;
+  end;
+
+
+end

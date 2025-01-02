@@ -1,0 +1,41 @@
+class inherited РКП_СИС.FalseCardBase "";
+
+import СИС2 classes Константы, Исключения;
+import РКП_СИС Classes StringsFunctions, Functions, Recs, FilterMaker;
+import Classes Def;
+
+--{{ 2_Свойства
+
+inclass private
+
+  var КлассИнтерфейса :Class RI.Справочники.intBaseType1 := RI.Справочники.intBaseType1;
+
+inobject private
+
+  var SelectedRecord :BaseRefType1; -- Выбранное значение
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inclass public
+
+  func ВыполнитьВыбор (var vSelectRes :РКП_Справочники.BaseRefType1; addParam :Variant[2] = nil) :Integer;
+    Return inherited ВыполнитьВыбор (vSelectRes, addParam);
+  end;
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+
+-- 2_Вспомогательные методы0. --
+
+
+
+end

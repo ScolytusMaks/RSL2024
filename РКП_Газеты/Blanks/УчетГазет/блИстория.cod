@@ -1,0 +1,872 @@
+class inherited СИС2.БазовыйБланк "";
+  -- При отрисовке бланка в зависимости от типа значения (поля):
+  -- Для учредитель/учредители - дополнительно перечислимое поле в последнюю запись?
+  -- Для прочих - привязка к справочнику и процедуры выбора значений
+  -- Для периодичности - разработка дополнительного класса
+
+inobject private
+
+  var секцПозиции :Section;
+  var кнВвод :Button;
+
+  var НомерРежима :Integer; -- режим отображения
+  var Газета :РКП_Газеты.Газета;
+
+  var НаименованиеПоказателя :String;
+  var ЗаголовокОкна      :String;
+  var АктуальноеНазвание :String;
+  var ДатаВыпуска        :Date[];
+  var НомерВыпуска       :String[];
+  var ЗначениеПоказателя :String[];
+  var СНомера            :Record[];
+  var Справ              :Record[];
+  var ГруппаУчредителей  :Boolean[];
+  var ТипИздания         :Integer[];
+
+--------------------------------------------------------------------------------
+
+  proc ПереименоватьЗаголовокОкна;
+    if    (НомерРежима =  0) then ЗаголовокОкна = "История основного названия";                 НаименованиеПоказателя="Название";
+    elsif (НомерРежима =  1) then ЗаголовокОкна = "История альтернативного названия (ин.яз.)";  НаименованиеПоказателя="Название(ин.яз.)";
+    elsif (НомерРежима =  2) then ЗаголовокОкна = "История альтернативного названия (нац.яз.)"; НаименованиеПоказателя="Название(нац.яз.)";
+    elsif (НомерРежима =  3) then ЗаголовокОкна = "История подзаголовка";                       НаименованиеПоказателя="Подзаголовок";
+    elsif (НомерРежима =  4) then ЗаголовокОкна = "История учредителей";                        НаименованиеПоказателя="Учредитель(и)";
+    elsif (НомерРежима =  5) then ЗаголовокОкна = "История места издания";                      НаименованиеПоказателя="Место издания";
+    elsif (НомерРежима =  6) then ЗаголовокОкна = "История адреса редакции";                    НаименованиеПоказателя="Адрес редакции";
+    elsif (НомерРежима =  7) then ЗаголовокОкна = "Редакторы";                                  НаименованиеПоказателя="Редактор";
+    elsif (НомерРежима =  8) then ЗаголовокОкна = "История типа издания";                       НаименованиеПоказателя="Тип издания";
+    elsif (НомерРежима =  9) then ЗаголовокОкна = "История территории распространения";         НаименованиеПоказателя="Территория распространения";
+    elsif (НомерРежима = 10) then ЗаголовокОкна = "История тематики";                           НаименованиеПоказателя="Тематика";
+    elsif (НомерРежима = 11) then ЗаголовокОкна = "История читательского адреса";               НаименованиеПоказателя="Читательский адрес";
+    elsif (НомерРежима = 12) then ЗаголовокОкна = "История языка издания";                      НаименованиеПоказателя="Язык";
+    elsif (НомерРежима = 13) then ЗаголовокОкна = "История периодичности выхода";               НаименованиеПоказателя="Периодичность";
+    fi;
+    Window.Caption = ЗаголовокОкна;
+  end;
+
+  proc ДоступностьВвода;
+    кнВвод.Enabled  = false;
+    if (секцПозиции.Count > 0) then
+      кнВвод.Enabled = true;      
+    fi;
+  end;
+
+  proc ПрочитатьИсторию;
+    var Q1, Q2 :Query;
+    var k, РешениеОЗакрытии :Integer;
+    ДатаВыпуска             = nil;
+    НомерВыпуска            = nil;
+    ЗначениеПоказателя      = nil;
+    СНомера                 = nil;
+    ГруппаУчредителей       = nil;
+    Справ                   = nil;
+    ТипИздания              = nil;
+    секцПозиции.FramesCount = nil;
+    --
+    Q1 = Query.Create([РКП_Газеты.ИсторияГазеты]);
+    Q1.Filter = "Газета=" + Str(Газета) + " and НомерПоля=" + Str(НомерРежима);
+    Q1.Order  = "НомерИзменений";
+    Q1.Select;
+        --
+    if Q1.Count>0 then
+      for k = 1 .. Q1.Count do
+        секцПозиции.InsertFrame(k);
+        InsertInArray(ДатаВыпуска, k, Q1.Current.СНомера.ДатаВыхода);
+        InsertInArray(НомерВыпуска, k, Q1.Current.СНомера.Номер);
+        if (НомерРежима = 8) then
+          #Warning "Подавлен вывод неопределенного типа издания (=2)";
+          if (Q1.Current.Значение = 'Не указан') then
+            InsertInArray(ЗначениеПоказателя, k, 'Газета');
+            InsertInArray(ТипИздания, k, 0);
+          else
+            if (Q1.Current.ТипИздания = 0) then
+              InsertInArray(ЗначениеПоказателя, k, 'Газета');
+              InsertInArray(ТипИздания, k, 0);
+            elsif (Q1.Current.ТипИздания = 1) then
+              InsertInArray(ЗначениеПоказателя, k, 'МПГ');
+              InsertInArray(ТипИздания, k, 1);
+            fi;
+          fi;
+        else
+          InsertInArray(ЗначениеПоказателя, k, Q1.Current.Значение);
+          InsertInArray(ТипИздания, k, Q1.Current.ТипИздания);
+        fi;
+        InsertInArray(СНомера, k, Q1.Current.СНомера);
+        InsertInArray(Справ, k, Q1.Current.Справ);
+        InsertInArray(ГруппаУчредителей, k, Q1.Current.ГруппаУчредителей);
+        Q1.Next;
+      od;
+    else
+      Q2 = Query.Create([РКП_Газеты.НомерГазеты]);
+      Q2.Filter = 'Газета=' + Str(Газета) + ' and isGroup>-1';
+      Q2.LoadingFields = 'ГодВыпуска;Номер;СерияНумерации;ДатаВыхода';
+      Q2.Order = 'ГодВыпуска;СерияНумерации;Номер';
+      Q2.Select;
+      if (Q2.Count > 0) then
+        секцПозиции.InsertFrame(1);
+        InsertInArray(ДатаВыпуска, 1, Q2.Current.ДатаВыхода);
+        InsertInArray(НомерВыпуска, 1, Q2.Current.Номер);
+        if    (НомерРежима = 0) then
+          InsertInArray(ЗначениеПоказателя, 1, Газета.НазваниеОсн);
+        elsif (НомерРежима = 1) then
+          InsertInArray(ЗначениеПоказателя, 1, Газета.НазваниеИнЯз);
+        elsif (НомерРежима = 2) then
+          InsertInArray(ЗначениеПоказателя, 1, Газета.НазваниеНацЯз);
+        elsif (НомерРежима = 3) then
+          InsertInArray(ЗначениеПоказателя, 1, Газета.Подзаголовок);
+        elsif (НомерРежима = 4) then
+          InsertInArray(ЗначениеПоказателя, 1, Газета.Учред);
+          InsertInArray(ГруппаУчредителей, 1, Газета.ГруппаУчредителей);
+        elsif (НомерРежима = 5) then
+          if (Газета.МестаИздания.Count > 0) then
+            InsertInArray(ЗначениеПоказателя, 1, Газета.МестаИздания.Items[1].МестоИздания.Наим);
+            InsertInArray(Справ, 1, Газета.МестаИздания.Items[1].МестоИздания);
+          else
+            InsertInArray(ЗначениеПоказателя, 1, '');
+          fi;
+        elsif (НомерРежима = 6) then
+          InsertInArray(ЗначениеПоказателя, 1, Газета.Редакция.Наим);
+          InsertInArray(Справ, 1, Газета.Редакция);
+        elsif (НомерРежима = 7) then
+          InsertInArray(ЗначениеПоказателя, 1, Газета.РедакторГазеты);
+          #Warning "Подавлен вывод неопределенного типа издания (=2)";
+        elsif (НомерРежима = 8) then
+          InsertInArray(ТипИздания, 1, if(Газета.ТипИздания=2, 0, Газета.ТипИздания));
+        elsif (НомерРежима = 9) then
+          InsertInArray(ЗначениеПоказателя, 1, Газета.ТерриторияРаспространения.Наим);
+          InsertInArray(Справ, 1, Газета.ТерриторияРаспространения);
+        elsif (НомерРежима = 10) then
+          if (Газета.Тематики.Count > 0) then
+            InsertInArray(ЗначениеПоказателя, 1, Газета.Тематики.Items[1].Тематика.Наим);
+            InsertInArray(Справ, 1, Газета.Тематики.Items[1].Тематика);
+          else
+            InsertInArray(ЗначениеПоказателя, 1, '');
+          fi;
+        elsif (НомерРежима = 11) then
+          if (Газета.ЧАЦН.Count > 0) then
+            InsertInArray(ЗначениеПоказателя, 1, Газета.ЧАЦН.Items[1].ЧАЦН.Наим);
+            InsertInArray(Справ, 1, Газета.ЧАЦН.Items[1].ЧАЦН);
+          else
+            InsertInArray(ЗначениеПоказателя, 1, '');
+          fi;
+        elsif (НомерРежима = 12) then
+          if (Газета.Языки.Count > 0) then
+            InsertInArray(ЗначениеПоказателя, 1, Газета.Языки.Items[1].Язык.Наим);
+            InsertInArray(Справ, 1, Газета.Языки.Items[1].Язык);
+          else
+            InsertInArray(ЗначениеПоказателя, 1, '');
+          fi;
+        elsif (НомерРежима = 13) then
+          InsertInArray(ЗначениеПоказателя, 1, Газета.Периодичность);
+        fi;
+        InsertInArray(СНомера, 1, Q2.Current);
+      else
+        Message('В базе данных не содержится сведений о номерах этой газеты!');
+        РешениеОЗакрытии = CmOk;
+      fi;
+      Q2.Close;
+    fi;
+    Q1.Close;
+    if (РешениеОЗакрытии = CmOk) then
+      Close(CmOk);
+    fi;
+  end;
+
+
+  proc ЗаписатьИсторию;
+  var Q : Query;
+  var k : integer;
+  var R : record;
+    --=== Поиск записи в справочниках ==--
+    #Warning "Организовать поиск записей в справочниках (для импортированных данных) ";
+    --=== Запись истории ===--
+    Q                   = Query.Create([РКП_Газеты.ИсторияГазеты]);
+    Q.Filter            = "Газета="+Str(Газета)+" and НомерПоля="+Str(НомерРежима);
+    Q.LoadingFieldsMode = СИС2.Константы.mdNone;
+    Q.LoadingFields     = "СНомера.ГодВыпуска;СНомера.СерияНумерации;СНомера.Номер";
+    Q.Order             = "СНомера.ГодВыпуска;СНомера.СерияНумерации;СНомера.Номер";
+    Q.Select;
+    Q.First;
+      for k = 1..секцПозиции.Count      do --цикл по позициям
+        if Q.EOF        = false then       --если запись есть
+          if Q.Current.СНомера          <>Сномера[k]
+          or Q.Current.Значение         <>ЗначениеПоказателя[k]
+          or Q.Current.ТипИздания       <>ТипИздания[k]
+          or Q.Current.НомерИзменений   <>k                     then
+            if Q.Current.СНомера        <>Сномера[k]            then
+              Q.Current.СНомера         = Сномера[k];
+            end;
+            if Q.Current.Значение       <>ЗначениеПоказателя[k] then
+             Q.Current.Значение         = ЗначениеПоказателя[k];
+            end;
+            if Q.Current.НомерИзменений <>k                     then
+              Q.Current.НомерИзменений  = k;
+            end;
+            if  Справ[k]<>nil                                   then
+              Q.Current.Справ           = Справ[k];
+            end;
+            if Q.Current.ГруппаУчредителей<>ГруппаУчредителей[k] then
+              Q.Current.ГруппаУчредителей = ГруппаУчредителей[k];
+            end;
+            if Q.Current.ТипИздания<>ТипИздания[k] then
+              #Warning "Подавлена запись неопределенного типа издания (=2)";
+              Q.Current.ТипИздания = if(ТипИздания[k]=2,0,ТипИздания[k]);
+            end;
+            if (Q.Current.State = Q.Current.Edited)
+            or (Q.Current.State = Q.Current.Created)            then
+              Q.Current.Post;
+            end;
+          end;
+
+        else
+          R                     = РКП_Газеты.ИсторияГазеты.Create;
+          R.Газета              = Газета;
+          R.НомерПоля           = НомерРежима;
+          R.НомерИзменений      = k;
+          R.СНомера             = Сномера[k];
+          R.Значение            = ЗначениеПоказателя[k];
+          R.Справ               = Справ[k];
+          R.ГруппаУчредителей   = ГруппаУчредителей[k];
+          R.ТипИздания          = ТипИздания[k];
+          R.UpdateDate          = Now(true);
+          R.UpdateUser          = SessionInfo.UserName;
+          R.Post;
+        end;
+      Q.Next;
+
+      end;
+    if Q.Count>секцПозиции.Count                                then
+    Q.First;
+      for k = 1..Q.Count do
+        if k>секцПозиции.Count                                  then
+          Q.Current.Delete;
+          if (Q.Current.State = Q.Current.Edited)
+          or (Q.Current.State = Q.Current.Created)              then
+            Q.Current.Post;
+          end;
+        end;
+        Q.Next;
+      end;
+    end;
+    Q.Close;
+    --=== Обновление газеты ===--
+    k           = секцПозиции.Count;
+    if    НомерРежима                   = 0     then
+      Газета.НазваниеОсн                = ЗначениеПоказателя[k];
+    elsif НомерРежима                   = 1     then
+      Газета.НазваниеИнЯз               = ЗначениеПоказателя[k];
+    elsif НомерРежима                   = 2     then
+      Газета.НазваниеНацЯз              = ЗначениеПоказателя[k];
+    elsif НомерРежима                   = 3     then
+      Газета.Подзаголовок               = ЗначениеПоказателя[k];
+    elsif НомерРежима                   = 4     then
+      Газета.Учред                      = ЗначениеПоказателя[k];
+      Газета.ГруппаУчредителей          = ГруппаУчредителей[k];
+      if  ГруппаУчредителей[k] = true           then
+        Газета.Учредитель               = nil;
+        Газета.Учредители               = ЗначениеПоказателя[k];
+      else
+        Газета.Учредитель               = ЗначениеПоказателя[k];
+        Газета.Учредители               = nil;
+      end;
+    elsif НомерРежима                   = 5     then
+      if Газета.МестаИздания.Count = 0          then
+        Газета.МестаИздания.Add;
+      end;
+      if Справ[k]<>nil                          then
+      Газета.МестаИздания.Items[1].МестоИздания = Справ[k];
+      end;
+    elsif НомерРежима                   = 6     then
+      Газета.Редакция                   = Справ[k];
+    elsif НомерРежима                   = 7     then
+      Газета.РедакторГазеты             = ЗначениеПоказателя[k];
+    elsif НомерРежима                   = 8     then
+      #Warning "Подавлена запись неопределенного типа издания (=2)";
+      Газета.ТипИздания                 = if(ТипИздания[k]=2,0,ТипИздания[k]);
+    elsif НомерРежима                   = 9     then
+      Газета.ТерриторияРаспространения  = Справ[k];
+    elsif НомерРежима                   =10     then
+      if Газета.Тематики.Count = 0              then
+        Газета.Тематики.Add;
+      end;
+      if Справ[k]<>nil                          then
+      Газета.Тематики.Items[1].Тематика         = Справ[k];
+      end;
+    elsif НомерРежима                   =11     then
+      if Газета.ЧАЦН.Count = 0                  then
+        Газета.ЧАЦН.Add;
+      end;
+      if Справ[k]<>nil                          then
+      Газета.ЧАЦН.Items[1].ЧАЦН                 = Справ[k];
+      end;
+    elsif НомерРежима                   =12     then
+      if Газета.Языки.Count = 0                 then
+        Газета.Языки.Add;
+      end;
+      if Справ[k]<>nil                          then
+      Газета.Языки.Items[1].Язык                 = Справ[k];
+      end;
+    elsif НомерРежима                   =13     then
+      Газета.Периодичность              = ЗначениеПоказателя[k];
+      Газета.КатегорияПериодичности     = РКП_Справочники.BiblioRecord.PeriodicityCategory(ЗначениеПоказателя[k]);
+      Газета.КоличествоВПериоде         = РКП_Справочники.BiblioRecord.QuantityInPeriod(ЗначениеПоказателя[k]);
+    end;
+  end;
+
+
+
+
+--{ Обработчики событий бланка
+
+  proc НеПрименять(Sender :Button);
+    Close(CmCancel);
+  end;
+
+  proc ВвестиПоследнее(Sender :Button);
+    if секцПозиции.Count>0 then
+      ЗаписатьИсторию;
+      Close(CmOk);
+    else
+      Message('Пустая история возможна только при полном отсутствии номеров! Для закрытия формы нажмите кнопку ОТМЕНА.');
+    end;
+  end;
+
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    inherited шаблон_ПриОткрытии(Create);
+    РКП_Газеты.ОбработкаИстории.ПоследнееЗначение   = nil;
+    НомерРежима         = РКП_Газеты.ОбработкаИстории.НомерРежима;
+    Газета              = РКП_Газеты.ОбработкаИстории.Газета;
+    ПереименоватьЗаголовокОкна;
+    --наиболее используемые настройки полей
+    секцПозиции.Column[6].Visible       = false;
+    секцПозиции.Column[7].Width         = 91;
+    секцПозиции.Column[7].Visible       = true;
+    секцПозиции.Column[8].Width         = 91;
+    секцПозиции.Column[8].Visible       = false;
+    секцПозиции.CellByField["ЗначениеПоказателя"].FieldColor    =  -2147483643;
+    секцПозиции.CellByField["ЗначениеПоказателя"].CanSelect     =  true;
+    секцПозиции.CellByField["ЗначениеПоказателя"].ReadOnly      =  false;
+    ------------------------
+    --особые
+    if    НомерРежима   = 0  then      секцПозиции.CellByField["ЗначениеПоказателя"].Button = false;
+    elsif НомерРежима   = 1  then      секцПозиции.CellByField["ЗначениеПоказателя"].Button = false;
+    elsif НомерРежима   = 2  then      секцПозиции.CellByField["ЗначениеПоказателя"].Button = false;
+    elsif НомерРежима   = 3  then      секцПозиции.CellByField["ЗначениеПоказателя"].Button = false;
+    elsif НомерРежима   = 4  then      секцПозиции.CellByField["ЗначениеПоказателя"].Button = false;
+    секцПозиции.Column[6].Visible       = true;
+    секцПозиции.Column[7].Width         = Int(секцПозиции.Column[7].Width)-Int(секцПозиции.Column[6].Width);
+    elsif НомерРежима   = 5  then      секцПозиции.CellByField["ЗначениеПоказателя"].Button = true;
+    elsif НомерРежима   = 6  then      секцПозиции.CellByField["ЗначениеПоказателя"].Button = true;
+    elsif НомерРежима   = 7  then      секцПозиции.CellByField["ЗначениеПоказателя"].Button = false;
+    elsif НомерРежима   = 8  then      секцПозиции.CellByField["ЗначениеПоказателя"].Button = true;
+    секцПозиции.Column[7].Visible       = false;
+    секцПозиции.Column[8].Visible       = true;
+    elsif НомерРежима   = 9  then      секцПозиции.CellByField["ЗначениеПоказателя"].Button = true;
+    elsif НомерРежима   =10  then      секцПозиции.CellByField["ЗначениеПоказателя"].Button = true;
+    elsif НомерРежима   =11  then      секцПозиции.CellByField["ЗначениеПоказателя"].Button = true;
+    elsif НомерРежима   =12  then      секцПозиции.CellByField["ЗначениеПоказателя"].Button = true;
+    elsif НомерРежима   =13  then      секцПозиции.CellByField["ЗначениеПоказателя"].Button = true;
+    секцПозиции.CellByField["ЗначениеПоказателя"].FieldColor    =  -1;
+    секцПозиции.CellByField["ЗначениеПоказателя"].CanSelect     =  false;
+    end;
+    if    Газета   <> nil then
+      АктуальноеНазвание                  = Газета.НазваниеОсн;
+      ПрочитатьИсторию;
+    else
+      АктуальноеНазвание                  = "";
+    end;
+    ДоступностьВвода;
+    --self.Template.Field                   = "НазваниеОсн";
+  end;
+
+  func ВыборНомера(Cell :TemplateCell; Value :Variant; var NewValue :Variant):Logical;
+    var Rec :НомерГазеты;
+    if (CmOk = УчетГазет.картНомераВыбор.ВыполнитьВыбор(Газета, nil, Rec)) then
+      НомерВыпуска[Cell.Frame] = Rec.Номер;
+      ДатаВыпуска[Cell.Frame]  = Rec.ДатаВыхода;
+      Сномера[Cell.Frame]      = Rec;
+    fi;
+  end;
+
+  --Позиции истории добавляются только в конец списка, с номерами не ранее существующих изменений
+  func ДобавитьИсторию(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var Index, ПозицийИстории :Integer;
+    var Rec :НомерГазеты;
+    var ПроверкаНаКорректность :Logical;
+    ПозицийИстории = 2секцПозиции0.Count;
+    Index = ПозицийИстории + 1;
+    if (CmOk = УчетГазет.картНомераВыбор.ВыполнитьВыбор(Газета, nil, Rec)) then
+      --
+      if (ПозицийИстории > 0) and (Сномера[Index - 1] <> nil) then
+        if (Rec.ГодВыпуска > Сномера[Index - 1].ГодВыпуска) then
+          ПроверкаНаКорректность = true;
+        elsif (Rec.ГодВыпуска = Сномера[Index - 1].ГодВыпуска) then
+          if  (Rec.Номер > Сномера[Index - 1].Номер) and (Rec.СерияНумерации >= Сномера[Index-1].СерияНумерации) then
+            ПроверкаНаКорректность = true;
+          fi;
+        fi;
+      else
+        ПроверкаНаКорректность = true;
+      fi;
+      --
+      if ПроверкаНаКорректность then
+        2секцПозиции0.InsertFrame(Index);
+        Self.Template.Frame   = Index;
+        Self.Template.Field   = 'НазваниеОсн';
+        НомерВыпуска[Index]   = Rec.Номер;
+        ДатаВыпуска[Index]    = Rec.ДатаВыхода;
+        Сномера[index]        = Rec;
+        if    (НомерРежима = 0) then
+          ЗначениеПоказателя[Index] = Rec.Газета.НазваниеОсн;
+        elsif (НомерРежима = 1) then
+          ЗначениеПоказателя[Index] = Rec.Газета.НазваниеИнЯз;
+        elsif (НомерРежима = 2) then
+          ЗначениеПоказателя[Index] = Rec.Газета.НазваниеНацЯз;
+        elsif (НомерРежима = 3) then
+          ЗначениеПоказателя[Index] = Rec.Газета.Подзаголовок;
+        elsif (НомерРежима = 4) then
+          ЗначениеПоказателя[Index] = Rec.Газета.Учред;
+          ГруппаУчредителей [Index] = Rec.Газета.ГруппаУчредителей;
+        elsif (НомерРежима = 5) then
+          if (Rec.Газета.МестаИздания.Count > 0) then
+            if (Rec.Газета.МестаИздания.Items[1].МестоИздания <> nil) then
+              ЗначениеПоказателя[Index] = Rec.Газета.МестаИздания.Items[1].МестоИздания.Наим;
+              Справ[Index]              = Rec.Газета.МестаИздания.Items[1].МестоИздания;
+            fi;
+          fi;
+        elsif (НомерРежима = 6) then
+          if (Rec.Газета.Редакция <> nil) then
+            ЗначениеПоказателя[Index] = Rec.Газета.Редакция.Наим;
+            Справ[Index]              = Rec.Газета.Редакция;
+          fi;
+        elsif (НомерРежима = 7) then
+          ЗначениеПоказателя[Index] = Rec.Газета.РедакторГазеты;
+        elsif (НомерРежима = 8) then
+          #Warning "Подавлена запись/вывод неопределенного типа издания";
+          if (Rec.Газета.ТипИздания = 0) then
+            ЗначениеПоказателя[Index] = 'Газета';
+          elsif (Rec.Газета.ТипИздания = 1) then
+            ЗначениеПоказателя[Index] = 'МПГ';
+          elsif (Rec.Газета.ТипИздания = 2) then
+            ЗначениеПоказателя[Index] = 'Газета';
+          fi;
+          ТипИздания[Index] = Rec.Газета.ТипИздания;
+        elsif (НомерРежима = 9) then
+          if (Rec.Газета.ТерриторияРаспространения <> nil) then
+            ЗначениеПоказателя[Index] = Rec.Газета.ТерриторияРаспространения.Наим;
+            Справ[Index]              = Rec.Газета.ТерриторияРаспространения;
+          fi;
+        elsif (НомерРежима = 10) then
+          if (Rec.Газета.Тематики.Count > 0) then
+            if (Rec.Газета.Тематики.Items[1].Тематика <> nil) then
+              ЗначениеПоказателя[Index] = Rec.Газета.Тематики.Items[1].Тематика.Наим;
+              Справ[Index]              = Rec.Газета.Тематики.Items[1].Тематика;
+            fi;
+          fi;
+        elsif (НомерРежима = 11) then
+          if (Rec.Газета.ЧАЦН.Count > 0) then
+            if (Rec.Газета.ЧАЦН.Items[1].ЧАЦН <> nil) then
+              ЗначениеПоказателя[Index] = Rec.Газета.ЧАЦН.Items[1].ЧАЦН.Наим;
+              Справ[Index]              = Rec.Газета.ЧАЦН.Items[1].ЧАЦН;
+            fi;
+          fi;
+        elsif (НомерРежима = 12) then
+          if (Rec.Газета.Языки.Count > 0) then
+            if (Rec.Газета.Языки.Items[1].Язык <> nil) then
+              ЗначениеПоказателя[Index] = Rec.Газета.Языки.Items[1].Язык.Наим;
+              Справ[Index]              = Rec.Газета.Языки.Items[1].Язык;
+            fi;
+          fi;
+        elsif (НомерРежима = 13) then
+          ЗначениеПоказателя[Index] = Rec.Газета.Периодичность;
+        fi;
+        --
+        if (ДатаВыпуска[Index] = nil) then
+          Message('Выбранный номер не содержит даты выхода!');
+        fi;
+      else
+        Message('Выбранный номер выпущен раньше, чем последний в истории! Пожалуйста, выберите другой!');
+      fi; -- условие на непересечение истории номеров (корректность)
+    fi;
+    ДоступностьВвода;
+  end;
+
+  func УдалитьИсторию(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+  var index:integer;
+    if    секцПозиции.Count > 1         then
+      index=Cell.Frame;
+      ДатаВыпуска[index]        = nil;
+      НомерВыпуска[index]       = nil;
+      ЗначениеПоказателя[index] = nil;
+      Сномера[index]            = nil;
+      Справ[index]              = nil;
+      ГруппаУчредителей[index]  = nil;
+      ТипИздания[index]         = nil;
+      секцПозиции.DeleteFrame(index);
+    elsif секцПозиции.Count = 1         then
+      ДатаВыпуска[1]            = nil;
+      НомерВыпуска[1]           = nil;
+      ЗначениеПоказателя[1]     = nil;
+      Сномера[1]                = nil;
+      Справ[1]                  = nil;
+      ГруппаУчредителей[1]      = nil;
+      ТипИздания[1]             = nil;
+      секцПозиции.DeleteFrame(1);
+    end;
+    ДоступностьВвода;
+    Result = False;
+  end;
+
+  proc ПолеНомер_ПриВыходе(Cell :TemplateCell; Index :Integer);
+    var vS :String;
+    vS = РКП_СИС.StdCode.FixCode10(НомерВыпуска[Index]);
+    if (vS <> НомерВыпуска[Index]) then
+      НомерВыпуска[Index] = vS;
+    fi;
+  end;
+
+  func ПолеПриОбзоре(Cell :TemplateCell; Value :Variant; var NewValue :Variant):Logical;
+    var Index :Integer;
+    var vRefRec :РКП_Справочники.BaseRefType1;
+    var aParam :Variant[2];
+    var локКатегорияПериодичности :Integer;
+    var локКоличествоВПериоде :Integer;
+    var локПериодичность :String;
+    Index = Cell.Frame;
+    if (НомерРежима = 5) then
+      --===Место издания==--
+      aParam[1] = ['ТипФрагмента', 0];
+      aParam[2] = ['Фрагмент', Value];
+      if (cmOk = РКП_Справочники.Справочники.картГеография.ВыполнитьВыбор(vRefRec, aParam)) then
+        Справ[index] = vRefRec;
+        NewValue = vRefRec.Наим;
+        Template.EndEdit(true);
+      fi;
+      Return false;
+    elsif (НомерРежима = 6) then
+      --===Редакция==--
+      if (Справ[Index] <> nil) and (Справ[Index].GetField('НаселенныйПункт') <> nil) then
+        aParam[1] = ['Фрагмент', Справ[Index].GetField('НаселенныйПункт').GetField('Наим')];
+        aParam[2] = ['ФрагментАдреса1', Value];
+      else
+        aParam[1] = ['ФрагментАдреса1', Value];
+      fi;
+      if (CmOk = РКП_Справочники.Справочники2.0блкартАдресРедакции.ВыполнитьВыбор(vRefRec, aParam)) then
+        Справ[index] = vRefRec;
+        NewValue = vRefRec.Наим;
+        Template.EndEdit(true);
+      fi;
+      Return false;
+    elsif (НомерРежима = 9) then
+      --===Территория распространения==--
+      aParam[1] = ['Фрагмент', Value];
+      if (CmOk = РКП_Справочники.Справочники2.0блкартТерриторияРаспространения.ВыполнитьВыбор(vRefRec, aParam)) then
+        Справ[index] = vRefRec;
+        NewValue = vRefRec.Наим;
+        Template.EndEdit(true);
+      fi;
+      Return false;
+    elsif (НомерРежима = 10) then
+      --===Тематика==--
+      aParam[1] = ['РежимВыбораТематики', true];
+      aParam[2] = ['РежимВыбораЧАЦН', false];
+      aParam[3] = ['Фрагмент', Value];
+      if (cmOk = РКП_Справочники.Справочники2.0блкартТематика.ВыполнитьВыбор(vRefRec, aParam) ) then
+        Справ[index] = vRefRec;
+        NewValue = vRefRec.Наим;
+        Template.EndEdit(true);
+      fi;
+      Return false;
+    elsif (НомерРежима = 11) then
+      --===Чит.адрес==--
+      aParam[1] = ['РежимВыбораТематики', false];
+      aParam[2] = ['РежимВыбораЧАЦН', true];
+      aParam[3] = ['Фрагмент', Value];
+      if (cmOk = РКП_Справочники.Справочники2.0блкартТематика.ВыполнитьВыбор(vRefRec, aParam) ) then
+        Справ[index] = vRefRec;
+        NewValue = vRefRec.Наим;
+        Template.EndEdit(true);
+      fi;
+      Return false;
+    elsif (НомерРежима = 12) then
+      --===Язык==--
+      aParam[1] = ['Фрагмент', Value];
+      if (cmOk = РКП_Справочники.Справочники2.0картЯзыкИздания.ВыполнитьВыбор(vRefRec, aParam) ) then
+        Справ[index] = vRefRec;
+        NewValue = vRefRec.Наим;
+        Template.EndEdit(true);
+      fi;
+      Return false;
+    elsif (НомерРежима = 13) then
+      --===Периодичность==--
+      локПериодичность = ЗначениеПоказателя[Index];
+      if (cmOk = УчетГазет.блВводПериодичности.ВыполнитьВвод(локКатегорияПериодичности, локКоличествоВПериоде, локПериодичность)) then
+        NewValue = локПериодичность;
+        Template.EndEdit(true);
+      fi;
+      Return false;
+    fi;
+  end;
+
+  func ПолеПриНаборе(Cell :TemplateCell; Key :String; Value :Variant;var NewValue :Variant) :Logical;
+    var vRefClass: class Record;
+    var vFindFlt :String;
+    var vRefRec :РКП_Справочники.BaseRefType1;
+    var Index, vAnswer, vCountRec :Integer;
+    var aParam :Variant[2];
+
+--    var Q                       : Query;
+--    var Решение1,Решение2       : integer;
+--    var NewRec,R                : record;
+--    var Index                   : integer;
+--    var CardForSelect           : UserObject;
+    Index = Cell.Frame;
+    if (НомерРежима = 5) then
+2  0  2  --====================================--
+2    0  2--======== Место издания =============--
+2    0  2--====================================--
+      vRefClass = РКП_Справочники.СпрГеография;
+      vFindFlt  = 'Match(Наим,"*' + Value + '*")';
+      vRefRec = РКП_СИС.Recs.FindRecordExt(vRefClass, vFindFlt, , vCountRec);
+      if (vCountRec = 0) then
+        vAnswer = Enquiry('', 'Наименования места издания, похожего на "' + Value +
+                              '", не найдено в справочнике. ' +
+                              'Пожалуйста, выберите действие:',
+                              ['Добавить в справочник','Искать в полном списке','Повторить ввод']);
+        if (vAnswer in [0,3]) then
+          Return;
+        elsif (vAnswer = 1) then
+          vRefRec = РКП_Справочники.СпрГеография.Create;
+          vRefRec.Наим = Value as String;
+          vRefRec.Post;
+          РКП_Справочники.Справочники.редГеография.ShowFormEx(vRefRec, Window.ModalWindow);
+          NewValue = vRefRec;
+          Template.EndEdit(true);
+          Return;
+        elsif (vAnswer = 2) then
+          if (cmOk = РКП_Справочники.Справочники.картГеография.ВыполнитьВыбор(vRefRec)) then
+            Справ[index] = vRefRec;
+            NewValue     = vRefRec.Наим;
+            Template.EndEdit(true);
+            Return false;
+          fi;
+          Return;
+        fi;
+      elsif (vCountRec = 1) then
+        Return true;
+      elsif (vCountRec > 1) then
+        aParam[1] = ['ТипФрагмента', 1];
+        aParam[2] = ['Фрагмент', Value];
+        if (cmOk = РКП_Справочники.Справочники.картГеография.ВыполнитьВыбор(vRefRec, aParam)) then
+          Справ[index] = vRefRec;
+          NewValue     = vRefRec.Наим;
+          Template.EndEdit(true);
+          Return false;
+        fi;
+        Return;
+      fi;
+    elsif (НомерРежима = 6) then
+2    0  2--=================================================--
+2    0  2--======== Адрес           редакции  ==============--
+2    0  2--=================================================--
+      vRefClass = РКП_Справочники.СпрГеография;
+      vFindFlt  = 'Match(Наим,"*' + Value + '*")';
+      vRefRec = РКП_СИС.Recs.FindRecordExt(vRefClass, vFindFlt, , vCountRec);
+      if (vCountRec = 0) then
+        vAnswer = Enquiry('', 'Наименования2 0населенного пункта, похожего на "' + Value +
+                              '", не найдено в справочнике. ' +
+                              'Пожалуйста, выберите действие:',
+                              ['Искать в полном списке','Повторить ввод']);
+        if (vAnswer in [0,2]) then
+          Return;
+        elsif (vAnswer = 1) then
+          if (CmOk = РКП_Справочники.Справочники2.0блкартАдресРедакции.ВыполнитьВыбор(vRefRec) ):
+            Справ[index] = vRefRec;
+            NewValue     = vRefRec.Наим;
+            Template.EndEdit(true);
+            Return false;
+          fi;
+          Return;
+        fi;
+      elsif (vCountRec >= 1) then
+        aParam[1] = ['ТипФрагмента', 1];
+        aParam[2] = ['Фрагмент', Value];
+        if (cmOk = РКП_Справочники.Справочники2.0блкартАдресРедакции.ВыполнитьВыбор(vRefRec, aParam)) then
+          Справ[index] = vRefRec;
+          NewValue     = vRefRec.Наим;
+          Template.EndEdit(true);
+          Return false;
+        fi;
+        Return;
+      fi;
+    elsif (НомерРежима = 9) then
+2   0   2--=================================================--
+2   0   2--======== Территория распространения =============--
+2   0   2--=================================================--
+      vRefClass = РКП_Справочники.СпрТерриторияРаспространения;
+      vFindFlt  = 'Match(Наим,"*' + Value + '*")';
+      vRefRec = РКП_СИС.Recs.FindRecordExt(vRefClass, vFindFlt, , vCountRec);
+      if (vCountRec = 0) then
+        vAnswer = Enquiry('', 'Наименования, похожего на "' + Value +
+                              '", не найдено в справочнике. ' +
+                              'Пожалуйста, выберите действие:',
+                              ['Искать в полном списке','Повторить ввод']);
+        if (vAnswer in [0,2]) then
+          Return;
+        elsif (vAnswer = 1) then
+          aParam[1] = ['Фрагмент', Value];
+          if (cmOk = РКП_Справочники.Справочники.блкартТерриторияРаспространения.ВыполнитьВыбор(vRefRec)) then
+            Справ[index] = vRefRec;
+            NewValue     = vRefRec.Наим;
+            Template.EndEdit(true);
+            Return false;
+          fi;
+          Return;
+        fi;
+      elsif (vCountRec = 1) then
+        Return true;
+      elsif (vCountRec > 1) then
+        aParam[1] = ['Фрагмент', Value];
+        if (cmOk = РКП_Справочники.Справочники.блкартТерриторияРаспространения.ВыполнитьВыбор(vRefRec, aParam)) then
+          Справ[index] = vRefRec;
+          NewValue     = vRefRec.Наим;
+          Template.EndEdit(true);
+          Return false;
+        fi;
+        Return;
+      fi;
+    elsif (НомерРежима = 10) then
+    2  --====================================--
+    2  --========   Тематика    =============--
+    2  --====================================--
+      vRefClass = РКП_Справочники.СпрТематика;
+      vFindFlt  = 'ЦельАнализа<1 and not НеПрименяется and Match(Наим,"*' + Value + '*")';
+      aParam[1] = ['РежимВыбораТематики', true];
+      aParam[2] = ['РежимВыбораЧАЦН', false];
+      aParam[3] = ['ТипФрагмента', 1];
+      --aParam[4] = ['Фрагмент', Value];
+      vRefRec = РКП_СИС.Recs.FindRecordExt(vRefClass, vFindFlt, , vCountRec);
+      if (vCountRec = 0) then
+        vAnswer = Enquiry('', 'Наименования, похожего на "' + Value +
+                              '", не найдено в справочнике. ' +
+                              'Пожалуйста, выберите действие:',
+                              ['Искать в полном списке','Повторить ввод']);
+        if (vAnswer in [0,2]) then
+          Return;
+        elsif (vAnswer = 1) then
+          if (cmOk = РКП_Справочники.Справочники.блкартТематика.ВыполнитьВыбор(vRefRec, aParam)) then
+            Справ[index] = vRefRec;
+            NewValue     = vRefRec.Наим;
+            Template.EndEdit(true);
+            Return false;
+          fi;
+          Return;
+        fi;
+      elsif (vCountRec = 1) then
+        Return true;
+      elsif (vCountRec > 1) then
+        aParam[4] = ['Фрагмент', Value];
+        if (cmOk = РКП_Справочники.Справочники.блкартТематика.ВыполнитьВыбор(vRefRec, aParam)) then
+          Справ[index] = vRefRec;
+          NewValue     = vRefRec.Наим;
+          Template.EndEdit(true);
+          Return false;
+        fi;
+        Return;
+      fi;
+    elsif (НомерРежима = 11) then
+2   0   2--============================================================--
+2   0   2--======== 0Читательский адрес/целевое назначение2 =============--
+2   0   2--============================================================--
+      vRefClass = РКП_Справочники.СпрТематика;
+      vFindFlt  = 'ЦельАнализа>0 and not НеПрименяется and Match(Наим,"*' + Value + '*")';
+      aParam[1] = ['РежимВыбораТематики', false];
+      aParam[2] = ['РежимВыбораЧАЦН', true];
+      aParam[3] = ['ТипФрагмента', 1];
+        --aParam[4] = ['Фрагмент', Value];
+      vRefRec = РКП_СИС.Recs.FindRecordExt(vRefClass, vFindFlt, , vCountRec);
+      if (vCountRec = 0) then
+        vAnswer = Enquiry('', 'Наименования, похожего на "' + Value +
+                              '", не найдено в справочнике. ' +
+                              'Пожалуйста, выберите действие:',
+                              ['Искать в полном списке','Повторить ввод']);
+        if (vAnswer in [0,2]) then
+          Return;
+        elsif (vAnswer = 1) then
+          if (cmOk = РКП_Справочники.Справочники.блкартТематика.ВыполнитьВыбор(vRefRec, aParam)) then
+            Справ[index] = vRefRec;
+            NewValue     = vRefRec.Наим;
+            Template.EndEdit(true);
+            Return false;
+          fi;
+          Return;
+        fi;
+      elsif (vCountRec = 1) then
+        Return true;
+      elsif (vCountRec > 1) then
+        aParam[4] = ['Фрагмент', Value];
+        if (cmOk = РКП_Справочники.Справочники.блкартТематика.ВыполнитьВыбор(vRefRec, aParam)) then
+          Справ[index] = vRefRec;
+          NewValue     = vRefRec.Наим;
+          Template.EndEdit(true);
+          Return false;
+        fi;
+        Return;
+      fi;
+    elsif (НомерРежима = 12) then
+2 0   2  --====================================--
+2 0   2  --======== Языки издания =============--
+2 0   2  --====================================--
+      vRefClass = РКП_Справочники.спрЯзыкИздания;
+      vFindFlt  = 'Match(Наим,"*' + Value + '*")';
+      vRefRec = РКП_СИС.Recs.FindRecordExt(vRefClass, vFindFlt, , vCountRec);
+      if (vCountRec = 0) then
+        vAnswer = Enquiry('', 'Наименования языка, похожего на "' + Value +
+                              '", не найдено в справочнике. ' +
+                              'Пожалуйста, выберите действие:',
+                              ['Искать в полном списке','Повторить ввод']);
+        if (vAnswer in [0,2]) then
+          Return;
+        elsif (vAnswer = 1) then
+          if (cmOk = РКП_Справочники.Справочники.картЯзыкИздания.ВыполнитьВыбор(vRefRec)) then
+            Справ[index] = vRefRec;
+            NewValue     = vRefRec.Наим;
+            Template.EndEdit(true);
+            Return false;
+          fi;
+          Return;
+        fi;
+      elsif (vCountRec = 1) then
+        Return true;
+      elsif (vCountRec > 1) then
+        aParam[1] = ['Фрагмент', Value];
+        if (cmOk = РКП_Справочники.Справочники.картЯзыкИздания.ВыполнитьВыбор(vRefRec, aParam)) then
+          Справ[index] = vRefRec;
+          NewValue     = vRefRec.Наим;
+          Template.EndEdit(true);
+          Return false;
+        fi;
+        Return;
+      fi;
+    fi;
+  end;
+
+  proc ПолеПриВыходе(Cell :TemplateCell; Index :Integer);
+    if (НомерРежима in [5,6,8,9,10,11,12]) then
+      if (ЗначениеПоказателя[Index] = nil) then
+        Справ[Index] = nil;
+      fi;
+    fi;
+    if (НомерРежима = 8) then
+      if (ТипИздания[Index] = 0) then
+        ЗначениеПоказателя[Index] = 'Газета';
+      elsif (ТипИздания[Index] = 1) then
+        ЗначениеПоказателя[Index] = 'МПГ';
+      end;
+    end;
+  end;
+
+--}
+
+end

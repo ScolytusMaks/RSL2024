@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Properties Version="1"/>
+<Items>
+  <Item Name="editBaseType1"/>
+  <Item Name="editBaseType2"/>
+  <Item Name="editBaseType3"/>
+  <Item Name="редТематика"/>
+  <Item Name="редТерриторияРаспространения"/>
+  <Item Name="редЯзыкИздания"/>
+  <Item Name="редЖанр"/>
+  <Item Name="редГеография"/>
+  <Item Name="редРедакция"/>
+  <Item Name="редТематикаСтатьи"/>
+  <Item Name="редББК"/>
+  <Item Name="редСерияСтатей"/>
+  <Item Name="редГеографияСтатьи"/>
+  <Item Name="редПерсоналия"/>
+  <Item Name="редПостОрг"/>
+  <Item Name="редПостОргКолл"/>
+  <Item Name="редПостОргСП"/>
+  <Item Name="редПостОргВП"/>
+  <Item Name="редВремОрг"/>
+  <Item Name="редВремОргКолл"/>
+  <Item Name="редВремОргСП"/>
+  <Item Name="редВремОргВП"/>
+  <Item Name="редЯзыкОригинала"/>
+  <Item Name="редТипУд"/>
+</Items>

@@ -1,0 +1,45 @@
+class inherited Справочники.editBaseType2 "", editor BaseRefType3;
+
+--{{ 2_Свойства
+
+inobject private
+
+  Интерфейс :РКП_Справочники.RI.Справочники.intBaseType3;
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func Поле_ПриПроверке_Код(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    Value = Trim(Value as String);
+    Return true;
+  end;
+
+  proc Поле_ПриВыходе_Код(Cell :TemplateCell; Index :Integer);
+    if (Cell.Contents in Интерфейс.ХешируемыеПоля) then
+      Hash = Интерфейс.GetHashByRecord(Self.Record);
+    fi;
+  end;
+
+  proc Поле_ПриВыходе_Наим(Cell :TemplateCell; Index :Integer);
+    if (Cell.Contents in Интерфейс.ХешируемыеПоля) then
+      Hash = Интерфейс.GetHashByRecord(Self.Record);
+    fi;
+  end;
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+-- 2_Дополнительные команды0. --
+
+-- 2_Вспомогательные методы0. --
+
+  proc УстановитьФокусНаПервоеПолеВвода;
+    Template.CellByField['Код'].SetFocus;
+  end;
+
+end

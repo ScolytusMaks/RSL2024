@@ -1,0 +1,17 @@
+\plain                  С помощью этой команды устанавливаются стандартные параметры форматирования.
+\rtlch                  The character data following this control word will be treated as a right-to-left run.
+\ltrch                  The character data following this control word will be treated as a left-to-right run (the default).
+\loch                   The text consists of single-byte low-ANSI (0x00–0x7F) characters.
+\langN                  Applies a language to a character. 
+                        N is a number corresponding to a language. 
+                        The \plain control word resets the language property to the 
+                        language defined by \deflangN in the document properties.
+\ltrpar                 Text in this paragraph will be displayed with left-to-right precedence (the default).
+\csN                    Designates character style. If a character style is specified, 
+                        style properties must be specified with the character run. 
+                        N refers to an entry in the style table.
+
+
+
+
+

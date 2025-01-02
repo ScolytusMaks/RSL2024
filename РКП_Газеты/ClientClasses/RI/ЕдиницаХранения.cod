@@ -1,0 +1,197 @@
+class inherited РКП_СИС.RI.intBase "Интерфейс записи (Единица хранения)";
+
+import РКП_СИС Classes Functions, Recs, StdCode;
+--import РКП_СИС Classes Functions, StringsFunctions, Recs, FilterMaker, StdCode;
+
+inclass public
+
+  func СвязанныйКлассЗаписей: Class СИС2.Базовая.БазоваяЗапись;
+    Result = РКП_Газеты.ЕдиницаХранения;
+  end;
+
+  func CreateNew(rFinDoc :РКП_Газеты.УчетныйДокумент; nearIntRec :РКП_Газеты.RI.ЕдиницаХранения): РКП_Газеты.RI.ЕдиницаХранения;
+    Result = Create;
+    Result.Record.УчетныйДокумент = rFinDoc;
+    if (rFinDoc = nil) then
+      Result.Record.ДатаПодшивки = nil;
+    else
+      Result.Record.ДатаПодшивки = Today;
+    fi;
+    if (nearIntRec <> nil) then
+      --Result.Record.Газета = nearIntRec.Record.Газета;
+      --Result.Record.ГодВыпуска = nearIntRec.Record.ГодВыпуска;
+    fi;
+    Result.InitByDefault;
+  end;
+
+  func Create: РКП_Газеты.RI.ЕдиницаХранения;
+    Result = inherited Create;
+    Result.Record = РКП_Газеты.ЕдиницаХранения.Create;
+  end;
+
+  func ОткрытьПоЗаписи synonym OpenRecord(locRecord: РКП_Газеты.ЕдиницаХранения): РКП_Газеты.RI.ЕдиницаХранения;
+    Result = inherited Create;
+    Result.Record = locRecord;
+  end;
+
+  func БланкРедакторПоУмолчанию: Class BlankForm;
+    Result = nil;
+  end;
+
+  func КартотекаПоУмолчанию: Class CardForm;
+    Result = nil;
+  end;
+
+inobject public
+
+  Record: РКП_Газеты.ЕдиницаХранения;
+
+  proc ИнициализироватьПоУмолчанию synonym InitByDefault;
+    Init;
+    with Self.Record do
+      if (ДатаПоступления = nil) then
+        ДатаПоступления = today;
+      fi;
+    end;
+  end;
+
+  proc Инициализировать synonym Init;
+    Assert(Record.State = Kernel.Record.Created);
+  end;
+
+  proc Записать synonym Post( аДиалоговыйРежим :Logical = False );
+    SetWorkLog(wsRecCreated, wsRecUpdated);
+    SetWorkLog(wsAccepted, wsAcpUpdated);
+    inherited Post(аДиалоговыйРежим);
+    if (Record.НомерГазеты <> nil) then
+      Record.НомерГазеты.ПринятоЭкземпляров = RI.НомерГазеты.ПолученоЕдХран(Record.НомерГазеты);
+      RecordPostIfNeed(Record.НомерГазеты);
+    fi;
+  end;
+
+  proc ВыполнитьУдаление synonym DoDelete( const aCheckRefs :Logical );
+    ClearWorkLog(wsRecCreated, false);
+    inherited DoDelete(aCheckRefs);
+  end;
+
+
+  func ContentValidToWorkLog(byWorkState :tWorkState) :Logical; -- Содержимое записи валидно для принятия к учету как единица рабочего процесса
+    if (byWorkState in [wsRecCreated, wsRecUpdated]) then
+      Result = (Record.Количество > 0);
+    elsif (byWorkState in [wsAccepted, wsAcpUpdated]) then
+      Result = (Record.Количество > 0) and (Record.УчетныйДокумент <> nil);
+    fi;
+  end;
+
+  func CreateDateForWorkLog (WorkState :tWorkState; byCurrentUsers :Logical) :Date; -- Дата, когда запись считается созданной и принимается к учету как единица рабочего процесса
+    var dt :Date;
+    if (WorkState in [wsRecCreated, wsRecUpdated]) then
+      if byCurrentUsers then
+        if (Self.Record.UpdateUser = SessionInfo.UserName) then
+          dt = Self.Record.ДатаПоступления;
+          Result = CreateDate(Day(dt), Mon(dt), Year(dt));
+        fi;
+      else
+        dt = Self.Record.ДатаПоступления;
+        Result = CreateDate(Day(dt), Mon(dt), Year(dt));
+      fi;
+    elsif (WorkState in [wsAccepted, wsAcpUpdated]) then
+      if byCurrentUsers then
+        if (Self.Record.UpdateUser = SessionInfo.UserName) then
+          dt = Self.Record.ДатаПодшивки;
+          Result = CreateDate(Day(dt), Mon(dt), Year(dt));
+        fi;
+      else
+        dt = Self.Record.ДатаПодшивки;
+        Result = CreateDate(Day(dt), Mon(dt), Year(dt));
+      fi;
+    fi;
+  end;
+
+  proc SaveStoredValI(rWrkLog :РКП_СИС.ЛогРабот; byWorkState :tWorkState);
+    rWrkLog.StoredValI = Self.Record.Количество; -- сохранение показателя целочисленного типа
+  end;
+
+
+  var ОперФильтрИздание :String;
+  var ОперФильтрГодВыпуска :Integer;
+  var ОперФильтрНомер :String;
+
+  func НомерНеВыбран :Logical;
+    Return (Record.НомерГазеты = nil);
+  end;
+
+
+  func ДатаПоступления :Date;
+    Return Record.ДатаПоступления;
+  end;
+
+  func Издание :РКП_Газеты.Газета;
+    if (Record.НомерГазеты <> nil) then
+      Return Record.НомерГазеты.Газета;
+    fi;
+  end;
+
+  func Издание_НазваниеОсн :String;
+    if (Record.НомерГазеты <> nil) and (Record.НомерГазеты.Газета <> nil) then
+      Return Record.НомерГазеты.Газета.НазваниеОсн;
+    fi;
+  end;
+
+  func ГодВыпуска :Integer;
+    if (Record.НомерГазеты <> nil) then
+      Return Record.НомерГазеты.ГодВыпуска;
+    fi;
+  end;
+
+  func НомерГазеты :РКП_Газеты.НомерГазеты;
+    Return Record.НомерГазеты;
+  end;
+
+  func Номер :String;
+    if (Record.НомерГазеты <> nil) then
+      if (Record.НомерГазеты.Номер = UnnumberedIssue) then
+        Return BiblioRecord.ОписаниеНомераПоРеквизитам( '?', Record.НомерГазеты.ВаловыйНомер, nil, nil);
+      else
+        Return BiblioRecord.ОписаниеНомераПоРеквизитам( Record.НомерГазеты.Номер, Record.НомерГазеты.ВаловыйНомер, nil, nil);
+      fi;
+    fi;
+  end;
+
+  func Ненумерованный :Logical;
+    if (Record.НомерГазеты <> nil) then
+      Return (Record.НомерГазеты.Номер = UnnumberedIssue);
+    fi;
+  end;
+
+  func ДатаВыхода :Date;
+    if (Record.НомерГазеты <> nil) then
+      Return Record.НомерГазеты.ДатаВыхода;
+    fi;
+  end;
+
+  func Количество :Integer;
+    Return Record.Количество;
+  end;
+
+  func Цена :Numeric;
+    if (Record.НомерГазеты <> nil) then
+      Return Record.НомерГазеты.Цена;
+    fi;
+  end;
+
+  func СуммаПозиции :Numeric;
+    Return Round((Количество * Цена), 2);
+  end;
+
+  proc УстУчДокумент(rDoc :РКП_Газеты.УчетныйДокумент);
+    Record.УчетныйДокумент = rDoc;
+    if (rDoc = nil) then
+      Record.ДатаПодшивки = nil;
+    else
+      Record.ДатаПодшивки = Today;
+    fi;
+  end;
+
+
+end

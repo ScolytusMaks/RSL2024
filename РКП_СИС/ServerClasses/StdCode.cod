@@ -1,0 +1,148 @@
+class "Стандартизатор кода";
+
+inclass public
+
+  -- Приведение сырого номера газеты к стандарту отдела регистрации без учета дополнения разрядности ведущими пробелами
+  func CustomStandard synonym СтандартРГ(ValSource :String) :String;
+    var k, kk :Integer;
+    var SmbBef, SmbCur, SmbAft :String;
+    ValSource = Trim(ValSource);
+    kk = Length(ValSource);
+    for k = 1 .. Length(ValSource) do
+      SmbBef = if( (k > 1),  SubStr(ValSource, k - 1, 1), nil);
+      SmbCur = SubStr(ValSource, k, 1);
+      SmbAft = if( (k < kk), SubStr(ValSource, k + 1, 1), nil);
+      --
+      if not ( SmbCur in [' ','-','_','+','=','\','|',')'] ) then
+        Result = Result + SmbCur;
+      elsif (SmbCur = '-') then
+        if not ( SmbAft in ['0','1','2','3','4','5','6','7','8','9','-',' '] ) then
+          Result = Result + SmbCur;
+        else
+          if not SmbBef in ['-'] then
+            Result = Result + '/';
+          fi;
+        fi;
+      fi;
+    od;
+  end;
+
+  -- Приведение аналит.кода к указанной длине.
+  func FixStr (ValSource :String; Symbol :String; Size:Integer) :String;
+    if (Length(ValSource) < Size) then
+      Result = PadL(ValSource, Size, Symbol);
+    else
+      Result = SubStr(ValSource, 1, Size);
+    fi;
+    if Pos('Нену', Result) = 0 then
+      Result = Up(Result);
+    fi;
+  end;
+
+  -- Ликвидация всех пробелов в строке без перевода в верхний регистр
+  func NoSpace (ValSource :String) :String;
+    var k, kk :Integer;
+    var Smb :String;
+    ValSource = Trim(ValSource);
+    if (Pos(' ', ValSource) > 0) then
+      kk = Length(ValSource);
+      for k = kk .. 1 step -1 do
+        Smb = SubStr(ValSource, k, 1);
+        if (Smb <> ' ') then
+          Result = Smb + Result;
+        fi;
+      od;
+    else
+      Result = ValSource;
+    fi;
+  end;
+
+  func FixCode4(ValSource :String) :String;
+    Return FixCodeSp (ValSource, 4);
+  end;
+
+  func FixCode8(ValSource :String) :String;
+    Return FixCodeSp (ValSource, 8);
+  end;
+
+  func FixCode10(ValSource :String) :String;
+    Return FixCodeSp (ValSource, 10);
+  end;
+
+  func FixCode14(ValSource :String) :String;
+    Return FixCodeSp (ValSource, 14);
+  end;
+
+  -- Приведение строкового кода в формате <ЦИФРЫ><РАЗДЕЛИТЕЛЬ><БУКВЕННО_ЦИФРОВОЙ ИНДЕКС>(кода УДК, справочника, номера газеты и т.д.)
+  -- к требуемой разрядности с учетом символов ('/','(','-','.','\') для правильной сортировки
+  -- К исходной строке добавляются ведущие пробелы.
+  func FixCodeSp (ValSource :String; SymbolsCount :Integer) :String;
+    var aSeparatorsPositions :Integer[];  -- Массив позиций первого разделителя в исходной строке
+    var vPositionFirstSymbols :Integer;   -- Позиция первого разделителя в исходной строке
+    var Str1, Str2, vFirstSymbol :String; -- Проект строки
+    var vOriginalLength :Integer;
+    if (Pos("Нену", ValSource) > 0) then
+      Return RepStr(" ", SymbolsCount) + 'Ненумер. вып.';
+    fi;
+    --
+    aSeparatorsPositions[ 1] = Pos('/', ValSource); aSeparatorsPositions[ 1] = if(aSeparatorsPositions[ 1] = 0, 1000, aSeparatorsPositions[ 1]);
+    aSeparatorsPositions[ 2] = Pos('-', ValSource); aSeparatorsPositions[ 2] = if(aSeparatorsPositions[ 2] = 0, 1000, aSeparatorsPositions[ 2]);
+    aSeparatorsPositions[ 3] = Pos('(', ValSource); aSeparatorsPositions[ 3] = if(aSeparatorsPositions[ 3] = 0, 1000, aSeparatorsPositions[ 3]);
+    aSeparatorsPositions[ 4] = Pos('\', ValSource); aSeparatorsPositions[ 4] = if(aSeparatorsPositions[ 4] = 0, 1000, aSeparatorsPositions[ 4]);
+    aSeparatorsPositions[ 5] = Pos('.', ValSource); aSeparatorsPositions[ 5] = if(aSeparatorsPositions[ 5] = 0, 1000, aSeparatorsPositions[ 5]);
+    --
+    aSeparatorsPositions[ 6] = Pos('А', ValSource); aSeparatorsPositions[ 6] = if(aSeparatorsPositions[ 6] = 0, 1000, aSeparatorsPositions[ 6]);
+    aSeparatorsPositions[ 7] = Pos('Б', ValSource); aSeparatorsPositions[ 7] = if(aSeparatorsPositions[ 7] = 0, 1000, aSeparatorsPositions[ 7]);
+    aSeparatorsPositions[ 8] = Pos('В', ValSource); aSeparatorsPositions[ 8] = if(aSeparatorsPositions[ 8] = 0, 1000, aSeparatorsPositions[ 8]);
+    aSeparatorsPositions[ 9] = Pos('Г', ValSource); aSeparatorsPositions[ 9] = if(aSeparatorsPositions[ 9] = 0, 1000, aSeparatorsPositions[ 9]);
+    aSeparatorsPositions[10] = Pos('Д', ValSource); aSeparatorsPositions[10] = if(aSeparatorsPositions[10] = 0, 1000, aSeparatorsPositions[10]);
+    aSeparatorsPositions[11] = Pos('A', ValSource); aSeparatorsPositions[11] = if(aSeparatorsPositions[11] = 0, 1000, aSeparatorsPositions[11]);
+    aSeparatorsPositions[12] = Pos('B', ValSource); aSeparatorsPositions[12] = if(aSeparatorsPositions[12] = 0, 1000, aSeparatorsPositions[12]);
+    aSeparatorsPositions[13] = Pos('C', ValSource); aSeparatorsPositions[13] = if(aSeparatorsPositions[13] = 0, 1000, aSeparatorsPositions[13]);
+    aSeparatorsPositions[14] = Pos('D', ValSource); aSeparatorsPositions[14] = if(aSeparatorsPositions[14] = 0, 1000, aSeparatorsPositions[14]);
+    aSeparatorsPositions[15] = Pos('E', ValSource); aSeparatorsPositions[15] = if(aSeparatorsPositions[15] = 0, 1000, aSeparatorsPositions[15]);
+    aSeparatorsPositions[16] = Pos('М', ValSource); aSeparatorsPositions[16] = if(aSeparatorsPositions[16] = 0, 1000, aSeparatorsPositions[16]);
+    aSeparatorsPositions[17] = Pos('Т', ValSource); aSeparatorsPositions[17] = if(aSeparatorsPositions[17] = 0, 1000, aSeparatorsPositions[17]);
+    aSeparatorsPositions[18] = Pos('П', ValSource); aSeparatorsPositions[18] = if(aSeparatorsPositions[18] = 0, 1000, aSeparatorsPositions[18]);
+    --
+    aSeparatorsPositions[19] = Pos('а', ValSource); aSeparatorsPositions[19] = if(aSeparatorsPositions[19] = 0, 1000, aSeparatorsPositions[19]);
+    aSeparatorsPositions[20] = Pos('б', ValSource); aSeparatorsPositions[20] = if(aSeparatorsPositions[20] = 0, 1000, aSeparatorsPositions[20]);
+    aSeparatorsPositions[21] = Pos('в', ValSource); aSeparatorsPositions[21] = if(aSeparatorsPositions[21] = 0, 1000, aSeparatorsPositions[21]);
+    aSeparatorsPositions[22] = Pos('г', ValSource); aSeparatorsPositions[22] = if(aSeparatorsPositions[22] = 0, 1000, aSeparatorsPositions[22]);
+    aSeparatorsPositions[23] = Pos('д', ValSource); aSeparatorsPositions[23] = if(aSeparatorsPositions[23] = 0, 1000, aSeparatorsPositions[23]);
+    aSeparatorsPositions[24] = Pos('a', ValSource); aSeparatorsPositions[24] = if(aSeparatorsPositions[24] = 0, 1000, aSeparatorsPositions[24]);
+    aSeparatorsPositions[25] = Pos('b', ValSource); aSeparatorsPositions[25] = if(aSeparatorsPositions[25] = 0, 1000, aSeparatorsPositions[25]);
+    aSeparatorsPositions[26] = Pos('c', ValSource); aSeparatorsPositions[26] = if(aSeparatorsPositions[26] = 0, 1000, aSeparatorsPositions[26]);
+    aSeparatorsPositions[27] = Pos('d', ValSource); aSeparatorsPositions[27] = if(aSeparatorsPositions[27] = 0, 1000, aSeparatorsPositions[27]);
+    aSeparatorsPositions[28] = Pos('e', ValSource); aSeparatorsPositions[28] = if(aSeparatorsPositions[28] = 0, 1000, aSeparatorsPositions[28]);
+    aSeparatorsPositions[29] = Pos('м', ValSource); aSeparatorsPositions[29] = if(aSeparatorsPositions[29] = 0, 1000, aSeparatorsPositions[29]);
+    aSeparatorsPositions[30] = Pos('т', ValSource); aSeparatorsPositions[30] = if(aSeparatorsPositions[30] = 0, 1000, aSeparatorsPositions[30]);
+    aSeparatorsPositions[31] = Pos('п', ValSource); aSeparatorsPositions[31] = if(aSeparatorsPositions[31] = 0, 1000, aSeparatorsPositions[31]);
+    --
+    vPositionFirstSymbols = Int(Min(aSeparatorsPositions));
+    vFirstSymbol = SubStr(ValSource, vPositionFirstSymbols, 1);
+    --
+   if Length(ValSource) < SymbolsCount or (vPositionFirstSymbols > 0 and vPositionFirstSymbols < 1000) then
+     vOriginalLength = Length(ValSource);
+     if (vOriginalLength > 0) or (vOriginalLength < SymbolsCount) then
+       Result = PadL(ValSource, SymbolsCount, ' ');
+     elsif (vOriginalLength >= SymbolsCount) then
+       Result = SubStr(ValSource, 1, SymbolsCount);
+     fi;
+     if (vPositionFirstSymbols > 0) and (vPositionFirstSymbols < 1000) then
+       Str1 = SubStr(ValSource, 1, vPositionFirstSymbols-1);
+       Str2 = SubStr(ValSource, vPositionFirstSymbols + 1, vOriginalLength);
+       Str1 = NoSpace(Str1);
+       Str1 = FixStr(Str1, ' ', SymbolsCount);
+       Str2 = NoSpace(Str2);
+       Str2 = FixCodeSp(Str2, 2); -- добавлено 01.06.2008 для правильной сортировки двухразрядных расширений
+       Result = Str1 + vFirstSymbol + Str2;
+     fi;
+   else
+     Result = ValSource;
+   fi;
+  end;
+
+  var UnnumberedIssue synonym НенумерованныйВыпуск :string := FixCode14('Ненумер. вып.');
+
+end

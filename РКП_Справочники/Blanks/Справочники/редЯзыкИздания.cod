@@ -1,0 +1,38 @@
+Class inherited —правочники.editBaseType1 "язык издани€" , editor спрязык»здани€;
+
+--{{ 2_—войства
+
+inobject private
+
+  var »нтерфейс :RI.—правочники.язык»здани€;
+
+--}}
+
+-- 2_ќбработчики событий шаблона0. --
+
+  func шаблон_ѕриѕроверке :Logical;
+    Result = inherited шаблон_ѕриѕроверке;
+    if Result and Self.Record.√осяз–‘ then
+      BeginTransaction([Record.ClassType] as Class[] Record);
+      try
+        with Query.Create([Record.ClassType] as Class[] Record) do
+          Filter = 'ExtID<>"' + Self.Record.ExtID  + '"';
+          Select;
+          while not Eof do
+            if Current.√осяз–‘ then
+              Current.√осяз–‘ = false;
+            fi;
+            Next;
+          od;
+        end;
+        EndTransaction;
+      except
+        AbortTransaction;
+      end;
+    fi;
+  end;
+
+-- 2_¬спомогательные методы0. --
+
+
+end

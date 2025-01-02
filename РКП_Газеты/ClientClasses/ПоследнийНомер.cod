@@ -1,0 +1,35 @@
+class "";
+
+inclass
+proc ВыполнениеЗапроса(Литера:string;ГодВыпуска:integer;ТипИздания:integer;var Номер[]:record);
+  var k,j               : integer;
+  var Q                 : query;
+  var r                 : record;
+    Q                   = Query.Create([РКП_Газеты.Газета]);
+    Q.Filter            = "Match(НазваниеОсн,'"+Литера+"*')"+" and ТипИздания="+Str(ТипИздания);
+    Q.Order             = "НазваниеОсн";
+    Q.Select;
+    Q.First;
+    for k = 1..Q.Count  do
+      Hint("Обработка <"+Литера+"> ["+SubStr(Q.Current.НазваниеОсн,1,20)+"...]",k,Q.Count);
+      if ГодВыпуска>0   then
+        r         = Стат.ПоследнийПолученныйНомерЗаГодВыпуска(Q.Current,ГодВыпуска);
+      else
+        r         = Стат.ПоследнийПолученныйНомер(Q.Current);
+      end;
+      if r<>nil         then
+        j       = j+1;
+        Номер[j]= r;
+      end;
+      Q.Next;
+    end;
+    Q.Close;
+end;
+
+inobject
+
+
+
+
+
+end

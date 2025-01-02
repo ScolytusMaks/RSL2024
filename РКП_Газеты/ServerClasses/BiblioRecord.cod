@@ -1,0 +1,41 @@
+class inherited РКП_Справочники.BiblioRecord;
+
+import РКП_СИС classes StdCode;
+
+inclass public
+
+  func ОписаниеНомера(Rec :РКП_Газеты.НомерГазеты) :String;
+    if (Rec <> nil) then
+      Return ОписаниеНомераПоРеквизитам(Rec.Номер, Rec.ВаловыйНомер, Rec.ДатаВыхода, Rec.ТочностьДатыВыхода);
+    fi;
+  end;
+
+  func ОписаниеНомераПоРеквизитам(IssueNom :String;    -- номер
+                                  IssueValNom :String; -- валовый номер
+                                  IssueDat :Date;      -- дата выпуска номера
+                                  IssueNot :Integer    -- точность даты выпуска номера
+                                  ) :String;
+    IssueNom    = NoSpace(IssueNom);
+    IssueValNom = NoSpace(IssueValNom);
+    if (IssueValNom <> nil) then
+      IssueNom = IssueNom + '(' + IssueValNom + ')';
+    fi;
+    if (IssueDat <> nil) then
+      if (IssueNot = 0) then
+        Result = IssueNom + ' от ' + Str(IssueDat);
+      elsif (IssueNot = 1) then
+        with РКП_СИС.DateDescription do
+          Result = IssueNom + ' от ' + ToString(IssueDat, dfMMMM) + ' ' + ToString(IssueDat, dfYYYYг);
+        end;
+      elsif (IssueNot = 2) then
+        with РКП_СИС.DateDescription do
+          Result = IssueNom + ' от ' + ToString(IssueDat, dfYYYYг);
+        end;
+      fi;
+    else
+      Result = IssueNom;
+    fi;
+  end;
+
+
+end

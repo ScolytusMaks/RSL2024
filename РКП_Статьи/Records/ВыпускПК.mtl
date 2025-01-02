@@ -1,0 +1,12 @@
+record ВыпускПК inherited Base.BaseHierarchicalRecord title "Выпуск печатных каталожных карточек" ;
+  field ОписаниеГруппы :String;
+  field КодВыпуска :String title "Код выпуска карточек"; -- для правильной сортировки групп; уникальный идентификатор выпуска
+  field ВыпускКарточек :Integer title "Номер выпуска карточек";
+  field ВыпускКарточекЛ :Integer title "Номер выпуска карточек в пределах летописи";
+  field ДатаВыпуска :Date title "Дата выпуска карточек";
+  field ШифрВыпуска :String title "Шифр выпуска карточек"; -- для файла
+  field ВыпускСверстан :Logical title "Выпуск сверстан";
+  field ВыпускЛетописи :Integer title "Выпуск ЛГС";
+  field ДатаЗаписиВФайл :Date  title "Дата записи в файл";
+  RecordDescription ВыпускКарточек;
+end;

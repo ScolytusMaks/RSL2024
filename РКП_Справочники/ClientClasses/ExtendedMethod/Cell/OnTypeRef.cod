@@ -1,0 +1,202 @@
+class "Расширенный метод клетки ПриНаборе (поле вввода значения справочника)";
+
+  import РКП_СИС classes StringsFunctions;
+  import classes Constants;
+
+inclass public
+
+   func CreateExt(vValue :Variant) :ExtendedMethod.Cell.OnTypeRef;
+     Result = inherited Create;
+     Result._Value = vValue;
+   end;
+
+inobject public
+
+  -- Результат - решение о разрешени окончания отработки события
+  -- vNewValue - новое значение
+  -- vEndEditSave - решение о сохранении введенного значения (парметр, далее передаваемый в метод Template.EndEdit() )
+  func 2_ReturnResult0.(var vNewValue :Variant; var vEndEditSave :Logical) :Logical;
+    var vRefRec :РКП_Справочники.BaseRefType1;
+    var vCountRec :Integer;
+    var vAlgIfNoValue :tAlgIfNoValue;
+    vRefRec = РКП_СИС.Recs.FindRecordExt(ClassRecord, FindFilter, , vCountRec);
+    if (vCountRec = 1) then -- найдено точное совпадение => можно продолжить обработку и разрешить присвоение в других обработчиках
+      vNewValue = vRefRec;
+      vEndEditSave = true;
+      Return true;
+    elsif (vCountRec > 1) then -- найдено более одного совпадение => открываеем картотеку или псевдокартотеку для выбора с фильтром
+      if (ClassCardfile <> nil) and (ClassFalseCardfiles = nil) then -- выбор из картотеки
+        if (cmOk = ClassCardfile.ВыполнитьВыбор(vRefRec, SearchFormParam)) then
+          vNewValue = vRefRec;
+          vEndEditSave = true;
+          Return false;
+        fi;
+      elsif (ClassCardfile = nil) and (ClassFalseCardfiles <> nil) then -- выбор из псевдокартотеки
+        if (cmOk = ClassFalseCardfiles.ВыполнитьВыбор(vRefRec, SearchFormParam)) then
+          vNewValue = vRefRec;
+          vEndEditSave = true;
+          Return false;
+        fi;
+      else
+        SetError(0, 'Неверно заданы параметры расширенного обработчика события клетки ПриНаборе');
+      fi;
+    elsif (vCountRec = 0) then -- совпадений не найдено - вызов диалога "что делать"
+      vAlgIfNoValue = GetAlgorithmIfNoValue(DialogIfNoValue, Value, Preamble);
+      if (vAlgIfNoValue = алгИскать) then
+        if (ClassCardfile <> nil) and (ClassFalseCardfiles = nil) then -- выбор из картотеки
+          if (cmOk = ClassCardfile.ВыполнитьВыбор(vRefRec, SearchFormParamDef)) then
+            vNewValue = vRefRec;
+            vEndEditSave = true;
+            Return false;
+          fi;
+        elsif (ClassCardfile = nil) and (ClassFalseCardfiles <> nil) then -- выбор из псевдокартотеки
+          if (cmOk = ClassFalseCardfiles.ВыполнитьВыбор(vRefRec, SearchFormParamDef)) then
+            vNewValue = vRefRec;
+            vEndEditSave = true;
+            Return false;
+          fi;
+        else
+          SetError(0, 'Неверно заданы параметры расширенного обработчика события клетки ПриНаборе');
+        fi;
+      elsif (vAlgIfNoValue = алгДобавить) then
+        vRefRec = ClassRecord.Create;
+        vRefRec.Наим = Value as String;
+        if (cmOk = ClassEditorForm.ShowFormEx(vRefRec, Window.ModalWindow)) then
+          vNewValue = Value;
+          vEndEditSave = true;
+          Return false;
+        fi;
+      fi;
+    fi;
+  end;
+
+inobject private
+
+  func GetAlgorithmIfNoValue(vDialogIfNoValue :tDialogIfNoValue; vValue :variant; vPreamble :String) :tAlgIfNoValue;
+    var vAnswer :Integer;
+    if (vDialogIfNoValue = тдДобавитьИскатьПовторить) then
+      vAnswer = Enquiry('', vPreamble + ' "' + vValue +'", не найдено в справочнике. ' + Br +
+                            'Пожалуйста, выберите действие:',
+                            ['Добавить в справочник','Искать в полном списке','Повторить ввод']);
+      if (vAnswer = 1) then    Return алгДобавить;
+      elsif (vAnswer = 2) then Return алгИскать;
+      fi;
+    elsif (vDialogIfNoValue = тдИскатьПовторить) then
+      vAnswer = Enquiry('', vPreamble + ' "' + vValue +'", не найдено в справочнике. ' + Br +
+                            'Пожалуйста, выберите действие:',
+                            ['Искать в полном списке','Повторить ввод']);
+      if (vAnswer = 1) then    Return алгИскать;
+      fi;
+    fi;
+  end;
+
+
+inobject public
+
+  -- Передача значений параметров
+
+  proc SetClassRecord(locValue :class BaseRefType1);  -- класс записи справочника для поиска
+    _ClassRecord = locValue;
+  end;
+
+  proc SetClassCardfile(locValue :class Справочники.CardBaseType1);  -- класс картотеки для выбора
+    _ClassCardfile = locValue;
+  end;
+
+  proc SetClassFalseCardfiles(locValue :class Справочники.FalseCardType1); -- класс псевдокартотеки для выбора
+    _ClassFalseCardfiles = locValue;
+  end;
+
+  proc SetClassEditorForm(locValue :class Справочники.editBaseType1); -- класс бланка-редактора записи справочника
+    _ClassEditorForm = locValue;
+  end;
+
+  proc SetFindFilter(locValue :String); -- фильтр для поиска
+    _FindFilter = locValue;
+  end;
+
+  proc SetSearchFormParam(locValue :Variant[2]); -- параметры для открытия клааса выбора с фильтром
+    _SearchFormParam = locValue;
+  end;
+
+  proc SetSearchFormParamDef(locValue :Variant[2]); -- параметры для открытия клааса выбора с дефолтовым фильтром
+    _SearchFormParamDef = locValue;
+  end;
+
+
+  proc SetDialogIfNoValue(locValue :tDialogIfNoValue); -- тип диалога, если нет искомого значения
+    _DialogIfNoValue = locValue;
+  end;
+
+  proc SetPreamble(locValue :String); -- преамбула диалога
+    _Preamble = locValue;
+  end;
+
+inobject private
+
+  -- Получение значений параметров
+
+  func ClassRecord :class BaseRefType1; -- класс записи справочника для поиска
+    Return _ClassRecord;
+  end;
+
+  func ClassCardfile :class Справочники.CardBaseType1; -- класс картотеки для выбора
+    Return _ClassCardfile;
+  end;
+
+  func ClassFalseCardfiles :class Справочники.FalseCardType1; -- класс псевдокартотеки для выбора
+    Return _ClassFalseCardfiles;
+  end;
+
+  func ClassEditorForm :class Справочники.editBaseType1; -- класс бланка-редактора записи справочника
+    Return _ClassEditorForm;
+  end;
+
+  func Value :Variant; -- введенное значение
+    Return _Value;
+  end;
+
+  func FindFilter :String;
+    if (_FindFilter = nil) and (_Value <> nil) then
+      Return 'Match(Наим,"*' + _Value as String + '*")';
+    elsif (_FindFilter <> nil) then
+      Return _FindFilter;
+    fi;
+  end;
+
+  func SearchFormParam :Variant[2]; -- параметры для открытия клааса выбора с фильтром
+    if (_SearchFormParam = nil) then
+      Result[1] = ['ТипФрагмента', 1];
+      Result[2] = ['Фрагмент', Value];
+    else
+      Return _SearchFormParam;
+    fi;
+  end;
+
+  func SearchFormParamDef :Variant[2]; -- параметры для открытия клааса выбора с дефолтовым фильтром
+    Return _SearchFormParamDef;
+  end;
+
+  func DialogIfNoValue :tDialogIfNoValue; -- тип диалога, если нет искомого значения
+    Result = if(_DialogIfNoValue = nil, тдИскатьПовторить, _DialogIfNoValue);
+  end;
+
+  func Preamble :String; -- преамбула диалога
+    Result = if(_Preamble = nil, 'Наименования, похожего на', _Preamble);
+  end;
+
+  -- Параметры обработчика
+
+  var _ClassRecord: class BaseRefType1;                       -- класс записи справочника для поиска
+  var _ClassCardfile :class Справочники.CardBaseType1;        -- класс картотеки для выбора
+  var _ClassFalseCardfiles :class Справочники.FalseCardType1; -- класс псевдокартотеки для выбора
+  var _ClassEditorForm :class Справочники.editBaseType1;      -- класс бланка-редактора записи справочника
+  var _Value :Variant;                                        -- введенное значение
+  var _NewValue :Variant;                                     -- новое значение
+  var _FindFilter :String;                                    -- фильтр для поиска
+  var _SearchFormParam :Variant[2];                           -- параметры для открытия клааса выбора с фильтром
+  var _SearchFormParamDef :Variant[2];                        -- параметры для открытия клааса выбора с дефолтовым фильтром
+  var _DialogIfNoValue :tDialogIfNoValue;                     -- тип диалога, если нет искомого значения
+  var _Preamble :String;                                      -- преамбула диалога
+
+end

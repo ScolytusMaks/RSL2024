@@ -1,0 +1,11 @@
+Class inherited —правочники.editBaseType3 "“ип учетного документа" , editor спр“ип”д;
+
+--{{ 2_—войства
+
+inobject private
+
+  var »нтерфейс :RI.—правочники.“ип”д;
+
+--}}
+
+end

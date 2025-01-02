@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Properties Version="1"/>
+<Items>
+  <Item Name="RI"/>
+  <Item Name="DR"/>
+  <Item Name="ЛППИ"/>
+  <Item Name="Экспорт"/>
+  <Item Name="ОбработкаИстории"/>
+  <Item Name="ПоследнийНомер"/>
+  <Item Name="Сервис"/>
+  <Item Name="Стат"/>
+</Items>

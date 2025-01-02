@@ -1,0 +1,72 @@
+class "Описание номеров";
+
+inclass
+  func ВСтроку(Газета:РКП_Газеты.Газета;НомерНомера[]:string):string;
+    var k       : integer;
+    var g1,g2   : integer;
+    if    LengthOfArray(НомерНомера)    = 1     then
+      if Pos("№",НомерНомера[1])        > 0     then
+        if Газета.ПриложениеКГазете     = nil   then
+          Return НомерНомера[1];
+        else
+          Return Газета.НазваниеЛГС+
+                 " ; "+
+                 НомерНомера[1];
+        end;
+      else
+        if Газета.ПриложениеКГазете     = nil   then
+          Return "№ "+
+                 НомерНомера[1];
+        else
+          Return Газета.НазваниеЛГС+
+                 " ; "+
+                 "№ "+
+                 НомерНомера[1];
+        end;
+      end;
+    elsif LengthOfArray(НомерНомера)    > 1     then
+      try
+        g1      = Int(НомерНомера[1]);
+      except
+      end;
+      try
+        g2      = Int(НомерНомера[LengthOfArray(НомерНомера)]);
+      except
+      end;
+      if g1>0 and g2>0                          then
+        if g2-g1=LengthOfArray(НомерНомера)-1   then
+          if Газета.ПриложениеКГазете     = nil then
+            Return "№ "+
+                   НомерНомера[1]+
+                   " - "+
+                   НомерНомера[LengthOfArray(НомерНомера)];
+          else
+            Return Газета.НазваниеЛГС+
+                   " ; "+
+                   "№ "+
+                   НомерНомера[1]+
+                   " - "+
+                   НомерНомера[LengthOfArray(НомерНомера)];
+          end;
+        end;
+      else
+        for k = 1..LengthOfArray(НомерНомера)   do
+          if k = 1                              then
+            Result = "№ "+НомерНомера[k];
+          else
+            Result = Result+", № "+НомерНомера[k];
+          end;
+        end;
+        if Газета.ПриложениеКГазете     <> nil  then
+          Result = Газета.НазваниеЛГС+
+                   " ; "+
+                   Result;
+        end;
+      end;
+    end;
+    Return  Result;
+  end;
+
+inobject
+
+end

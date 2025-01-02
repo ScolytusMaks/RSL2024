@@ -1,0 +1,85 @@
+class inherited РКП_Газеты.УчетГазет.Отчеты.блОтчетСтатРГБазовый1 "Отчет по работе библиографа";
+
+inclass
+
+inobject
+НомерСмены[]            : Integer;
+ДатаСмены[]             : Date;
+ВведеноСтатей[]         : Integer;
+ВведеноСтатейВсего      : Integer;
+
+--------------------------------------------------------------------------------
+--{ Обработчики событий бланка
+
+  proc ПостроитьОтчет(Sender :Button);
+  var Q         : query;
+  var k,z       : integer;
+  var dt0,dt1   : date;
+  var rec       : record;
+  var UserName_ :string;
+  inherited ПостроитьОтчет(Sender);
+  секцПозиции.Count     = nil;
+  НомерСмены            = nil;
+  ДатаСмены             = nil;
+  ВведеноСтатей         = nil;
+  ВведеноСтатейВсего    = nil;
+  --Проверить настройки запроса
+    if    ДатаН <> nil            and
+          ДатаК <> nil            and
+          ДатаН<=ДатаК            then
+        rec = SessionInfo.UserRecord;
+        if rec<>nil     then
+          UserName_     = rec.Name;
+          --UserFullName_ = rec.FullName;
+        end;
+    --Построить список дат, за которые был ввод
+      Q                           = Query.Create([РКП_Статьи.Роспись]);
+      Q.Filter                    = "CreateUser='"+UserName_+
+                                    "' and CreateDate>="+Str(ДатаН)+
+                                    " and CreateDate<"+Str(ДатаК+1);
+      Q.LoadingFields             = "РКП_Статьи.Роспись.CreateDate";
+      Q.Order                     = "CreateDate";
+      Q.Select;
+      Q.First;
+      for k =  1..Q.Count         do
+        dt1       = Dat(Day(Q.Current.CreateDate),Mon(Q.Current.CreateDate),Year(Q.Current.CreateDate));   --Q.Current.CreateDate;
+          if dt1  <>dt0           then
+           z      = z+1;
+           секцПозиции.InsertFrame(z);
+           InsertInArray(ДатаСмены,z,Dat(Day(Q.Current.CreateDate),Mon(Q.Current.CreateDate),Year(Q.Current.CreateDate)));    --
+            dt0   = Dat(Day(Q.Current.CreateDate),Mon(Q.Current.CreateDate),Year(Q.Current.CreateDate));--Q.Current.CreateDate;
+          end;
+        Q.Next;
+      end;
+      Q.Close;
+    --Привязать даты к номерам смен
+      for k = 1..секцПозиции.Count do
+        Q                         = Query.Create([РКП_СИС.Смена]);
+        Q.Filter                  = "CreateUser='"+UserName_+
+                                    "' and Day(CreateDate)="+Str(Day(ДатаСмены[k]))+
+                                    " and Mon(CreateDate)="+Str(Mon(ДатаСмены[k]))+
+                                    " and Year(CreateDate)="+Str(Year(ДатаСмены[k]));
+        Q.Select;
+        if Q.Count>0              then
+          Q.First;
+          НомерСмены[k]           = Q.Current.НомерСменыВГоду;
+        end;
+    --Вычислить количество введенных номеров
+      ВведеноСтатей[k]            = РКП_Статьи.Стат.ВведеноСтатейЗаСмену(UserName_,ДатаСмены[k]);
+      end;
+    ВведеноСтатейВсего            = Int(SumOfArray(ВведеноСтатей,k-1));
+    else
+      Message("Не заданы или неправильно заданы условия поcтроения отчета!");
+    end;
+    ОтчетСоздан =       Now;
+  end;
+
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    inherited шаблон_ПриОткрытии(Create);
+    СменаВариантаПериода(секцВарианты.CellByField["ЗаДату5"],Template.SingleClick);
+  end;
+
+--}
+
+end

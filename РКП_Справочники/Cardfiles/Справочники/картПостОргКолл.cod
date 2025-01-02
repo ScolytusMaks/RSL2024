@@ -1,0 +1,8 @@
+Class inherited Справочники.CardBaseType1 "Постоянные организации - коллективы (основное деление)";
+
+inclass private
+
+  var КлассИнтерфейса :Class RI.Справочники.intBaseType1 = RI.Справочники.ПостОргКолл;
+
+
+end

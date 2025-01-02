@@ -1,0 +1,44 @@
+class "Количество обязательных экземпляров";
+
+import РКП_СИС Classes Functions;
+
+inclass public
+
+  -- Создание репозитория данных
+  proc СоздатьХранилище synonym CreateRepository;
+    var i, ii, vY, vN :Integer;
+    var vKey :String;
+    var vValue :Integer[];
+    var vValue2 :Integer[2];
+    Repository = Storage.Create;
+    with Query.Create([РКП_Справочники.спрТерриторияРаспространения]) do
+      Order = 'Номер';
+      Select;
+      while not Eof do
+        vKey = Current.ExtID;
+        ii = (Current as РКП_Справочники.спрТерриторияРаспространения).ПланКолНом.Count;
+        vValue2 = nil;
+        for i = 1 .. ii do
+          vY = (Current as РКП_Справочники.спрТерриторияРаспространения).ПланКолНом.Items[i].НормГод;
+          vN = (Current as РКП_Справочники.спрТерриторияРаспространения).ПланКолНом.Items[i].КолНом;
+          vValue = [vY, vN];
+          AddInArray(vValue2, vValue);
+        od;
+        SortArray(vValue2, [1]);
+        Repository.SetField(vKey, vValue2);
+        Next;
+      od;
+    end;
+  end;
+
+  func КоличествоДляГазеты(локИздание :Record; локГод :Integer) :Integer;
+  end;
+
+inclass private
+
+  Repository :Storage;
+
+inclass private
+
+
+end

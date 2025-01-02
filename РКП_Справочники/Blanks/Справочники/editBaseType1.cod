@@ -1,0 +1,185 @@
+class inherited МашинаРеквизитов.Базовые.блРедакторСИнтерфейсом "", editor BaseRefType1;
+
+import РКП_СИС Classes Functions, StringsFunctions, Recs, FilterMaker;
+
+--{{ 2_Свойства
+
+inobject private
+
+  Интерфейс :РКП_Справочники.RI.Справочники.intBaseType1;
+  frInternalInfo :TemplateFrame;
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inobject private
+
+  proc ПросмотрПохожихЗаписей( aFilter :String; WinStyle :Window.WindowStyles = Kernel.Window.ModalWindow; addParam :Variant = nil);
+    Интерфейс.КартотекаПоУмолчанию.ПросмотрПохожихЗаписей(aFilter, WinStyle, addParam);
+  end;
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриОткрытии( aCreate :Logical );
+    var j, x, y :Integer;
+    inherited  шаблон_ПриОткрытии(aCreate);
+    j = Self.ClassType.ObjectsCount;
+    if (j > 1) then
+      j = j - 1;
+      if (Self.ClassType.Objects[j].Window <> nil) then
+        x = Self.ClassType.Objects[j].Window.Left + 30;
+        y = Self.ClassType.Objects[j].Window.Top  + 30;
+        Self.Window.Left = x;
+        Self.Window.Top  = y;
+      fi;
+    fi;
+  end;
+
+  func шаблон_ПриПроверке :Logical;
+    Result = inherited шаблон_ПриПроверке;
+    if Result then
+      Result = ПроверкаОбязательныхПолей;
+    fi;
+    if Result then
+      Result = ПроверкаПохожихЗначений;
+    fi;
+  end;
+
+  func ПроверкаОбязательныхПолей :Logical;
+    var мОбязательныеПоля :String[];
+    var i, ii :Integer;
+    var aTest :Logical[];
+    var aTxt :String[];
+    мОбязательныеПоля = Интерфейс.ОбязательныеПоля;
+    if (мОбязательныеПоля <> nil) then
+      ii = LengthOfArray(мОбязательныеПоля);
+      for i = 1 .. ii do
+        aTest[i] = ( Record.GetField(мОбязательныеПоля[i]) <> nil );
+      od;
+      Result = not false in aTest;
+      if not Result then
+        AddInArray( aTxt, 'Не заполнено одно или несколько обязательных для заполнения полей:' );
+        for i = 1 .. ii do
+          AddInArray( aTxt, '- ' + мОбязательныеПоля[i] );
+        od;
+        Message( ArrayToText(aTxt) );
+      fi;
+    else
+      Return true;
+    fi;
+  end;
+
+  func ПроверкаПохожихЗначений :Logical;
+    var vOriginalVal, vHash, vRequest :String;
+    var vRec :Record;
+    var aFlt, aButtonFace :String[];
+    var f, vAnswer :Integer;
+    var aDocId :Integer[];
+    var aHashgFields :Variant[2];
+    aHashgFields = Интерфейс.ПолучитьХешируемыеПоля;
+    for f = 1 .. LengthOfArray(aHashgFields) do
+      if (aHashgFields[f,2] = VarString ) then
+        vOriginalVal = vOriginalVal + Self.Record.GetField(aHashgFields[f,1]);
+      elsif (aHashgFields[f,2] = VarObject ) then
+        vRec = Self.Record.GetField(aHashgFields[f,1]) as Record;
+        vOriginalVal = vOriginalVal + vRec.ExtID;
+      else
+        vOriginalVal = vOriginalVal + Str(Self.Record.GetField(aHashgFields[f,1]));
+      fi;
+    od;
+    vHash = Интерфейс.GetHashFromValue(vOriginalVal);
+    with Query.Create([Интерфейс.СвязанныйКлассЗаписей]) do
+      aFlt[1] = 'Hash="' + vHash + '"';
+      aFlt[2] = 'DocId<>' + Str(Self.Record.DocId);
+      aFlt[3] = 'not ' + Интерфейс.ИмяПоляНеПрименяется;
+      Filter = MakeFilter(aFlt);
+      Select;
+      if (Count > 0) then
+        vRequest = 'Справочник уже содержит похожие записи (' + Str(Count) + ').' + br + 'Выберите действие:';
+        aButtonFace = ['Просмотр', 'Продолжить сохранение', 'Отмена'];
+        vAnswer = Enquiry('Запрос', vRequest, aButtonFace, 1, itWarning);
+        if (vAnswer = 1) then
+          while not Eof do
+            AddInArray(aDocId, Current.DocID);
+            Next;
+          od;
+          ПросмотрПохожихЗаписей('DocId in ' + ToStr(aDocId));
+          Return false;
+        elsif (vAnswer = 2) then
+          Return true;
+        elsif (vAnswer = 3) then
+          Return false;
+        fi;
+      else
+        Return true;
+      fi;
+    end;
+  end;
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func Поле_ПриПроверке_Наим(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    var vHash :String;
+    var aFlt :String[];
+    var vRequest :String;
+    var vAnswer :Integer;
+    var aButtonFace :String[];
+    var aDocId :Integer[];
+    Value = Trim(Value);
+    if Интерфейс.ХешируемыеПоля = [Интерфейс.ИмяПоляНаим] then -- проверка имеет смысл, если единственное хэшируемое поле - 'Наим'
+      vHash = Интерфейс.GetHashFromValue(Value);
+      with Query.Create([Интерфейс.СвязанныйКлассЗаписей]) do
+        aFlt[1] = 'Hash="' + vHash + '"';
+        aFlt[2] = 'DocId<>' + Str(Record.DocId);
+        aFlt[3] = 'not ' + Интерфейс.ИмяПоляНеПрименяется;
+        Filter = MakeFilter(aFlt);
+        Select;
+        if (Count > 0) then
+          vRequest = 'Справочник уже содержит похожие записи (' + Str(Count) + ').' + br + 'Выберите действие:';
+          aButtonFace = ['Просмотр', 'Принять введенное значение', 'Отмена'];
+          vAnswer = Enquiry('Запрос', vRequest, aButtonFace, 1, itWarning);
+          if (vAnswer = 1) then
+            while not Eof do
+              AddInArray(aDocId, Current.DocID);
+              Next;
+            od;
+            Интерфейс.КартотекаПоУмолчанию.ПросмотрПохожихЗаписей('DocId in ' + ToStr(aDocId));
+          elsif (vAnswer = 2) then
+            Return true;
+          else
+            Return false;
+          fi;
+        else
+          Return true;
+        fi;
+      end;
+    else
+      Return true;
+    fi;
+  end;
+
+  proc Поле_ПриВыходе_Наим(Cell :TemplateCell; Index :Integer);
+    if (Cell.Contents = 'Наим') and (Cell.Contents in Интерфейс.ХешируемыеПоля) then
+      Hash = Интерфейс.GetHashByRecord (Self.Record);
+    fi;
+  end;
+
+  func Поле_ПриВыводе_ЗаголовокОкнаФормы(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    inherited ПолеЗаголовокОкнаФормы_ПриВыводе(Cell, Value, Action, Format);
+    Return '';
+  end;
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+
+-- 2_Дополнительные команды0. --
+
+
+-- 2_Вспомогательные методы0. --
+
+  proc УстановитьФокусНаПервоеПолеВвода;
+    Template.CellByField['Наим'].SetFocus;
+  end;
+
+
+end

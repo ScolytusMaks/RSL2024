@@ -1,0 +1,15 @@
+
+  abstract record BaseRefType1 inherited СИС2.Базовая.БазоваяЗапись title "Базовая запись";
+    field Наим          :String(MaxIndexedStr) title "Наименование";
+    field НеПрименяется :Logical               title "Более не применяется";
+    field Hash          :String; -- хэш строкового поля, по которому будет контролироваться относительная уникальность
+    RecordDescription Наим;
+  end;
+
+  abstract record BaseRefType2 inherited BaseRefType1 title "Базовая запись";
+    field Номер         :Integer; -- Кастомный порядок сортировки
+  end;
+
+  abstract record BaseRefType3 inherited BaseRefType2 title "Базовая запись";
+    field Код           :String                title "Код"; -- Не уникальный, не является внешним ключем
+  end;

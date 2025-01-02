@@ -1,0 +1,656 @@
+class inherited СИС2.БазовыйБланк "Ввод номеров списком";
+
+  Import СИС2           Classes Константы;
+  Import РКП_СИС        Classes DateDescription;
+  Import РКП_СИС        Classes StdCode;
+
+inclass Public
+
+inobject Public
+
+стрНомера:TemplateRow;
+
+var ЗаписьИздания               : record;
+var Издание                     : string;
+var ГодВыпуска                  : integer;
+var СерияНумерацииОбщ           : integer;
+var ТочностьДатыВыходаОбщ       : integer;
+var НомерС                      : integer;
+var НомерПо                     : integer;
+var ТиражОбщ                    : integer;
+
+var НомерВыпуска                : string[];
+var НеНумерованныйВыпуск        : logical[];
+var ВаловыйНомерВыпуска         : string[];
+var ТочностьДатыВыпуска         : integer[];
+var ДатаНомера                  : date[];
+var ДатаНомераСтр               : string[];
+var ТиражНомера                 : integer[];
+var Примечание                  : string[];
+var ЛожныйНомер                 : logical[];
+var НеПолучен                   : logical[];
+var ВсегоНомеров                : integer;
+var ПринялНаХранение            : string;
+var ТочностьВыходаДень          : logical;
+var ТочностьВыходаМесяц         : logical;
+var ТочностьВыходаГод           : logical;
+
+
+
+inobject Private
+КнВвод                  :Button;
+секцВыход               :Section;
+секцШапка               :Section;
+секцНомера              :Section;
+--{ Обработчики событий бланка
+
+  proc ВидСекцииВыход;
+    секцВыход.Row[1].Visible            = false;
+    секцВыход.Row[2].Visible            = false;
+    секцВыход.Row[3].Visible            = false;
+    ТочностьВыходаДень                  = false;
+    ТочностьВыходаМесяц                 = false;
+    ТочностьВыходаГод                   = false;
+    if     ТочностьДатыВыходаОбщ=0     then        
+      секцВыход.Row[1].Visible          = true;
+      ТочностьВыходаДень                = true;
+    elsif  ТочностьДатыВыходаОбщ=1     then        
+      секцВыход.Row[2].Visible          = true;
+      ТочностьВыходаМесяц               = true;
+    elsif  ТочностьДатыВыходаОбщ=2     then        
+      секцВыход.Row[3].Visible          = true;
+      ТочностьВыходаГод                 = true;
+    end;
+  end;
+
+  proc СписокНомеров(Cell : TemplateCell);
+  --процедура создает или модифицирует список номеров (проект ввода)
+  var ВсегоНомеров,k,kk,index           :integer;
+  if Cell.Contents = "НомерС"                                           or
+     Cell.Contents = "НомерПо"                                          then
+  ВсегоНомеров                          = НомерПо-НомерС;
+  if ВсегоНомеров                       >=0                             then
+    if   Cell.Contents                  = "НомерПо"                     then
+      kk                                = ВсегоНомеров+1;
+    --удаление лишних позиций
+      if kk < секцНомера.Count          then
+        kk                              = секцНомера.Count;
+        for k=1..kk                                     do
+          index                         = kk+1-k;
+          if index>ВсегоНомеров+1       then
+             секцНомера.DeleteFrame(index);
+          end;
+        end;
+      end;
+      kk                                = ВсегоНомеров+1;
+    else
+      kk                                = секцНомера.Count;
+    end;
+    for k=1..kk                                         do
+     if НомерВыпуска[k]                 <> FixCode10(Str(НомерС-1+k))   and
+        НеНумерованныйВыпуск[k]         = false                         then
+       секцНомера.InsertFrame(секцНомера.Count+1);
+       НомерВыпуска[k]                  = FixCode10(Str(НомерС-1+k));
+       if Cell.Contents="ТиражОбщ"      then
+       ТиражНомера[k]                   = ТиражОбщ;
+       end;
+       ТочностьДатыВыпуска[k]           = ТочностьДатыВыходаОбщ;
+     else
+       if   Cell.Contents               = "ТиражОбщ"                    then
+         ТиражНомера[k]                 = ТиражОбщ;
+       elsif Cell.Contents              = "ТочностьДатыВыходаОбщ"       then
+         ТочностьДатыВыпуска[k]         = ТочностьДатыВыходаОбщ;
+       end;
+     end;
+    end;
+    КнВвод.Enabled                      = True;
+  else
+    Message('Начальный номер превышает конечный!');
+    Self.Template.Field                 = "НомерПо";
+  fi;
+  else
+    kk                                  = секцНомера.Count;
+    for k=1..kk                         do
+      if Cell.Contents="ТиражОбщ"       then
+      ТиражНомера[k]                    = ТиражОбщ;
+      end;
+      if Cell.Contents<>"ТиражОбщ"      then
+      ТочностьДатыВыпуска[k]            = ТочностьДатыВыходаОбщ;
+        if    ТочностьДатыВыпуска[k]=1                                   then
+          if ДатаНомера[k] <> nil                                        then
+            ДатаНомераСтр[k]             = ВСтроку(ДатаНомера[k], dfYYYYMMM);
+          end;
+        elsif ТочностьДатыВыпуска[k]=2                                   then
+          if ДатаНомера[k] <> nil                                        then
+            ДатаНомераСтр[k]             = ВСтроку(ДатаНомера[k], dfYYYYг);
+          end;
+        elsif ТочностьДатыВыпуска[k]     = 0                             then
+          if ДатаНомера[k] <> nil                                        then
+            ДатаНомераСтр[k]             = ВСтроку(ДатаНомера[k], dfDDMMYYYY);
+          end;
+        end;
+      end;--условие на поле ТИРАЖОБЩ
+    end;
+  end;
+ End;
+
+
+
+
+  func ПроверкаТиража   :logical;
+  var k : integer;
+  Result              = true;
+  for k=1..секцНомера.Count do
+    if ТиражНомера[k]   = 0 and not НеПолучен[k]:
+      Result                    = false;
+      Self.Template.Field       = "ТиражНомера";
+      self.Template.Frame       = k;
+      Break;
+    end;
+  od;
+  end; -- ПроверкаТиража
+
+
+
+  proc ВводСписка;
+  var k                 : integer;
+  var r                 : record;
+  var ТекстСообщения1   : string;
+  var ТекстСообщения2   : string;
+  var ТекстСообщения    : string;
+  var Q                 : Query;
+  var РезультатПроверки : Logical;
+  var НеВнесено         : integer;
+  var Обновлено         : integer;
+    try
+    BeginTransaction([РКП_Газеты.НомерГазеты]);
+        for k = 1..секцНомера.Count do
+          --Проверка на наличие в БД такого же номера с определением - какой отдел ввел
+          if ЛожныйНомер[k]=false                               then
+          if Pos("ненум",НомерВыпуска[k])=0                     and  
+             НомерВыпуска[k]<>""                                then
+          РезультатПроверки             = false;
+          Q                             = Query.Create([РКП_Газеты.НомерГазеты]);
+          Q.Filter                      = "Газета ="+Str(ЗаписьИздания)+" and "+
+                                          "ГодВыпуска="+Str(ГодВыпуска)+" and "+
+                                          "СерияНумерации="+Str(СерияНумерацииОбщ)+" and "+
+                                          "Номер='"+НомерВыпуска[k]+"'";
+          --введено 20.03.2009
+          Q.Filter                      = '('+Q.Filter+') and not(СозданОЛГС and НеПолучен)';
+          -----------------------------
+          Q.LoadingFieldsMode           = mdNone;
+          Q.Select;
+            if Q.Count>0                                        then
+              Q.First;
+              РезультатПроверки         = true;
+              НеВнесено                 = НеВнесено + 1;
+              if Q.Count=1                                      then --найден единственный номер,
+                if Q.Current.СозданОЛГС=true                    then --он идентифицирован как описанный ОЛГС
+                r                       = Q.Current;                 --вычислена ссылка на этот номер
+                Обновлено               = Обновлено+1;
+                НеВнесено               = НеВнесено-1;
+                  if ТекстСообщения2=nil                        then
+                    if СерияНумерацииОбщ=0                      then
+                      ТекстСообщения2   = НомерВыпуска[k]+" ("+Str(ГодВыпуска)+")";
+                    else--СерияНумерацииОбщ>0
+                      ТекстСообщения2   = НомерВыпуска[k]+"["+Str(СерияНумерацииОбщ)+"] ("+Str(ГодВыпуска)+")";
+                    end;
+                  else--ТекстСообщения2<>""
+                    if СерияНумерацииОбщ=0                      then
+                      ТекстСообщения2   = ТекстСообщения2+";"+Chr(13)+НомерВыпуска[k]+" ("+Str(ГодВыпуска)+")";
+                    else--СерияНумерацииОбщ>0
+                      ТекстСообщения2   = ТекстСообщения2+";"+Chr(13)+НомерВыпуска[k]+"["+Str(СерияНумерацииОбщ)+"] ("+Str(ГодВыпуска)+")";
+                    end;
+                  end;
+                  ТекстСообщения2       = ТекстСообщения2 + "[Л Г С]";
+                end;
+              end;
+              if Q.Count>1 or Q.Current.СозданОЛГС=false        then
+                if ТекстСообщения1=nil                          then
+                  if СерияНумерацииОбщ=0                        then
+                    ТекстСообщения1     = НомерВыпуска[k]+" ("+Str(ГодВыпуска)+")";
+                  else--СерияНумерацииОбщ>0
+                    ТекстСообщения1     = НомерВыпуска[k]+"["+Str(СерияНумерацииОбщ)+"] ("+Str(ГодВыпуска)+")";
+                  end;
+                else--ТекстСообщения1<>""
+                  if СерияНумерацииОбщ=0                        then
+                    ТекстСообщения1     = ТекстСообщения1+";"+Chr(13)+НомерВыпуска[k]+" ("+Str(ГодВыпуска)+")";
+                  else--СерияНумерацииОбщ>0
+                    ТекстСообщения1     = ТекстСообщения1+";"+Chr(13)+НомерВыпуска[k]+"["+Str(СерияНумерацииОбщ)+"] ("+Str(ГодВыпуска)+")";
+                  end;
+                end;
+                if Q.Current.СозданОЛГС = true                  then
+                  ТекстСообщения1       = ТекстСообщения1 + "[Л Г С]";
+                end;
+              end;
+
+            end;
+          Q.Close;
+          else
+          РезультатПроверки             = false;
+          end;
+          end;
+          --конец проверки
+          if РезультатПроверки=false                                    then
+            r                           = РКП_Газеты.НомерГазеты.Create;
+            r.Газета                    = ЗаписьИздания;
+            r.ГодВыпуска                = ГодВыпуска;
+            r.СерияНумерации            = СерияНумерацииОбщ;
+            --r.Номер                     = НомерВыпуска[k];
+            if НомерВыпуска[k]<>"" and not НеНумерованныйВыпуск[k]      then
+              r.Номер                   = FixCode10(НомерВыпуска[k]);
+            else
+              r.Номер                   = UnnumberedIssue;
+            end;
+            if ВаловыйНомерВыпуска[k]<>""                               then
+              r.ВаловыйНомер            = FixCode10(ВаловыйНомерВыпуска[k]);
+            end;
+            if ДатаНомера[k]<>nil                                       then
+              r.ДатаВыхода              = ДатаНомера[k];
+            end;
+            r.ТочностьДатыВыхода        = ТочностьДатыВыпуска[k];
+            r.ЛожныйНомер               = ЛожныйНомер[k];
+            r.НеПолучен                 = НеПолучен[k];
+            if not НеПолучен[k]                                         then
+              r.ДатаПринятияНаХранение  = Today;
+              r.ПринялНаХранение        = ПринялНаХранение;
+              r.Тираж                   = ТиражНомера[k];
+            end;
+            --r.ПечатныеЛисты             =
+            r.Комментарий               = Примечание[k];
+            --r.ПрекращениеИздания        =
+            if (r.State = r.Edited) or (r.State = r.Created)            then
+              RI.НомерГазеты.OpenRecord(r).Post;
+            end;
+            r                           = nil;
+          end;--РезультатПроверки          = false
+          --
+          if РезультатПроверки=true and r<>nil                          then
+            r.СерияНумерации            = СерияНумерацииОбщ;
+            if НомерВыпуска[k]<>"" and not НеНумерованныйВыпуск[k]      then
+              r.Номер                   = FixCode10(НомерВыпуска[k]);
+            else
+              r.Номер                   = UnnumberedIssue;
+            end;
+            if ВаловыйНомерВыпуска[k]<>""                               then
+              r.ВаловыйНомер            = FixCode10(ВаловыйНомерВыпуска[k]);
+            end;
+            if ДатаНомера[k]<>nil                                       then
+              r.ДатаВыхода              = ДатаНомера[k];
+            end;
+            r.ТочностьДатыВыхода        = ТочностьДатыВыпуска[k];
+            r.ЛожныйНомер               = ЛожныйНомер[k];
+            r.НеПолучен                 = НеПолучен[k];
+            if not НеПолучен[k]                                         then
+              r.ДатаПринятияНаХранение  = Today;
+              r.ПринялНаХранение        = ПринялНаХранение;
+              r.Тираж                   = ТиражНомера[k];
+            end;
+            r.Комментарий               = Примечание[k];
+            if (r.State = r.Edited) or (r.State = r.Created)            then
+              RI.НомерГазеты.OpenRecord(r).Post;
+            end;
+            r                           = nil;
+          end;--РезультатПроверки          = true
+
+
+        end;--цикл по номерам
+    EndTransaction;
+    if ТекстСообщения1<>"" or ТекстСообщения2<>""               then
+        ТекстСообщения          = "Всего внесено номеров: "+Str(секцНомера.Count-НеВнесено)+
+                                  Chr(13)+
+                                  Chr(13)+
+                                  "Обновлено номеров: "+Str(Обновлено)+
+                                  Chr(13)+
+                                  "Обновленные номера:"+
+                                  ТекстСообщения2+
+                                  Chr(13)+
+                                  Chr(13)+
+                                  "Не внесено номеров: "+Str(НеВнесено)+
+                                  Chr(13)+
+                                  "Номера газеты, внесенные в базу данных ранее:"+
+                                  Chr(13)+
+                                  ТекстСообщения1;
+      Message(ТекстСообщения);
+    end;
+    except
+    AbortTransaction;
+    end;
+  End;
+
+
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    inherited шаблон_ПриОткрытии(Create);
+    ВидСекцииВыход;
+    КнВвод.Enabled                      = false;
+--    Message(str(self.стрНомера.Top));
+--    Message(str(self.стрНомера.Number));
+    --self.template.FreezeArea(0,0, 250,70);
+
+  end;
+
+
+
+  func ДобавитьНомер(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+  var index             :integer;
+    self.Template.Field                 = "НомерВыпуска";
+    if секцНомера.Count                 = 0 then
+      index                             = 1;
+    else
+      index                             = Cell.Frame+1;
+    end;
+    Template.CurrentSection.InsertFrame(index);
+    self.Template.Frame                 = index;
+    self.Template.Field                 = "НомерВыпуска";
+    Result                              = True;
+  end;
+
+  func ДобавитьНомерВКонец(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    self.Template.Field                 = "НомерВыпуска";
+    секцНомера.InsertFrame(секцНомера.Count+1);
+    self.Template.Frame                 = секцНомера.Count;
+    self.Template.Field                 = "НомерВыпуска";
+    Result                              = True;
+  end;
+
+  func УдалитьНомер(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+  var Index     :integer;
+  var LastIndex :integer;
+    if секцНомера.Count                 > 0 then
+    index                               = Cell.Frame;
+    LastIndex                           = секцНомера.Count;
+    секцНомера.DeleteFrame(index);
+      if    index>1                     and
+            index<LastIndex             then
+        self.Template.Frame             = index;
+      elsif  index>1                    and
+             index=LastIndex            then
+        self.Template.Frame             = index-1;
+        self.Template.Field             = "НомерВыпуска";
+      end;
+    end;
+    Result                              = False;
+  end;
+
+
+
+--  func ПолеДатаНомераСтр_ПриПроверке(Cell :TemplateCell; Index :Integer;var Value :Variant) :Logical;
+--  var SValue    : string;
+--    try
+--      if Length(Value)                  = 0  then
+--        ДатаНомераСтр[Index]            = nil;
+--        ДатаНомера[Index]               = nil;
+--        Return True;
+--      elsif Length(Value)               = 6  then
+--        if  Int(SubStr(Value,5,2))      > 40 then
+--          SValue                        = SubStr(Value,1,2)+"."+SubStr(Value,3,2)+".19"+SubStr(Value,5,2);
+--        else
+--          SValue                        = SubStr(Value,1,2)+"."+SubStr(Value,3,2)+".20"+SubStr(Value,5,2);
+--        end;
+--      elsif Length(Value)               = 8  then
+--        SValue                          = SubStr(Value,1,2)+"."+SubStr(Value,3,2)+"."+SubStr(Value,5,4);
+--      elsif Length(Value)               = 10 then
+--        SValue                          = Value;
+--      end;
+--      --
+--      if Year(StringToDate(SValue))=ГодВыпуска then
+--        Value                           = SValue;
+--        --ДатаНомераСтр[Index]            = SValue;
+--        ДатаНомера[Index]               = StringToDate(SValue);
+--        Result                          = True; -- Разрешаем сохранить изменения в поле
+--      else
+--        Message("Дата выхода номера должна лежать в пределах "+Str(ГодВыпуска)+" года!");
+--        Result                          = False;
+--      end;
+----      ДатаНомера[Index]                 = StringToDate(Value);
+----      Result                            = True; -- Разрешаем сохранить изменения в поле
+--    except
+--      Result                            = False;
+--    end;
+--  end;--ПолеДатаНомераСтр_ПриПроверке
+
+
+  func ПолеДатаНомераСтр_ПриПроверке(Cell :TemplateCell; Index :Integer;var Value :Variant) :Logical;
+  var FinValue          : string;
+  if Value<>nil                                         then
+  --1.Проверить допустимость введенного значения строки
+  if  ПроверитьСтроку(Value,FinValue)=true              then
+    --2.Проверить допустимость введенного значения года
+    if Year(StringToDate(FinValue))=ГодВыпуска          then
+      Value                     = FinValue;
+      ДатаНомераСтр[Index]      = FinValue;
+      ДатаНомера[Index]         = StringToDate(FinValue);
+      Result                    = True; -- Разрешаем сохранить изменения в поле
+    else
+      Message("Дата выхода номера "+НомерВыпуска[Index]+" не лежит в пределах "+Str(ГодВыпуска)+" года!");
+      --Result                    = False;
+      Value                     = FinValue;
+      ДатаНомераСтр[Index]      = FinValue;
+      ДатаНомера[Index]         = StringToDate(FinValue);
+      Result                    = True; -- Разрешаем сохранить изменения в поле
+    end;
+  end;
+  else--Value=nil
+      ДатаНомераСтр[Index]      = nil;
+      ДатаНомера[Index]         = nil;
+      Result                    = True; -- Разрешаем сохранить изменения в поле
+  end;
+  end;--ПолеДатаНомераСтр_ПриПроверке
+
+  func ПолеДатаНомераСтр_ПриВходе(Cell :TemplateCell; Index :Integer;Action :Template.EnterTypes) :Logical;
+    if ТочностьДатыВыпуска[Index] = 0           then
+      Result                            = true;
+      --Result                            = ПолеДатаНомераСтр_ПриПроверке(Cell,Index,"");
+    elsif ТочностьДатыВыпуска[Index]> 0         then
+      if KeyPressed(46)= true                   then
+        ТочностьДатыВыпуска[Index]      = 0;
+        ДатаНомераСтр[Index]            = nil;
+        ДатаНомера[Index]               = nil;
+        Result                          = false;
+      else
+--        Result                          = true;
+        #NoWarning;
+        Result                          = ПолеДатаНомераСтр_ПриОбзоре(Cell,"","");
+      end;
+    end;
+  end;
+
+
+  func ПолеДатаНомераСтр_ПриОбзоре(Cell :TemplateCell; Value :Variant;var NewValue :Variant) :Logical;
+    var NewDate :Date;
+    var Index, локГод, локМес :Integer;
+    Index = Self.Template.Frame;
+    if (ТочностьДатыВыпуска[Index] = 0) then
+      NewDate = Calendar;
+    elsif (ТочностьДатыВыпуска[Index] = 1) then
+      if (cmOk = РКП_СИС.Сервис.блВыборМесяца.ВыполнитьВыбор(локГод, локМес)) then
+        NewDate = Dat(1, локМес, локГод);
+      fi;
+    elsif (ТочностьДатыВыпуска[Index] = 2) then
+      if (cmOk = РКП_СИС.Сервис.блВыборГода.ВыполнитьВыбор(локГод)) then
+        NewDate = Dat(1, 1, локГод);
+      fi;
+    end;
+    if (NewDate <> nil) and (NewDate <> ДатаНомера[Index]) then
+      if (Year(NewDate) = ГодВыпуска) then
+        if (ТочностьДатыВыпуска[Index] = 0) then
+          NewValue = ToStr(NewDate);
+        elsif (ТочностьДатыВыпуска[Index] = 1) then
+          NewValue = ToString(NewDate, dfYYYYMMM);
+        elsif (ТочностьДатыВыпуска[Index] = 2) then
+          NewValue = ToString(NewDate, dfYYYYг);
+        fi;
+        ДатаНомераСтр[Index] = NewValue;
+        ДатаНомера[Index] = NewDate;
+      else
+        Message("Дата выхода номера должна лежать в пределах " + Str(ГодВыпуска) + " года!");
+      fi;
+    fi;
+    if (Self.Template.Frame < секцНомера.Count) then
+      Self.Template.Field = "ДатаНомераСтр";
+      Self.Template.Frame = Index+1;
+    else
+      Self.Template.Field = "ТиражНомера";
+      Self.Template.Frame = Index;
+    fi;
+  end;
+
+  proc ПолеВвода_ПриВыходе(Cell :TemplateCell; Index :Integer);
+    if (Cell.Contents = "НомерС") then
+      Self.Template.Field = "НомерПо";
+    elsif (Cell.Contents = "НомерПо") then
+      Self.Template.Field = "ТиражОбщ";
+      СписокНомеров(Cell);
+    elsif (Cell.Contents = "ТиражОбщ") then
+      Self.Template.Field = "ВаловыйНомерВыпуска";
+      Self.Template.Frame = 1;
+      СписокНомеров(Cell);
+    elsif (Cell.Contents = "ТочностьДатыВыходаОбщ") then
+      Self.Template.Field = "ВаловыйНомерВыпуска";
+      Self.Template.Frame = 1;
+      СписокНомеров(Cell);
+      ВидСекцииВыход;
+    elsif (Cell.Contents = "НомерВыпуска") then
+      НомерВыпуска[Index] = FixCode10(НомерВыпуска[Index]);
+      Self.Template.Field = "ВаловыйНомерВыпуска";
+    elsif (Cell.Contents = "ВаловыйНомерВыпуска") then
+      Self.Template.Field = "ДатаНомераСтр";
+    elsif (Cell.Contents = "ДатаНомераСтр") then
+      -- преобразование отрисовки даты
+      if (ТочностьДатыВыпуска[Index] = 1) then
+        if (ДатаНомера[Index] <> nil) then
+          ДатаНомераСтр[Index] = ToString(ДатаНомера[Index], dfYYYYMMM);
+        fi;
+      elsif (ТочностьДатыВыпуска[Index] = 2) then
+        if (ДатаНомера[Index] <> nil) then
+          ДатаНомераСтр[Index] = ToString(ДатаНомера[Index], dfYYYYг);
+        fi;
+      elsif (ТочностьДатыВыпуска[Index] = 0) then
+        if (ДатаНомера[Index] <> nil) then
+          ДатаНомераСтр[Index] = ToString(ДатаНомера[Index], dfDDMMYYYY);
+        fi;
+      fi;
+      Self.Template.Field = "ТиражНомера";
+    elsif (Cell.Contents = "ТиражНомера") then
+      Self.Template.Field = "ТиражНомера";
+      if (Cell.Frame < секцНомера.Count) then
+        ExecuteCommand("Kernel.Move.Down");
+      fi;
+    elsif (Cell.Contents = "НеНумерованныйВыпуск") then
+      if (НеНумерованныйВыпуск[Index]) then
+        НомерВыпуска[Index] = UnnumberedIssue;
+      else
+        НомерВыпуска[Index] = '';
+      fi;
+      Self.Template.Field = "ВаловыйНомерВыпуска";
+    elsif (Cell.Contents = "ТочностьДатыВыпуска") then
+      if (ТочностьДатыВыпуска[Index] = 0) then
+        ДатаНомераСтр[Index] = ToStr(ДатаНомера[Index]);
+      elsif (ТочностьДатыВыпуска[Index] = 1) then
+        if (ДатаНомера[Index] <> nil) then
+          ДатаНомераСтр[Index] = ToString(ДатаНомера[Index], dfYYYYMMM);
+        fi;
+      elsif (ТочностьДатыВыпуска[Index] = 2) then
+        if (ДатаНомера[Index] <> nil) then
+          ДатаНомераСтр[Index] = ToString(ДатаНомера[Index], dfYYYYг);
+        fi;
+      elsif (ТочностьДатыВыпуска[Index] = 0) then
+        if (ДатаНомера[Index] <> nil) then
+          ДатаНомераСтр[Index] = ToString(ДатаНомера[Index], dfDDMMYYYY);
+        fi;
+      fi;
+      Self.Template.Field = "ДатаНомераСтр";
+    elsif (Cell.Contents = "ЛожныйНомер") then
+      Self.Template.Field = "ЛожныйНомер";
+      if (Cell.Frame < секцНомера.Count) then
+        ExecuteCommand("Kernel.Move.Down");
+      fi;
+    elsif (Cell.Contents = "НеПолучен") then
+      Self.Template.Field = "НеПолучен";
+      if (Cell.Frame < секцНомера.Count) then
+        ExecuteCommand("Kernel.Move.Down");
+      fi;
+    fi;
+  end;
+
+  func ОбратитьЛогику(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var k:integer;
+    if Cell.Column                      = 9 then
+      for k = 1..секцНомера.Count do
+        if ЛожныйНомер[k]=false  then  ЛожныйНомер[k]=true ;
+        else                           ЛожныйНомер[k]=false;
+        end;
+      end;--for
+    elsif Cell.Column                   = 10 then
+      for k = 1..секцНомера.Count do
+        if НеПолучен[k]=false  then  НеПолучен[k]=true ;
+        else                         НеПолучен[k]=false;
+        end;
+      end;--for
+    end;
+    Result = false;
+  end;
+
+  proc КнВвод_ПриНажатии(Sender :Button);
+    ВсегоНомеров = секцНомера.Count;
+    if ПроверкаТиража = true  then
+    ВводСписка;
+    Close(cmOK);
+    else
+    Message('Пожалуйста, заполните все позиции колонки "Тираж номера"!'+Chr(13)+
+    'Нулевой тираж возможен только у не поступивших номеров.'
+    );
+    end;--проверка тиража
+  end;
+
+  proc кнОтмена_ПриНажатии(Sender :Button);
+    Close(cmCancel);
+  end;
+
+
+
+  func СменитьТочностьДаты(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    if          Cell.Contents="2ТочностьВыходаДень0"      then    ТочностьДатыВыходаОбщ=0;
+2    elsif0       Cell.Contents="2ТочностьВыходаМесяц0"     then    ТочностьДатыВыходаОбщ=1;
+2    elsif0       Cell.Contents="2ТочностьВыходаГод0"       then    ТочностьДатыВыходаОбщ=2;
+    end;
+    СписокНомеров(Cell);
+    ВидСекцииВыход;
+    Result = False;
+  end;
+
+
+  func СменитьЗначение(Cell :TemplateCell; Index :Integer;Action :Template.EnterTypes) :Logical;
+
+    if        Cell.Value=false                          then
+              Cell.Value=true;
+    else      Cell.Value=false;
+    end;
+    if          Cell.Contents="НеНумерованныйВыпуск"    then
+      Self.Template.Field               = "ВаловыйНомерВыпуска";
+2    elsif0       Cell.Contents="ЛожныйНомер"             then
+      if Cell.Frame<секцНомера.Count                    then
+        ExecuteCommand("Kernel.Move.Down");
+      end;
+2    elsif0       Cell.Contents="НеПолучен"               then
+      if Cell.Frame<секцНомера.Count                    then
+        ExecuteCommand("Kernel.Move.Down");
+      end;
+    end;
+    Result = false;
+  end;
+
+
+  proc Поле_ПриРисовании(Cell :TemplateCell; Selected :Logical; var Color :Integer;var FieldColor :Integer; Font :Font);
+  if Selected=true then
+    Color       = clWhite;
+    Font.Size   = 20;
+  end;
+  end;
+
+
+
+--}
+
+end

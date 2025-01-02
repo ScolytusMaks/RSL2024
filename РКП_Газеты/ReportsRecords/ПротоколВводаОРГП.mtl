@@ -1,0 +1,79 @@
+record ПротоколВводаОРГП inherited РКП_СИС.AbstractRecord.StoredReport title "Сводная статистика ввода данных ОРГП";
+
+  struct Газеты array Integer title "Статистика ввода газет";
+    field ОператорИмя                 :String  title "";
+    field Оператор                    :String  title "Оператор";
+    field Введено                     :Integer title "Введено газет";
+    field Редактировано               :Integer title "Изменено газет";
+  end;
+  field ВсегоВведеноГазет             :Integer title "Всего введено газет";
+  field ВсегоРедактированоГазет       :Integer title "Всего редактировано газет";
+
+  struct Номера array Integer title "Статистика ввода номеров газет";
+    field ОператорИмя                 :String  title "";
+    field Оператор                    :String  title "Оператор";
+    field Введено                     :Integer title "Введено номеров";
+    field Редактировано               :Integer title "Изменено номеров";
+  end;
+  field ВсегоВведеноНомеров           :Integer title "Всего введено номеров газет";
+  field ВсегоРедактированоНомеров     :Integer title "Всего редактировано номеров газет";
+
+  struct Поступления array Integer title "Статистика ввода поступлений номеров газет";
+    field ОператорИмя                 :String  title "";
+    field Оператор                    :String  title "Оператор";
+    field Введено                     :Integer title "Введено партий номеров";
+    field Редактировано               :Integer title "Изменено партий номеров";
+  end;
+  field ВсегоВведеноПоступлений       :Integer title "Всего введено партий номеров";
+  field ВсегоРедактированоПоступлений :Integer title "Всего редактировано партий номеров";
+
+  struct УчДок array Integer title "Статистика ввода учетных документов";
+    field ОператорИмя                 :String  title "";
+    field Оператор                    :String  title "Оператор";
+    field Введено                     :Integer title "Введено учетных документов";
+    field Редактировано               :Integer title "Изменено учетных документов";
+  end;
+  field ВсегоВведеноУчДок             :Integer title "Всего введено учетных документов";
+  field ВсегоРедактированоУчДок       :Integer title "Всего редактировано учетных документов";
+
+  RecordDescription НомерОтчета;
+end;
+
+--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--
+-- #Deprecated --
+--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--
+
+record ПротоколВводаРГ inherited СИС2.Базовая.БазоваяЗапись title "Сводная статистика ввода данных ОРГП до 2025 года";
+  field ГодПротокола                  :Integer title "Год протокола";
+  field НомерПротокола                :Integer title "Номер протокола";
+  field ИзмененияЗапрещены            :Logical title "Изменения запрещены";
+  field ДатаНачалаПериода             :Date    title "Дата начала периода";
+  field ДатаКонцаПериода              :Date    title "Дата окончания периода";
+  field СтандартныйПериод             :Integer title ""; -- служебное поле
+  field Комментарий                   :String  title "Комментарий";
+  struct Газеты array Integer title "Статистика ввода газет";
+    field ОператорИмя                 :String  title "";
+    field Оператор                    :String  title "Оператор";
+    field Введено                     :Integer title "Введено газет";
+    field Редактировано               :Integer title "Изменено газет";
+  end;
+  field ВсегоВведеноГазет             :Integer title "Всего введено газет";
+  field ВсегоРедактированоГазет       :Integer title "Всего редактировано газет";
+  struct Номера array Integer title "Статистика ввода номеров газет";
+    field ОператорИмя                 :String  title "";
+    field Оператор                    :String  title "Оператор";
+    field Введено                     :Integer title "Введено номеров";
+    field Редактировано               :Integer title "Изменено номеров";
+  end;
+  field ВсегоВведеноНомеров           :Integer title "Всего введено номеров газет";
+  field ВсегоРедактированоНомеров     :Integer title "Всего редактировано номеров газет";
+  struct Поступления array Integer title "Статистика ввода поступлений номеров газет";
+    field ОператорИмя                 :String  title "";
+    field Оператор                    :String  title "Оператор";
+    field Введено                     :Integer title "Введено номеров";
+    field Редактировано               :Integer title "Изменено номеров";
+  end;
+  field ВсегоВведеноПоступлений       :Integer title "Всего введено номеров газет";
+  field ВсегоРедактированоПоступлений :Integer title "Всего редактировано номеров газет";
+  RecordDescription  НомерПротокола;
+end;

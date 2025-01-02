@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Properties Version="1">
+  <Property Name="Required" Value="True"/>
+  <Property Name="ProcSrv" Value="True"/>
+</Properties>
+<Items>
+  <Item Name="Def"/>
+  <Item Name="StdCode"/>
+  <Item Name="BiblioRecord"/>
+</Items>

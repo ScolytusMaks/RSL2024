@@ -1,0 +1,289 @@
+class inherited Статьи.редВыпускЛГС_02 "Создание именного указателя", editor ВыпускЛГС;
+
+inclass
+
+inobject
+  var У_ФИО[]                   : String;
+  var У_Статья[]                : Integer;
+  var У_НеАвтор[]               : logical;
+  секцУ_Имен                    : Section;
+
+--------------------------------------------------------------------------------
+--{ Обработчики событий бланка
+
+  proc СозданиеУказателяИмен;
+  #Warning "Проверить формирование отсылок!!!!";
+    var i,k,t,j         : integer;
+    var Q               : Query;
+    var Fam,IO          : String;
+    var Nom,FormOtv     : integer;
+    var SubTab          : SubTable;
+    ------
+    У_ФИО               = nil;
+    У_Статья            = nil;
+    У_НеАвтор           = nil;
+    --организация запроса к статьям
+    i                           = 0;
+    Q                           = Query.Create([РКП_Статьи.Роспись]);
+    Q.Filter                    = "ГодЛетописи="+Str(ГодЛетописи)+
+                                  " and ВыпускЛетописи="+Str(ВыпускЛетописи);
+    Q.Select;
+    --организация цикла
+    Q.First;
+      for k = 1..Q.Count                                        do
+        --авторы статей
+        if Q.Current.КатегорияОтветственности = 0               then
+--          if Q.Current.Разночтения.Count = 0                    then
+            Fam                 = Q.Current.АвторФамилия;
+            IO                  = Q.Current.АвторИнициалы;
+            Nom                 = Q.Current.НомерЗаписиВВыпускеГЛ;
+            if Fam<>nil                                         then
+            i                   = i+1;
+              У_ФИО[i]          = Fam;
+              if IO<>nil                                        then
+                У_ФИО[i]        = У_ФИО[i]+" "+IO;
+              end;
+              У_Статья[i]       = Nom;
+            end;
+
+            for t = 1..Q.Current.Разночтения.Count              do
+              if Q.Current.Разночтения.Items[t].Разночтение<>"" and
+                Fam<>nil                                        then
+                i               = i+1;
+                if Fam<>nil                                     then
+                  У_ФИО[i]      = Q.Current.Разночтения.Items[t].Разночтение + " - см. "+Fam;
+                  if IO<>nil                                    then
+                      У_ФИО[i]    = У_ФИО[i]+" "+IO;
+                  end;
+                  У_Статья[i]   = nil;
+                end;
+              end;
+            end;
+
+--          else
+--            for t = 1..Q.Current.Разночтения.Count              do
+--              Fam               = Q.Current.АвторФамилия;
+--              IO                = Q.Current.АвторИнициалы;
+--              Nom               = Q.Current.НомерЗаписиВВыпускеГЛ;
+--              if Fam<>nil                                       then
+--              i                 = i+1;
+--                У_ФИО[i]        = Fam;
+--                if IO<>nil                                      then
+--                  У_ФИО[i]      = У_ФИО[i]+" "+IO;
+--                end;
+--                У_ФИО[i]        = У_ФИО[i]+" ( "+Q.Current.Разночтения.Items[t].Разночтение+")";
+--                if t = 1                                        then
+--                У_Статья[i]     = Nom;
+--                end;
+--              end;
+--              --доп. обработка разночтений--
+--              --i                 = i+1;
+--              --У_ФИО[i]          = Q0.Current.Разночтения.Items[t].Разночтение+" - см. "+SubStr(ФИО_[i-1],1,Pos(":",ФИО_[i-1])-1)+":";
+--            end;
+--          end;
+        end;
+        --Персоналии
+        SubTab                  = Q.Current.Персоналии;
+        for j = 1..SubTab.Count                                 do
+          Fam                   = SubTab.Items[j].Фамилия;
+          IO                    = SubTab.Items[j].Инициалы;
+          Nom                   = Q.Current.НомерЗаписиВВыпускеГЛ;
+          if Fam<>nil                                           then
+          i                     = i+1;
+            У_ФИО[i]            = Fam;
+            if IO<>nil                                          then
+              У_ФИО[i]          = У_ФИО[i]+" "+IO;
+            end;
+            У_Статья[i]         = Nom;
+            У_НеАвтор[i]        = true;
+          end;
+        end;
+        --Авторы, не указанные в заголовке
+        SubTab                  = Q.Current.АвторыНеУказанные;
+        for j = 1..SubTab.Count                                 do
+          Fam                   = SubTab.Items[j].Фамилия;
+          IO                    = SubTab.Items[j].Инициалы;
+          Nom                   = Q.Current.НомерЗаписиВВыпускеГЛ;
+          if Fam<>nil                                           then
+          i                     = i+1;
+            У_ФИО[i]            = Fam;
+            if IO<>nil                                          then
+              У_ФИО[i]          = У_ФИО[i]+" "+IO;
+            end;
+            У_Статья[i]         = Nom;
+          end;
+        end;
+        --Участники бесед
+        --Редакторы
+        SubTab                  = Q.Current.Редакторы;
+        for j = 1..SubTab.Count                                 do
+          Fam                   = SubTab.Items[j].Фамилия;
+          IO                    = SubTab.Items[j].Инициалы;
+          Nom                   = Q.Current.НомерЗаписиВВыпускеГЛ;
+          FormOtv               = Q.Current.ФормаОтвР;
+          if Fam<>nil                                           then
+          i                     = i+1;
+            У_ФИО[i]            = Fam;
+            if IO<>nil                                          then
+              У_ФИО[i]          = У_ФИО[i]+" "+IO;
+            end;
+            if ФормаОтветственности.ПоНомеру(702,FormOtv,1)<>"" then
+              У_ФИО[i]          = У_ФИО[i]+", "+ФормаОтветственности.ПоНомеру(702,FormOtv,1);
+            end;
+            У_Статья[i]         = Nom;
+          end;
+        end;
+        --Переводчики
+        SubTab                  = Q.Current.Переводчики;
+        for j = 1..SubTab.Count                                 do
+          Fam                   = SubTab.Items[j].Фамилия;
+          IO                    = SubTab.Items[j].Инициалы;
+          Nom                   = Q.Current.НомерЗаписиВВыпускеГЛ;
+          FormOtv               = 0;
+          if Fam<>nil                                           then
+          i                     = i+1;
+            У_ФИО[i]            = Fam;
+            if IO<>nil                                          then
+              У_ФИО[i]          = У_ФИО[i]+" "+IO;
+            end;
+            У_ФИО[i]          = У_ФИО[i]+", "+ФормаОтветственности.ПоНомеру(703,FormOtv,1);
+            У_Статья[i]         = Nom;
+          end;
+        end;
+        --Авторы вступ. статей
+        SubTab                  = Q.Current.АвторыВступСтатей;
+        for j = 1..SubTab.Count                                 do
+          Fam                   = SubTab.Items[j].Фамилия;
+          IO                    = SubTab.Items[j].Инициалы;
+          Nom                   = Q.Current.НомерЗаписиВВыпускеГЛ;
+          FormOtv               = 0;
+          if Fam<>nil                                           then
+          i                     = i+1;
+            У_ФИО[i]            = Fam;
+            if IO<>nil                                          then
+              У_ФИО[i]          = У_ФИО[i]+" "+IO;
+            end;
+            У_ФИО[i]          = У_ФИО[i]+", "+ФормаОтветственности.ПоНомеру(704,FormOtv,1);
+            У_Статья[i]         = Nom;
+          end;
+        end;
+        --Авторы лит. обработки
+        SubTab                  = Q.Current.АвторыЛитОбработки;
+        for j = 1..SubTab.Count                                 do
+          Fam                   = SubTab.Items[j].Фамилия;
+          IO                    = SubTab.Items[j].Инициалы;
+          Nom                   = Q.Current.НомерЗаписиВВыпускеГЛ;
+          FormOtv               = Q.Current.ФормаОтвАЛО;
+          if Fam<>nil                                           then
+          i                     = i+1;
+            У_ФИО[i]            = Fam;
+            if IO<>nil                                          then
+              У_ФИО[i]          = У_ФИО[i]+" "+IO;
+            end;
+            if ФормаОтветственности.ПоНомеру(705,FormOtv,1)<>"" then
+            У_ФИО[i]          = У_ФИО[i]+", "+ФормаОтветственности.ПоНомеру(705,FormOtv,1);
+            end;
+            У_Статья[i]         = Nom;
+          end;
+        end;
+        --Иллюстраторы
+        SubTab                  = Q.Current.Иллюстраторы;
+        for j = 1..SubTab.Count                                 do
+          Fam                   = SubTab.Items[j].Фамилия;
+          IO                    = SubTab.Items[j].Инициалы;
+          Nom                   = Q.Current.НомерЗаписиВВыпускеГЛ;
+          FormOtv               = 0;
+          if Fam<>nil                                           then
+          i                     = i+1;
+            У_ФИО[i]            = Fam;
+            if IO<>nil                                          then
+              У_ФИО[i]          = У_ФИО[i]+" "+IO;
+            end;
+            У_ФИО[i]          = У_ФИО[i]+", "+ФормаОтветственности.ПоНомеру(706,FormOtv,1);
+            У_Статья[i]         = Nom;
+          end;
+        end;
+        --Авторы инсценировок
+        SubTab                  = Q.Current.АвторыИнсценировок;
+        for j = 1..SubTab.Count                                 do
+          Fam                   = SubTab.Items[j].Фамилия;
+          IO                    = SubTab.Items[j].Инициалы;
+          Nom                   = Q.Current.НомерЗаписиВВыпускеГЛ;
+          FormOtv               = 0;
+          if Fam<>nil                                           then
+          i                     = i+1;
+            У_ФИО[i]            = Fam;
+            if IO<>nil                                          then
+              У_ФИО[i]          = У_ФИО[i]+" "+IO;
+            end;
+            У_ФИО[i]          = У_ФИО[i]+", "+ФормаОтветственности.ПоНомеру(707,FormOtv,1);
+            У_Статья[i]         = Nom;
+          end;
+        end;
+        --Прочие авторы
+        SubTab                  = Q.Current.АвторыПрочие;
+        for j = 1..SubTab.Count                                 do
+          Fam                   = SubTab.Items[j].Фамилия;
+          IO                    = SubTab.Items[j].Инициалы;
+          Nom                   = Q.Current.НомерЗаписиВВыпускеГЛ;
+          FormOtv               = 0;
+          if Fam<>nil                                           then
+          i                     = i+1;
+            У_ФИО[i]            = Fam;
+            if IO<>nil                                          then
+              У_ФИО[i]          = У_ФИО[i]+" "+IO;
+            end;
+            У_Статья[i]         = Nom;
+          end;
+        end;
+        Q.Next;
+      end;
+     Q.Close;
+     секцУ_Имен.Count           = i;
+     секцУ_Имен.SortBy("У_ФИО,У_Статья");
+     --==========заполнение подтаблицы
+     Record.УказательИмен.Clear;
+     for k = 1..секцУ_Имен.Count                                do
+       if k = 1                                                 then
+         i                              = Record.УказательИмен.Add;
+         УказательИмен[i].ФИО           = У_ФИО[k];
+           if У_НеАвтор[k] = false                              then
+             if У_Статья[k]<>nil                                then
+         УказательИмен[i].БибЗапись     = Str(У_Статья[k]);
+             end;
+           else
+             if У_Статья[k]<>nil                                then
+         УказательИмен[i].БибЗапись     = "("+Str(У_Статья[k])+")";
+             end;
+           end;
+       else
+         if У_ФИО[k] = У_ФИО[k-1]                               then
+           if У_НеАвтор[k] = false                              then
+             if У_Статья[k]<>nil                                then
+         УказательИмен[i].БибЗапись     = УказательИмен[i].БибЗапись+", "+Str(У_Статья[k]);
+             end;
+           else
+             if У_Статья[k]<>nil                                then
+         УказательИмен[i].БибЗапись     = УказательИмен[i].БибЗапись+", "+"("+Str(У_Статья[k])+")";
+             end;
+           end;
+         else
+           i                            = Record.УказательИмен.Add;
+         УказательИмен[i].ФИО           = У_ФИО[k];
+           if У_НеАвтор[k] = false                              then
+             if У_Статья[k]<>nil                                then
+         УказательИмен[i].БибЗапись     = Str(У_Статья[k]);
+             end;
+           else
+             if У_Статья[k]<>nil                                then
+         УказательИмен[i].БибЗапись     = "("+Str(У_Статья[k])+")";
+             end;
+           end;
+         end;
+       end;
+     end;
+  end;
+
+--}
+
+end

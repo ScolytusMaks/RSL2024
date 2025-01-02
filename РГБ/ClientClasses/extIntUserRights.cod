@@ -1,0 +1,15 @@
+﻿extends МашинаРеквизитов.УправлениеДоступом.интПраваПользователя "";
+
+inclass public
+
+  func ИмяФайлаИнтерфейснойСхемы(aName :String) :String;
+    var vPrjName :String;
+    vPrjName = ExtractWord(aName, 1);
+    if vPrjName = 'РГБ' then
+      Result = ПутьККаталогуХранения + ExtractWord(aName, 2) + '.shi';
+    else
+      Result = extended ИмяФайлаИнтерфейснойСхемы(aName);
+    fi;
+  end;
+
+end

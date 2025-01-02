@@ -1,0 +1,295 @@
+class "";
+
+inclass
+--  func ЗаменаТире(ИсходныйТекст:string):string;
+--    var k,kk            : integer;
+--    var СимволДо        : String;
+--    var СимволТекущий   : String;
+--    var СимволПосле     : String;
+--    kk          = Length(ИсходныйТекст);
+--    for k = 1..Length(ИсходныйТекст)    do
+--      --
+--      if k>1                            then
+--        СимволДо        = SubStr(ИсходныйТекст,k-1,1);
+--      else
+--        СимволДо        = "";
+--      end;
+--      СимволТекущий     = SubStr(ИсходныйТекст,k,1);
+--      if k<kk                           then
+--        СимволПосле     = SubStr(ИсходныйТекст,k+1,1);
+--      else
+--        СимволПосле     = "";
+--      end;
+--      --
+--      if СимволДо=" " and СимволТекущий="-" and СимволПосле=" "         then
+--        Result          = Result+"\endash ";
+--      else
+--        Result          = Result+СимволТекущий;
+--      end;
+--    end;
+--    Return Result;
+--  end;
+
+
+--  func ЗаменаКавычек(ИсходныйТекст:string):string;
+--    var k,kk            : integer;
+--    var СимволДо        : String;
+--    var СимволТекущий   : String;
+--    var СимволПосле     : String;
+--    kk          = Length(ИсходныйТекст);
+--    for k = 1..Length(ИсходныйТекст)    do
+--      --
+--      if k>1                            then
+--        СимволДо        = SubStr(ИсходныйТекст,k-1,1);
+--      else
+--        СимволДо        = "";
+--      end;
+--      СимволТекущий     = SubStr(ИсходныйТекст,k,1);
+--      if k<kk                           then
+--        СимволПосле     = SubStr(ИсходныйТекст,k+1,1);
+--      else
+--        СимволПосле     = "";
+--      end;
+--      --
+--      if                     СимволТекущий='"' and СимволПосле<>' '     then
+--        Result          = Result+"\'ab";
+--      elsif СимволДо<>'' and СимволТекущий='"' and СимволПосле=' '      then
+--        Result          = Result+"\'bb ";
+--      else
+--        Result          = Result+СимволТекущий;
+--      end;
+--    end;
+--    Return Result;
+--  end;
+
+  func ЗаменаДвойныхПробелов(ИсходныйТекст:string):string;
+    var k,kk            : integer;
+    var СимволДо        : String;
+    var СимволТекущий   : String;
+    var СимволПосле     : String;
+    kk          = Length(ИсходныйТекст);
+    for k = 1..Length(ИсходныйТекст)    do
+      --
+      if k>1                            then
+        СимволДо        = SubStr(ИсходныйТекст,k-1,1);
+      else
+        СимволДо        = "";
+      end;
+      СимволТекущий     = SubStr(ИсходныйТекст,k,1);
+      if k<kk                           then
+        СимволПосле     = SubStr(ИсходныйТекст,k+1,1);
+      else
+        СимволПосле     = "";
+      end;
+      --
+      if    СимволДо=' ' and СимволТекущий=' '                          then
+        Result          = Result;
+      else
+        Result          = Result+СимволТекущий;
+      end;
+    end;
+    Return Result;
+  end;
+
+
+  func ВставкаСпецСимволов(ИсходныйТекст:string):string;
+    var k,kk            : integer;
+    var СимволДо        : String;
+    var СимволТекущий   : String;
+    var СимволПосле     : String;
+    kk          = Length(ИсходныйТекст);
+    for k = 1..Length(ИсходныйТекст)    do
+      --I.Определение предыдущего, текущего и последующего символов
+      if k>1                            then
+        СимволДо        = SubStr(ИсходныйТекст,k-1,1);
+      else
+        СимволДо        = "";
+      end;
+      СимволТекущий     = SubStr(ИсходныйТекст,k,1);
+      if k<kk                           then
+        СимволПосле     = SubStr(ИсходныйТекст,k+1,1);
+      else
+        СимволПосле     = "";
+      end;
+      --ЗАМЕНА
+      --II.Замена дефиса на длинное тире - при отбивке его пробелами
+      if    СимволДо=" " and СимволТекущий="-" and СимволПосле=" "              then
+        Result          = Result+"\endash ";
+      --III.Замена двойного дефиса на длинное тире
+      elsif                  СимволТекущий="-" and СимволПосле="-"              then
+        Result          = Result+"\endash ";
+      elsif СимволДо="-" and СимволТекущий="-"                                  then
+        Result          = Result;
+      --III.Замена кавычек
+      elsif СимволДо=' ' and СимволТекущий='"'                                  then
+        Result          = Result+"\'ab";
+      elsif СимволДо='[' and СимволТекущий='"'                                  then
+        Result          = Result+"\'ab";
+      elsif СимволДо=nil and СимволТекущий='"'                                  then
+        Result          = Result+"\'ab";
+      elsif СимволДо='(' and СимволТекущий='"'                                  then
+        Result          = Result+"\'ab";
+      elsif СимволДо<>' ' and СимволТекущий='"'                                 then
+        Result          = Result+"\'bb";
+      elsif СимволДо=' ' and СимволТекущий='<'                                  then
+        Result          = Result+"\'ab";
+      elsif СимволДо='[' and СимволТекущий='<'                                  then
+        Result          = Result+"\'ab";
+      elsif СимволДо=nil and СимволТекущий='<'                                  then
+        Result          = Result+"\'ab";
+      elsif СимволДо='(' and СимволТекущий='<'                                  then
+        Result          = Result+"\'ab";
+      elsif СимволДо<>' ' and СимволТекущий='>'                                 then
+        Result          = Result+"\'bb";
+      --IV.Замена пробел+тире  на неразрывный пробел+тире
+      elsif                  СимволТекущий=' ' and СимволПосле="-"              then
+        Result          = Result+"\~";
+      --V.Замена //+пробел на неразрывный пробел+тире
+      elsif   СимволДо="/" and СимволТекущий=' ' and СимволПосле=' '            then
+        Result          = Result+"\~";
+      elsif                    СимволТекущий=' ' and СимволПосле=' '            then
+        Result          = Result+"\~";
+      elsif СимволДо=' ' and   СимволТекущий=' '                                then
+        Result          = Result+"\~";
+
+      else  --исключение - изменения не вносятся
+        Result          = Result+СимволТекущий;
+      end;
+    end;
+    Return Result;
+
+  end;
+
+
+  func ВставкаРазрываСтроки(ИсходныйТекст:string):string;
+    var k,kk            : integer;
+    var СимволДо        : String;
+    var СимволТекущий   : String;
+    var СимволПосле1    : String;
+    var СимволПосле2    : String;
+    var СимволПосле3    : String;
+    var СимволПосле4    : String;
+    var СимволДо1       : String;
+    var СимволДо2       : String;
+    var СимволДо3       : String;
+    var СимволДо4       : String;
+    var СимволДо5       : String;
+    var СимволДо6       : String;
+    var СимволДо7       : String;
+    var СимволДо8       : String;
+    var СимволДо9       : String;
+    kk          = Length(ИсходныйТекст);
+    for k = 1 .. kk do
+      --
+      if k>1                            then        СимволДо        = SubStr(ИсходныйТекст,k-1,1);
+      else                                          СимволДо        = "";
+      end;
+      if k>2                            then        СимволДо1       = SubStr(ИсходныйТекст,k-2,1);
+      else                                          СимволДо1       = "";
+      end;
+      if k>3                            then        СимволДо2       = SubStr(ИсходныйТекст,k-3,1);
+      else                                          СимволДо2       = "";
+      end;
+      if k>4                            then        СимволДо3       = SubStr(ИсходныйТекст,k-4,1);
+      else                                          СимволДо3       = "";
+      end;
+      if k>5                            then        СимволДо4       = SubStr(ИсходныйТекст,k-5,1);
+      else                                          СимволДо4       = "";
+      end;
+      if k>6                            then        СимволДо5       = SubStr(ИсходныйТекст,k-6,1);
+      else                                          СимволДо5       = "";
+      end;
+      if k>7                            then        СимволДо6       = SubStr(ИсходныйТекст,k-7,1);
+      else                                          СимволДо6       = "";
+      end;
+
+
+      СимволТекущий     = SubStr(ИсходныйТекст,k,1);
+      СимволПосле1      = SubStr(ИсходныйТекст,k+1,1);
+      СимволПосле2      = SubStr(ИсходныйТекст,k+2,1);
+      СимволПосле3      = SubStr(ИсходныйТекст,k+3,1);
+      СимволПосле4      = SubStr(ИсходныйТекст,k+4,1);
+      --
+      if                     СимволТекущий='/' and СимволПосле1='/'     then
+        Result          = Trim(Result)+'.\par '+СимволТекущий;
+      elsif                  Up(СимволТекущий)  ='П'    and
+                             Up(СимволПосле1)   ='Р'    and
+                             Up(СимволПосле2)   ='И'    and
+                             Up(СимволПосле3)   ='Л'    and
+                             Up(СимволПосле4)   ='.'    then
+        Result          = Trim(Result)+'\par '+СимволТекущий;
+      else
+        Result          = Result+СимволТекущий;
+      end;
+--      if                     Up(СимволДо)  ='R'         and
+--                             Up(СимволДо1)   ='A'       and
+--                             Up(СимволДо2)   ='P'       and
+--                             Up(СимволДо3)   ='\'       and
+--                             Up(СимволДо4)   ='H'       and
+--                             Up(СимволДо5)   ='S'       and
+--                             Up(СимволДо6)   ='A'       then
+--        Result          = SubStr(Result,1,Length(Result)-12)+'\par ';
+--      end;
+    end;
+    Return Result;
+  end;
+--\endash\par
+
+  func ЗаменаРегистраИдентификаторов(ИсходныйТекст:string):string;
+    var k,kk            : integer;
+    var СимволДо        : String;
+    var СимволТекущий   : String;
+    kk          = Length(ИсходныйТекст);
+    for k = 1 .. kk do
+      --
+      if k>1                            then
+        СимволДо        = SubStr(ИсходныйТекст,k-1,1);
+      else
+        СимволДо        = "";
+      end;
+      СимволТекущий     = SubStr(ИсходныйТекст,k,1);
+      --
+      if                     СимволТекущий<>'' and СимволДо='^'     then
+        Result          = Result+Lo(СимволТекущий);
+      else
+        Result          = Result+СимволТекущий;
+      end;
+    end;
+    Return Result;
+  end;
+
+
+  func КодировкаСпецСимволовDOS(ИсходныйТекст:string):string;
+    var k,kk            : integer;
+    var СимволДо        : String;
+    var СимволТекущий   : String;
+    var СимволПосле     : String;
+    kk          = Length(ИсходныйТекст);
+    for k = 1..Length(ИсходныйТекст)    do
+      --I.Определение предыдущего, текущего и последующего символов
+      if k>1                                                                    then
+        СимволДо        = SubStr(ИсходныйТекст,k-1,1);
+      else
+        СимволДо        = "";
+      end;
+      СимволТекущий     = SubStr(ИсходныйТекст,k,1);
+      if k<kk                                                                   then
+        СимволПосле     = SubStr(ИсходныйТекст,k+1,1);
+      else
+        СимволПосле     = "";
+      end;
+      if        СимволТекущий='-' and СимволДо<>'' and  СимволПосле<>''         then
+        Result          = Result+Chr(245);
+      elsif     СимволТекущий='№'                                               then
+        Result          = Result+Chr(251);
+      else
+        Result          = Result+СимволТекущий;
+      end;
+    end;
+    Return Result;
+  end;
+
+
+inobject
+
+end

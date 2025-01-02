@@ -1,0 +1,378 @@
+class inherited СИС2.БазовыйБланкРедактор "Отчет о пополнении БД", editor СправкаПополненияБД;
+
+import СИС2 classes Функции, ФункцииДокумента, Математика;
+
+inobject private
+
+--{{ 2_Свойства
+
+  var секцШапка       :TemplateSection;
+  var секцПозиции     :TemplateSection;
+  var секцСПО         :TemplateSection;
+  var секцВарианты    :TemplateSection;
+  var Nom             :Integer[];
+  var мГазета         :Газета[];
+  var мНаименование   :String[];
+  var мНомераГазет    :String[];
+  var мЕдиницХранения :Integer[];
+
+--}}
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриСчитывании;
+    ПрочитатьРасчет;
+  end;
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+    -- При нажатии на "кнопку"
+  func СменаВариантаПериода(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    if (ЗаГод > 1801) and (ЗаГод < 2999) then
+      ЗаДату1 = false;
+      ЗаДату2 = false;
+      ЗаДату3 = false;
+      ЗаДату4 = false;
+      ЗаДату5 = false;
+      ЗаДату  = nil;
+      секцСПО.Row[1].Visible = false;
+      секцСПО.Row[2].Visible = false;
+      секцВарианты.CellByField['ЗаДату1'].Font.Bold = false;
+      секцВарианты.CellByField['ЗаДату2'].Font.Bold = false;
+      секцВарианты.CellByField['ЗаДату3'].Font.Bold = false;
+      секцВарианты.CellByField['ЗаДату4'].Font.Bold = false;
+      секцВарианты.CellByField['ЗаДату5'].Font.Bold = false;
+      if (Cell.Contents = 'ЗаДату1') then
+        ЗаДату  = 0;
+        ЗаДату1 = true;
+        секцВарианты.CellByField['ЗаДату1'].Font.Bold = true;
+        ДатаН   = РКП_СИС.СтандартныйПериод.НачалоГода(Today);
+        ДатаК   = today;
+        ПериодЗапроса = 'в I квартале ' + Str(ЗаГод) + ' г.';
+        ОчиститьРезультатыРасчета;
+      elsif (Cell.Contents = 'ЗаДату2') then
+        ЗаДату  = 1;
+        ЗаДату2 = true;
+        секцВарианты.CellByField['ЗаДату2'].Font.Bold = true;
+        ДатаН   = РКП_СИС.СтандартныйПериод.НачалоМесяца(Today);
+        ДатаК   = today;
+        ПериодЗапроса = 'в I-II квартале ' + Str(ЗаГод) + ' г.';
+        ОчиститьРезультатыРасчета;
+      elsif (Cell.Contents = 'ЗаДату3') then
+        ЗаДату  = 2;
+        ЗаДату3 = true;
+        секцВарианты.CellByField['ЗаДату3'].Font.Bold = true;
+        ДатаН = РКП_СИС.СтандартныйПериод.НачалоКвартала(Today);
+        ДатаК = today;
+        ПериодЗапроса = 'в I-III квартале ' + Str(ЗаГод) + ' г.';
+        ОчиститьРезультатыРасчета;
+      elsif (Cell.Contents = 'ЗаДату4') then
+        ЗаДату  = 3;
+        ЗаДату4 = true;
+        секцВарианты.CellByField['ЗаДату4'].Font.Bold = true;
+        ДатаН = РКП_СИС.СтандартныйПериод.НачалоГода(Today);
+        ДатаК = today;
+        ПериодЗапроса = 'в ' + Str(ЗаГод) + ' г.';
+        ОчиститьРезультатыРасчета;
+      elsif (Cell.Contents = 'ЗаДату5') then
+        секцСПО.Row[1].Visible = true;
+        секцСПО.Row[2].Visible = true;
+        ЗаДату  = 4;
+        ЗаДату5 = true;
+        секцВарианты.CellByField["ЗаДату5"].Font.Bold = true;
+        ДатаН   = Dat(Day(ДатаН), Mon(ДатаН), ЗаГод);
+        ДатаК   = Dat(Day(ДатаК), Mon(ДатаК), ЗаГод);
+        ПериодЗапроса = 'с ' + Str(ДатаН) + ' по ' + Str(ДатаК);
+        ОчиститьРезультатыРасчета;
+      end;
+    else
+      Message('Пожалуста, укажите корректный год запроса!');
+    end;
+  end;
+
+  func ПолеГодПриОбзоре(Cell :TemplateCell; Value :Variant; var NewValue :Variant) :Logical;
+    var vYear :Integer;
+    if (CmOk = РКП_СИС.Сервис.блВыборГода.ВыполнитьВыбор(vYear)) then
+      NewValue     = vYear;
+    --if (CmOk = OpenBlank('РКП_СИС.Сервис.блВыборГода', Window.ModalWindow)) then
+    --  NewValue = РКП_СИС.Сервис.блВыборГода.Решение;
+      ЗаГод    = NewValue;
+      Template.EndEdit(True);
+      --if (Value > 1901) then
+      --  РКП_СИС.Сервис.блВыборГода.ВыбранныйГод = Value;
+      --else
+      --  РКП_СИС.Сервис.блВыборГода.ВыбранныйГод = (Year(Today) - 1);
+      --end;
+      if (ЗаДату = 0) then
+        Result = СменаВариантаПериода(секцВарианты.CellByField['ЗаДату1'],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      elsif (ЗаДату = 1) then
+        Result = СменаВариантаПериода(секцВарианты.CellByField['ЗаДату2'],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      elsif (ЗаДату = 2) then
+        Result = СменаВариантаПериода(секцВарианты.CellByField['ЗаДату3'],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      elsif (ЗаДату = 3) then
+        Result = СменаВариантаПериода(секцВарианты.CellByField['ЗаДату4'],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      elsif (ЗаДату = 4) then
+        Result = СменаВариантаПериода(секцВарианты.CellByField['ЗаДату5'],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      else
+        Result = false;
+      end;
+    else
+      Result = false;
+    end;
+  end;
+
+  proc ПолеЗаГодПриВыходе(Cell :TemplateCell; Index :Integer);
+    if (ЗаДату = 0) then
+      СменаВариантаПериода(секцВарианты.CellByField['ЗаДату1'],Template.ClickTypes(1));
+      ОчиститьРезультатыРасчета;
+    elsif (ЗаДату = 1) then
+      СменаВариантаПериода(секцВарианты.CellByField['ЗаДату2'],Template.ClickTypes(1));
+      ОчиститьРезультатыРасчета;
+    elsif (ЗаДату = 2) then
+      СменаВариантаПериода(секцВарианты.CellByField['ЗаДату3'],Template.ClickTypes(1));
+      ОчиститьРезультатыРасчета;
+    elsif (ЗаДату = 3) then
+      СменаВариантаПериода(секцВарианты.CellByField['ЗаДату4'],Template.ClickTypes(1));
+      ОчиститьРезультатыРасчета;
+    elsif (ЗаДату = 4) then
+      СменаВариантаПериода(секцВарианты.CellByField['ЗаДату5'],Template.ClickTypes(1));
+      ОчиститьРезультатыРасчета;
+    end;
+  end;
+
+  -- ПриВыходе
+  proc ОписатьПериодЗапроса(Cell :TemplateCell; Index :Integer);
+    ПериодЗапроса = 'с ' + Str(ДатаН) + ' по ' + Str(ДатаК);
+  end;
+
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+  proc ПостроитьОтчет(Sender :Button);
+    var Q :Query;
+    if ПостроитьОтчет_ПроверкаУсловий then
+      ПостроитьОтчет_ОчисткаРезультатов;
+      Q = ПостроитьОтчет_ЗапросКНомерам;
+      ПостроитьОтчет_ПолучениеОбщейСтатистики(Q);
+      if CmOk = EnqOkCancel('Построить список газет?') then
+        ПостроитьОтчет_РасшифровкаПоИзданиям(Q);
+        Hint('Закрытие запроса к БД...');
+        Q.Close;
+        ПостроитьОтчет_ЗаписатьРасшифровку;
+      else
+        Hint('Закрытие запроса к БД...');
+        Q.Close;
+      fi;
+      ПостроитьОтчет_СведенияОбИсполнителе;
+      ПрочитатьРасчет;
+    end;
+  end;
+
+
+-- 2_Вспомогательные методы0. --
+
+
+  func ПостроитьОтчет_ПроверкаУсловий :Logical;
+    if  not (false in [(ДатаН <> nil), (ДатаК <> nil), (ДатаН <= ДатаК)]) then --проверка корректности условий
+      СИС2.ФункцииДокумента.RecordPostIfNeed(Record);
+      Return true;
+    else
+      Message('Неверно заданы даты построения отчета!');
+    end;
+  end;
+
+  proc ПостроитьОтчет_ОчисткаРезультатов;
+    ОчиститьРезультатыРасчета;
+  end;
+
+  func ПостроитьОтчет_ЗапросКНомерам :Query;
+    var aFlt :String[];
+    Hint('Открытие запроса к БД...');
+    Result = Query.Create([РКП_Газеты.НомерГазеты]);
+    СИС2.Функции.AddInArray( aFlt, 'Газета<>nil' );
+    СИС2.Функции.AddInArray( aFlt, 'ФункцияГруппы=0' );
+    СИС2.Функции.AddInArray( aFlt, 'НеПолучен=false' );
+    СИС2.Функции.AddInArray( aFlt, 'ПринялНаХранение<>"Администратор"' );
+    СИС2.Функции.AddInArray( aFlt, 'ДатаПринятияНаХранение>=' + Str(ДатаН) );
+    СИС2.Функции.AddInArray( aFlt, 'ДатаПринятияНаХранение<'  + Str(ДатаК + 1) );
+    Result.Filter = СИС2.СтроковыеФункции.СложитьСтрокиФильтраПоИ(aFlt);
+    Result.LoadingFieldsMode = СИС2.Константы.mdNone;
+    Result.LoadingFields = 'Газета;Номер';
+    Result.Order = 'Газета';
+    Result.OpenHint[Query.Interrupted] = true;
+    Result.Select;
+  end;
+
+  proc ПостроитьОтчет_ПолучениеОбщейСтатистики(Q :Query);
+    var cNspNum :РКП_Газеты.НомерГазеты;
+    var vNspCurr, vNspPrev :РКП_Газеты.Газета;
+    var vNspCount, k :Integer;
+    Hint('Получение общей статистики...');
+    with Q do
+      ВсегоЕдиницХранения = Count;
+      while not Eof do
+        k = k + 1;
+        Hint('Получение общей статистики...', k, ВсегоЕдиницХранения);
+        cNspNum = Current as РКП_Газеты.НомерГазеты;
+        vNspCurr = cNspNum.Газета;
+        if (vNspCurr <> vNspPrev) then
+          vNspCount = vNspCount + 1;
+        end;
+        vNspPrev = cNspNum.Газета;
+        Next;
+      end;
+      ВсегоЕдиницИзданий = vNspCount;
+      First;
+    end;
+  end;
+
+  var DataCache :Variant[];
+
+  proc ПостроитьОтчет_РасшифровкаПоИзданиям(Q :Query);
+    var cNspNum :РКП_Газеты.НомерГазеты;
+    var vNspCurr, vNspPrev :РКП_Газеты.Газета;
+    var vNumberStr, vNumbersStr :String;
+    var vNumbersCount, k :Integer;
+    var vNsp :Storage; -- представление (кэш) данных о газете
+    DataCache = nil;
+    Hint('Расшифровка по изданиям...');
+    with Q do
+      while not Eof do
+        k = k + 1;
+        cNspNum = Current as РКП_Газеты.НомерГазеты;
+        vNspCurr = cNspNum.Газета;
+        Hint('Расшифровка по изданиям [' + vNspCurr.НазваниеОсн + ']...', k, ВсегоЕдиницХранения);
+        if (vNspCurr <> vNspPrev) then -- Это новая газета в запросе
+          if (vNspPrev <> nil) then -- считаем, что анализ предыдущей газеты завершен и добавляем строку в отчет
+            vNsp = Storage.Create;
+            vNsp.Газета = vNspPrev;
+            vNsp.Наименование = vNspPrev.НазваниеОсн;
+            vNsp.НомераГазет = vNumbersStr;
+            vNsp.ЕдиницХранения = vNumbersCount;
+            СИС2.Функции.AddInArray(DataCache, vNsp);
+          fi;
+          -- Очистка накопленных по газете данных, старт подсчета и описания номеров
+          vNumbersCount = 1;
+          vNumberStr = cNspNum.Номер;
+          vNumberStr = Trim(vNumberStr);
+          vNumbersStr = vNumberStr;
+        else -- продолжение подсчета и описания номеров
+          vNumbersCount = vNumbersCount + 1;
+          vNumberStr = cNspNum.Номер;
+          vNumberStr = Trim(vNumberStr);
+          vNumbersStr = vNumbersStr + ';' + vNumberStr;
+        end;
+        --
+        vNspPrev = cNspNum.Газета;
+        if (k = ВсегоЕдиницХранения) and (vNspCurr = vNspPrev) then
+          vNsp = Storage.Create;
+          vNsp.Газета = vNspPrev;
+          vNsp.Наименование = vNspPrev.НазваниеОсн;
+          vNsp.НомераГазет = vNumbersStr;
+          vNsp.ЕдиницХранения = vNumbersCount;
+          СИС2.Функции.AddInArray(DataCache, vNsp);
+        fi;
+        Next;
+      end;
+    end;
+  end;
+
+  proc ПостроитьОтчет_ЗаписатьРасшифровку;
+    var k, kk :Integer;
+    var vNsp :Storage; -- представление (кэш) данных о номере
+    var vTransaction :СИС2.SmartTransaction;
+    --var vNewRec :РКП_Газеты.ПозицияПополненияБД;
+    kk = LengthOfArray(DataCache);
+    vTransaction  = СИС2.SmartTransaction.CreateEx([РКП_Газеты.ПозицияПополненияБД], 1000, 10, kk, 'Запись расшифровки...');
+    for k = 1 .. kk do
+      vNsp = DataCache[k] as Storage;
+      with РКП_Газеты.ПозицияПополненияБД.Create do
+        Справка        = Self.Record;
+        Газета         = vNsp.Газета;
+        Наименование   = vNsp.Наименование;
+        НомераГазет    = vNsp.НомераГазет;
+        ЕдиницХранения = vNsp.ЕдиницХранения;
+        Post;
+      end;
+      vTransaction.NextStep;
+    end;
+    vTransaction.Apply;
+  end;
+
+  proc ПостроитьОтчет_СведенияОбИсполнителе;
+    var RUser :Kernel.Settings.User;
+    RUser = SessionInfo.UserRecord;
+    if (RUser <> nil) then
+      Библиограф = RUser.FullName;
+    end;
+  end;
+
+  proc ПрочитатьРасчет;
+    var k :Integer;
+    ОчиститьПредставлениеРасчета;
+    with Query.Create([ПозицияПополненияБД]) do
+      Filter = 'Справка=' + Record.DocIDStr;
+      Order = 'Наименование';
+      Select;
+      while not Eof do
+        k = Int(Inc(k));
+        AddInArray(Nom, k);
+        AddInArray(мГазета, Current.Газета);
+        AddInArray(мНаименование,  Current.Наименование);
+        AddInArray(мНомераГазет, Current.НомераГазет);
+        AddInArray(мЕдиницХранения, Current.ЕдиницХранения);
+        Next;
+      od;
+    end;
+    секцПозиции.Count = k;
+  end;
+
+  proc ОчиститьПредставлениеРасчета;
+    секцПозиции.Count   = 0;
+    Nom                 = nil;
+    мГазета             = nil;
+    мНаименование       = nil;
+    мНомераГазет        = nil;
+    мЕдиницХранения     = nil;
+  end;
+
+  proc ОчиститьРезультатыРасчета;
+    var Q :Query;
+    секцПозиции.Count   = 0;
+    Nom                 = nil;
+    мГазета             = nil;
+    мНаименование       = nil;
+    мНомераГазет        = nil;
+    мЕдиницХранения     = nil;
+    Q  = Query.Create([ПозицияПополненияБД]);
+    Q.Filter = 'Справка=' + Record.DocIDStr;
+    Q.Select;
+    РКП_СИС.Recs.DeleteAllRecords(Q);
+    Q.Close;
+  end;
+
+  proc Button1OnClick(Sender :Button);
+    var vRTotal :РКП_Газеты.ПоступлениеГазеты;
+    with Query.Create([ПозицияПополненияБД]) do
+      Filter = 'Справка=' + Record.DocIDStr;
+      Order = 'Наименование';
+      Select;
+      while not Eof do
+        vRTotal = РКП_СИС.Recs.FindRecord(РКП_Газеты.ПоступлениеГазеты, 'ГодПоступления=' + Str(Record.ЗаГод) + ' and Газета=' + Current.Газета.DocIDStr);
+        if (vRTotal <> nil) then
+          if (vRTotal.НомеровПолучено <> Current.ЕдиницХранения) then
+            Trace(Current.Газета.НазваниеОсн);
+          end;
+        fi;
+        Next;
+      od;
+    end;
+  end;
+
+
+end

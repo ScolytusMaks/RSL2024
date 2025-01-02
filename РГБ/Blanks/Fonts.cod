@@ -1,0 +1,18 @@
+Class "Fonts" ;
+
+  func Field_OnOutput_N(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;  --  ? ­
+    Return Cell.Row;
+  end;
+
+  func Field_OnOutput_Chr(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    Return Chr(Cell.Row);
+  end;
+
+  -- Многоточие : Symbol ј
+  -- Шеврон1 вправо : Symbol с
+  -- Шеврон1 вниз : Symbol Ъ
+  -- Прозрачный треугольник вправо : Windings3 w
+  -- Прозрачный треугольник вниз : Windings3 s
+  -- Черный треугольник вниз : Windings3 s
+
+end

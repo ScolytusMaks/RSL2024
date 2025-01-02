@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Properties Version="1">
+  <Property Name="Title" Value="Учет фактически поступивших экземпляров газет и МП"/>
+</Properties>
+<Items>
+  <Item Name="Default.htm"/>
+  <Item Name="УчетныеДокументы.htm"/>
+  <Item Name="ЕдиницыХранения.htm"/>
+  <Item Name="РеестрГазет.htm"/>
+  <Item Name="КарточкаИздания.htm"/>
+  <Item Name="ГодВыпуска.htm"/>
+  <Item Name="РеестрНомеров.htm"/>
+  <Item Name="КарточкаНомера.htm"/>
+</Items>

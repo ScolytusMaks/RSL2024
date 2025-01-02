@@ -1,0 +1,111 @@
+class inherited РКП_СИС.RI.intBase "Интерфейс записи (поступление газеты в году)";
+
+import РКП_СИС Classes Functions, Recs;
+
+inclass public
+
+  func СвязанныйКлассЗаписей: Class СИС2.Базовая.БазоваяЗапись;
+    Result = РКП_Газеты.ПоступлениеГазеты;
+  end;
+
+--  func CreateNew(rFinDoc :РКП_Газеты.ВыпускГазеты; nearIntRec :РКП_Газеты.RI.ЕдиницаХранения): РКП_Газеты.RI.ЕдиницаХранения;
+--    Result = Create;
+--    Result.Record.УчетныйДокумент = rFinDoc;
+--    if (nearIntRec <> nil) then
+--      Result.Record.Газета = nearIntRec.Record.Газета;
+--      Result.Record.ГодВыпуска = nearIntRec.Record.ГодВыпуска;
+--    fi;
+--    Result.InitByDefault;
+--  end;
+
+  func Create: РКП_Газеты.RI.ПоступлениеГазеты;
+    Result = inherited Create;
+    Result.Record = РКП_Газеты.ПоступлениеГазеты.Create;
+  end;
+
+  func ОткрытьПоЗаписи synonym OpenRecord(locRecord: РКП_Газеты.ПоступлениеГазеты): РКП_Газеты.RI.ПоступлениеГазеты;
+    Result = inherited Create;
+    Result.Record = locRecord;
+  end;
+
+  func БланкРедакторПоУмолчанию: Class BlankForm;
+    Result = nil;
+  end;
+
+  func КартотекаПоУмолчанию: Class CardForm;
+    Result = nil;
+  end;
+
+inobject public
+
+  Record: РКП_Газеты.ПоступлениеГазеты;
+
+  proc ИнициализироватьПоУмолчанию synonym InitByDefault;
+    Init;
+  end;
+
+  proc Инициализировать synonym Init;
+    Assert(Record.State = Kernel.Record.Created);
+  end;
+
+inclass public
+
+  proc ОбновитьСтатистику (vNsp :РКП_Газеты.Газета; vYear :Integer; vOpt :РКП_Газеты.RI.Газета.типОпцияПолученияСтатАн);
+    var rStat :РКП_Газеты.ПоступлениеГазеты;
+    var НомеровПолученоП :Integer;
+    var ГодовойТиражП, СреднийРазовыйТиражП :Numeric;
+    var aAnlt :Variant[];
+    rStat = ПолучитьЗаписьСтат(vNsp, vYear);
+    if not rStat.ИзмененияЗапрещены then -- Обработка происходит, если изменения не запрещены
+      with Query.Create([РКП_Газеты.НомерГазеты]) do
+        with FltMaker.CreateExt do
+          AddCondition( 'isGroup=0' );
+          AddCondition( 'Газета=' + vNsp.DocIDStr );
+          AddCondition( 'Year(ДатаПринятияНаХранение) in ' + ToStr([(vYear),(vYear - 1)]) );
+          CompressConditionsToOne;
+          AddCondition( 'not(СозданОЛГС and НеПолучен)' );
+          Filter = GetFilter;
+        end;
+        НомеровПолученоП = Count;
+        if (НомеровПолученоП > 0) then
+          ГодовойТиражП        = CalcAggregates("Sum(Тираж)") / 1000;
+          СреднийРазовыйТиражП = Round(ГодовойТиражП/НомеровПолученоП, 1);
+          ГодовойТиражП        = Round(ГодовойТиражП, 1);
+        fi;
+      end;
+      -- Аналитика
+      aAnlt = RI.Газета.ПолучитьСтатАналитикуДляГазеты(vNsp, vOpt);
+      with RI.Газета do
+        rStat.СреднийРазовыйТираж       = СреднийРазовыйТиражП;
+        rStat.ГодовойТираж              = ГодовойТиражП;
+        rStat.НомеровПолучено           = НомеровПолученоП;
+        rStat.Тематика                  = aAnlt[анТематика] as РКП_Справочники.спрТематика;
+        rStat.МестоИздания              = aAnlt[анМестоИздания] as РКП_Справочники.спрГеография;
+        rStat.ТерриторияРаспространения = aAnlt[анТерриторияРаспространения] as РКП_Справочники.спрТерриторияРаспространения;
+        rStat.ТипИздания                = aAnlt[анТипИздания] as Integer;
+        rStat.Язык                      = aAnlt[анЯзык] as РКП_Справочники.спрЯзыкИздания;
+        rStat.ЧАЦН                      = aAnlt[анЧАЦН] as РКП_Справочники.спрТематика;
+        rStat.Жанр                      = aAnlt[анЖанр] as РКП_Справочники.спрЖанр;
+        rStat.КатегорияПериодичности    = aAnlt[анКатегорияПериодичности] as Integer;
+        rStat.КоличествоВПериоде        = aAnlt[анКоличествоВПериоде] as Integer;
+        rStat.Периодичность             = aAnlt[анПериодичность] as String;
+      end;
+      RecordPostIfNeed(rStat);
+    fi;
+  end;
+
+  func ПолучитьЗаписьСтат(vNsp :РКП_Газеты.Газета; vYear :Integer) :РКП_Газеты.ПоступлениеГазеты;
+    var rStat :РКП_Газеты.ПоступлениеГазеты;
+    rStat = FindRecord( РКП_Газеты.ПоступлениеГазеты, 'Газета=' + vNsp.DocIDStr + ' and ГодПоступления=' + Str(vYear) );
+    if (rStat <> nil) then
+      Return rStat;
+    else
+      rStat = РКП_Газеты.ПоступлениеГазеты.Create;
+      rStat.Газета = vNsp;
+      rStat.ГодПоступления = vYear;
+      rStat.Post;
+      Return rStat;
+    fi;
+  end;
+
+end

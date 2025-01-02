@@ -1,0 +1,80 @@
+class inherited ”чет√азет.ќтчеты.–ед¬ыпускЋѕѕ»_03 "выпуск Ћѕѕ»", editor ¬ыпускЋѕѕ»;
+
+inobject private
+
+--{{ 2_—войства
+  var секц”казатель“ематик :TemplateSection;
+  var секцћеста»здани€     :TemplateSection;
+  var секц”казательћест    :TemplateSection;
+  var секц”казательјдм     :TemplateSection;
+  var секц»ерархи€–‘       :TemplateSection;
+--}}
+
+
+-- 2_ќбработчики событий клеток шаблона0. --
+
+  func ќбновитьЌумерацию(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    – ѕ_√азеты.Ћѕѕ».Ќумераци€—татей.¬ыполнение(√одЋетописи);
+    Result = True; 
+  end;
+
+  func ќбновитьќписание (Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var Q : Query;
+    var k : integer;
+    var «аголовок_      : string;
+    var ќписание√азеты_ : string;
+        Q               = Query.Create([– ѕ_√азеты.√азета]);
+        Q.Filter        = "√одЋетописи="+Str(√одЋетописи);
+        Q.Select;
+        Q.First;
+        for k = 1..Q.Count      do
+          Hint("",k,Q.Count);
+          if CmOk=– ѕ_√азеты.Ћѕѕ».Ѕиб—тать€.2—оздание0(Q.Current,«аголовок_,ќписание√азеты_)       then
+            Q.Current.«аголовок         = «аголовок_;
+            Q.Current.ќписание√азеты    = ќписание√азеты_;
+            if Q.Current.State = Record.Edited                  then
+              Q.Current.Post;
+            end;
+          end;
+          Q.Next;
+        end;
+        Q.Close;
+    Result = True; 
+  end;
+
+  func —оздать¬ыпуск(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var Ћѕѕ» :TextFile;
+    ----—оздание файла-----
+    – ѕ_√азеты.Ћѕѕ».“екст_01_‘айл.—оздание(ѕапкаЋѕѕ», ‘айлЋѕѕ», Ћѕѕ»);
+    – ѕ_√азеты.Ћѕѕ».“екст_02_ќсновной“екст.—оздание(Ћѕѕ», Record);
+    —оздание—ист”казател€;
+    —озданиећест”казател€;
+    —озданиејдм”казател€;
+    —озданиеяз”казател€;
+    Result = True; 
+  end;
+
+  func ѕросмотр арточек(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    – ѕ_√азеты.”чет√азет.блкарт√азетыЋѕѕ».ѕоказать—оставЋѕѕ»(√одЋетописи);
+  end;
+
+  func ќткрытьќригиналћакетIn(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    OpenEditor(‘айлЋѕѕ»);--отладка
+    Result = True; 
+  end;
+
+  func ќткрытьќригиналћакетOut(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    ExecuteProgram(‘айлЋѕѕ»);
+    Result = True; 
+  end;
+
+  func ќткрытьќригиналћакетFold(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    ExecuteProgram(ѕапкаЋѕѕ»);
+    Result = True; 
+  end;
+
+  proc ѕоле¬ыпуск—верстанѕри¬ыходе(Cell :TemplateCell; Index :Integer);
+  end;
+
+
+end

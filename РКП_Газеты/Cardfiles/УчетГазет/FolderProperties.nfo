@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Properties Version="1"/>
+<Items>
+  <Item Name="Отчеты"/>
+  <Item Name="Справочники"/>
+  <Item Name="Экспорт"/>
+  <Item Name="картГазеты"/>
+  <Item Name="картЕдиницаХранения"/>
+  <Item Name="картНомера"/>
+  <Item Name="картНомераВыбор"/>
+  <Item Name="картНомерГазеты"/>
+  <Item Name="картУчетныйДокумент"/>
+  <Item Name="картГазетыЛППИ"/>
+  <Item Name="картГазетыСложнФильтр"/>
+  <Item Name="картГазетыВыбор"/>
+</Items>

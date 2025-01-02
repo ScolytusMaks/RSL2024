@@ -1,0 +1,43 @@
+﻿class inherited СИС2.БазовыйБланк "Colors";
+
+inclass
+
+inobject
+
+--------------------------------------------------------------------------------
+--{ Обработчики событий бланка
+
+  proc Cells_OnDraw(Cell :TemplateCell; Selected :Logical; var Color :Integer; var FieldColor :Integer; Font :Font);
+    if (Cell.Row    =  01):  FieldColor = Int(СИС2.Константы.COLOR_SCROLLBAR);
+    elsif (Cell.Row =  02):  FieldColor = СИС2.Константы.COLOR_BACKGROUND;
+    elsif (Cell.Row =  03):  FieldColor = СИС2.Константы.COLOR_ACTIVECAPTION;
+    elsif (Cell.Row =  04):  FieldColor = СИС2.Константы.COLOR_INACTIVECAPTION;
+    elsif (Cell.Row =  05):  FieldColor = СИС2.Константы.COLOR_MENU;
+    elsif (Cell.Row =  06):  FieldColor = СИС2.Константы.COLOR_WINDOW;
+    elsif (Cell.Row =  07):  FieldColor = СИС2.Константы.COLOR_WINDOWFRAME;
+    elsif (Cell.Row =  08):  FieldColor = СИС2.Константы.COLOR_MENUTEXT;
+    elsif (Cell.Row =  09):  FieldColor = СИС2.Константы.COLOR_WINDOWTEXT;
+    elsif (Cell.Row =  10):  FieldColor = СИС2.Константы.COLOR_CAPTIONTEXT;
+    elsif (Cell.Row =  11):  FieldColor = СИС2.Константы.COLOR_ACTIVEBORDER;
+    elsif (Cell.Row =  12):  FieldColor = СИС2.Константы.COLOR_INACTIVEBORDER;
+    elsif (Cell.Row =  13):  FieldColor = СИС2.Константы.COLOR_APPWORKSPACE;
+    elsif (Cell.Row =  14):  FieldColor = СИС2.Константы.COLOR_HIGHLIGHT;
+    elsif (Cell.Row =  15):  FieldColor = СИС2.Константы.COLOR_HIGHLIGHTTEXT;
+    elsif (Cell.Row =  16):  FieldColor = СИС2.Константы.COLOR_BTNFACE;
+    elsif (Cell.Row =  17):  FieldColor = СИС2.Константы.COLOR_BTNSHADOW;
+    elsif (Cell.Row =  18):  FieldColor = СИС2.Константы.COLOR_GRAYTEXT;
+    elsif (Cell.Row =  19):  FieldColor = СИС2.Константы.COLOR_BTNTEXT;
+    elsif (Cell.Row =  20):  FieldColor = СИС2.Константы.COLOR_INACTIVECAPTIONTEXT;
+    elsif (Cell.Row =  21):  FieldColor = СИС2.Константы.COLOR_BTNHIGHLIGHT;
+    elsif (Cell.Row =  22):  FieldColor = СИС2.Константы.COLOR_3DDKSHADOW;
+    elsif (Cell.Row =  23):  FieldColor = СИС2.Константы.COLOR_3DLIGHT;
+    elsif (Cell.Row =  24):  FieldColor = СИС2.Константы.COLOR_INFOTEXT;
+    elsif (Cell.Row =  25):  FieldColor = СИС2.Константы.COLOR_INFOBK;
+    elsif (Cell.Row =  26):  FieldColor = СИС2.Константы.COLOR_ENDCOLORS;
+    elsif (Cell.Row =  27):  FieldColor = СИС2.Константы.COLOR_FormPageColor;
+    fi;
+  end;
+
+--}
+
+end

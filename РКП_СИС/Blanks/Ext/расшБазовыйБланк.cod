@@ -1,0 +1,266 @@
+﻿extends СИС2.БазовыйБланк "";
+
+import СИС2 classes Константы;
+import classes Def, Functions;
+
+inclass public
+
+  var СимволСкрыто synonym SymbolCollapsed    :String = 'w';
+  var СимволРазвернуто synonym SymbolExpanded :String = 'q';
+
+inobject private
+
+--  var Компетенции :РКП_СИС.Def.tCompetence[];  -- компетенции, определенные правами доступа
+--  var КомпетенцииРазработчиков   :tCompetence[] := [кмпРазработчик];
+--  var КомпетенцииАдминистраторов :tCompetence[] := [кмпАдминистратор];
+--  var КомпетенцииПолногоДоступа  :tCompetence[] := [кмпРазработчик, кмпАдминистратор, кмпРуководитель, кмпОРГПзав];
+--  var КомпетенцииОРГП            :tCompetence[] := [кмпОРГПзав, кмпОРГПсотр];
+--  var КомпетенцииОППИ            :tCompetence[] := [кмпОППИзав, кмпОППИсотр];
+--  var КомпетенцииГЛГС            :tCompetence[] := [кмпГЛГСзав, кмпГЛГСсотр];
+--  var DevAccess  :Logical;
+--  var AdmAccess  :Logical;
+--  var FullAccess :Logical;
+--  var OPPIAccess :Logical;
+--  var ORGPAccess :Logical;
+--  var GLGSAccess :Logical;
+
+  proc шаблон_ПриСоздании(Context :Variant);
+    ТолькоДляЧтения = false;
+    extended шаблон_ПриСоздании(Context);
+--    Self.Компетенции = МашинаРеквизитов.УправлениеДоступом.интПраваПользователя.ПолучитьКомпетенции;
+--    DevAccess  = (GetArrayIntersection(КомпетенцииРазработчиков, Компетенции) <> nil);
+--    AdmAccess  = (GetArrayIntersection(КомпетенцииАдминистраторов, Компетенции) <> nil);
+--    FullAccess = (GetArrayIntersection(КомпетенцииПолногоДоступа, Компетенции) <> nil);
+--    ORGPAccess = (GetArrayIntersection(КомпетенцииОРГП, Компетенции) <> nil) and (not FullAccess);
+--    OPPIAccess = (GetArrayIntersection(КомпетенцииОППИ, Компетенции) <> nil) and (not FullAccess);
+--    GLGSAccess = (GetArrayIntersection(КомпетенцииГЛГС, Компетенции) <> nil) and (not FullAccess);
+  end;
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    extended шаблон_ПриОткрытии(Create);
+    МодифицироватьШаблон;
+    УстРазмерОкна;
+  end;
+
+  proc ПриРисовании_КакТекстШаблона (Cell: TemplateCell; Selected: Logical; var Color: Integer; var FieldColor: Integer; Font: Font);
+    var locStyle: TemplateStyle;
+    locStyle = СтильПоИмени('Текст шаблона');
+    Color = locStyle.Color;
+    FieldColor = locStyle.FieldColor;
+    Font.Color = locStyle.Font.Color;
+    if Selected:
+      Color = COLOR_HIGHLIGHT;
+    fi;
+  end;
+
+  proc ПриРисовании_КакЗаголовокТаблицы (Cell: TemplateCell; Selected: Logical; var Color: Integer; var FieldColor: Integer; Font: Font);
+    var locStyle: TemplateStyle;
+    locStyle = СтильПоИмени('Заголовок таблицы');
+    Color = locStyle.Color;
+    FieldColor = locStyle.FieldColor;
+    Font.Color = locStyle.Font.Color;
+  end;
+
+  proc ПриРисовании_КакПолеВвода (Cell: TemplateCell; Selected: Logical; var Color: Integer; var FieldColor: Integer; Font: Font);
+    var locStyle: TemplateStyle;
+    locStyle = СтильПоИмени('Поле ввода');
+    Color = locStyle.Color;
+    FieldColor = locStyle.FieldColor;
+    Font.Color = locStyle.Font.Color;
+    if Selected:
+      Color = COLOR_HIGHLIGHT;
+    fi;
+  end;
+
+  proc ПриРисовании_КакПолеВыбора (Cell: TemplateCell; Selected: Logical; var Color: Integer; var FieldColor: Integer; Font: Font);
+    var locStyle: TemplateStyle;
+    locStyle = СтильПоИмени('Поле выбора');
+    Color = locStyle.Color;
+    FieldColor = locStyle.FieldColor;
+    Font.Color = locStyle.Font.Color;
+    if Selected:
+      Color = COLOR_HIGHLIGHT;
+    fi;
+  end;
+
+  proc ПриРисовании_КакПолеВывода (Cell: TemplateCell; Selected: Logical; var Color: Integer; var FieldColor: Integer; Font: Font);
+    var locStyle: TemplateStyle;
+    locStyle = СтильПоИмени('Поле вывода');
+    Color = locStyle.Color;
+    FieldColor = locStyle.FieldColor;
+    Font.Color = locStyle.Font.Color;
+    if Selected:
+      Color = COLOR_HIGHLIGHT;
+    fi;
+  end;
+
+  proc ПриРисовании_КакПолеИзмененноеПользователем (Cell: TemplateCell; Selected: Logical; var Color: Integer; var FieldColor: Integer; Font: Font);
+    var locStyle: TemplateStyle;
+    locStyle = СтильПоИмени('Поле ввода');
+    Color = locStyle.Color;
+    FieldColor = locStyle.FieldColor;
+    Font.Color = clBlue;
+    Font.Italic = true;
+    Font.Bold = true;
+    if Selected:
+      Color = COLOR_HIGHLIGHT;
+    fi;
+  end;
+
+  proc ПриРисовании_КакПолеВыводаИзмененноеПользователем (Cell: TemplateCell; Selected: Logical; var Color: Integer; var FieldColor: Integer; Font: Font);
+    var locStyle: TemplateStyle;
+    locStyle = СтильПоИмени('Поле вывода');
+    Color = locStyle.Color;
+    FieldColor = locStyle.FieldColor;
+    Font.Color = clBlue;
+    Font.Italic = true;
+    Font.Bold = true;
+    if Selected:
+      Color = COLOR_HIGHLIGHT;
+    fi;
+  end;
+
+  proc ПриРисовании_КакПолеСОшибкой (Cell: TemplateCell; Selected: Logical; var Color: Integer; var FieldColor: Integer; Font: Font);
+    var locStyle: TemplateStyle;
+    locStyle = СтильПоИмени('Поле вывода');
+    Color = locStyle.Color;
+    FieldColor = locStyle.FieldColor;
+    Font.Color = clRed;
+    Font.Bold = true;
+    if Selected:
+      Color = COLOR_HIGHLIGHT;
+    fi;
+  end;
+
+  proc ПриРисовании_КакЗапрещенное (Cell: TemplateCell; Selected: Logical; var Color: Integer; var FieldColor: Integer; Font: Font);
+    var locStyle: TemplateStyle;
+    locStyle = СтильПоИмени('Поле вывода');
+    Color = locStyle.Color;
+    FieldColor = locStyle.FieldColor;
+    Font.Color = COLOR_GRAYTEXT;
+    if Selected:
+      Color = COLOR_HIGHLIGHT;
+    fi;
+  end;
+
+
+  -- Создает список в поле перечислимого типа на основании константы - многомерного массива,
+  -- по умолчанию имеющего структуру [[Код:Integer,Наименование:String]]
+  proc UpdateFieldList synonym ОбновитьСписокПоля(locCell: TemplateCell; locList: Variant[2]; ИндексКода: Integer = 1; ИндексОписания: Integer = 2);
+    var i, ii: Integer;
+    if (locCell <> nil):
+      locCell.List.Clear;
+      ii = LengthOfArray(locList);
+      for i = 1 .. ii do
+        locCell.List.Add(locList[i, ИндексОписания] as String + '|' + Str(locList[i, ИндексКода]));
+      od;
+    fi;
+  end;
+
+  func КлонироватьСекцию synonym CloneSection (locFrameRecipient: TemplateFrame; locSectionDonorName: string; locFrameDonor: TemplateFrame = nil): TemplateSection;
+    var locSectionDonor: TemplateSection;
+    locSectionDonor = SectionByName(locSectionDonorName, locFrameDonor);
+    Result = locFrameRecipient.AddSection;
+    if (locSectionDonor <> nil):
+      Result.Assign(locSectionDonor);
+    fi;
+  end;
+
+  -- Метод возвращает объект TemplateSection в шаблоне по имени объекта <locName>. Параметр <locFrame> введен для оптимизации времени исполнения (сканируется только указанный фрейм)
+  func СекцияПоИмени synonym SectionByName, GetSectionByName (locName: String; locFrame: TemplateFrame = nil): TemplateSection;
+    var s, ss, f, ff: Integer;
+    if (locFrame <> nil) and (locFrame.FramesCount = 0):
+      ss = locFrame.SectionsCount;
+      for s = 1 .. ss do
+        if locName = locFrame.Section[s].Name:
+          return (locFrame.Section[s]);
+        fi;
+      od;
+    elsif (locFrame <> nil) and (locFrame.FramesCount > 0):
+      ff = locFrame.FramesCount;
+      for f = 1 .. ff do
+        Result = SectionByName(locName, locFrame.Frame[f]);
+        if Result <> nil: return; fi;
+      od;
+    elsif (locFrame = nil):
+      ff = Template.RootFrame.FramesCount;
+      if (ff = 0):
+        Result = SectionByName(locName, Template.RootFrame);
+      else
+        for f = 1 .. ff do
+          Result = SectionByName(locName, Template.RootFrame.Frame[f]);
+          if Result <> nil: return; fi;
+        od;
+      fi;
+    fi;
+  end;
+
+  -- Поиск клетки по содержимому в секции
+  func КлеткаСекцииПоСодержимому synonym SectionCellByContents (locSection: Section; locContent: string): TemplateCell;
+    Return Functions.SectionCellByContents(locSection, locContent);
+  end;
+
+  -- Возвращает объект "СтрокаШаблона" по клетке
+  func СтрокаКлетки synonym CellRow (Cell: TemplateCell): TemplateRow;
+    Return Functions.CellRow(Cell);
+  end;
+
+  -- Возвращает объект "СтолбецШаблона" по клетке
+  func СтолбецКлетки synonym CellColumn (Cell: TemplateCell): TemplateColumn;
+    Return Functions.CellColumn(Cell);
+  end;
+
+  -- Создает список в столбце картотеки перечислимого типа на основании константы - многомерного массива,
+  -- по умолчанию имеющего структуру [[Код:integer,Наименование:string]]
+  proc UpdateCardFieldList synonym ОбновитьСписокПоляКартотеки (locColumn: CardFileColumn; locList: variant[2]; ИндексКода: integer=1; ИндексОписания: integer=2);
+    var i, ii: integer;
+    locColumn.List.Clear;
+    ii = LengthOfArray(locList);
+    for i = 1 .. ii do
+      locColumn.List.Add(locList[i,ИндексОписания] as String + '|' + Str(locList[i,ИндексКода]));
+    od;
+  end;
+
+  proc SetSectionDisabled synonym УстСекцияНеактивна (vSect :TemplateSection);
+    var c, cc, r, rr :Integer;
+    var vCell :TemplateCell;
+    cc = vSect.ColumnsCount;
+    rr = vSect.RowsCount;
+    for c = 1 .. cc do
+      for r = 1 .. rr do
+        vCell = vSect.Cell[c,r];
+        vCell.Enabled = false;
+      od;
+    od;
+  end;
+
+  -- Клонирование первых строк секции.
+  proc КлонироватьПервыеСтроки synonym CloneFirstRows (locSection: TemplateSection; locCount: integer);
+    РКП_СИС.Functions.CloneFirstRows(locSection, locCount);
+  end;
+
+  -- Создание строки по образцу
+  proc СтрокаПоОбразцу synonym RowByPattern (locRowRecipient, locRowDonor: TemplateRow);
+    РКП_СИС.Functions.RowByPattern(locRowRecipient, locRowDonor);
+  end;
+
+  proc МодифицироватьШаблон;
+  end;
+
+  proc УстРазмерОкна;
+--    var minHeight, minWidth :Integer;
+--    if SelectMode then
+--      minHeight = Int(ScreenHeight / 2);
+--      minWidth  = Int(ScreenWidth / 2);
+--      if (Self.Window.Height < minHeight) then
+--        Self.Window.Height = minHeight;
+--      fi;
+--      if (Self.Window.Width < minWidth) then
+--        Self.Window.Width = minWidth;
+--      fi;
+--    fi;
+  end;
+
+
+
+end

@@ -1,0 +1,55 @@
+class inherited РКП_СИС.RI.intBase 'Интерфейс записи';
+
+import РКП_СИС Classes Functions, Recs, StdCode, StringsFunctions;
+
+inclass public
+
+  var ИмяПоляНеПрименяется :String = 'Завершен';
+  var ИмяПоляНаим          :String = 'НазваниеОсн';
+
+  func СвязанныйКлассЗаписей: Class СИС2.Базовая.БазоваяЗапись;
+    Result = РКП_Статьи.Роспись;
+  end;
+
+  func Create: РКП_Статьи.RI.Роспись;
+    Result = inherited Create;
+    Result.Record = РКП_Статьи.Роспись.Create;
+  end;
+
+  func ОткрытьПоЗаписи synonym OpenRecord(locRecord: РКП_Статьи.Роспись): РКП_Статьи.RI.Роспись;
+    Result = inherited Create;
+    Result.Record = locRecord;
+  end;
+
+  func БланкРедакторПоУмолчанию: Class BlankForm;
+    Result = Статьи.редСтатья;
+  end;
+
+  func КартотекаПоУмолчанию: Class CardForm;
+    Result = Статьи.картРосписьСтатей;
+  end;
+
+inobject public
+
+  Record: РКП_Статьи.Роспись;
+
+  proc ИнициализироватьПоУмолчанию synonym InitByDefault;
+    Init;
+  end;
+
+  proc Инициализировать synonym Init;
+    Assert(Record.State = Kernel.Record.Created);
+  end;
+
+  proc Записать synonym Post( аДиалоговыйРежим :Logical = False );
+    SetWorkLog(wsRecCreated, wsRecUpdated);
+    inherited Post(аДиалоговыйРежим);
+  end;
+
+  proc ВыполнитьУдаление synonym DoDelete( const aCheckRefs :Logical );
+    ClearWorkLog(wsRecCreated, false);
+    inherited DoDelete(aCheckRefs);
+  end;
+
+
+end

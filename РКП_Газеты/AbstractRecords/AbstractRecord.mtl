@@ -1,0 +1,7 @@
+group "AbstractRecord";
+
+  abstract record БазоваяКИзданию inherited СИС2.Базовая.БазоваяЗапись title "Базовая запись с кодом и именем";
+    field Газета             :РКП_Газеты.Газета title "Издание";
+  end;
+
+end;

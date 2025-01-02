@@ -1,0 +1,15 @@
+Class inherited Справочники.CardBaseType1 "Служебная форма";
+
+
+inclass private
+
+  var КлассИнтерфейса :Class RI.Справочники.intBaseType1 = RI.Справочники.ТематикаСтатьи;
+
+inobject private
+
+  proc Blank_OnOpen(Create :Logical);
+    Message('Пожалуйста, завершите редактирование поля перед тем, как закрыть форму!');
+    Close;
+  end;
+
+end

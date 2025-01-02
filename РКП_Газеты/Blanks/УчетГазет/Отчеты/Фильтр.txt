@@ -1,0 +1,33 @@
+(МестоИздания.GroupDoc.GroupDoc.GroupDoc.GroupDoc.GroupDoc.DocID = 2118 or  
+МестоИздания.GroupDoc.GroupDoc.GroupDoc.GroupDoc.DocID = 2118 or  
+МестоИздания.GroupDoc.GroupDoc.GroupDoc.DocID = 2118 or  
+МестоИздания.GroupDoc.GroupDoc.DocID = 2118 or  
+МестоИздания.GroupDoc.DocID = 2118 or  
+МестоИздания.DocID = 2118) 
+
+and (МестоИздания.Категория>1) 
+
+and ( МестоИздания.GroupDoc.GroupDoc.Категория<>5 and 
+      МестоИздания.GroupDoc.Категория<>5 and 
+      МестоИздания.Категория<>5 and 
+      МестоИздания.GroupDoc.GroupDoc.Категория<>6 and 
+      МестоИздания.GroupDoc.Категория<>6 and 
+      МестоИздания.Категория<>6 and 
+      МестоИздания.GroupDoc.GroupDoc.Категория<>7 and 
+      МестоИздания.GroupDoc.Категория<>7 and 
+      МестоИздания.Категория<>7 ) 
+
+or МестоИздания.DocID = 2118
+------------------------------
+(
+(МестоИздания.GroupDoc is {РКП_Справочники.СпрГеография:2118} or МестоИздания.DocId=2118)
+and
+( (МестоИздания.Категория>1) and
+  (not (МестоИздания.Категория in [5,6,7]))and
+  (not (МестоИздания.GroupDoc.Категория in [5,6,7]))and
+  (not (МестоИздания.GroupDoc.GroupDoc.Категория in [5,6,7])))
+)
+
+or
+
+(МестоИздания={РКП_Справочники.СпрГеография:2118})

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Properties Version="1">
+  <Property Name="Title" Value="Серверные классы"/>
+  <Property Name="Required" Value="True"/>
+  <Property Name="ProcSrv" Value="True"/>
+</Properties>
+<Items>
+  <Item Name="extComVars"/>
+  <Item Name="Constants"/>
+  <Item Name="Def"/>
+  <Item Name="BiblioRecord"/>
+  <Item Name="DateDescription"/>
+  <Item Name="FilterMaker"/>
+  <Item Name="Functions"/>
+  <Item Name="NameSplitterSrv"/>
+  <Item Name="Recs"/>
+  <Item Name="StdCode"/>
+  <Item Name="СтандартныйПериод"/>
+</Items>

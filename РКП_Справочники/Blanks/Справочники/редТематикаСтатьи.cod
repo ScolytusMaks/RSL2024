@@ -1,0 +1,58 @@
+Class inherited Справочники.editBaseType3 "Тематика статьи" , editor спрТематикаСтатьи;
+
+--{{ 2_Свойства
+
+inobject private
+
+  var Интерфейс :RI.Справочники.ТематикаСтатьи;
+
+--}}
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  proc Поле_ПриВыходе_Наим(Cell :TemplateCell; Index :Integer);
+    if (КрНаим = nil) then
+      КрНаим = Наим;
+    fi;
+    if (Cell.Contents in Интерфейс.ХешируемыеПоля) then
+      Hash = Интерфейс.GetHashByRecord(Self.Record);
+    fi;
+  end;
+
+  proc Поле_ПриВыходе(Cell :TemplateCell; Index :Integer);
+    if (Cell.Contents = 'ВклОгл') then
+      if ВклОгл then
+        БезКода    = false;
+        Временная  = false;
+        Подрубрика = false;
+      fi;
+    elsif (Cell.Contents = 'Временная') then
+      if Временная then
+        ВклОгл     = false;
+        Подрубрика = false;
+        БезКода    = true;
+        if (КрНаим = nil) then
+          КрНаим = Наим;
+        fi;
+      fi;
+    elsif (Cell.Contents = 'Подрубрика') then
+      if Подрубрика then
+        Временная = false;
+        if (КрНаим = nil) then
+          КрНаим = Наим;
+        fi;
+      fi;
+    elsif (Cell.Contents = 'БезКода') then
+      if БезКода then
+        ВклОгл = false;
+        if (КрНаим = nil) then
+          КрНаим = Наим;
+        fi;
+      fi;
+    fi;
+  end;
+
+-- 2_Вспомогательные методы0. --
+
+
+end

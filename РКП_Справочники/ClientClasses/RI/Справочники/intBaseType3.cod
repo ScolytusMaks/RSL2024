@@ -1,0 +1,21 @@
+class inherited RI.Справочники.intBaseType2 "Интерфейс записи (справочник, тип 3)";
+
+inclass public
+
+  var ОбязательныеПоля     :String[] = ['Код','Наим'];
+  var ХешируемыеПоля       :String[] = ['Код','Наим'];
+
+  func СвязанныйКлассЗаписей: Class BaseRefType3;
+    Result = nil;
+  end;
+
+  func БланкРедакторПоУмолчанию: Class Справочники.editBaseType3;
+    Result = nil;
+  end;
+
+inobject public
+
+  var Record :BaseRefType3;
+
+
+end

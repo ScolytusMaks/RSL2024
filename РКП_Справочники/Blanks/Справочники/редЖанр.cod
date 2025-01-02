@@ -1,0 +1,13 @@
+Class inherited Справочники.editBaseType2 "Жанр" , editor спрЖанр;
+
+
+--{{ 2_Свойства
+
+inobject private
+
+  var Интерфейс :RI.Справочники.Жанр;
+
+--}}
+
+
+end

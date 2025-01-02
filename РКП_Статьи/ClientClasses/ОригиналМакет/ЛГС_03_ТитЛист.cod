@@ -1,0 +1,47 @@
+class  '';
+
+inclass public
+
+  proc Создание (ЛГС :TextFile; ЗаписьЛГС :ВыпускЛГС);
+    ЛГС.WriteLn("\titlepg"); -- вывод 2ТИТУЛЬНОГО ЛИСТА0 для подавления нумерации (стр.1)
+    ЛГС.Write  ("\par\pard"+ОригиналМакет.Стиль.styl4+"\ql ");
+    ЛГС.Write  ("{\fs16\tab\tab\tab Российская книжная палата}");
+    --ЛГС.Write  ("{\а9\fs24\tab\tab\tab Российская книжная палата}");
+    ЛГС.WriteLn("\ds4");
+    ЛГС.WriteLn("{\par}");
+    ЛГС.WriteLn("{\par}");
+    ЛГС.Write  ("\par\pard"+ОригиналМакет.Стиль.styl8+"\ql ");
+    ЛГС.Write  ("{\fs96\b ЛЕТОПИСЬ\b0}");
+    ЛГС.Write  ("{\fs70\line\tab\tab ГАЗЕТНЫХ");
+    ЛГС.Write  ("\line\tab\tab СТАТЕЙ}");
+    ЛГС.Write  ("{\fs16\line");
+    --ЛГС.Write  ("{\f9\fs24\line");
+    ЛГС.Write  ("\line\tab\tab Государственный");
+    ЛГС.Write  ("\line\tab\tab библиографический");
+    ЛГС.Write  ("\line\tab\tab указатель");
+    ЛГС.Write  ("\line\tab\tab Российской Федерации");
+    ЛГС.Write  ("\line");
+    ЛГС.Write  ("\line\tab\tab Издается с 1936 года");
+    ЛГС.Write  ("\line");
+    ЛГС.Write  ("\line");
+    ЛГС.Write  ("\line");
+    ЛГС.Write  ("\line");
+    ЛГС.Write  ("\line");
+    ЛГС.Write  ("\line");
+    ЛГС.Write  ("\line");
+    ЛГС.Write  ("\line");
+    ЛГС.Write  ("\line");
+    ЛГС.Write  ("\line");
+    ЛГС.Write  ("\line");
+    ЛГС.Write  ("\line");
+    ЛГС.Write  ("\line");
+    ЛГС.Write  ("\line\tab\tab Выходит еженедельно\line}");
+    ЛГС.Write  ("{\fs80\tab\tab\b "+Str(ЗаписьЛГС.ВыпускЛетописи)+"'"+Str(ЗаписьЛГС.ГодЛетописи)+"\b0}");
+    ЛГС.Write  ("{\fs16");
+    --ЛГС.Write  ("{\f9\fs24");
+    ЛГС.Write  ("\line\tab\tab ("+Str(ЗаписьЛГС.ПервыйНомерСтатьи)+"-"+Str(ЗаписьЛГС.ПоследнийНомерСтатьи)+")");
+    ЛГС.Write  ('\line\tab\tab Москва "Бук Чембэр Интернэшнл" '+Str(ЗаписьЛГС.ГодЛетописи)+"}");
+    ЛГС.WriteLn("\ds8");
+  end;
+
+end

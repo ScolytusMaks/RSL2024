@@ -1,0 +1,44 @@
+class "";
+
+inclass
+  proc КВС;
+    var From_           : Form;
+    var Cell_           : TemplateCell;
+    var Template_       : Template;
+    var OldValue        : String;
+    var NewValue        : String;
+    var k               : integer;
+    if TopWindowExists(From_)                                           then
+      if From_<>nil                                                     then
+        Template_           = From_.Template;
+        Cell_               = Template_.CurrentCell;
+          if Pos("СТАТЬИ\РЕДСТАТЬЯ",Up(From_.ClassFileName))>0          then
+            if Cell_.Contents="КраткоеСодержаниеСтатьи"                 or
+             Cell_.Contents="Ответственность1"                          or
+             Cell_.Contents="Ответственность2"                          then
+             Template_.EndEdit;
+             if (Pos("[",Cell_.Value)=0 or Pos("]",Cell_.Value)=0)      and
+                (Cell_.Value<>nil)                                      then
+               NewValue     = "["+Cell_.Value+"]";
+               Cell_.Value  = NewValue;
+               Template_.EndEdit;
+               Template_.BeginEdit;
+             else
+               OldValue         = Cell_.Value;
+               for k = 1..Length(OldValue)              do
+                 if SubStr(OldValue,k,1)<>"["                           and
+                    SubStr(OldValue,k,1)<>"]"                           then
+                   NewValue = NewValue+SubStr(OldValue,k,1);
+                 end;
+               end;
+               Cell_.Value  = NewValue;
+             end;
+           end;
+         end;
+       end;
+    end;
+  end;
+
+inobject
+
+end

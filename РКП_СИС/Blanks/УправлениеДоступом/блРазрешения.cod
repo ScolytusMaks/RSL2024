@@ -1,0 +1,34 @@
+Class inherited МашинаРеквизитов.УправлениеДоступом.блБазовыйБланкПравДоступа '' , editor Kernel.Settings.Role;
+
+inobject private
+
+-- Обработчики событий шаблона --
+
+  proc шаблон_ПриОткрытии (Create: Logical);
+    if (not ОткрытВоФрейме):
+      Message('Бланк открывается только как дополнительная страница.');
+      Close;
+      Abort;
+    fi;
+    inherited шаблон_ПриОткрытии(Create);
+    УстановитьДоступностьПолей;
+  end;
+
+-- Обработчики событий клеток шаблона --
+
+  func Право_ПриВыводе (Cell: TemplateCell; Value: Variant; Action: Template.OutputTypes; var Format: String): Variant;
+    --if (Cell.Contents = 'Профиль.Разработчик'):
+    --  --Result = СИС2.Функции.UserIsDeveloper;
+    --  --Cell.Font.Color = СИС2.Константы.clGray;
+    --else
+      Result = inherited Право_ПриВыводе(Cell, Value, Action, Format);
+    --fi;
+  end;
+
+-- Вспомогательные методы --
+
+  proc УстановитьДоступностьПолей;
+    --Template.CellByField['Профиль.Разработчик'].Enabled = false;
+  end;
+
+end

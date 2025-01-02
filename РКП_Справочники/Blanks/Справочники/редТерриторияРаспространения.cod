@@ -1,0 +1,40 @@
+Class inherited Справочники.editBaseType2 "Территория распространения" , editor спрТерриторияРаспространения;
+
+
+--{{ 2_Свойства
+
+inobject private
+
+  var Интерфейс :RI.Справочники.ТерриторияРаспространения;
+
+--}}
+
+-- 2_Обработчики событий шаблона0. --
+
+  func шаблон_ПриЗаписи :Logical;
+    Result = inherited шаблон_ПриЗаписи;
+    РКП_Справочники.Справочники.КОЭ.CreateRepository;
+  end;
+
+inobject private
+
+-- _Обработчики событий клеток шаблона. --
+
+  func Поле_ПриНажатии_ДобавитьПозицию(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    ПланКолНом.Add;
+  end;
+
+  func Поле_ПриНажатии_УдалитьПозицию(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var Index :Integer;
+    Index = Cell.Frame;
+    if (Index > 0) and (Index <= ПланКолНом.Count) then
+      ПланКолНом.Delete(Index);
+      Cell.SetFocus;
+      ExecuteCommand('Kernel.Move.Up', false);
+    fi;
+  end;
+
+
+
+
+end

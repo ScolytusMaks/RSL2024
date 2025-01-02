@@ -1,0 +1,48 @@
+class inherited RI.Справочники.intBaseType1 'Интерфейс записи (справочник, тип 1)';
+
+import РКП_СИС Classes Functions, Recs;
+
+inclass public
+
+  var ОбязательныеПоля     :String[] = ['Наим', 'НаимСокр'];
+  var ХешируемыеПоля       :String[] = ['НаимБибл'];
+
+  func СвязанныйКлассЗаписей: Class BaseRefType1;
+    Result = спрГеография;
+  end;
+
+  func Create: RI.Справочники.География;
+    Result = inherited Create;
+    Result.Record = спрГеография.Create;
+  end;
+
+  func ОткрытьПоЗаписи synonym OpenRecord(locRecord: спрГеография): RI.Справочники.География;
+    Result = inherited Create;
+    Result.Record = locRecord;
+  end;
+
+  func БланкРедакторПоУмолчанию: Class Справочники.editBaseType1;
+    Result = Справочники.редГеография;
+  end;
+
+  func КартотекаПоУмолчанию: Class Справочники.CardBaseType1;
+    Result = Справочники.картГеография;
+  end;
+
+inobject public
+
+  Record: спрГеография;
+
+  proc Инициализировать synonym Init;
+    var vLevel :Integer;
+    Inherited Init;
+    vLevel = РКП_СИС.Recs.RecordsLevel(Record);
+    if    vLevel = 1 then  Record.Категория = Def.ктрФедеральныйОкруг;
+    elsif vLevel = 2 then  Record.Категория = Def.ктрОбласть;
+    elsif vLevel = 3 then  Record.Категория = Def.ктрРайон;
+    elsif vLevel = 4 then  Record.Категория = Def.ктрНаселенныйПункт;
+    elsif vLevel = 5 then  Record.Категория = Def.ктрНаселенныйПункт;
+    fi;
+  end;
+
+end

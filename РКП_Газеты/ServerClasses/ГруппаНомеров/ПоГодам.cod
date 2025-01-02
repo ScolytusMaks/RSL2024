@@ -1,0 +1,182 @@
+class "";
+
+import РКП_СИС classes Functions, FilterMaker;
+
+inclass public
+
+  -- По записи газеты rNsp в таблице РКП_Газеты.ВыпускГазеты
+  -- создает группы второго уровня для каждого года выпуска.
+  -- Группа должна быть единственной.
+  -- После создания (или идентификации ранее созданной группы)
+  -- выполняется включение записей в эту группу
+  proc CreateGroupsByYears (rNsp :РКП_Газеты.Газета);
+    var vYear :Integer;
+    with Query.Create([РКП_Газеты.ВыпускГазеты]) do
+      Filter = 'Газета=' + rNsp.DocIDStr;
+      Order = 'ГодВыпуска';
+      Select;
+      while not Eof do
+        try
+          vYear = Int(Current.ГодВыпуска);
+        except
+          vYear = nil;
+        end;
+        if (Current.Газета <> nil) and (vYear > 0) then
+          UpdateYearGroup(Current.Газета, vYear);
+        fi;
+        Next;
+      od;
+    end;
+  end;
+
+inclass private
+
+  proc UpdateYearGroup(rNsp :РКП_Газеты.Газета; vYear :Integer);
+    var aFlt :String[];
+    var vNspIssueAllGroup :РКП_Газеты.НомерГазеты[];
+    var vNspIssueGroup :РКП_Газеты.НомерГазеты;
+    AddInArray( aFlt, 'Газета=' + rNsp.DocIDStr );
+    AddInArray( aFlt, 'ФункцияГруппы=-1' );
+    AddInArray( aFlt, 'Номер="' + Str(vYear) + '"' );
+    AddInArray( aFlt, 'isGroup=-1' );
+    with Query.Create([РКП_Газеты.НомерГазеты]) do
+      Filter = MakeFilter(aFlt);
+      Select;
+      while not Eof do
+        AddInArray( vNspIssueAllGroup, Current );
+        Next;
+      od;
+    end;
+    if (LengthOfArray(vNspIssueAllGroup) > 0) then
+      vNspIssueGroup = vNspIssueAllGroup[1];
+      РКП_СИС.Recs.RecordPostIfNeed(vNspIssueGroup);
+    else
+      vNspIssueGroup = РКП_Газеты.НомерГазеты.Create;
+      vNspIssueGroup.Номер   = Str(vYear);
+      vNspIssueGroup.Газета  = rNsp;
+      vNspIssueGroup.isGroup = true;
+      vNspIssueGroup.ФункцияГруппы = -1;
+      vNspIssueGroup.Post;
+    fi;
+    FillYearGroup(rNsp, vNspIssueGroup, vYear);
+    DelExcessYearGroup(vNspIssueGroup, vNspIssueAllGroup);
+  end;
+
+  proc FillYearGroup (rNsp :РКП_Газеты.Газета; vGroup :РКП_Газеты.НомерГазеты; vYear :Integer);
+    var aFlt :String[];
+    var ST :СИС2.УмнаяТранзакция;
+    AddInArray( aFlt, 'Газета=' + rNsp.DocIDStr );
+    AddInArray( aFlt, 'ФункцияГруппы=0' );
+    AddInArray( aFlt, 'ГодВыпуска=' + Str(vYear) );
+    AddInArray( aFlt, 'isGroup=0' );
+    with Query.Create([РКП_Газеты.НомерГазеты]) do
+      Filter = MakeFilter(aFlt);
+      Select;
+      ST = СИС2.SmartTransaction.CreateEx([РКП_Газеты.НомерГазеты], 900);
+      while not Eof do
+        try
+          Current.GroupDoc = vGroup;
+          РКП_СИС.Recs.RecordPostIfNeed(Current);
+        except
+        end;
+        ST.NextStep;
+        Next;
+      od;
+      ST.Apply;
+    end;
+  end;
+
+  proc DelExcessYearGroup (vGroup :РКП_Газеты.НомерГазеты; aGroup :РКП_Газеты.НомерГазеты[]);
+    var i, ii :Integer;
+    ii = LengthOfArray(aGroup);
+    for i = 1 .. ii do
+      if (aGroup[i] <> vGroup) then
+        РКП_СИС.Recs.RecordDeleteEx(aGroup[i], false);
+      fi;
+    od;
+  end;
+
+--  proc СоздатьГруппы(ФильтрГазеты :String);
+--    var Q1, Q2 :Query;
+--    var k1, k2 :Integer;
+--    var r :Record;
+--    --1. Проверка наличия групп по годам
+--    --1.1 Запрос и цикл по таблице "ВыпускГазеты"
+--    Q1 = Query.Create([РКП_Газеты.ВыпускГазеты]);
+--    Q1.Filter = ФильтрГазеты;
+--    Q1.Order = "ГодВыпуска";
+--    Q1.Select;
+--    Q1.First;
+--    for k1 = 1..Q1.Count do
+--      --Собственно проверка наличия группы
+--      Q2 = Query.Create([РКП_Газеты.НомерГазеты]);
+--      Q2.Filter = ФильтрГазеты + " and ФункцияГруппы=-1 and Номер='" + Str(Q1.Current.ГодВыпуска) + "' and isGroup=-1";
+--      Q2.Select;
+--      for k2 = 1 .. Q2.Count do   -- удаление лишних без проверки ссылочной целостности
+--        BeginTransaction([РКП_Газеты.НомерГазеты]);
+--        Q2.Current.Delete(false);
+--        if (Q2.Current.State = Q2.Current.Edited) or (Q2.Current.State = Q2.Current.Created) then
+--          Q2.Current.Post;
+--        fi;
+--        EndTransaction;
+--        Q2.Next;
+--      od;
+--      --
+--      Q2 = Query.Create([РКП_Газеты.НомерГазеты]);
+--      Q2.Filter = ФильтрГазеты + " and ФункцияГруппы=-1 and Номер='" + Str(Q1.Current.ГодВыпуска) + "' and isGroup=-1";
+--      Q2.Select;
+--      if (Q2.Count = 0) then -- то создание новой группы
+--        BeginTransaction([РКП_Газеты.НомерГазеты]);
+--        r               = РКП_Газеты.НомерГазеты.Create;
+--        r.Номер         = Str(Q1.Current.ГодВыпуска);
+--        r.Газета        = Q1.Current.Газета;
+--        r.isGroup       = true;
+--        r.ФункцияГруппы = -1;
+--        if (r.State = r.Edited)          or
+--           (r.State = r.Created)         then
+--          r.Post;
+--        end;
+--        EndTransaction;
+--      fi;
+--      --Наконец, группа одна-единственная. Организация ссылок номеров на эту группу
+--      Q2                            = Query.Create([РКП_Газеты.НомерГазеты]);
+--      Q2.Filter                     = ФильтрГазеты+
+--                                      " and ФункцияГруппы=-1"+
+--                                      " and Номер='"+Str(Q1.Current.ГодВыпуска)+"'"+
+--                                      " and isGroup=-1";
+--      Q2.Select;
+--        if Q2.Count=1                       then -- то вычисление номера группы
+--           Q2.First;
+--           r                        = Q2.Current;
+--        end;
+--      Q2.Close;
+--      -- собственно организация ссылок
+--      Q2                            = Query.Create([РКП_Газеты.НомерГазеты]);
+--      Q2.Filter                     = ФильтрГазеты+
+--                                      " and ФункцияГруппы=0"+
+--                                      " and ГодВыпуска="+Str(Q1.Current.ГодВыпуска)+
+--                                      " and isGroup=0";
+--      Q2.Select;
+--      Q2.First;
+--          for k2 = 1..Q2.Count      do
+--             if Q2.Current.GroupDoc <> r    then
+--             BeginTransaction([РКП_Газеты.НомерГазеты]);
+--             Q2.Current.GroupDoc    = r;
+--             if (Q2.Current.State = Q2.Current.Edited)      or
+--                (Q2.Current.State = Q2.Current.Created)     then
+--               Q2.Current.Post;
+--             end;
+--             EndTransaction;
+--             end;
+--             Q2.Next;
+--          end;
+--      Q2.Close;
+--      Q1.Next;
+--    od;
+--  end;
+--  --
+
+
+
+
+end

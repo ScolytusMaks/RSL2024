@@ -1,0 +1,81 @@
+class inherited Справочники.FalseCardType2 "";
+
+import Classes Def;
+import РКП_СИС Classes Functions, FilterMaker;
+
+--{{ 2_Свойства
+
+inclass private
+
+  var КлассИнтерфейса :Class RI.Справочники.intBaseType3 := RI.Справочники.intBaseType3;
+
+  stored var ТипФрагмента :Integer;
+  FilterFragment synonym ФрагментФильтра: variant[2] =
+    [[fltByCodeField, 'Фрагмент кода'],            -- 0
+     [fltByNameField, 'Фрагмент наименования']];   -- 1
+
+inobject private
+
+  var SelectedRecord :BaseRefType3; -- Проброс выбранного значения
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inclass public
+
+
+inclass private
+
+-- 2_Обработчики событий шаблона0. --
+
+inobject private
+
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func Поле_Фильтр_ПриНажатии (Cell: TemplateCell; Action: Template.ClickTypes): Logical;
+    var r: Integer;
+    if (Cell.Contents = 'ПоказатьУстаревшее') then
+      if (ПоказатьУстаревшее in [0, 1]) then
+        ПоказатьУстаревшее = -1;
+      else
+        ПоказатьУстаревшее = 1;
+      fi;
+    elsif (Cell.Contents = 'ТипФрагмента') then
+      r = Cell.Row;
+      ТипФрагмента = (r - 1);
+    fi;
+    ОбновитьФильтр;
+  end;
+
+  func Поле_Фильтр_ПриВыводе (Cell: TemplateCell; Value: Variant; Action: Template.OutputTypes; var Format: String): Variant;
+    var r: Integer;
+    if (Cell.Contents = 'ТипФрагмента') then
+      r = Cell.Row;
+      Cell.Caption = if( (r - 1) = ТипФрагмента, 'l', '');
+    else
+      Result = Inherited Поле_Фильтр_ПриВыводе(Cell, Value, Action, Format);
+    fi;
+  end;
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+-- 2_Дополнительные команды0. --
+
+-- 2_Вспомогательные методы0. --
+
+
+  proc ИнициализироватьСтолбцыКартотеки;
+    inherited ИнициализироватьСтолбцыКартотеки;
+  end;
+
+  func ПолучитьФильтрПоФрагменту :String;
+    if (ТипФрагмента = fltByCodeField) and (Фрагмент <> nil) then
+      Result = 'Match(Код,"*' + Фрагмент +'*")';
+    elsif (ТипФрагмента = fltByNameField) and (Фрагмент <> nil) then
+      Result = 'Match(Наим,"*' + Фрагмент +'*")';
+    fi;
+  end;
+
+
+end

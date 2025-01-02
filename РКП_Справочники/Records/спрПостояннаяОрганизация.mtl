@@ -1,0 +1,11 @@
+record спрПОрганизация inherited BaseRefType1 title "Постоянные организации";
+end;
+
+record спрПКоллектив   inherited BaseRefType1 title "Постоянные организации - коллективы (основное деление)";
+end;
+
+record спрПСтруктПодр  inherited BaseRefType1 title "Постоянные организации - структурные подразделения";
+end;
+
+record спрПВремПодр    inherited BaseRefType1 title "Постоянные организации - временные подразделения";
+end;

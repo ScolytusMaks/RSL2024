@@ -1,0 +1,56 @@
+class "Стандартный период";
+
+inclass public
+
+  func НачалоГода(CurrentDate:date) : date;
+    Result = Dat(1,1,Year(CurrentDate));
+  end;
+
+  func НачалоМесяца(CurrentDate:date) : date;
+    Result = Dat(1,Mon(CurrentDate),Year(CurrentDate));
+  end;
+
+  func НачалоКвартала(CurrentDate:date) : date;
+    var Mon_:integer;
+    Mon_ = Mon(CurrentDate);
+    if          Mon_=1  or Mon_=2  or Mon_=3  then
+      Result = Dat(1,1 ,Year(CurrentDate));
+    elsif       Mon_=4  or Mon_=5  or Mon_=6  then
+      Result = Dat(1,4,Year(CurrentDate));
+    elsif       Mon_=7  or Mon_=8  or Mon_=9  then
+      Result = Dat(1,7 ,Year(CurrentDate));
+    elsif       Mon_=10 or Mon_=11 or Mon_=12 then
+      Result = Dat(1,10,Year(CurrentDate));
+    end;
+  end;
+
+  func НачалоНедели(CurrentDate:date) : date;
+    Result = Today-(DayOfWeek(CurrentDate)+1);
+  end;
+
+  func Начало1Квартала(QueryYear:integer) : date;
+    Result = Dat(1,1,QueryYear);
+  end;
+
+  func Начало2Квартала(QueryYear:integer) : date;
+    Result = Dat(1,4,QueryYear);
+  end;
+
+  func Начало3Квартала(QueryYear:integer) : date;
+    Result = Dat(1,7,QueryYear);
+  end;
+
+  func Начало4Квартала(QueryYear:integer) : date;
+    Result = Dat(1,10,QueryYear);
+  end;
+
+  func Конец4Квартала(QueryYear:integer) : date;
+    Result = Dat(31,12,QueryYear);
+  end;
+
+
+
+
+inobject
+
+end

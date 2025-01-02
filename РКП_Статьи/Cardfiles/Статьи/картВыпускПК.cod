@@ -1,0 +1,31 @@
+class inherited СИС2.картБазовая "Выпуск каталожных карточек";
+
+inclass
+
+inobject
+
+--------------------------------------------------------------------------------
+--{ Обработчики событий картотеки
+  proc шаблон_ПриОткрытии(Create :Logical);
+    inherited шаблон_ПриОткрытии(Create);
+    Self.CardFile.TreeRoot      = "Год выпуска";
+    Self.CardFile.Order         = "КодВыпуска";
+  end;
+  proc картотека_ПриПеремещении(Record :Record);
+    var СтолбецОписаниеГруппы   : CardFileColumn;
+    var СтолбецОписаниеВыпуска  : CardFileColumn;
+    inherited картотека_ПриПеремещении(Record);
+    СтолбецОписаниеГруппы       = Self.CardFile.ColumnByField["ОписаниеГруппы"];
+    СтолбецОписаниеВыпуска      = Self.CardFile.ColumnByField["ВыпускКарточек"];
+    if Self.CardFile.Current.isGroup = true     then
+      СтолбецОписаниеГруппы.Visible = true;
+      СтолбецОписаниеВыпуска.Visible= false;
+    else
+      СтолбецОписаниеГруппы.Visible = false;
+      СтолбецОписаниеВыпуска.Visible= true;
+    end;
+  end;
+
+--}
+
+end

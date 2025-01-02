@@ -1,0 +1,7 @@
+record спрЛица inherited BaseRefType1 title "Авторы, персоналии";
+  field Имя         :String title "Имя";
+  field Отчество    :String title "Отчество";
+  field Инициалы    :String title "Инициалы";
+  field Частица     :String title "Отделяемая частица";
+  field ДопСведения :String title "Дополнительные сведения об инд. авторе"; -- (в т.ч звание, чин и т.п.)
+end;

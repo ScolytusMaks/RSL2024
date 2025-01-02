@@ -1,0 +1,1491 @@
+class inherited МашинаРеквизитов.Базовые.блРедакторСИнтерфейсом "Издание", editor Газета;
+--Класс может работать только модально в связи с обработкой переменных InClass класса РКП_Газеты.ОбработкаИстории
+
+import СИС2 Classes Константы;
+import РКП_СИС Classes Profile, StringsFunctions, Recs, StdCode, Functions, FilterMaker, Def;
+import РКП_Справочники classes Constants;
+Import Classes Константы, Экспорт.Газет;
+
+
+inobject private
+
+--{{ 2_Свойства
+
+  var Интерфейс :РКП_Газеты.RI.Газета;
+
+  var ИдентификаторГазеты :String = FixStr(Str(Record.DocId), '0', 10); -- ID на форме;
+
+  var ФильтрПоФрагменту           :Logical;
+  var ТолькоНеПолученныеКомплекты :Logical;
+  var КоличествоВПериоде_         :Integer;
+  var ПоступлениеНомеров          :РКП_Газеты.ПоступлениеГазеты[];
+  var ТочностьВыходаДень          :Logical;
+  var ТочностьВыходаМесяц         :Logical;
+  var ТочностьВыходаГод           :Logical;
+  -- Переменная, используемая при вычислении массива, описывающего входной формат РКП. В запись результат вливается только после построчного сравнения.
+  var ЭкспортРКПДанные[]          :String;
+
+  var БланкЗакрывается            :Logical;
+  var редНомерГЗ                  :Edit;
+  var редДатаЗаписиВФайлГЗ        :Edit;
+  var флСтатус                    :CheckBox;
+  var флОтсылка                   :CheckBox;
+  var флРосписьСтатей             :CheckBox;
+  var флКомплектРГБ               :CheckBox;
+  var фреймРегистрация            :TemplateFrame;
+  var фреймНазвания               :TemplateFrame;
+  var фреймКонтейнер              :TemplateFrame;
+  var фреймКлассификация          :TemplateFrame;
+  var фреймМесто                  :TemplateFrame;
+  var фреймВыходИЗакрытие         :TemplateFrame;
+  var фреймВводПоступлений        :TemplateFrame;
+  var фреймСтатистикаПоступлений  :TemplateFrame;
+  var фреймЛППИ                   :TemplateFrame;
+  var фреймRusMarc                :TemplateFrame;
+  var секцГлавная                 :TemplateSection;
+  var секцГазетаОтсылки           :TemplateSection;
+  var секцНазваниеОсн             :TemplateSection;
+  var секцНазваниеИнЯз            :TemplateSection;
+  var секцНазваниеНацЯз           :TemplateSection;
+  var секцПодзаголовок            :TemplateSection;
+  var секцУчредитель              :TemplateSection;
+  var секцМестаИздания            :TemplateSection;
+  var секцМестоИздания            :TemplateSection;
+  var секцМестаИзданияОППИ        :TemplateSection;
+  var секцТипИзданияОППИ          :TemplateSection;
+  var секцТематика                :TemplateSection;
+  var секцЧАЦН                    :TemplateSection;
+  var секцЯзык                    :TemplateSection;
+  var секцВыпускНомеров           :TemplateSection;
+  var секцПоступлениеНомеров      :TemplateSection;
+  var стлбЛГС                     :TemplateColumn;
+  var секцСтатистикаПоступлений   :TemplateSection;
+  var секцПрекращение             :TemplateSection;
+  var секцПериодичность           :TemplateSection;
+  var секцBChMarc                 :TemplateSection;
+  var ОбТаймер                    :Timer;
+  var секцТочностьДаты            :TemplateSection;
+  var фреймЭкспорт                :TemplateFrame;
+
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриСоздании(Context :Variant);
+    inherited шаблон_ПриСоздании(Context);
+    if OPPIAccess then
+      Template.HelpContext =  'РКП_Газеты.РГБ.УчетФактическихПоступлений.КарточкаИздания.htm';
+    else
+      Template.HelpContext =  'РКП_Газеты.РГБ.Регистрация.КарточкаИздания.htm';
+    fi;
+  end;
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    inherited шаблон_ПриОткрытии(Create);
+    УстановитьФокусПриОткрытии;
+  end;
+
+  proc шаблон_ПриСчитывании;
+    inherited шаблон_ПриСчитывании;
+    УстФлаги_ТочностьДатыВыхода;
+    ПрочитатьВыпускНомеров;
+    ПрочитатьПоступлениеНомеров;
+    МодифицироватьСекцию_Периодичность;  -- Корректные значения периодичности
+    РКП_Газеты.ОбработкаИстории.СоздатьМассивыСтарыхЗначений(Record); -- Подготовка эталонов значения значимых полей (до изменения)
+    УстановитьФокусПриСчитывании;
+  end;
+
+  func шаблон_ПриПроверке :Logical;
+    Result = inherited шаблон_ПриЗаписи;
+    РКП_Газеты.ОбработкаИстории.СоздатьМассивыНовыхЗначений(Record);
+    РКП_Газеты.ОбработкаИстории.СоздатьНачалоИстории(Record);
+    Result = РКП_Газеты.ОбработкаИстории.АнализИзменений(Record);
+    if not ExistEditingAccessConstraint(РКП_Газеты.Газета) then
+      ФормированиеВходногоФорматаРКП;
+      ФормированиеБиблиографическойЗаписи;
+    fi;
+    if not Result then
+      Message('Пожалуйста, продолжите редактирование или отмените внесенные изменения!');
+    fi;
+  end;
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func Поле_ПриВыводе_ЗаголовокОкнаФормы(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    Window.Caption = НазваниеОсн;
+  end;
+
+  func Поле_ПриВыводе_НазваниеОсн(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    if (НазваниеОсн = nil) then
+      Return 'Н а з в а н и е   г а з е т ы';
+    else
+      Return НазваниеОсн;
+    fi;
+  end;
+
+  func Поле_ПриВыводе_Учред(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    if (Учред = nil) then
+      if ГруппаУчредителей then
+        Return 'Г р у п п а   у ч р е д и т е л е й';
+      else
+        Return 'У ч р е д и т е л ь';
+      fi;
+    else
+      Return Учред;
+    fi;
+  end;
+
+  func Поле_ПриВыводе_МестаИзданияОППИ(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+--  func картПоле_ПриВыводе_МестоИздания(Column :CardfileColumn; Rec :РКП_Газеты.Газета; Action :Template.OutputTypes; var Format :String) :Variant;
+    var vCount :Integer;
+    if (Action = Template.Output) then
+      vCount = Self.Record.МестаИздания.Count;
+      if (vCount = 1) then
+        Return Self.Record.МестаИздания.Items[1].МестоИздания.Наим;
+      elsif (vCount = 2) then
+        Return Self.Record.МестаИздания.Items[1].МестоИздания.Наим + Br +
+               Self.Record.МестаИздания.Items[2].МестоИздания.Наим;
+      elsif (vCount >= 3) then
+        Return Self.Record.МестаИздания.Items[1].МестоИздания.Наим + Br +
+               Self.Record.МестаИздания.Items[2].МестоИздания.Наим + Br +
+               Self.Record.МестаИздания.Items[3].МестоИздания.Наим;
+      fi;
+    fi;
+--  end;
+  end;
+
+  func Поле_ПриВыводе_НомерПозиции(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    if (Cell.Owner.Subtable <> nil) then
+      Return if( Cell.Owner.Subtable.Count = 0, nil, Cell.Frame );
+    fi;
+  end;
+
+  func Поле_ПриВыводе_ДатаВыхода(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    var локТочностьДаты :Integer;
+    var локДатаНомера :Date;
+    if (Cell.Contents = 'ДатаВыходаПервогоНомера') then
+      локТочностьДаты = ТочностьДатыПервогоНомера;
+      локДатаНомера = ДатаВыходаПервогоНомера;
+    elsif (Cell.Contents = 'ДатаВыходаПоследнегоНомера') then
+      локТочностьДаты = ТочностьДатыПоследнегоНомера;
+      локДатаНомера = ДатаВыходаПоследнегоНомера;
+    fi;
+    if (локТочностьДаты = 0) then
+      Cell.FieldFormat = 'dd.mm.yyyy';
+    elsif (локТочностьДаты = 1) then
+      if (Mon(локДатаНомера) = 01) then     Cell.FieldFormat = 'yyyy, январь';
+      elsif (Mon(локДатаНомера) = 02) then  Cell.FieldFormat = 'yyyy, февраль';
+      elsif (Mon(локДатаНомера) = 03) then  Cell.FieldFormat = 'yyyy, март';
+      elsif (Mon(локДатаНомера) = 04) then  Cell.FieldFormat = 'yyyy, апрель';
+      elsif (Mon(локДатаНомера) = 05) then  Cell.FieldFormat = 'yyyy, май';
+      elsif (Mon(локДатаНомера) = 06) then  Cell.FieldFormat = 'yyyy, июнь';
+      elsif (Mon(локДатаНомера) = 07) then  Cell.FieldFormat = 'yyyy, июль';
+      elsif (Mon(локДатаНомера) = 08) then  Cell.FieldFormat = 'yyyy, август';
+      elsif (Mon(локДатаНомера) = 09) then  Cell.FieldFormat = 'yyyy, сентябрь';
+      elsif (Mon(локДатаНомера) = 10) then  Cell.FieldFormat = 'yyyy, октябрь';
+      elsif (Mon(локДатаНомера) = 11) then  Cell.FieldFormat = 'yyyy, ноябрь';
+      elsif (Mon(локДатаНомера) = 12) then  Cell.FieldFormat = 'yyyy, декабрь';
+      fi;
+    elsif (локТочностьДаты = 2) then
+      Cell.FieldFormat = 'yyyy г.';
+    fi;
+    Return локДатаНомера;
+  end;
+
+  func Поле_ПриВыводе_ВыпускНомеров(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    var vRowTag :DR.Номера;
+    func GetRowTag :DR.Номера;
+      var locRow :TemplateRow;
+      locRow = Cell.Owner.Row[Cell.Row];
+      if (locRow.Tag is DR.Номера) then
+        Return (locRow.Tag as DR.Номера);
+      fi;
+    end;
+    vRowTag = GetRowTag;
+    if vRowTag <> nil then
+      if (Cell.Contents = 'ГодВыпуска') then
+        Return GetRowTag.ГодВыпуска;
+      elsif (Cell.Contents = 'КомплектПолучен') then
+        Result = GetRowTag.КомплектПолучен;
+      elsif (Cell.Contents = 'НомеровВсего') then
+        Return GetRowTag.НомеровВыпущено;
+      elsif (Cell.Contents = 'НомеровПолучено') then
+        Return GetRowTag.НомеровПолучено;
+      elsif (Cell.Contents = 'НомеровНеПолучено') then
+        Return GetRowTag.НомеровНеПолучено;
+      elsif (Cell.Contents = 'ПоследнийПолученныйНомер') then
+        Return GetRowTag.ПоследнийПолученныйНомер;
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриВыводе_ПоследнийНомер(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    Return BiblioRecord.ОписаниеНомераПоРеквизитам( Record.НомерПоследнегоНомера,
+                                                    Record.ВалПоследнегоНомера,
+                                                    Record.ДатаВыходаПоследнегоНомера,
+                                                    Record.ТочностьДатыПоследнегоНомера );
+  end;
+
+  func Поле_ПриВыводе_ПоступлениеНомеров(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    if (ПоступлениеНомеров <> nil) and (LengthOfArray(ПоступлениеНомеров) >= Cell.Frame) then
+      if (Cell.Contents = 'Год') then
+        Return ПоступлениеНомеров[Cell.Frame].ГодПоступления;
+      elsif (Cell.Contents = 'Принято') then
+        Return ПоступлениеНомеров[Cell.Frame].НомеровПолучено;
+      elsif (Cell.Contents = 'СреднийРазовыйТираж') then
+        Return ПоступлениеНомеров[Cell.Frame].СреднийРазовыйТираж;
+      elsif (Cell.Contents = 'ГодовойТираж') then
+        Return ПоступлениеНомеров[Cell.Frame].ГодовойТираж;
+      elsif (Cell.Contents = 'ТерриторияРаспространения') and (ПоступлениеНомеров[Cell.Frame].ТерриторияРаспространения <> nil) then
+        Return ПоступлениеНомеров[Cell.Frame].ТерриторияРаспространения.Наим;
+      elsif (Cell.Contents = 'Периодичность') then
+        Return ПоступлениеНомеров[Cell.Frame].Периодичность;
+      elsif (Cell.Contents = 'Язык') and (ПоступлениеНомеров[Cell.Frame].Язык <> nil) then
+        Return ПоступлениеНомеров[Cell.Frame].Язык.Наим;
+      elsif (Cell.Contents = 'МестоИздания') and (ПоступлениеНомеров[Cell.Frame].МестоИздания <> nil) then
+        Return ПоступлениеНомеров[Cell.Frame].МестоИздания.Наим;
+      elsif (Cell.Contents = 'Тематика') and (ПоступлениеНомеров[Cell.Frame].Тематика <> nil) then
+        Return ПоступлениеНомеров[Cell.Frame].Тематика.Наим;
+      elsif (Cell.Contents = 'ЧАЦН') and (ПоступлениеНомеров[Cell.Frame].ЧАЦН <> nil) then
+        Return ПоступлениеНомеров[Cell.Frame].ЧАЦН.Наим;
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриНажатии_ИсторияГазеты(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    РКП_Газеты.ОбработкаИстории.Газета = Record;
+    РКП_Газеты.ОбработкаИстории.НомерРежима = ОбработкаИстории.НомерПоляПоСекции(Str(Cell.Owner.Name));
+    if CmOk = OpenBlank('УчетГазет.блИстория') then
+      if    РКП_Газеты.ОбработкаИстории.НомерРежима =  0 then РКП_Газеты.ОбработкаИстории.OldValueFieldS[1] = НазваниеОсн;
+      elsif РКП_Газеты.ОбработкаИстории.НомерРежима =  1 then РКП_Газеты.ОбработкаИстории.OldValueFieldS[2] = НазваниеИнЯз;
+      elsif РКП_Газеты.ОбработкаИстории.НомерРежима =  2 then РКП_Газеты.ОбработкаИстории.OldValueFieldS[3] = НазваниеНацЯз;
+      elsif РКП_Газеты.ОбработкаИстории.НомерРежима =  3 then РКП_Газеты.ОбработкаИстории.OldValueFieldS[4] = Подзаголовок;
+      elsif РКП_Газеты.ОбработкаИстории.НомерРежима =  4 then РКП_Газеты.ОбработкаИстории.OldValueFieldS[5] = Учред;
+      elsif РКП_Газеты.ОбработкаИстории.НомерРежима =  7 then РКП_Газеты.ОбработкаИстории.OldValueFieldS[8] = РедакторГазеты;
+      elsif РКП_Газеты.ОбработкаИстории.НомерРежима = 13 then МодифицироватьСекцию_Периодичность;
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриНажатии_ГруппаУчредителей(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    if ГруппаУчредителей then
+      Учредитель = Учред;
+      Учредители = nil;
+    else
+      Учредитель = nil;
+      Учредители = Учред;
+    fi;
+    ГруппаУчредителей = not ГруппаУчредителей;
+  end;
+
+  func Поле_ПриНажатии_ДобавитьМестоИздания(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var Index :Integer;
+    секцМестоИздания.CellByField['МестоИздания.Наим'].SetFocus;
+    Index = if(Record.МестаИздания.Count = 0, 1, Record.МестаИздания.Count + 1);
+    Template.CurrentSection.InsertFrame(Index);
+    Self.Template.Frame = Index;
+    РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+    ПрочитатьПоступлениеНомеров;
+  end;
+
+  func Поле_ПриНажатии_ДобавитьТематику(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var Index :Integer;
+    секцТематика.CellByField['Тематика.Наим'].SetFocus;
+    Index = if(Record.Тематики.Count = 0, 1, Record.Тематики.Count + 1);
+    Template.CurrentSection.InsertFrame(Index);
+    Self.Template.Frame = Index;
+    РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+    ПрочитатьПоступлениеНомеров;
+  end;
+
+  func Поле_ПриНажатии_ДобавитьЧАЦН(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var Index :Integer;
+    секцЧАЦН.CellByField['ЧАЦН.Наим'].SetFocus;
+    Index = if(Record.ЧАЦН.Count = 0, 1, Record.ЧАЦН.Count + 1);
+    Template.CurrentSection.InsertFrame(Index);
+    Self.Template.Frame = Index;
+    РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+    ПрочитатьПоступлениеНомеров;
+  end;
+
+  func Поле_ПриНажатии_ДобавитьЯзык(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var Index :Integer;
+    секцЯзык.CellByField['Язык.Наим'].SetFocus;
+    Index = if(Record.Языки.Count = 0, 1, Record.Языки.Count + 1);
+    Template.CurrentSection.InsertFrame(Index);
+    Self.Template.Frame = Index;
+    РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+    ПрочитатьПоступлениеНомеров;
+  end;
+
+  func Поле_ПриНажатии_УдалитьПозициюСправочника(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var vSct :TemplateSection;
+    vSct = Cell.Owner;
+    if (vSct.Count > 0) then
+      vSct.DeleteFrame(Cell.Frame);
+    fi;
+    РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+    ПрочитатьПоступлениеНомеров;
+  end;
+
+  func Поле_ПриНажатии_ВверхПозициюСправочника(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var Index :Integer;
+    if (Cell.Owner = секцМестоИздания) then
+      секцМестоИздания.CellByField['МестоИздания.Наим'].SetFocus;
+      Index = Cell.Frame;
+      Self.Template.Frame = Index;
+      if (Index > 1) then
+        Template.CurrentSection.FrameUp(index);
+        Self.Template.Frame = (index - 1);
+      fi;
+      РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+      секцМестоИздания.CellByField['МестоИздания.Наим'].SetFocus;
+      РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+      ПрочитатьПоступлениеНомеров;
+    elsif  (Cell.Owner = секцТематика) then
+      секцТематика.CellByField['Тематика.Наим'].SetFocus;
+      Index = Cell.Frame;
+      Self.Template.Frame = Index;
+      if (Index > 1) then
+        Template.CurrentSection.FrameUp(index);
+        Self.Template.Frame = (index - 1);
+      fi;
+      РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+      секцТематика.CellByField['Тематика.Наим'].SetFocus;
+      РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+      ПрочитатьПоступлениеНомеров;
+    elsif  (Cell.Owner = секцЧАЦН) then
+      секцЧАЦН.CellByField['ЧАЦН.Наим'].SetFocus;
+      Index = Cell.Frame;
+      Self.Template.Frame = Index;
+      if (Index > 1) then
+        Template.CurrentSection.FrameUp(index);
+        Self.Template.Frame = (index - 1);
+      fi;
+      РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+      секцЧАЦН.CellByField['ЧАЦН.Наим'].SetFocus;
+      РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+      ПрочитатьПоступлениеНомеров;
+    elsif  (Cell.Owner = секцЯзык) then
+      секцЯзык.CellByField['Язык.Наим'].SetFocus;
+      Index = Cell.Frame;
+      Self.Template.Frame = Index;
+      if (Index > 1) then
+        Template.CurrentSection.FrameUp(index);
+        Self.Template.Frame = (index - 1);
+      fi;
+      РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+      секцЯзык.CellByField['Язык.Наим'].SetFocus;
+      РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+      ПрочитатьПоступлениеНомеров;
+    fi;
+  end;
+
+  func Поле_ПриНажатии_ВнизПозициюСправочника(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var Index :Integer;
+    if (Cell.Owner = секцМестоИздания) then
+      секцМестоИздания.CellByField['МестоИздания.Наим'].SetFocus;
+      Index = Cell.Frame;
+      Self.Template.Frame = Index;
+      if (Index >= 1) and (Index < Template.CurrentSection.Count) and (Template.CurrentSection.Count > 1) then
+        Template.CurrentSection.FrameDown(index);
+        Self.Template.Frame = Index + 1;
+      fi;
+      РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+      ПрочитатьПоступлениеНомеров;
+    elsif (Cell.Owner = секцТематика) then
+      секцТематика.CellByField['Тематика.Наим'].SetFocus;
+      Index = Cell.Frame;
+      Self.Template.Frame = Index;
+      if (Index >= 1) and (Index < Template.CurrentSection.Count) and (Template.CurrentSection.Count > 1) then
+        Template.CurrentSection.FrameDown(index);
+        Self.Template.Frame = Index + 1;
+      fi;
+      РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+      ПрочитатьПоступлениеНомеров;
+    elsif (Cell.Owner = секцЧАЦН) then
+      секцЧАЦН.CellByField['ЧАЦН.Наим'].SetFocus;
+      Index = Cell.Frame;
+      Self.Template.Frame = Index;
+      if (Index >= 1) and (Index < Template.CurrentSection.Count) and (Template.CurrentSection.Count > 1) then
+        Template.CurrentSection.FrameDown(index);
+        Self.Template.Frame = Index + 1;
+      fi;
+      РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+      ПрочитатьПоступлениеНомеров;
+    elsif (Cell.Owner = секцЯзык) then
+      секцЯзык.CellByField['Язык.Наим'].SetFocus;
+      Index = Cell.Frame;
+      Self.Template.Frame = Index;
+      if (Index >= 1) and (Index < Template.CurrentSection.Count) and (Template.CurrentSection.Count > 1) then
+        Template.CurrentSection.FrameDown(index);
+        Self.Template.Frame = Index + 1;
+      fi;
+      РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+      ПрочитатьПоступлениеНомеров;
+    fi;
+  end;
+
+  func Поле_ПриНажатии_ТочностьВыхода(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var vAccuracyBefore, vAccuracyNew :Integer;
+    vAccuracyBefore = ТочностьДатыПервогоНомера;
+    vAccuracyNew = Int(секцТочностьДаты.Column[Cell.Column].Caption);
+    if (vAccuracyBefore <> vAccuracyNew) then
+      РКП_СИС.Recs.RecordModify(Record);
+      ТочностьДатыПервогоНомера = vAccuracyNew;
+      УстФлаги_ТочностьДатыВыхода;
+      --if (ТочностьДатыПервогоНомера = 1) and (ДатаВыходаПервогоНомера <> nil) then
+      --  ДатаВыходаПервогоНомера = Dat(1, Mon(ДатаВыходаПервогоНомера), Year(ДатаВыходаПервогоНомера));
+      --elsif (ТочностьДатыПервогоНомера = 2) and (ДатаВыходаПервогоНомера <> nil) then
+      --  ДатаВыходаПервогоНомера = Dat(1, 1, Year(ДатаВыходаПервогоНомера));
+      --fi;
+    fi;
+  end;
+
+  #Warning 'Поле_ПриНажатии_ДобавитьГодВыпуска - ревизия';
+  func Поле_ПриНажатии_ДобавитьГодВыпуска(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    -- Процедура создает новую пустую запись в таблице РКП_Газеты.ВыпускГазеты
+    -- (накопленная статистика ВЫПУСКА газеты за определенный год)
+    var newRec, lastYearRec :РКП_Газеты.ВыпускГазеты;
+    lastYearRec = Recs.FindRecord(РКП_Газеты.ВыпускГазеты, 'Газета=' + Self.Record.DocIDStr, 'ГодВыпуска-');
+    newRec = РКП_Газеты.ВыпускГазеты.Create;
+    newRec.Газета = Self.Record;
+    if (lastYearRec <> nil) then
+      newRec.ГодВыпуска    = lastYearRec.ГодВыпуска + 1;
+      newRec.ФорматВыпуска = lastYearRec.ФорматВыпуска;
+      newRec.ЧислоПолос    = lastYearRec.ЧислоПолос;
+    else
+      newRec.ГодВыпуска = Year(Today);
+    fi;
+    #NoWarning;
+    УчетГазет.редВыпускГазеты.ShowFormEx(newRec, Window.ModalWindow);
+    if (newRec <> nil) and (newRec.State = Kernel.Record.Normal) then
+      ПрочитатьВыпускНомеров;
+    fi;
+
+
+
+
+--    -- ИСКЛЮЧАЕТСЯ ДУБЛИРОВАНИЕ ГОДОВ НА СТАДИИ ВВОДА ДАННЫХ
+--    var Q,Q2            : Query;
+--    var r               : record;
+--    var BlankForSelect  : BlankForm;
+--    var locCell :TemplateCell;
+--    BlankForSelect                      = РКП_Газеты.УчетГазет.блГодоваяСтатистикаВыпуска.Create;
+--    BlankForSelect.Газета_              = Record;
+--    Q                                   = Query.Create([РКП_Газеты.ВыпускГазеты]);
+--    Q.Filter                            = "Газета="+Str(Record);
+--    Q.LoadingFields                     = "ГодВыпуска";
+--    Q.Order                             = "ГодВыпуска";
+--    Q.Select;
+--    if Q.Count>0                                                then
+--       Q.Last;
+--       BlankForSelect.ГодВыпуска_       = Q.Current.ГодВыпуска+1;
+--    else
+--       BlankForSelect.ГодВыпуска_       = Year(Today);
+--    end;
+--    #NoWarning;
+--    if CmOk = BlankForSelect.ShowEx(nil,Window.ModalWindow)     then
+--      Q2                                = Query.Create([РКП_Газеты.ВыпускГазеты]);
+--      Q2.Filter                         = "Газета="+Str(Record)+" and ГодВыпуска="+Str(BlankForSelect.ГодВыпуска_);
+--      Q2.Select;
+--        if Q2.Count=0                   then
+--          r                             = РКП_Газеты.ВыпускГазеты.Create;
+--          r.ГодВыпуска                  = BlankForSelect.ГодВыпуска_;
+--          r.Газета                      = BlankForSelect.Газета_;
+--          r.ФорматВыпуска               = BlankForSelect.ФорматВыпуска_;
+--          r.ШифрХранения                = BlankForSelect.ШифрХранения_;
+--          r.ЧислоПолос                  = BlankForSelect.ЧислоПолос_;
+--          r.Комментарий                 = BlankForSelect.Комментарий_;
+--          r.Post;
+--          ПрочитатьВыпускНомеров;
+--        else
+--          Message("Такая запись уже существует! Введите другой год!");
+--        end;
+--    end;
+--    Q.Close;
+--    Result = True; -- Разрешаем стандартную обработку
+--    if (Template.CurrentFrame = фреймВыходИЗакрытие) then
+--      locCell = секцВыпускНомеров.CellByField['НомеровВсего'];
+--      Self.Template.CurrentCell = секцВыпускНомеров.Cell[locCell.Column, секцВыпускНомеров.RowsCount];
+--    elsif (Template.CurrentFrame = фреймВводПоступлений) then
+--      locCell = фреймВводПоступлений.CellByField['НомеровВсего'];
+--      Self.Template.CurrentCell = секцПоступлениеНомеров.Cell[locCell.Column, секцПоступлениеНомеров.RowsCount];
+--    fi;
+  end;
+
+  func Поле_ПриНажатии_ДобавитьГодВыпуска_(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    -- Процедура создает новую пустую запись в таблице РКП_Газеты.ВыпускГазеты
+    -- (накопленная статистика ВЫПУСКА газеты за определенный год)
+    -- ИСКЛЮЧАЕТСЯ ДУБЛИРОВАНИЕ ГОДОВ НА СТАДИИ ВВОДА ДАННЫХ
+    var Q,Q2            : Query;
+    var r               : record;
+    var BlankForSelect  : BlankForm;
+    var locCell :TemplateCell;
+    --BlankForSelect                      = РКП_Газеты.УчетГазет.блГодоваяСтатистикаВыпуска.Create;
+    BlankForSelect.Газета_              = Record;
+    Q                                   = Query.Create([РКП_Газеты.ВыпускГазеты]);
+    Q.Filter                            = "Газета="+Str(Record);
+    Q.LoadingFields                     = "ГодВыпуска";
+    Q.Order                             = "ГодВыпуска";
+    Q.Select;
+    if Q.Count>0                                                then
+       Q.Last;
+       BlankForSelect.ГодВыпуска_       = Q.Current.ГодВыпуска+1;
+    else
+       BlankForSelect.ГодВыпуска_       = Year(Today);
+    end;
+    #NoWarning;
+    if CmOk = BlankForSelect.ShowEx(nil,Window.ModalWindow)     then
+      Q2                                = Query.Create([РКП_Газеты.ВыпускГазеты]);
+      Q2.Filter                         = "Газета="+Str(Record)+" and ГодВыпуска="+Str(BlankForSelect.ГодВыпуска_);
+      Q2.Select;
+        if Q2.Count=0                   then
+          r                             = РКП_Газеты.ВыпускГазеты.Create;
+          r.ГодВыпуска                  = BlankForSelect.ГодВыпуска_;
+          r.Газета                      = BlankForSelect.Газета_;
+          r.ФорматВыпуска               = BlankForSelect.ФорматВыпуска_;
+          r.ШифрХранения                = BlankForSelect.ШифрХранения_;
+          r.ЧислоПолос                  = BlankForSelect.ЧислоПолос_;
+          r.Комментарий                 = BlankForSelect.Комментарий_;
+          r.Post;
+          ПрочитатьВыпускНомеров;
+        else
+          Message("Такая запись уже существует! Введите другой год!");
+        end;
+    end;
+    Q.Close;
+    Result = True; -- Разрешаем стандартную обработку
+    if (Template.CurrentFrame = фреймВыходИЗакрытие) then
+      locCell = секцВыпускНомеров.CellByField['НомеровВсего'];
+      Self.Template.CurrentCell = секцВыпускНомеров.Cell[locCell.Column, секцВыпускНомеров.RowsCount];
+    elsif (Template.CurrentFrame = фреймВводПоступлений) then
+      locCell = фреймВводПоступлений.CellByField['НомеровВсего'];
+      Self.Template.CurrentCell = секцПоступлениеНомеров.Cell[locCell.Column, секцПоступлениеНомеров.RowsCount];
+    fi;
+  end;
+
+
+  func Поле_ПриНажатии_УдалитьГодВыпуска(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    -- Процедура удаляет статистику выпуска издания вместе с номерами.
+    -- ОЧЕНЬ НАДО: ПРИ УДАЛЕНИИ СТАТИСТИКИ ВЫПУСКА
+    -- ПРОВЕРЯТЬ НА КОРРЕКТНОСТЬ СТАТИСТИКУ ПОСТУПЛЕНИЙ,
+    -- ПРОВЕРЯТЬ НА КОРРЕКТНОСТЬ ИСТОРИЮ ИЗДАНИЯ
+    var vRowTag :DR.Номера;
+    var rStat :РКП_Газеты.ВыпускГазеты;
+
+    func GetRowTag :DR.Номера;
+      var locRow :TemplateRow;
+      locRow = Cell.Owner.Row[Cell.Row];
+      if (locRow.Tag is DR.Номера) then
+        Return (locRow.Tag as DR.Номера);
+      fi;
+    end;
+
+    if (секцВыпускНомеров.RowsCount > 0) then
+      vRowTag = GetRowTag;
+      if (vRowTag.НомеровВыпущено > 0) then
+        Message('За указанный год в базе данных уже хранятся зарегистрированные номера газет. Удаление невозможно.' +
+                ' Если Вы все же желаете удалить год выпуска, то следует сначала удалить все зарегистрированные номера газет.');
+      else
+        rStat = vRowTag.ВыпускГазеты;
+        try
+          РКП_СИС.Recs.RecordDeleteEx(rStat, true);
+        finally
+          ПрочитатьВыпускНомеров;
+        end;
+        --ПрочитатьВыпускГазет;
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриНажатии_ОбновитьЭкспорт(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    ФормированиеВходногоФорматаРКП;
+  end;
+
+  func Поле_ПриНажатии_ОбновитьБибЗапись(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    ФормированиеБиблиографическойЗаписи;
+    Result = True; 
+  end;
+
+  func Поле_ПриНажатии_ВыпускНомеров(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var vRowTag :DR.Номера;
+    func GetRowTag :DR.Номера;
+      var locRow :TemplateRow;
+      locRow = Cell.Owner.Row[Cell.Row];
+      if (locRow.Tag is DR.Номера) then
+        Return (locRow.Tag as DR.Номера);
+      fi;
+    end;
+    vRowTag = GetRowTag;
+    РКП_Газеты.УчетГазет.блНомераГазеты.OpenExt(vRowTag, DR.Номера.допФлтЛГС);
+  end;
+
+  func Поле_ПриВходе_ДатаВыхода(Cell :TemplateCell; Index :Integer; Action :Template.EnterTypes) :Logical;
+    var локТочностьДаты :Integer;
+    var vY, vM :Integer;
+    var newDate :Date;
+    if (Cell.Contents = 'ДатаВыходаПервогоНомера') then
+      локТочностьДаты = ТочностьДатыПервогоНомера;
+    elsif (Cell.Contents = 'ДатаВыходаПоследнегоНомера') then
+      локТочностьДаты = ТочностьДатыПоследнегоНомера;
+    fi;
+    if (Action = Template.Clear) then
+      if (Cell.Contents = 'ДатаВыходаПервогоНомера') then
+        ДатаВыходаПервогоНомера = nil;
+      elsif (Cell.Contents = 'ДатаВыходаПоследнегоНомера') then
+        ДатаВыходаПоследнегоНомера = nil;
+      fi;
+    else
+      if (локТочностьДаты = 0) then
+        Return true;
+      elsif (локТочностьДаты = 1) then
+        vY = Year(Today);
+        if (CmOk = РКП_СИС.Сервис.блВыборМесяца.ВыполнитьВыбор(vY, vM)) then
+          newDate = Dat(1, vM, vY);
+          if Year((newDate as Date)) > Year(Today) then
+            Message('Выбранная дата не может быть позже текущего года!');
+          else
+            if (Cell.Contents = 'ДатаВыходаПервогоНомера') then
+              ДатаВыходаПервогоНомера = newDate;
+            elsif (Cell.Contents = 'ДатаВыходаПоследнегоНомера') then
+              ДатаВыходаПоследнегоНомера = newDate;
+            fi;
+          fi;
+        fi;
+      elsif (локТочностьДаты = 2) then
+        vY = Year(Today);
+        if (CmOk = РКП_СИС.Сервис.блВыборГода.ВыполнитьВыбор(vY)) then
+          newDate = Dat(1, 1, vY);
+          if Year((newDate as Date)) > Year(Today) then
+            Message('Выбранная дата не может быть позже текущего года!');
+          else
+            if (Cell.Contents = 'ДатаВыходаПервогоНомера') then
+              ДатаВыходаПервогоНомера = newDate;
+            elsif (Cell.Contents = 'ДатаВыходаПоследнегоНомера') then
+              ДатаВыходаПоследнегоНомера = newDate;
+            fi;
+          fi;
+        fi;
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриВходе_ВыпускНомеров(Cell :TemplateCell; Index :Integer;Action :Template.EnterTypes) :Logical;
+    var vRowTag :DR.Номера;
+    func GetRowTag :DR.Номера;
+      var locRow :TemplateRow;
+      locRow = Cell.Owner.Row[Cell.Row];
+      if (locRow.Tag is DR.Номера) then
+        Return (locRow.Tag as DR.Номера);
+      fi;
+    end;
+    if RecordEdited(Self.Record) then
+      EditorPost;
+    fi;
+    РКП_Газеты.ОбработкаИстории.СоздатьМассивыСтарыхЗначений(Record);
+    vRowTag = GetRowTag;
+    if (Cell.Contents = 'ГодВыпуска') then
+      #NoWarning;
+      --РКП_Газеты.УчетГазет.редГодоваяСтатистикаВыпуска.ShowFormEx(vRowTag.ВыпускГазеты, Kernel.Window.ModalWindow);
+      РКП_Газеты.УчетГазет.редВыпускГазеты.ShowFormEx(vRowTag.ВыпускГазеты, Kernel.Window.ModalWindow);
+      vRowTag.ОбновитьДанные;
+      фреймВыходИЗакрытие.Update;
+    else
+      --with УчетГазет.блкартНомераГазеты do
+      if (Cell.Contents = 'НомеровВсего') then
+        --РКП_Газеты.УчетГазет.блкартНомераГазеты.OpenExt(vRowTag, DR.Номера.допФлтВсе);
+        РКП_Газеты.УчетГазет.блНомераГазеты.OpenExt(vRowTag, DR.Номера.допФлтВсе);
+        vRowTag.ОбновитьДанные;
+        ОбновитьСведенияОПрекращении;
+        фреймВыходИЗакрытие.Update;
+      elsif (Cell.Contents = 'НомеровПолучено') then
+        --РКП_Газеты.УчетГазет.блкартНомераГазеты.OpenExt(vRowTag, DR.Номера.допФлтРег);
+        РКП_Газеты.УчетГазет.блНомераГазеты.OpenExt(vRowTag, DR.Номера.допФлтРег);
+        vRowTag.ОбновитьДанные;
+        ОбновитьСведенияОПрекращении;
+        фреймВыходИЗакрытие.Update;
+      elsif (Cell.Contents = 'НомеровНеПолучено') then
+        --РКП_Газеты.УчетГазет.блкартНомераГазеты.OpenExt(vRowTag, DR.Номера.допФлтНеРег);
+        РКП_Газеты.УчетГазет.блНомераГазеты.OpenExt(vRowTag, DR.Номера.допФлтНеРег);
+        vRowTag.ОбновитьДанные;
+        ОбновитьСведенияОПрекращении;
+        фреймВыходИЗакрытие.Update;
+      fi;
+      --end;
+    fi;
+    РКП_Газеты.ОбработкаИстории.СоздатьМассивыНовыхЗначений(Record);
+    РКП_Газеты.ОбработкаИстории.СоздатьНачалоИстории(Record);
+    РКП_Газеты.ОбработкаИстории.АнализИзменений(Record);
+  end;
+
+  func Поле_ПриВходе_ГодПоступления(Cell :TemplateCell; Index :Integer; Action :Template.EnterTypes) :Logical;
+    if (ПоступлениеНомеров[Index] <> nil) then
+      #NoWarning;
+      РКП_Газеты.УчетГазет.редГодоваяСтатистикаПоступлений.ShowFormEx(ПоступлениеНомеров[Index], Kernel.Window.ModalWindow);
+    fi;
+  end;
+
+  func Поле_Отсылка_ПриНаборе(Cell :TemplateCell; Key :String; Value :Variant; var NewValue :Variant) :Logical;
+    var rChoice :РКП_Газеты.Газета;
+    if (cmOk = РКП_Газеты.УчетГазет.картГазеты.ВыполнитьВыбор_Отсылки(rChoice, Self.Record, Value as String)) then
+      NewValue = rChoice;
+      Template.EndEdit(true);
+    fi;
+  end;
+
+  func Поле_ПриОбзоре(Cell :TemplateCell; Value :Variant; var NewValue :Variant) :Logical;
+    var Index :Integer;
+    var aParam :Variant[2];
+    var vRefRec :РКП_Справочники.BaseRefType1;
+    Index = Cell.Frame;
+    if (Cell.Contents = 'МестоИздания.Наим') then
+      aParam[1] = ['ТипФрагмента', 0];
+      aParam[2] = ['Фрагмент', Value];
+      if (cmOk = РКП_Справочники.Справочники.картГеография.ВыполнитьВыбор(vRefRec, aParam)) then
+        МестаИздания[index].МестоИздания = vRefRec;
+        NewValue = vRefRec;
+        Template.EndEdit(true);
+        РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+        ПрочитатьПоступлениеНомеров;
+      fi;
+      Return false;
+    elsif (Cell.Contents = 'Редакция') then
+      -- отключено в 2024 году по просьбе трудящихся
+      --if (Редакция <> nil) then
+      --  aParam[1] = ['Фрагмент', Редакция.НаселенныйПункт.Наим];
+      --elsif (Редакция = nil) and (МестаИздания.Count > 0) then
+      --  aParam[1] = ['Фрагмент', МестаИздания[1].МестоИздания.Наим];
+      --fi;
+      if (Редакция <> nil) then
+        aParam[1] = ['SelectedRecord', Редакция];
+      fi;
+      if (CmOk = РКП_Справочники.Справочники2.0блкартАдресРедакции.ВыполнитьВыбор(vRefRec, aParam)) then
+        NewValue = vRefRec;
+        Template.EndEdit(true);
+      fi;
+      Return false;
+    elsif (Cell.Contents = 'ТерриторияРаспространения') then
+      aParam[1] = ['Фрагмент', Value];
+      if (CmOk = РКП_Справочники.Справочники2.0блкартТерриторияРаспространения.ВыполнитьВыбор(vRefRec, aParam)) then
+        NewValue = vRefRec;
+        Template.EndEdit(true);
+        РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+        ПрочитатьПоступлениеНомеров;
+      fi;
+      Return false;
+    elsif (Cell.Contents = 'Тематика.Наим') then
+      aParam[1] = ['РежимВыбораТематики', true];
+      aParam[2] = ['РежимВыбораЧАЦН', false];
+      aParam[3] = ['Фрагмент', Value];
+      aParam[4] = ['ТипФрагмента', 1];
+      if (cmOk = РКП_Справочники.Справочники2.0блкартТематика.ВыполнитьВыбор(vRefRec, aParam) ) then
+        NewValue = vRefRec;
+        Тематики[Index].Тематика = vRefRec;
+        Template.EndEdit(true);
+        РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+        ПрочитатьПоступлениеНомеров;
+      fi;
+      Return false;
+    elsif (Cell.Contents = 'ЧАЦН.Наим') then
+      aParam[1] = ['РежимВыбораТематики', false];
+      aParam[2] = ['РежимВыбораЧАЦН', true];
+      aParam[3] = ['Фрагмент', Value];
+      aParam[4] = ['ТипФрагмента', 1];
+      if (cmOk = РКП_Справочники.Справочники2.0блкартТематика.ВыполнитьВыбор(vRefRec, aParam) ) then
+        NewValue = vRefRec;
+        ЧАЦН[Index].ЧАЦН = vRefRec;
+        Template.EndEdit(true);
+        РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+        ПрочитатьПоступлениеНомеров;
+      fi;
+      Return false;
+    elsif (Cell.Contents = 'Язык.Наим') then
+      aParam[1] = ['Фрагмент', Value];
+      if (cmOk = РКП_Справочники.Справочники2.0картЯзыкИздания.ВыполнитьВыбор(vRefRec, aParam) ) then
+        NewValue = vRefRec;
+        Языки[Index].Язык = vRefRec;
+        Template.EndEdit(true);
+        РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+        ПрочитатьПоступлениеНомеров;
+      fi;
+      Return false;
+2    end;
+  end;
+
+  func Поле_Отсылка_ПриОбзоре(Cell :TemplateCell; Value :Variant; var NewValue :Variant) :Logical;
+    var rChoice :РКП_Газеты.Газета;
+    if (cmOk = РКП_Газеты.УчетГазет.картГазеты.ВыполнитьВыбор_Отсылки(rChoice, Self.Record, Value as String)) then
+      NewValue = rChoice;
+      Template.EndEdit(true);
+    fi;
+  end;
+
+  proc Поле_ПриВыходе(Cell :TemplateCell; Index :Integer);
+    var локПериодичность :String;
+    if (Cell.Contents = 'КатегорияПериодичности') then
+      локПериодичность = РКП_Справочники.BiblioRecord.ПериодичностьВыхода(КоличествоВПериоде_ + 1, КатегорияПериодичности as tPeriodicityCategory);
+      if (Периодичность <> локПериодичность) then
+        Периодичность = локПериодичность;
+      fi;
+      РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+      ПрочитатьПоступлениеНомеров;
+    elsif (Cell.Contents = 'КоличествоВПериоде_') then
+ 2  0   КоличествоВПериоде =2 0КоличествоВПериоде_ + 1;
+      локПериодичность = РКП_Справочники.BiblioRecord.ПериодичностьВыхода(КоличествоВПериоде_ + 1, КатегорияПериодичности as tPeriodicityCategory);
+    2  0if (Периодичность <> локПериодичность) then
+      2 0 Периодичность =  локПериодичность;
+    2  0fi;
+      РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+      ПрочитатьПоступлениеНомеров;
+    2elsif0 (Cell.Contents = 'ТерриторияРаспространения') then
+      РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+      ПрочитатьПоступлениеНомеров;
+      Self.Template.Field = 'Тематика.Наим';
+    elsif (Cell.Contents = 'Тематика.Наим') then
+      РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+      ПрочитатьПоступлениеНомеров;
+      Self.Template.Field = 'ЧАЦН.Наим';
+    elsif (Cell.Contents = 'ЧАЦН.Наим') then
+      РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+      ПрочитатьПоступлениеНомеров;
+      Self.Template.Field = 'Язык.Наим';
+    elsif (Cell.Contents = 'Язык.Наим') then
+      РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+      ПрочитатьПоступлениеНомеров;
+    elsif (Cell.Contents in ['Тематика.Наим','МестоИздания.Наим','ТерриторияРаспространения','ТипИздания','Язык.Наим','ЧАЦН.Наим']) then
+      РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+      ПрочитатьПоступлениеНомеров;
+    elsif (Cell.Contents = 'ГодЛетописи') then
+      ФормированиеВходногоФорматаРКП;
+      ФормированиеБиблиографическойЗаписи;
+    fi;
+    --
+    if    (Cell.Contents = 'РегНомер')            then Self.Template.Field = 'ISSN';
+    elsif (Cell.Contents = 'ISSN')                then Self.Template.Field = 'НазваниеОсн';
+    elsif (Cell.Contents = 'Отсылка.НазваниеОсн') then Self.Template.Field = 'НазваниеОсн';
+    elsif (Cell.Contents = 'НазваниеОсн')         then Self.Template.Field = 'Подзаголовок';
+    elsif (Cell.Contents = 'НазваниеИнЯз')        then Self.Template.Field = 'Подзаголовок';
+    elsif (Cell.Contents = 'НазваниеНацЯз')       then Self.Template.Field = 'Подзаголовок';
+    elsif (Cell.Contents = 'Подзаголовок')        then Self.Template.Field = 'Учредитель';
+    elsif (Cell.Contents = 'МестоИздания.Наим')   then Self.Template.Field = 'Редакция';
+    elsif (Cell.Contents = 'Телефон')             then Self.Template.Field = 'HTTP';
+    elsif (Cell.Contents = 'HTTP')                then Self.Template.Field = 'E_mail';
+    elsif (Cell.Contents = 'E_mail')              then Self.Template.Field = 'РедакторГазеты';
+    fi;
+  end;
+
+  proc Поле_ПриВыходе_Учред(Cell :TemplateCell; Index :Integer);
+    Учред = Trim(Учред);
+    if (Учред <> nil) then
+      if ГруппаУчредителей then
+        Учредители = Учред;
+      else
+        Учредитель = Учред;
+      fi;
+    else
+      Учредители = Учред;
+      Учредитель = Учред;
+    fi;
+    секцМестоИздания.CellByField['МестоИздания.Наим'].SetFocus;
+  end;
+
+  func Поле_ПриВходе_ДатаВыхода1(Cell :TemplateCell; Index :Integer;Action :Template.EnterTypes) :Logical;
+    var локГод, локМес :Integer;
+    if (Action <> Template.Clear) then
+      if CmOk = РКП_СИС.Сервис.блВыборМесяца.ВыполнитьВыбор(локГод, локМес) then
+        ДатаВыходаПервогоНомера = Dat(1, локМес, локГод);
+      fi;
+    else
+      ДатаВыходаПервогоНомера = nil;
+    fi;
+  end;
+
+  func Поле_ПриВходе_ДатаВыхода2(Cell :TemplateCell; Index :Integer;Action :Template.EnterTypes) :Logical;
+    var локГод :Integer;
+    if (Action <> Template.Clear) then
+      if CmOk = РКП_СИС.Сервис.блВыборГода.ВыполнитьВыбор(локГод) then
+        ДатаВыходаПервогоНомера=Dat(1, 1, локГод);
+      fi;
+    else
+      ДатаВыходаПервогоНомера = nil;
+    fi;
+  end;
+
+  func Поле_ПриНаборе(Cell :TemplateCell; Key :String; Value :Variant; var NewValue :Variant) :Logical;
+    var aParam :Variant[2];
+    var vExtMethod :РКП_Справочники.ExtendedMethod.Cell.OnTypeRef;
+    var vEndEditSave :Logical;
+2    --====================================--
+2    --======== Место издания =============--
+2    --====================================--
+    if (Cell.Contents = 'МестоИздания.Наим') then
+      vExtMethod = РКП_Справочники.ExtendedMethod.Cell.OnTypeRef.CreateExt(Value);
+      vExtMethod.SetClassRecord(РКП_Справочники.спрГеография);
+      vExtMethod.SetClassCardfile(РКП_Справочники.Справочники.картГеография);
+      Result = vExtMethod.ReturnResult(NewValue, vEndEditSave);
+      if (not Result) and vEndEditSave then
+        Template.EndEdit(true);
+        РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+        ПрочитатьПоступлениеНомеров;
+      fi;
+      Return;
+2    --=================================================--
+2    --======== Адрес редакции  ========================--
+2    --=================================================--
+    elsif (Cell.Contents = 'Редакция') then
+      vExtMethod = РКП_Справочники.ExtendedMethod.Cell.OnTypeRef.CreateExt(Value);
+      vExtMethod.SetClassRecord(РКП_Справочники.спрГеография);
+      vExtMethod.SetClassFalseCardfiles(РКП_Справочники.Справочники.блкартАдресРедакции);
+      aParam[1] = ['ФорматФильтраПоФрагменту', 1];
+      aParam[2] = ['Фрагмент', Value];
+      vExtMethod.SetSearchFormParam(aParam);
+      Result = vExtMethod.ReturnResult(NewValue, vEndEditSave);
+      if (not Result) and vEndEditSave then
+        Template.EndEdit(true);
+      fi;
+      Return;
+2    --=================================================--
+2    --======== Территория распространения =============--
+2    --=================================================--
+    elsif (Cell.Contents = 'ТерриторияРаспространения') then
+      vExtMethod = РКП_Справочники.ExtendedMethod.Cell.OnTypeRef.CreateExt(Value);
+      vExtMethod.SetClassRecord(РКП_Справочники.спрТерриторияРаспространения);
+      vExtMethod.SetClassFalseCardfiles(РКП_Справочники.Справочники.блкартТерриторияРаспространения);
+      aParam[1] = ['Фрагмент', Value];
+      vExtMethod.SetSearchFormParam(aParam);
+      Result = vExtMethod.ReturnResult(NewValue, vEndEditSave);
+      if (not Result) and vEndEditSave then
+        Template.EndEdit(true);
+        РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+        ПрочитатьПоступлениеНомеров;
+      fi;
+      Return;
+2    --====================================--
+2    --========   Тематика    =============--
+2    --====================================--
+    elsif (Cell.Contents ='Тематика.Наим') then
+      vExtMethod = РКП_Справочники.ExtendedMethod.Cell.OnTypeRef.CreateExt(Value);
+      vExtMethod.SetFindFilter( 'ЦельАнализа<1 and not НеПрименяется and Match(Наим,"*' + Value + '*")' );
+      vExtMethod.SetClassRecord(РКП_Справочники.спрТематика);
+      vExtMethod.SetClassFalseCardfiles(РКП_Справочники.Справочники.блкартТематика);
+      aParam[1] = ['РежимВыбораТематики', true];
+      aParam[2] = ['РежимВыбораЧАЦН', false];
+      aParam[3] = ['ТипФрагмента', 1];
+      vExtMethod.SetSearchFormParamDef(aParam);
+      aParam[4] = ['Фрагмент', Value];
+      vExtMethod.SetSearchFormParam(aParam);
+      Result = vExtMethod.ReturnResult(NewValue, vEndEditSave);
+      if (not Result) and vEndEditSave then
+        Template.EndEdit(true);
+        РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+        ПрочитатьПоступлениеНомеров;
+      fi;
+      Return;
+2    --============================================================--
+2    --======== 0Читательский адрес/целевое назначение2 =============--
+2    --============================================================--
+    elsif (Cell.Contents = 'ЧАЦН.Наим') then
+      vExtMethod = РКП_Справочники.ExtendedMethod.Cell.OnTypeRef.CreateExt(Value);
+      vExtMethod.SetFindFilter( 'ЦельАнализа>0 and not НеПрименяется and Match(Наим,"*' + Value + '*")' );
+      vExtMethod.SetClassRecord(РКП_Справочники.спрТематика);
+      vExtMethod.SetClassFalseCardfiles(РКП_Справочники.Справочники.блкартТематика);
+      aParam[1] = ['РежимВыбораТематики', false];
+      aParam[2] = ['РежимВыбораЧАЦН', true];
+      aParam[3] = ['ТипФрагмента', 1];
+      vExtMethod.SetSearchFormParamDef(aParam);
+      aParam[4] = ['Фрагмент', Value];
+      vExtMethod.SetSearchFormParam(aParam);
+      Result = vExtMethod.ReturnResult(NewValue, vEndEditSave);
+      if (not Result) and vEndEditSave then
+        Template.EndEdit(true);
+        РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+        ПрочитатьПоступлениеНомеров;
+      fi;
+      Return;
+2    --====================================--
+2    --======== Языки издания =============--
+2    --====================================--
+    elsif (Cell.Contents = 'Язык.Наим') then
+      vExtMethod = РКП_Справочники.ExtendedMethod.Cell.OnTypeRef.CreateExt(Value);
+      vExtMethod.SetClassRecord(РКП_Справочники.спрЯзыкИздания);
+      vExtMethod.SetClassCardfile(РКП_Справочники.Справочники.картЯзыкИздания);
+      --aParam[1] = ['Фрагмент', Value];
+      vExtMethod.SetSearchFormParam([['Фрагмент', Value]]);
+      Result = vExtMethod.ReturnResult(NewValue, vEndEditSave);
+      if (not Result) and vEndEditSave then
+        Template.EndEdit(true);
+        РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+        ПрочитатьПоступлениеНомеров;
+      fi;
+      Return;
+    fi;
+    Return true;
+  end;
+
+  func Поле_ПриПроверке(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    if (Cell.Contents = 'КатегорияПериодичности') then
+      if (Value <=4 ) then
+        if (КатегорияПериодичности <> Value) then
+          КатегорияПериодичности = Value;
+          КоличествоВПериоде = 1;
+          МодифицироватьСекцию_Периодичность;
+        fi;
+        Return true;
+      else
+        Return;
+      fi;
+    elsif (Cell.Contents = 'ГодЛетописи') then
+      Return ЛППИ.ЗаписьВыпуска.Создание(Value);
+    fi;
+  end;
+
+  func Поле_ПриПроверке_ДатаВыхода(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    if Year((Value as Date)) > Year(Today) then
+      Message('Выбранная дата не может быть позже текущего года!');
+    else
+      ДатаВыходаПервогоНомера = Value as Date;
+      Return true;
+    fi;
+  end;
+
+  proc Поле_ПриРисовании(Cell :TemplateCell; Selected :Logical; var Color :Integer;var FieldColor :Integer; Font :Font);
+    if not Cell.Enabled then
+      inherited ПриРисовании_КакПолеВывода(Cell, Selected, Color, FieldColor, Font);
+    fi;
+  end;
+
+  proc Поле_ПриРисовании_НазваниеОсн(Cell :TemplateCell; Selected :Logical; var Color :Integer; var FieldColor :Integer; Font :Font);
+    if Cell.Enabled then
+      if (НазваниеОсн = nil) then
+        Font.Color = COLOR_GRAYTEXT;
+        Font.Italic = true;
+      fi;
+    else
+      inherited ПриРисовании_КакПолеВывода(Cell, Selected, Color, FieldColor, Font);
+    fi;
+  end;
+
+  proc Поле_ПриРисовании_Учред(Cell :TemplateCell; Selected :Logical; var Color :Integer; var FieldColor :Integer; Font :Font);
+    if (Учред = nil) then
+      Font.Color = COLOR_GRAYTEXT;
+      Font.Italic = true;
+    fi;
+  end;
+
+  proc Поле_ПриРисовании_ДатаВыхода(Cell :TemplateCell; Selected :Logical; var Color :Integer; var FieldColor :Integer; Font :Font);
+    var локТочностьДаты :Integer;
+    if (Cell.Contents = 'ДатаВыходаПервогоНомера') then
+      локТочностьДаты = ТочностьДатыПервогоНомера;
+    elsif (Cell.Contents = 'ДатаВыходаПоследнегоНомера') then
+      локТочностьДаты = ТочностьДатыПоследнегоНомера;
+    fi;
+    if (локТочностьДаты > 0) then
+      ПриРисовании_КакПолеВывода(Cell, Selected, Color, FieldColor, Font);
+    fi;
+  end;
+
+  proc Поле_ПриРисовании_ТочностьВыхода(Cell :TemplateCell; Selected :Logical; var Color :Integer; var FieldColor :Integer; Font :Font);
+    if (Cell.Owner = секцТочностьДаты) then
+      Font.Bold = (ТочностьДатыПервогоНомера = Int(секцТочностьДаты.Column[Cell.Column].Caption));
+      if Font.Bold then
+        Font.Color = СИС2.Константы.clBlue;
+        Cell.Bevel = Template.ClientBevel;
+      else
+        Cell.Bevel = Template.NoneBevel;
+      fi;
+    fi;
+  end;
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+  func фреймКонтейнер_ПриПереключении(Frame :TemplateFrame; SubFrame :TemplateFrame) :Logical;    #Warning 'Проверить в фреймКонтейнер_ПриПереключении повторное чтение номеров';
+    var locCell :TemplateCell;
+    if (SubFrame = фреймМесто) then
+      фреймМесто.CellByField['Учред'].SetFocus;
+    elsif (SubFrame = фреймКлассификация) then
+      фреймКлассификация.CellByField['ТерриторияРаспространения'].SetFocus;
+    elsif (SubFrame = фреймВыходИЗакрытие) then
+      RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+      ПрочитатьВыпускНомеров;
+      if (секцВыпускНомеров.RowsCount > 0) then
+        locCell = секцВыпускНомеров.CellByField['НомеровВсего'];
+        Self.Template.CurrentCell = секцВыпускНомеров.Cell[locCell.Column, секцВыпускНомеров.RowsCount];
+      else
+        фреймВыходИЗакрытие.CellByField['ДатаВыходаПервогоНомера'].SetFocus;
+      fi;
+    elsif (SubFrame = фреймЛППИ) then
+      if (ГодЛетописи = 0) then
+        фреймЛППИ.CellByField['ГодЛетописи'].SetFocus;
+      else
+        фреймЛППИ.CellByField['ГодЛетописи'].SetFocus;
+        ФормированиеБиблиографическойЗаписи;
+      fi;
+    elsif (SubFrame = фреймRusMarc) then
+      ФормированиеВходногоФорматаРКП;
+    fi;
+    Return true;
+  end;
+
+  proc секцСправочникПослеУдаления(Section :TemplateSection);
+    РКП_Газеты.RI.Газета.ОбновитьСтатАналитикуДляГазеты(Self.Record);
+    ПрочитатьПоступлениеНомеров;
+  end;
+
+  proc флТолькоНеПолученныеКомплектыПриИзменении(Sender :CheckBox);
+    ПрочитатьВыпускНомеров;
+  end;
+
+  proc флОтсылкаПриИзменении(Sender :CheckBox);
+    var NewRec :РКП_Газеты.Газета;
+    var МестоИзданияГаз, МестоИзданияОтс, ЯзыкИзданияГаз, ПоследнийСимволГаз :String;  --, ПоследнийСимволОтс
+    if ПризнакОтсылки then -- если признак отсылки меняется на ИСТИНА
+      if ( CmOk = РКП_Газеты.УчетГазет.картГазеты.ВыполнитьВыбор_Отсылки(NewRec, Self.Record) ) then -- если газета отсылки выбрана
+        Отсылка = NewRec;
+        if (Record.МестаИздания.Count > 0) then -- если указано место издания газеты
+          МестоИзданияГаз = Record.МестаИздания.Items[1].МестоИздания.Наим;
+        else
+          Message('Пожалуйста, укажите место издания газеты!');
+          Self.Template.Field = 'МестоИздания.Наим';
+          Return;
+        fi;
+        if (NewRec.МестаИздания.Count > 0) then -- если указано место издания отсылки
+          МестоИзданияОтс = NewRec.МестаИздания.Items[1].МестоИздания.Наим;
+        else
+          Message('Пожалуйста, укажите место издания газеты отсылки!');
+          Self.Template.Field = 'Отсылка.НазваниеОсн';
+          Return;
+        fi;
+        if (Record.Языки.Count > 0) then -- если указан язык издания газеты
+          if not Record.Языки.Items[1].Язык.ГосЯзРФ then -- если указанный язык не является государственным языком РФ
+            ЯзыкИзданияГаз = Record.Языки.Items[1].Язык.НаимБибл; -- то считывается сокращенное библиографическое наименование языка
+          fi;
+        fi;
+        ПоследнийСимволГаз = SubStr(НазваниеОсн, Length(НазваниеОсн), 1);
+        --ПоследнийСимволОтс = SubStr(NewRec.НазваниеОсн, Length(NewRec.НазваниеОсн), 1);
+        ---
+        if (0 = Pos('. - См.', НазваниеОсн) ) then -- если в названии уже НЕ прописана отсылка
+          if (ЯзыкИзданияГаз = nil) then -- если язык газеты - русский
+            if not (ПоследнийСимволГаз in ['!','?','.','"']) then -- если название НЕ заканчивается на "!" ,"?" или "..." или '"'
+              НазваниеОсн = НазваниеОсн + '. - ' + МестоИзданияГаз + '. - См.: ' + NewRec.НазваниеОсн;
+            else -- если название ЗАКАНЧИВАЕТСЯ на "!" ,"?" или "..." или '"'
+              НазваниеОсн = НазваниеОсн + ' - ' + МестоИзданияГаз + '. - См.: ' + NewRec.НазваниеОсн;
+            fi;
+          else -- если язык газеты - НЕ русский
+            if not (ПоследнийСимволГаз in ['!','?','.','"']) then -- если название НЕ заканчивается на "!" ,"?" или "..." или '"'
+              НазваниеОсн = НазваниеОсн + '. - ' + ЯзыкИзданияГаз + ' - ' + МестоИзданияГаз + '. - См.: ' + NewRec.НазваниеОсн;
+            else -- если название заканчивается на "!" ,"?" или "..." или '"'
+              НазваниеОсн = НазваниеОсн + ' - ' + ЯзыкИзданияГаз + ' - ' + МестоИзданияГаз + '. - См.: ' + NewRec.НазваниеОсн;
+            fi;
+          fi;
+        fi;
+        ---
+        if (МестоИзданияГаз <> МестоИзданияОтс) then
+          if not (ПоследнийСимволГаз in ['!','?','.','"']) then -- если название НЕ заканчивается на "!" ,"?" или "..." или '"'
+            НазваниеОсн = НазваниеОсн + '. - ' + МестоИзданияОтс;
+          else -- если название заканчивается на "!" ,"?" или "..." или '"'
+            НазваниеОсн = НазваниеОсн + ' - ' + МестоИзданияОтс;
+          fi;
+        fi;
+      else
+        ПризнакОтсылки = false;
+      fi;
+    else
+      if (Pos('. - См.', НазваниеОсн) > 0) then
+        Message('Пожалуйста, проверьте правильность данных в поле "Название"! ' + Br +
+                'Вероятно, оно не должно содержать последоватьельность ". - См.:" !');
+        ПризнакОтсылки = false;
+      fi;
+      if (Отсылка <> nil) then
+        Отсылка = nil;
+      fi;
+    fi;
+    МодифицироватьШаблон;
+  end;
+
+  proc РазблокировкаЗаписи(Sender :Button);
+    Record.UnLock;
+  end;
+
+  proc кнЗакрытьПриНажатии(Sender :Button);
+    БланкЗакрывается = True;
+    if BlankOption[AutoPostOrCancel] = True then
+      EditorPost;
+    end;
+    Close(cmOK);
+  end;
+
+  proc кнОтменаПриНажатии(Sender :Button);
+    БланкЗакрывается = True;
+    if (BlankOption[AutoPostOrCancel] = True) and (СИС2.ХранимыеНастройки.ВернутьВыдаватьЗапросНаПодтверждение = False) then
+      EditorCancel;
+    end;
+    Close(cmCancel);
+  end;
+
+  proc кнПредПриНажатии(Sender :Button);
+    ExecuteCommand('Kernel.Card.Run.PrevRec');
+  end;
+
+  proc кнСледПриНажатии(Sender :Button);
+    ExecuteCommand('Kernel.Card.Run.NextRec');
+  end;
+
+-- 2_Дополнительные команды0. --
+
+
+-- 2_Вспомогательные методы0. --
+
+  proc УстановитьФокусНаПервоеПолеВвода;
+  end;
+
+  proc УстановитьФокусПриОткрытии;
+    if OPPIAccess then
+      Template.CurrentFrame = фреймВводПоступлений;
+    elsif (FullAccess or ORGPAccess) then
+      if (Record.State = Record.Normal) then -- Определение закладки
+        Template.CurrentFrame = фреймВыходИЗакрытие;
+      else
+        if (НазваниеОсн = nil) then -- Определение места селектора
+          Self.Template.Field = 'РегНомер';
+        else
+          Self.Template.Field = 'НазваниеОсн';
+        fi;
+      fi;
+    fi;
+  end;
+
+  proc УстановитьФокусПриСчитывании;
+    var locCell :TemplateCell;
+    var cl, rw :Integer;
+    if OPPIAccess then
+      locCell = секцПоступлениеНомеров.CellByField['НомеровВсего'];
+      cl = locCell.Column;
+      rw = секцПоступлениеНомеров.RowsCount;
+      секцПоступлениеНомеров.Cell[cl, rw].SetFocus;
+    elsif (FullAccess or ORGPAccess) then
+      if (Template.CurrentFrame = фреймВыходИЗакрытие) then
+        locCell = секцВыпускНомеров.CellByField['НомеровВсего'];
+        cl = locCell.Column;
+        rw = секцВыпускНомеров.RowsCount;
+        секцВыпускНомеров.Cell[cl, rw].SetFocus;
+      fi;
+    fi;
+  end;
+
+  proc УстФлаги_ТочностьДатыВыхода;
+    ТочностьВыходаДень  = (ТочностьДатыПервогоНомера = 0);
+    ТочностьВыходаМесяц = (ТочностьДатыПервогоНомера = 1);
+    ТочностьВыходаГод   = (ТочностьДатыПервогоНомера = 2);
+  end;
+
+  proc ПрочитатьВыпускНомеров;
+    var aStatOut :DR.Номера[];
+    var y, yy :Integer;
+    var vCell :TemplateCell;
+    Self.Template.BeginModify;
+    секцВыпускНомеров.RowsCount = 1;
+    секцВыпускНомеров.Visible = false;
+    секцПоступлениеНомеров.RowsCount = 1;
+    секцПоступлениеНомеров.Visible = false;
+    aStatOut = DR.Номера.ПолучитьДанные(Self.Record, ТолькоНеПолученныеКомплекты);
+    yy = LengthOfArray(aStatOut);
+    if (yy > 0) then
+      CloneFirstRows(секцВыпускНомеров, yy);
+      CloneFirstRows(секцПоступлениеНомеров, yy);
+      for y = 1 .. yy do
+        секцВыпускНомеров.Row[y].Tag = aStatOut[y];
+        vCell = секцВыпускНомеров.Cell[стлбЛГС.Number, y];
+        vCell.Enabled = aStatOut[y].ЕстьДанныеЛГС;
+        --vCell.Font.Bold = vCell.Enabled;
+        секцПоступлениеНомеров.Row[y].Tag = aStatOut[y];
+        секцПоступлениеНомеров.Cell[3, y].Enabled = true;
+        секцПоступлениеНомеров.Cell[4, y].Enabled = true;
+      od;
+      секцВыпускНомеров.Visible = true;
+      секцПоступлениеНомеров.Visible = true;
+    fi;
+    Self.Template.EndModify;
+  end;
+
+  proc ПрочитатьПоступлениеНомеров;
+    ПоступлениеНомеров = nil;
+    секцСтатистикаПоступлений.FramesCount = 1;
+    секцСтатистикаПоступлений.Visible = false;
+    with Query.Create([РКП_Газеты.ПоступлениеГазеты]) do
+      Filter = 'ГодПоступления>0 and Газета=' + Record.DocIDStr;
+      Order  = 'ГодПоступления';
+      Select;
+      while not Eof do
+        РКП_СИС.Functions.AddInArray(ПоступлениеНомеров, Current);
+        Next;
+      od;
+      секцСтатистикаПоступлений.FramesCount = Count;
+      секцСтатистикаПоступлений.Visible = (Count > 0);
+    end;
+  end;
+
+  proc ОбновитьСведенияОПрекращении;
+    var rNspIss :РКП_Газеты.НомерГазеты;
+    if not ExistEditingAccessConstraint(РКП_Газеты.Газета) then
+      with FltMaker.CreateExt do
+        AddCondition( 'isGroup=0' );
+        AddCondition( 'Газета=' + Self.Record.DocIDStr );
+        AddCondition( 'ПрекращениеИздания' );
+        CompressConditionsToOne;
+        AddCondition( 'not(СозданОЛГС and НеПолучен)' );
+        rNspIss = FindRecord(РКП_Газеты.НомерГазеты, GetFilter, 'DocId-');
+        if (rNspIss = nil) then
+          Self.Record.НомерПоследнегоНомера        = nil;
+          Self.Record.ВалПоследнегоНомера          = nil;
+          Self.Record.ДатаВыходаПоследнегоНомера   = nil;
+          Self.Record.ТочностьДатыПоследнегоНомера = nil;
+          Self.Record.Прекращено = false;
+        else
+          Self.Record.НомерПоследнегоНомера        = rNspIss.Номер;
+          Self.Record.ВалПоследнегоНомера          = rNspIss.ВаловыйНомер;
+          Self.Record.ДатаВыходаПоследнегоНомера   = rNspIss.ДатаВыхода;
+          Self.Record.ТочностьДатыПоследнегоНомера = rNspIss.ТочностьДатыВыхода;
+          Self.Record.Прекращено = true;
+        fi;
+      end;
+    fi;
+  end;
+
+  -- Формирование записи во входном формаие РКП.
+  -- Выполняется перед сохранением записи.
+  proc ФормированиеВходногоФорматаРКП;
+    var ЭкспортРКПДанные_ :String[];
+    var КолСтрок, k :Integer;
+    if (not ПризнакОтсылки) then
+      ЭкспортРКПДанные = nil;
+      секцBChMarc.Count = 0;
+      СоздатьЗаписьРКП(Record, ЭкспортРКПДанные_, КолСтрок);
+      for k = 1 .. КолСтрок do
+        ЭкспортРКПДанные[k] = ЭкспортРКПДанные_[k];
+      od;
+      секцBChMarc.Count = КолСтрок;
+      РКП_Газеты.Экспорт.Газет.Синхронизация(Record, ЭкспортРКПДанные);
+    fi;
+  end;
+
+  proc ФормированиеБиблиографическойЗаписи;
+    var Заголовок_, ОписаниеГазеты_ :String;
+    if (CmOk = РКП_Газеты.ЛППИ.БибСтатья.Создание(Record,Заголовок_,ОписаниеГазеты_)) then
+      Заголовок = Заголовок_;
+      ОписаниеГазеты = ОписаниеГазеты_;
+    fi;
+  end;
+
+  proc МодифицироватьШаблон;
+    флРосписьСтатей.Visible = (AdmAccess or DevAccess);
+    флКомплектРГБ.Visible = (AdmAccess or DevAccess);
+    флСтатус.Enabled = false; -- флаг "Прекращено" недоступен
+    кнОтмена.Visible = (FullAccess or ORGPAccess); -- для ОППИ не имеет смысла
+    фреймЭкспорт.Visible = (FullAccess or ORGPAccess); -- для ОППИ не имеет смысла
+    редНомерГЗ.Enabled = false; -- edt ID записи недоступен
+    редДатаЗаписиВФайлГЗ.Enabled = false; -- edt Дата записи в файл недоступен
+    секцГазетаОтсылки.Visible = ПризнакОтсылки;
+    секцВыпускНомеров.CellByField['КомплектПолучен'].Enabled = false;
+    секцПрекращение.Visible = (НомерПоследнегоНомера <> nil);
+    ---
+    фреймРегистрация.CellByField['РегНомер'].Enabled = not OPPIAccess;
+    фреймРегистрация.CellByField['ISSN'].Enabled = not OPPIAccess;
+    CellRow(фреймРегистрация.CellByField['ГодЛетописи']).Visible = not OPPIAccess;
+    флОтсылка.Enabled = not OPPIAccess;
+    ---
+    секцМестаИзданияОППИ.Visible = OPPIAccess;
+    секцТипИзданияОППИ.Visible   = OPPIAccess;
+    фреймМесто.Visible           = (FullAccess or ORGPAccess);
+    фреймКлассификация.Visible   = (FullAccess or ORGPAccess);
+    фреймВыходИЗакрытие.Visible  = (FullAccess or ORGPAccess);
+    фреймВводПоступлений.Visible = (OPPIAccess or DevAccess);
+    фреймСтатистикаПоступлений.Visible = (FullAccess or ORGPAccess);
+    фреймЛППИ.Visible = (FullAccess or ORGPAccess);
+    фреймRusMarc.Visible = DevAccess;
+    if OPPIAccess then
+      SetSectionDisabled(секцГазетаОтсылки);
+      SetSectionDisabled(секцНазваниеОсн);
+      SetSectionDisabled(секцНазваниеИнЯз);
+      SetSectionDisabled(секцНазваниеНацЯз);
+      SetSectionDisabled(секцПодзаголовок);
+      фреймКонтейнер.Orientation = Template.Vertical;
+      фреймКонтейнер.ShowTabs = false;
+      Template.CurrentFrame = фреймВводПоступлений;
+    else
+      фреймКонтейнер.Orientation = Template.WithTabs;
+      фреймКонтейнер.ShowTabs = true;
+    fi;
+  end;
+
+  -- Процедура управляет видом секции, описывающей периодичность,
+  -- не позволяя оператору вводить недопустимые значения
+  proc МодифицироватьСекцию_Периодичность;
+    var CellPeriod :TemplateCell;
+    var локПериодичность :String;
+    CellPeriod = секцПериодичность.CellByField['КоличествоВПериоде_'];
+    CellPeriod.List.Clear;
+    КоличествоВПериоде_ = nil;
+    with РКП_СИС.Def do
+      if (Self.Record.КатегорияПериодичности = pcUnDef) then -- Неопределенно
+        CellPeriod.ReadOnly = true;
+        CellPeriod.FieldColor = Template.CurrentFrame.Color;
+      else
+        CellPeriod.ReadOnly = false;
+        CellPeriod.FieldColor = секцПериодичность.CellByField['КатегорияПериодичности'].FieldColor;
+        if (Self.Record.КатегорияПериодичности = pcInDay) then -- В течение дня
+          КоличествоВПериоде_ = (КоличествоВПериоде - 1);
+          CellPeriod.List.Add('1 раз');
+          CellPeriod.List.Add('2 раза');
+        elsif (Self.Record.КатегорияПериодичности = pcInWeek) then -- В течение недели
+          КоличествоВПериоде_ = (КоличествоВПериоде - 1);
+          CellPeriod.List.Add('1 раз');
+          CellPeriod.List.Add('2 раза');
+          CellPeriod.List.Add('3 раза');
+          CellPeriod.List.Add('4 раза');
+          CellPeriod.List.Add('5 раз');
+          CellPeriod.List.Add('6 раз');
+          CellPeriod.List.Add('7 раз');
+        elsif (Self.Record.КатегорияПериодичности = pcInMonth) then -- В течение месяца
+          КоличествоВПериоде_ = (КоличествоВПериоде - 1);
+          CellPeriod.List.Add('1 раз');
+          CellPeriod.List.Add('2 раза');
+          CellPeriod.List.Add('3 раза');
+          CellPeriod.List.Add('4 раза');
+          CellPeriod.List.Add('5 раз');
+          CellPeriod.List.Add('6 раз');
+          CellPeriod.List.Add('7 раз');
+          CellPeriod.List.Add('8 раз');
+        elsif (Self.Record.КатегорияПериодичности = pcInYear) then -- В течение года
+          КоличествоВПериоде_ = (КоличествоВПериоде - 1);
+          CellPeriod.List.Add('1 раз');
+          CellPeriod.List.Add('2 раза');
+          CellPeriod.List.Add('3 раза');
+          CellPeriod.List.Add('4 раза');
+          CellPeriod.List.Add('5 раз');
+          CellPeriod.List.Add('6 раз');
+          CellPeriod.List.Add('7 раз');
+          CellPeriod.List.Add('8 раз');
+          CellPeriod.List.Add('9 раз');
+          CellPeriod.List.Add('10 раз');
+          CellPeriod.List.Add('11 раз');
+          CellPeriod.List.Add('12 раз');
+        else
+          Message('Недопустимое значение периодичности!');
+          Self.Record.КатегорияПериодичности  = pcUnDef;
+          CellPeriod.ReadOnly = true;
+          CellPeriod.FieldColor = Template.CurrentFrame.Color;
+        fi;
+      fi;
+    end;
+    локПериодичность = РКП_Справочники.BiblioRecord.ПериодичностьВыхода(КоличествоВПериоде_ + 1, КатегорияПериодичности as РКП_СИС.Def.tPeriodicityCategory);
+    if (Self.Record.Периодичность <> локПериодичность) then
+      if not ExistEditingAccessConstraint(РКП_Газеты.Газета) then
+        Self.Record.Периодичность = локПериодичность;
+      fi;
+    fi;
+  end;
+
+end

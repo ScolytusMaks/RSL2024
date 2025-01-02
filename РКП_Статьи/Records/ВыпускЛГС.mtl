@@ -1,0 +1,56 @@
+record ВыпускЛГС inherited Base.BaseHierarchicalRecord title "Выпуск ЛГС";
+  field ГодЛетописи :Integer title "Год летописи";
+  field ВыпускЛетописи :Integer title "Выпуск летописи";
+  field ЛетописьСверстана :Logical title "Выпуск сверстан";
+  field ПечатьКодаББК :Logical title "Выводить код ББК в ЛГС";
+
+  struct УказательУДК array Integer title "Содержание";
+    field ИндексУДК :РКП_Справочники.СпрТематикаСтатьи title "Индекс УДК";
+  end;
+
+  struct УказательИмен array Integer title "Именной указатель";
+    field ФИО :String title "Ф И О";
+    field БибЗапись :String title "Номер биб.записи";
+  end;
+
+  struct УказательГео array Integer title "Именной указатель";
+    field Гео :String title "Место (страна)";
+    field Тематика :String title "Систематическая подрубрика";
+    field БибЗапись :String(MaxStr) title "Номер биб.записи";
+  end;
+
+  struct УказательГазет array Integer title "Указатель газет";
+    field Газета :РКП_Газеты.Газета title "Издание";
+    field БибОписание :String title "Биб. описание газеты";
+    field Номера :String(MaxStr) title "номера";
+  end;
+
+  struct УказательВТР array Integer title "Указатель временных тематических рубрик";
+    field Рубрика :РКП_Справочники.СпрТематикаСтатьи title "Временная тем. рубрика";
+    field НомераЛГС :String title "Номера ЛГС";
+  end;
+
+  struct Содержание array Integer title "Содержание";
+    field Глава :String title "Глава";
+    field ИндексУДК :РКП_Справочники.СпрТематикаСтатьи title "Индекс УДК";
+    field Страница :Integer title "Страница";
+  end;
+
+  field ШифрВыпуска :String title "Шифр выпуска ЛГС"; -- для файла
+  field ДатаЗаписиВФайл :Date title "Дата записи в файл";
+
+  -- оформление --
+  field ПервыйНомерСтатьи :Integer title "Первый номер статьи";
+  field ПоследнийНомерСтатьи :Integer title "Последний номер статьи";
+  field ОтвРедактор :String title "Ответственный редактор";
+  field РедСоставитель :String title "Редактор-составитель";
+  field ОтвЗаВыпуск :String title "Ответственный за выпуск";
+  field ХудОформление :String title "Художественное оформление";
+  field КомпВерстка :String title "Компьютерная верстка";
+  field ПодписаноВПечать :Date title "Подписано в печать";
+  field УслПечЛ :Numeric title "Усл.-печ.л.";
+  field УчИздЛ :Numeric title "Уч.-изд.л.";
+  field ТиражВыпуска :Integer title "Тираж выпуска";
+
+  RecordDescription ВыпускЛетописи;
+end;

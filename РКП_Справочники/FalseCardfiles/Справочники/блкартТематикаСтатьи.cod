@@ -1,0 +1,215 @@
+class inherited Справочники.FalseCardType3 "Тематики статей";
+
+import РКП_СИС Classes Functions, FilterMaker;
+import Classes Def;
+
+
+--{{ 2_Свойства
+
+inclass private
+
+  var КлассИнтерфейса :Class RI.Справочники.ТематикаСтатьи := RI.Справочники.ТематикаСтатьи;
+
+  ByHeadingType synonym ПоТипуРубрик: variant[2] =
+    [[RI.Справочники.ТематикаСтатьи.fltByHeadingTypeAny,  'Все'],              -- 0
+     [RI.Справочники.ТематикаСтатьи.fltByHeadingTypeSyst, 'Сист. подрубрики'], -- 1
+     [RI.Справочники.ТематикаСтатьи.fltByHeadingTypeTemp, 'Врем. рубрики']];   -- 2
+
+inobject private
+
+  var секцФильтрПоТипуРубрик :TemplateSection;
+  var ТипРубрик :Integer;
+  var SelectedRecord :спрТематикаСтатьи; -- Проброс выбранного значения
+  var РежимВыбораСистР :Logical;
+  var РежимВыбораВремР :Logical;
+--}}
+
+inobject private
+
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    var c, r :Integer;
+    var locCell :TemplateCell;
+    inherited шаблон_ПриОткрытии(Create);
+    if (true in [РежимВыбораСистР, РежимВыбораВремР]) then
+      for c = 1 .. секцФильтрПоТипуРубрик.ColumnsCount do
+        for r = 1 .. секцФильтрПоТипуРубрик.RowsCount do
+          locCell = секцФильтрПоТипуРубрик.Cell[c,r];
+          if locCell.Contents = 'ТипРубрик' then
+            locCell.Enabled = false;
+          fi;
+        od;
+      od;
+    fi;
+    if РежимВыбораСистР and (not РежимВыбораВремР) then
+      Window.Caption = 'Систематические подрубрики';
+    elsif РежимВыбораВремР and (not РежимВыбораСистР) then
+      Window.Caption = 'Временные тематическая рубрика';
+    fi;
+  end;
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func Поле_Фильтр_ПриНажатии (Cell: TemplateCell; Action: Template.ClickTypes): Logical;
+    var r: Integer;
+    if (Cell.Contents = 'ТипРубрик') then
+      r = Cell.Row;
+      ТипРубрик = (r - 1);
+      ОбновитьФильтр;
+    else
+      Result = inherited Поле_Фильтр_ПриНажатии(Cell, Action);
+      Return; -- чтобы не вызывать дважды "ОбновитьФильтр"
+    fi;
+  end;
+
+  func Поле_Фильтр_ПриВыводе (Cell: TemplateCell; Value: Variant; Action: Template.OutputTypes; var Format: String): Variant;
+    var r: Integer;
+    if (Cell.Contents = 'ТипРубрик') then
+      r = Cell.Row;
+      if SimilarDataViewsMode then
+        Cell.Caption = if( (r = 1), 'l', '');
+      else
+        if РежимВыбораСистР and (not РежимВыбораВремР) then
+          Cell.Caption = if( (r = 2), 'l', '');
+        elsif (not РежимВыбораСистР) and РежимВыбораВремР then
+          Cell.Caption = if( (r = 3), 'l', '');
+        else
+          Cell.Caption = if( (r - 1) = ТипРубрик, 'l', '');
+        fi;
+      fi;
+    else
+      Result = inherited Поле_Фильтр_ПриВыводе(Cell, Value, Action, Format);
+    fi;
+  end;
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+  proc Столбец_ПриРисовании(Column :CardfileColumn; Rec :Record; Selected :Logical; var Color :Integer; Font :Font);
+    var vCode :String;
+    inherited Столбец_ПриРисовании(Column, Rec, Selected, Color, Font);
+    vCode = Rec.GetField('Код') as String;
+    if Match(vCode, '?') or Match(vCode, '?/?') then
+      Font.Bold = true;
+    fi;
+  end;
+
+-- 2_Вспомогательные методы0. --
+
+  proc ИнициализироватьСтолбцыКартотеки;
+    inherited ИнициализироватьСтолбцыКартотеки;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'Код';
+      Caption = 'Код УДК';
+      FieldType = Template.StringField;
+      Alignment = Template.LeftAlign;
+      Font.Size = crdBuiltIn.Font.Size;
+      MinWidth = 140;
+      Width = 140;
+      CanEdit = false;
+    end;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'Наим';
+      Caption = 'Наименование';
+      FieldType = Template.StringField;
+      Alignment = Template.LeftAlign;
+      Font.Size = crdBuiltIn.Font.Size;
+      MinWidth = 100;
+      Width = 0;
+      CanEdit = false;
+    end;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'КрНаим';
+      Caption = 'Краткое наименование';
+      FieldType = Template.StringField;
+      Alignment = Template.LeftAlign;
+      Font.Size = crdBuiltIn.Font.Size;
+      MinWidth = 200;
+      Width = 350;
+      CanEdit = false;
+    end;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'ВклОгл';
+      Caption = 'Огл. ЛГС';
+      Hint = 'Включать в содержание (оглавление) ЛГС';
+      FieldType = Template.LogicalField;
+      Alignment = Template.CenterAlign;
+      MinWidth = 160;
+      Width = 160;
+      Visible = false;
+      CanEdit = false;
+    end;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'Подрубрика';
+      Caption = 'Сист. подрубрика';
+      Hint = 'Систематическая подрубрика';
+      FieldType = Template.LogicalField;
+      Alignment = Template.CenterAlign;
+      MinWidth = 160;
+      Width = 160;
+      Visible = false;
+      CanEdit = false;
+    end;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'Временная';
+      Caption = 'Врем. рубрика';
+      Hint = 'Временная рубрика';
+      FieldType = Template.LogicalField;
+      Alignment = Template.CenterAlign;
+      MinWidth = 160;
+      Width = 160;
+      Visible = false;
+      CanEdit = false;
+    end;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'БезКода';
+      Caption = 'Без кода в ЛГС';
+      Hint = 'Не показывать код в ЛГС';
+      FieldType = Template.LogicalField;
+      Alignment = Template.CenterAlign;
+      MinWidth = 160;
+      Width = 160;
+      Visible = false;
+      CanEdit = false;
+    end;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'НеПрименяется';
+      Caption = 'Не применяется';
+      Hint = 'Более не применяется';
+      FieldType = Template.LogicalField;
+      Alignment = Template.CenterAlign;
+      MinWidth = 160;
+      Width = 160;
+      Visible = false;
+      CanEdit = false;
+    end;
+  end;
+
+  func СоздатьФильтр :String;
+    var aFlt :String[];
+    AddInArray( aFlt, inherited СоздатьФильтр );
+    AddInArray( aFlt, ПолучитьФильтрПоРубрике );
+    Result = MakeFilter(aFlt);
+  end;
+
+  func ПолучитьФильтрПоРубрике :String;
+    if not SimilarDataViewsMode then
+      if (ТипРубрик = RI.Справочники.ТематикаСтатьи.fltByHeadingTypeAny) then
+      elsif (ТипРубрик = RI.Справочники.ТематикаСтатьи.fltByHeadingTypeSyst) then
+        Result = 'Подрубрика';
+      elsif (ТипРубрик = RI.Справочники.ТематикаСтатьи.fltByHeadingTypeTemp) then
+        Result = 'Временная';
+      fi;
+    fi;
+  end;
+
+  proc УстановитьДоступностьОбъектовШаблона;
+    inherited УстановитьДоступностьОбъектовШаблона;
+    if SimilarDataViewsMode then
+      SetSectionDisabled(секцФильтрПоТипуРубрик);
+    fi;
+  end;
+
+
+end

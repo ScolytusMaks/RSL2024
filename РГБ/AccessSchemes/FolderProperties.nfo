@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Properties Version="1"/>
+<Items>
+  <Item Name="Администратор"/>
+  <Item Name="ЗавОППИ"/>
+  <Item Name="СотрудникОППИ"/>
+  <Item Name="ЗавОРГП"/>
+  <Item Name="СотрудникОРГП"/>
+  <Item Name="ЗавГЛГС"/>
+  <Item Name="СотрудникГЛГС"/>
+  <Item Name="Разработчик"/>
+  <Item Name="Руководитель"/>
+</Items>

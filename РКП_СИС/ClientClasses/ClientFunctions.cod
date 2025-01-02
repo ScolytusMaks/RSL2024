@@ -1,0 +1,102 @@
+﻿extends Functions;
+
+inclass public
+
+  -- Поиск клетки по содержимому в секции
+  func SectionCellByContents (locSection: Section; locContent: string): TemplateCell;
+    var r, c: integer;
+    if (locSection <> nil):
+      with locSection do
+        for c = 1 .. ColumnsCount do
+          for r = 1 .. RowsCount do
+            if (Cell[c,r].Contents =  locContent):
+              Result = Cell[c,r];
+              Break;
+            fi;
+          od;
+          if Result <> nil:
+            Break;
+          fi;
+        od;
+      end;
+    fi;
+  end;
+
+  -- Клонирование первых строк секции.
+  -- Метод устанавливает количество блоков строк (под блоком подразумеваются строки, имевшиеся в секции в ее начальном состоянии) равным параметру locCount
+  -- и устанваливает свойства каждого ряда клеток такими же, как в первой строке (первых строках) секции.
+  -- Метод учитывает наличие слитых клеток
+  proc CloneFirstRows (locSection: TemplateSection; locCount: integer);
+    var StartRowCount: integer;
+    var r, rd, rc: integer;
+    var locRowDonor: TemplateRow[];
+    var locRowRecipient: TemplateRow;
+    StartRowCount = locSection.RowsCount; -- кол-во строк в секции до начала клонирования
+    for rd = 1 .. StartRowCount do -- формирование массива строк-доноров
+      locRowDonor[rd] = locSection.Row[rd];
+    od;
+    -- установка желаемого значения строк в секции
+    if (locCount > 0):
+      locSection.RowsCount = (locCount * StartRowCount);
+    else
+      locSection.RowsCount = (StartRowCount);
+    fi;
+    r = StartRowCount; -- установка начального значения счетчика новых строк в секции
+    for rc = 2 .. locCount do -- цикл по кол-ву клонов
+      for rd = 1 .. StartRowCount do -- цикл по кол-ву строк в стартовом состоянии секции
+        r = r + 1;
+        locRowRecipient = locSection.Row[r];
+        RowByPattern(locRowRecipient, locRowDonor[rd]);
+        locRowRecipient.Height = locRowDonor[rd].Height;
+        locRowRecipient.AutoHeight = locRowDonor[rd].AutoHeight;
+      od;
+    od;
+  end;
+
+  -- Создание строки по образцу
+  -- Возвращает количество строк, которые нужно докопировать без разрыва вертикальной линковки
+  -- Метод учитывает, что в секции-доноре может быть недостаточно колонок
+  -- Метод учитывает, что в строке-доноре могут быть слитые клетки
+  -- Метод Kernel TemplateSection.Assign(TemplateSection), который должен делать то, что делает этот, работает загадошно.
+  func RowByPattern (locRowRecipient, locRowDonor: TemplateRow): integer; -- КопироватьСтрокуСекции synonym CopySectionRow synonym
+    var locSectionRecipient, locSectionDonor: TemplateSection;
+    var locCellRecipient, locCellDonor: TemplateCell;
+    var rRecipient, rDonor, c, cc, lw, lh: integer; --2_L0.inked2_W0.idth  2_L0.inked2_H0.eight
+    locSectionRecipient = locRowRecipient.Owner; -- определение секции-реципиента по строке-реципиенту
+    rRecipient = locRowRecipient.Number; -- определение номера строки-реципиента
+    locSectionDonor = locRowDonor.Owner; -- определение секции-донора по строке-донору
+    rDonor = locRowDonor.Number; -- определение номера строки-донора
+    cc = locSectionDonor.ColumnsCount; -- проверка достаточного кол-ва колонок
+    if (locSectionRecipient.ColumnsCount < cc):
+      locSectionRecipient.ColumnsCount = cc;
+    fi;
+    for c = 1 .. cc do -- переливание клеток
+      locCellDonor     = locSectionDonor.Cell[c,rDonor];
+      if locCellDonor.IsMaster: -- ..выполняется только для клеток, являющихся "мастерами"
+        locCellRecipient = locSectionRecipient.Cell[c,rRecipient];
+        locCellRecipient.Assign(locCellDonor);
+        lw = locCellDonor.LinkedWidth;
+        lh = locCellDonor.LinkedHeight;
+        if lh - 1 > result:
+          result = lh - 1 ;
+        fi;
+        if ((lw + lh) > 2):
+          locSectionRecipient.LinkCells(c, rRecipient, lw, lh);
+        fi;
+      fi;
+    od;
+  end;
+
+  func СтрокаКлетки synonym CellRow (Cell: TemplateCell): TemplateRow;
+    if (Cell <> nil):
+      Return Cell.Owner.Row[Cell.Row];
+    fi;
+  end;
+
+  func СтолбецКлетки synonym CellColumn (Cell: TemplateCell): TemplateColumn;
+    if (Cell <> nil):
+      Return Cell.Owner.Column[Cell.Column];
+    fi;
+  end;
+
+end

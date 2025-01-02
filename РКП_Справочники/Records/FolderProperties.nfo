@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Properties Version="1">
+  <Property Name="Title" Value="Классы записей"/>
+</Properties>
+<Items>
+  <Item Name="Base"/>
+  <Item Name="cпрТематика"/>
+  <Item Name="спрТерриторияРаспространения"/>
+  <Item Name="спрЯзыкИздания"/>
+  <Item Name="спрЖанр"/>
+  <Item Name="спрГеография"/>
+  <Item Name="cпрРедакция"/>
+  <Item Name="спрТематикаСтатьи"/>
+  <Item Name="спрББК"/>
+  <Item Name="спрСерияСтатей"/>
+  <Item Name="спрГеографияСтатьи"/>
+  <Item Name="спрЛица"/>
+  <Item Name="спрПостояннаяОрганизация"/>
+  <Item Name="спрВременнаяОрганизация"/>
+  <Item Name="спрЯзыкОригинала"/>
+  <Item Name="спрТипУд"/>
+  <Item Name="isTrashes"/>
+</Items>

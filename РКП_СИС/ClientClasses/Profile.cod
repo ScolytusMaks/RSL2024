@@ -1,0 +1,100 @@
+class "";
+
+--import СИС2 classes Константы;
+import classes Def, Functions;
+
+inclass public
+
+  var Компетенции :РКП_СИС.Def.tCompetence[];  -- компетенции, определенные правами доступа
+  var КомпетенцииРазработчиков   :tCompetence[] := [кмпРазработчик];
+  var КомпетенцииАдминистраторов :tCompetence[] := [кмпАдминистратор];
+  var КомпетенцииПолногоДоступа  :tCompetence[] := [кмпРазработчик, кмпАдминистратор, кмпРуководитель, кмпОРГПзав];
+  var КомпетенцииОРГП            :tCompetence[] := [кмпОРГПзав, кмпОРГПсотр];
+  var КомпетенцииОППИ            :tCompetence[] := [кмпОППИзав, кмпОППИсотр];
+  var КомпетенцииГЛГС            :tCompetence[] := [кмпГЛГСзав, кмпГЛГСсотр];
+  var DevAccess  :Logical;
+  var AdmAccess  :Logical;
+  var FullAccess :Logical;
+  var OPPIAccess :Logical;
+  var ORGPAccess :Logical;
+  var GLGSAccess :Logical;
+  var МаскаКомпетенций :String;  -- Строка вида '|4|5|7|' : набор значений tCompetence через чмволы "|" для записи в лог
+
+inclass private
+
+  proc PreInit;
+    if СИС2.Переменные.ПроцессЗагрузкиПрерван:
+      Return;
+    fi;
+    ПроверитьКритичныеНастройки;
+  end;
+
+  proc Init;
+    if СИС2.Переменные.ПроцессЗагрузкиПрерван:
+      Return;
+    fi;
+    ЗагрузитьИконкуГлавногоОкна;
+    ДонастроитьУправлениеПравами;
+    ПроверитьНеКритичныеНастройки;
+    ПолучитьКомпетенции;
+  end;
+
+  proc GetSessionInfo;
+    var MineInfo: string[];
+    var iComment, iRevision: string;
+    MineInfo[1] = '<cf:$FF0000><s->Copyright © 2010..2019 <b+>ООО ИСФ "Консультант"<b->';
+    MineInfo[2] = 'Московская обл., г. Можайск, ул.Мира';
+    MineInfo[5] = 'E-mail: info@isf-consult.ru';
+    MineInfo[6] = ' <s.><cf.>';
+    MineInfo[7] = 'ПРИКЛАДНЫЕ ПРОЕКТЫ : версия # номер ревизии';
+    MineInfo[8] = ' ';
+    MineInfo[9] = ClassProject + ' : ' + РКП_СИС.StringsFunctions.TAB(2) + Str(РКП_СИС.Constants.ПолучитьВерсиюПроекта, '0.000');
+    --
+    iComment = BaseInfo.ProjectByName[Self.ClassProject].Comment;
+    if (WordsCount(iComment) = 1) and (Pos('#', iComment) = 1):
+      iRevision = SubStr(iComment, 2);
+    elsif (WordsCount(iComment) > 1) and (Pos('#', iComment) > 1):
+      iRevision = ExtractWord(iComment, 2, '#');
+    fi;
+    if (iRevision <> nil):
+      iRevision = ' # ' + iRevision;
+    fi;
+    --
+    AddSessionInfo(РКП_СИС.Constants.ЗаголовокИнформацииОРелизахРГБ, РКП_СИС.StringsFunctions.ArrayToText(MineInfo) + iRevision);
+  end;
+
+  proc ПроверитьКритичныеНастройки;
+  end;
+
+  proc ПроверитьНеКритичныеНастройки;
+  end;
+
+  proc ЗагрузитьИконкуГлавногоОкна;
+  end;
+
+  proc ДонастроитьУправлениеПравами;
+    with МашинаРеквизитов.УправлениеДоступом.интПраваПользователя do
+      ЗарегистрироватьСтраницуОсновныхНастроек('Компетенции', УправлениеДоступом.блРазрешения);
+    end;
+  end;
+
+inclass public
+
+  proc ПолучитьКомпетенции;
+    var i :Integer;
+    Self.Компетенции = МашинаРеквизитов.УправлениеДоступом.интПраваПользователя.ПолучитьКомпетенции;
+    Self.DevAccess  = (GetArrayIntersection(КомпетенцииРазработчиков, Компетенции) <> nil);
+    Self.AdmAccess  = (GetArrayIntersection(КомпетенцииАдминистраторов, Компетенции) <> nil);
+    Self.FullAccess = (GetArrayIntersection(КомпетенцииПолногоДоступа, Компетенции) <> nil);
+    Self.ORGPAccess = (GetArrayIntersection(КомпетенцииОРГП, Компетенции) <> nil) and (not FullAccess);
+    Self.OPPIAccess = (GetArrayIntersection(КомпетенцииОППИ, Компетенции) <> nil) and (not FullAccess);
+    Self.GLGSAccess = (GetArrayIntersection(КомпетенцииГЛГС, Компетенции) <> nil) and (not FullAccess);
+    if (Self.Компетенции <> nil) then
+      Self.МаскаКомпетенций = '|';
+      for i = 1 .. LengthOfArray(Self.Компетенции) do
+        Self.МаскаКомпетенций = Self.МаскаКомпетенций + Str(Self.Компетенции[i]) + '|';
+      od;
+    fi;
+  end;
+
+end

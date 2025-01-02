@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Properties Version="1">
+  <Property Name="Title" Value="Справочники"/>
+</Properties>
+<Items>
+  <Item Name="Default.htm"/>
+  <Item Name="Отправители.htm"/>
+  <Item Name="ТипыУчетныхДокументов.htm"/>
+  <Item Name="МестаИзданий.htm"/>
+  <Item Name="УровниИзданий.htm"/>
+  <Item Name="АдресаРедакций.htm"/>
+  <Item Name="ЯзыкиИзданий.htm"/>
+  <Item Name="ЯзыкиОригиналовСтатей.htm"/>
+  <Item Name="ТематикиИзданий.htm"/>
+  <Item Name="ТематикиСтатей.htm"/>
+  <Item Name="ББК.htm"/>
+  <Item Name="ГеоРубрикиСтатей.htm"/>
+  <Item Name="Персоналии.htm"/>
+  <Item Name="КоллективныеАвторы.htm"/>
+</Items>

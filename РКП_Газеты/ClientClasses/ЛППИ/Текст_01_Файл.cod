@@ -1,0 +1,18 @@
+class "";
+
+inclass
+--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  proc Создание(ПапкаЛетописи:string;ФайлЛетописи:string;var ЛППИ:TextFile);
+    if    ExistFolder(ПапкаЛетописи) = false    then
+      CreateFolder(ПапкаЛетописи);
+    end;
+    if  ExistFile(ФайлЛетописи) = true          then
+      RemoveFile(ФайлЛетописи);
+    end;
+    ЛППИ        = TextFile.Create(ФайлЛетописи,fmCreate);
+  end;
+--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+inobject
+
+end

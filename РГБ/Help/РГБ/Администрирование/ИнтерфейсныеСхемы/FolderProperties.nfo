@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Properties Version="1">
+  <Property Name="Title" Value="Интерфейсные схемы"/>
+</Properties>
+<Items>
+  <Item Name="Dafault.htm"/>
+  <Item Name="ЭлементыИнтерфейса.htm"/>
+  <Item Name="ОРГП.htm"/>
+</Items>

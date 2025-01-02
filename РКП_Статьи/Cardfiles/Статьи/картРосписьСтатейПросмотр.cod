@@ -1,0 +1,36 @@
+Class inherited РКП_Статьи.Статьи.картРосписьСтатей "Статьи (просмотр)";
+
+import РКП_СИС Classes Functions, FilterMaker;
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриСоздании(Context :Variant);
+    inherited шаблон_ПриСоздании(Context);
+    Self.Cardfile.CanInsert = false;
+    Self.Cardfile.CanDelete = false;
+    фреймФильтрЛГС.CellByField['ГодВыпуска'].Enabled = false;
+    фреймФильтрЛГС.CellByField['НомерВыпуска'].Enabled = false;
+    фреймФильтрПК.Visible = true;
+    фреймФильтрПК.UseSplitter = true;
+    фреймФильтрНомеров.Visible = false;
+    фреймФильтрНомеров.UseSplitter = false;
+    фреймИнформацияОСмене.Visible = false;
+  end;
+
+
+-- 2_Вспомогательные методы0. --
+
+  proc ВключитьИерархию;
+    -- так и должно быть
+  end;
+
+  func ПолучитьФильтрКартотеки (var locTreeFilter :String = nil) :String;
+    var aFlt :String[];
+    AddInArray( aFlt, inherited ПолучитьФильтрКартотеки(locTreeFilter) );
+    AddInArray( aFlt, 'isGroup=0' );
+    Result = MakeFilter(aFlt);
+  end;
+
+end

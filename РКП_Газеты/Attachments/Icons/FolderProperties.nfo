@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Properties Version="1"/>
+<Items>
+  <Item Name="book_open.ico"/>
+  <Item Name="book_open_T.ico"/>
+  <Item Name="clock_history16.ico"/>
+  <Item Name="clock_history.ico"/>
+  <Item Name="dots.ico"/>
+  <Item Name="emotion_eye.ico"/>
+  <Item Name="eye-2-line.ico"/>
+  <Item Name="eye-line.ico"/>
+  <Item Name="eye-line16.ico"/>
+  <Item Name="eye.ico"/>
+  <Item Name="eye16.ico"/>
+  <Item Name="filter.ico"/>
+  <Item Name="filter48.ico"/>
+  <Item Name="globe_model.ico"/>
+  <Item Name="history-line.ico"/>
+  <Item Name="history-line16.ico"/>
+  <Item Name="inbox_document_text.ico"/>
+  <Item Name="mailing_list.ico"/>
+</Items>

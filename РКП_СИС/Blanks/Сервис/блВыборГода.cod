@@ -1,0 +1,71 @@
+class inherited СИС2.БазовыйБланк "Выбор года";
+
+inclass   Public
+
+  func ВыполнитьВыбор(var локГод :Integer) :Integer;
+    var vObj :Сервис.блВыборГода;
+    vObj = Сервис.блВыборГода.Create;
+    if (локГод = nil) then -- год не передан
+      локГод = ВыбранныйРанееГод;
+    fi;
+    if (локГод = nil) then -- год ранее не выбирался или сброшен
+      локГод = Year(today);
+    fi;
+    vObj.ВыбранныйГод = локГод;
+    if cmOk = vObj.ShowEx(, Kernel.Window.ModalWindow) then
+      ВыбранныйРанееГод = vObj.ВыбранныйГод;
+      локГод = vObj.ВыбранныйГод;
+      Result = cmOk;
+    fi;
+  end;
+
+inclass private
+
+  stored var ВыбранныйРанееГод :Integer;
+  stored var ВыбранныйРанееМес :Integer;
+
+inobject private
+
+  var Кнопка1 :Object;
+  var Кнопка2 :Object;
+  var Кнопка3 :Object;
+
+  var ВыбранныйГод :Integer;
+
+  proc ПриОткр(Create: Logical);
+    if ВыбранныйГод<1901 then
+      ВыбранныйГод = Year(Today);
+    fi;
+    Кнопка1.Caption = Str(ВыбранныйГод - 1);
+    Кнопка2.Caption = Str(ВыбранныйГод);
+    Кнопка3.Caption = Str(ВыбранныйГод + 1);
+    Self.Template.CurrentObject = Кнопка2;
+  end;
+
+  proc ГодДо(Sender :Button);
+    ВыбранныйГод = ВыбранныйГод - 1;
+    Кнопка1.Caption = Str(ВыбранныйГод - 1);
+    Кнопка2.Caption = Str(ВыбранныйГод);
+    Кнопка3.Caption = Str(ВыбранныйГод + 1);
+  end;
+
+  proc ГодПосле(Sender :Button);
+    ВыбранныйГод = ВыбранныйГод + 1;
+    Кнопка1.Caption = Str(ВыбранныйГод - 1);
+    Кнопка2.Caption = Str(ВыбранныйГод);
+    Кнопка3.Caption = Str(ВыбранныйГод + 1);
+  end;
+
+  proc Выбор(Sender :Button);
+    if      Sender = Кнопка1 then ВыбранныйГод = ВыбранныйГод-1;
+    elsif   Sender = Кнопка2 then ВыбранныйГод = ВыбранныйГод;
+    elsif   Sender = Кнопка3 then ВыбранныйГод = ВыбранныйГод+1;
+    fi;
+    Close(cmOK);
+  end;
+
+  Proc Отм(Sender :Button);
+    Close(cmCancel);
+  end;
+
+end

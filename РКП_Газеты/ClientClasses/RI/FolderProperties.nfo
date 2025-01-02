@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Properties Version="1">
+  <Property Name="Title" Value="Интерфейсы классов записей"/>
+</Properties>
+<Items>
+  <Item Name="Газета"/>
+  <Item Name="ЕдиницаХранения"/>
+  <Item Name="НомерГазеты"/>
+  <Item Name="ВыпускГазеты"/>
+  <Item Name="ПоступлениеГазеты"/>
+  <Item Name="Отправитель"/>
+  <Item Name="УчетныйДокумент"/>
+</Items>

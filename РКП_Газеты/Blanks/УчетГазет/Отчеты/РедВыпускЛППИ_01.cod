@@ -1,0 +1,163 @@
+class inherited УчетГазет.Отчеты.РедВыпускЛППИ_00 "", editor ВыпускЛППИ;
+
+inclass
+
+inobject
+
+
+  var Место_            : string[];
+  var НомерЗаписи_      : integer[];
+  секцМестаИздания      : TemplateSection;
+  var Место_УМ          : string[];
+  var НомераЗаписей_УМ  : string[];
+  секцУказательМест     : TemplateSection;
+
+--------------------------------------------------------------------------------
+--{ Обработчики событий бланка
+ proc ПодготовкаМестУказателя;
+    var Qg                      : Query;
+    var g,i,z,k                 : integer;
+    var Копилка,Шкала           : integer;
+    var Место0,Место1           : string;
+    var РешениеПродолжить       : logical;
+    Место_                      = nil;
+    НомерЗаписи_                = nil;
+    --каждое место
+    Qg                          = Query.Create([РКП_Газеты.Газета]);
+    Qg.Filter                   = "ГодЛетописи="+Str(ГодЛетописи);
+--                                  " and ПризнакОтсылки=false";  --13.01.2009
+    Qg.Select;
+    Qg.First;
+    Шкала                       = Qg.Count;
+    for g = 1..Qg.Count         do
+      Hint("Места изданий...",g,Шкала*2);
+      if Qg.Current.ПризнакОтсылки=false                then
+        for i = 1..Qg.Current.МестаИздания.Count        do
+          z                     = z+1;
+          НомерЗаписи_[z]       = Qg.Current.НомерВЛетописи;
+          Место_[z]             = Qg.Current.МестаИздания.Items[i].МестоИздания.Наим;
+        end;
+      else
+        if Qg.Current.Отсылка<>nil   and Qg.Current.Отсылка.ГодЛетописи=ГодЛетописи      then
+          for i = 1..Qg.Current.Отсылка.МестаИздания.Count      do
+            if Qg.Current.МестаИздания.Count<=i                         then--условие, допускающее сравнимость позиции
+            if Qg.Current.Отсылка.МестаИздания.Items[i].МестоИздания.Наим<>
+               Qg.Current.МестаИздания.Items[i].МестоИздания.Наим       then
+            z                   = z+1;
+            НомерЗаписи_[z]     = Qg.Current.Отсылка.НомерВЛетописи;
+            Место_[z]           = Qg.Current.МестаИздания.Items[i].МестоИздания.Наим;
+            end;
+            else
+            z                   = z+1;
+            НомерЗаписи_[z]     = Qg.Current.Отсылка.НомерВЛетописи;
+            Место_[z]           = Qg.Current.МестаИздания.Items[i].МестоИздания.Наим;
+            end;
+          end;
+        end;
+      end;
+      Qg.Next;
+    end;
+    Qg.Close;
+    Копилка                     = g-1;
+    --несколько мест
+    Qg                          = Query.Create([РКП_Газеты.Газета]);
+    Qg.Filter                   = "ГодЛетописи="+Str(ГодЛетописи)+" and МестаИздания.Count>1";
+    Qg.Select;
+    Qg.First;
+    Шкала                       = Шкала+Qg.Count;
+    for g = 1..Qg.Count         do
+      Hint("Места изданий...",Копилка+g,Шкала*2);
+      if Qg.Current.ПризнакОтсылки=false                then
+        z                       = z+1;
+        НомерЗаписи_[z]         = Qg.Current.НомерВЛетописи;
+        for i = 1..Qg.Current.МестаИздания.Count        do
+          if i=1                                        then
+            Место_[z]           = Qg.Current.МестаИздания.Items[i].МестоИздания.Наим;
+          else
+            Место_[z]           = Место_[z]+" ; "+Qg.Current.МестаИздания.Items[i].МестоИздания.Наим;
+          end;
+        end;
+      else
+        if Qg.Current.Отсылка<>nil and Qg.Current.Отсылка.ГодЛетописи=ГодЛетописи       then
+        РешениеПродолжить       = false;
+        if Qg.Current.Отсылка.МестаИздания.Count<>Qg.Current.МестаИздания.Count         then
+          РешениеПродолжить       = true;
+        else
+          for i = 1..Qg.Current.Отсылка.МестаИздания.Count                              do
+            if Qg.Current.Отсылка.МестаИздания.Items[i].МестоИздания.Наим<>
+               Qg.Current.МестаИздания.Items[i].МестоИздания.Наим                       then
+               РешениеПродолжить  = true;
+              Break;
+            end;
+          end;
+        end;--Qg.Current.Отсылка.МестаИздания.Count<>Qg.Current.МестаИздания.Count
+        if РешениеПродолжить  = true                                                    then
+        z                       = z+1;
+        НомерЗаписи_[z]         = Qg.Current.Отсылка.НомерВЛетописи;
+          for i = 1..Qg.Current.Отсылка.МестаИздания.Count      do
+            if i=1                                      then
+              Место_[z]         = Qg.Current.Отсылка.МестаИздания.Items[i].МестоИздания.Наим;
+            else
+              Место_[z]         = Место_[z]+" ; "+Qg.Current.Отсылка.МестаИздания.Items[i].МестоИздания.Наим;
+            end;
+          end;
+        end;--РешениеПродолжить
+        end;--Qg.Current.Отсылка<>nil and Qg.Current.Отсылка.ГодЛетописи=ГодЛетописи
+      end;
+      Qg.Next;
+    end;
+    Qg.Close;
+    Копилка                     = Копилка+g-1;
+    ----
+    секцМестаИздания.Count      = z;
+    секцМестаИздания.SortBy("Место_,НомерЗаписи_");
+    ----
+    секцУказательМест.Count     = 0;
+    Место_УМ                    = nil;
+    НомераЗаписей_УМ            = nil;
+    Шкала                       = Шкала+z;
+    for k = 1..секцМестаИздания.Count           do
+      Hint("Места изданий...",Копилка+k,Шкала);
+      --Hint("Места изданий...",g-1+k,Qg.Count+секцМестаИздания.Count);
+      Место1                    = Место_[k];
+      if Место1<>Место0                         then
+        i                       = i+1;
+        Место_УМ[i]             = Место_[k];
+        НомераЗаписей_УМ[i]     = Str(НомерЗаписи_[k]);
+      else
+        НомераЗаписей_УМ[i]     = НомераЗаписей_УМ[i]+", "+Str(НомерЗаписи_[k]);
+      end;
+      Место0=Место1;
+    end;
+    секцУказательМест.Count     = i;
+    --Qg.Close;
+ end;
+
+
+  proc СозданиеМестУказателя;
+    var k       : integer;
+    var ЛППИ    : TextFile;
+    ПодготовкаМестУказателя;
+    -------
+    if    ExistFolder(ПапкаЛППИ) = false                        then
+      CreateFolder(ПапкаЛППИ);
+    end;
+    if  ExistFile(ПапкаЛППИ+"\МестУказатель.txt") = true        then
+      RemoveFile(ПапкаЛППИ+"\МестУказатель.txt");
+    end;
+    ЛППИ        = TextFile.Create(ПапкаЛППИ+"\МестУказатель.txt",fmCreate);
+    ------
+    ЛППИ.WriteLn("");
+    ЛППИ.WriteLn("УКАЗАТЕЛЬ МЕСТ ИЗДАНИЯ ГАЗЕТ");
+    ЛППИ.WriteLn("");
+    for k=1..секцУказательМест.Count    do
+      Hint("Формирование файла...",k,секцУказательМест.Count);
+      if Место_УМ[k]<>""                                        then
+      ЛППИ.WriteLn("    "+Место_УМ[k]+" "+НомераЗаписей_УМ[k]);
+      end;
+    end;
+    end;
+
+--}
+
+end

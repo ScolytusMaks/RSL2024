@@ -1,0 +1,497 @@
+class inherited МашинаРеквизитов.Базовые.картСИнтерфейсом "Газеты и МП";
+
+import РКП_СИС Classes Profile, StringsFunctions, StdCode, Functions, Recs, FilterMaker;
+
+--{{ 2_Свойства
+inclass public
+
+  var КлассИнтерфейса :Class МашинаРеквизитов.Базовые.интЗапись = RI.Газета;
+
+inclass private
+
+  stored var хВариантПростогоФильтра  :Integer;
+  stored var хВариантПростогоФильтра2 :Integer;
+  var ИменаКлючевыхСтолбцов :String[] := ['РегНомер','ISSN','НазваниеОсн','НазваниеНацЯз','НазваниеИнЯз','НазваниеИнЯз','Подзаголовок','МестаИзданияСтр']; -- столбцы, нобходимые для идентификации издания
+  var ИменаСтолбцовЛППИ     :String[] := ['ГодЛетописи', 'НомерВЛетописи','ЗаписьВЛетописи','ПризнакОтсылки','НазваниеОсн','Подзаголовок']; -- столбцы для идентификации издания в картотеке формирования ЛППИ
+
+inobject public
+
+  var ИгнорироватьХранимыеСвойства   :Logical;
+
+inobject private
+
+  stored var ВариантПростогоФильтра  :Integer;
+  stored var ВариантПростогоФильтра2 :Integer;
+  var ФрагментНазвания     :String;
+  var ФрагментПодзаголовка :String;
+  var ФрагментРегНомера    :String;
+
+  var Смена          :РКП_СИС.Смена := ПолучитьЗаписьСмены;
+  var НачалоСмены    :Date          := if((Смена <> nil), Смена.CreateDate, nil);
+  var Оператор       :String        := if((SessionInfo.UserRecord <> nil), (SessionInfo.UserRecord as Kernel.Settings.User).FullName, nil);
+  var НомеровЗаСмену :Integer;
+
+  var UpdateDate     :Date;
+  var UpdateUser     :String;
+  var CreateDate     :Date;
+  var CreateUser     :String;
+
+  var фреймИнформацияОЗаписи :TemplateFrame;
+  var фреймИнформацияОСмене  :TemplateFrame;
+  var фреймСервис :TemplateFrame;
+  var секцИнфОЗаписи1 :TemplateSection;
+  var секцИнфОЗаписи2 :TemplateSection;
+  var секцИнфОСмене1  :TemplateSection;
+  var секцИнфОСмене2  :TemplateSection;
+  var секцИнфОСмене3  :TemplateSection;
+  var клУпрИнфОЗаписи :TemplateCell := if(секцИнфОЗаписи1 <> nil, секцИнфОЗаписи1.Cell[1,1], nil);
+  var клУпрИнфОСмене  :TemplateCell := if(секцИнфОСмене1<> nil, секцИнфОСмене1.Cell[1,1], nil);
+
+  var PageDef    :Image;
+  var PageBlack  :Image;
+  var PageYellow :Image;
+  var PageBlue   :Image;
+  var PageRed    :Image;
+
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inclass public
+
+  func ВыполнитьВыбор_Отсылки (var локРезультатВыбора: РКП_Газеты.Газета; локВызывающая :РКП_Газеты.Газета; локФрагментНазвания :String = nil): Integer;
+    var locForm: УчетГазет.картГазеты;
+    locForm = УчетГазет.картГазеты.Create;
+    locForm.УдалитьНеключевыеСтолбцы;
+    locForm.SetField('Запретить_Добавление', true);
+    locForm.SetField('Запретить_ДобавлениеГрупп', true);
+    locForm.SetField('Запретить_Дублирование', true);
+    locForm.SetField('Запретить_Удаление', true);
+    locForm.SetField('Запретить_Перенос', true);
+    locForm.SetField('Запретить_Копирование', true);
+    locForm.SetField('Запретить_Преобразование', true);
+    locForm.ФрагментНазвания = локФрагментНазвания;
+    locForm.ДополнительныйФильтр = 'not ПризнакОтсылки and DocId<>' + Str(локВызывающая.DocId);
+    locForm.секцИнфОСмене1.Visible = false;
+    if CmOk = locForm.ShowEx(локРезультатВыбора, nil, Kernel.Window.ModalWindow) then
+      Return CmOk;
+    fi;
+  end;
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриСоздании(Context :Variant);
+    inherited шаблон_ПриСоздании(Context);
+    Self.Cardfile.CanInsert = (FullAccess or ORGPAccess);
+    Self.Cardfile.CanDelete = (FullAccess or ORGPAccess);
+    Self.Cardfile.CanCopy = false;
+    PageDef    = Image.Create; PageDef.LoadFromFile('%Projects%\РКП_СИС\Attachments\Icons\PageDef.ico');
+    PageBlack  = Image.Create; PageBlack.LoadFromFile('%Projects%\РКП_СИС\Attachments\Icons\PageBlack.ico');
+    PageYellow = Image.Create; PageYellow.LoadFromFile('%Projects%\РКП_СИС\Attachments\Icons\PageYellow.ico');
+    PageBlue   = Image.Create; PageBlue.LoadFromFile('%Projects%\РКП_СИС\Attachments\Icons\PageBlue.ico');
+    PageRed    = Image.Create; PageRed.LoadFromFile('%Projects%\РКП_СИС\Attachments\Icons\PageRed.ico');
+    if OPPIAccess then
+      УдалитьНеключевыеСтолбцы;
+      Template.HelpContext =  'РКП_Газеты.РГБ.УчетФактическихПоступлений.РеестрГазет.htm';
+    else
+      Template.HelpContext =  'РКП_Газеты.РГБ.Регистрация.РеестрГазет.htm';
+    fi;
+    фреймСервис.Visible = DevAccess;
+    Self.CanHideTemplate = true;
+  end;
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    if (клУпрИнфОЗаписи <> nil) then
+      клУпрИнфОЗаписи.Contents = SymbolCollapsed;
+    fi;
+    if (клУпрИнфОСмене <> nil) then
+      клУпрИнфОСмене.Contents = SymbolCollapsed;
+    fi;
+    if not ИгнорироватьХранимыеСвойства then
+      ВариантПростогоФильтра  = хВариантПростогоФильтра;
+      ВариантПростогоФильтра2 = хВариантПростогоФильтра2;
+    else
+      Self.Window.Caption = 'Газеты и МП (фильтр)';
+    fi;
+    inherited шаблон_ПриОткрытии(Create);
+    SetFindMaskFormat('НазваниеОсн');
+    SetFindMaskFormat('НазваниеНацЯз');
+    SetFindMaskFormat('НазваниеИнЯз');
+    SetFindMaskFormat('Подзаголовок');
+    SetFindMaskFormat('E_mail');
+    SetFindMaskFormat('HTTP');
+    УстановитьОграничениеМинШириныСтолбцов;
+    ИзменитьИконкуОкна;
+    Смена = ПолучитьЗаписьСмены;
+  end;
+
+  func шаблон_ПередЗакрытием(ModalResult :Integer) :Logical;
+    хВариантПростогоФильтра  = ВариантПростогоФильтра;
+    хВариантПростогоФильтра2 = ВариантПростогоФильтра2;
+    Result = inherited шаблон_ПередЗакрытием(ModalResult);
+  end;
+
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func Поле_ПриНажатии_Фильтр(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var r: Integer;
+    r = Cell.Row;
+    if (Cell.Contents = 'ВариантПростогоФильтра') then
+      ВариантПростогоФильтра = (r - 1);
+    elsif (Cell.Contents = 'ВариантПростогоФильтра2') then
+      ВариантПростогоФильтра2 = (r - 1);
+    fi;
+    ОбновитьФильтр;
+  end;
+
+  func Поле_ПриНажатии_ДопИнфо(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    if (Cell in [клУпрИнфОЗаписи, клУпрИнфОСмене]) then
+      if Cell.Contents = SymbolCollapsed then
+        Cell.Contents = SymbolExpanded;
+      elsif Cell.Contents = SymbolExpanded then
+        Cell.Contents = SymbolCollapsed;
+      fi;
+      МодифицироватьШаблон;
+      if Cell.Contents = SymbolExpanded then
+        ВычислитьЧислоНомеровЗаСмену;
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриНажатии_ПринятоЗаПериод(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    if true in [DevAccess,AdmAccess,FullAccess,ORGPAccess] then
+      РКП_Газеты.УчетГазет.Отчеты.блПротоколВводаСотрОРГП.ShowFormEx( , Kernel.Window.ModalWindow);
+    elsif OPPIAccess then
+      РКП_Газеты.УчетГазет.Отчеты.блПротоколВводаСотрОППИ.ShowFormEx( , Kernel.Window.ModalWindow);
+    fi;
+  end;
+
+  proc Поле_Фильтр_ПриВыходе(Cell :TemplateCell; Index :Integer);
+    ОбновитьФильтр;
+  end;
+
+  func Поле_ПриВыводе_Фильтр(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    var r: Integer;
+    r = Cell.Row;
+    if (Cell.Contents = 'ВариантПростогоФильтра') then
+      Cell.Caption = if( (r - 1) = ВариантПростогоФильтра, 'l', '');
+    elsif (Cell.Contents = 'ВариантПростогоФильтра2') then
+      Cell.Caption = if( (r - 1) = ВариантПростогоФильтра2, 'l', '');
+    fi;
+  end;
+
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+  proc кнУдалить_ПриНажатии(Sender :Button);
+    --var Названиегазеты :string;
+    --Названиегазеты = CardFile.Current.НазваниеОсн;
+    if (ParentFrame <> nil) then
+      if (Window.CurrentObject = nil) or (Window.CurrentObject in [Window.CardFile, Window.CardfileSubtable, Window.Template]) then
+        Window.CurrentObject = Window.CardFile;
+      else
+        Window.CurrentObject = Window.CardfileSubtable;
+      fi;
+    fi;
+    --if ПроверитьГазетуДоУдаления(CardFile.Current) then
+      ExecuteCommand('Kernel.Card.Run.DeleteRec');
+    --  Message("Газета <" + Названиегазеты + "> успешно удалена!");
+    --fi;
+  end;
+
+  proc кнОбработать_ПриНажатии(Sender :Button);
+    var k, kk :Integer;
+    var ri :RI.Газета;
+    with Query.Create([РКП_Газеты.Газета]) do
+      kk = Count;
+      Select;
+      while not Eof do
+        ri = РКП_Газеты.RI.Газета.OpenRecord(Current);
+        ri.ОбновитьПоляИнфо;
+        РКП_СИС.Recs.RecordPostIfNeed(Current);
+        k = k + 1;
+        Hint('Выполнение (' + Current.НазваниеОсн + ')...', k, kk);
+        Next;
+      od;
+    end;
+  end;
+
+  proc кнИмпорт_ПриНажатии(Sender :Button);
+    var vFileName, vLine, vCode:String;
+    var vFileCsv :TextFile;
+    var aValue :String[];
+    var rNsp :Газета;
+    if (cmOk = ChooseFile(vFileName, 'Данные для загрузки', 'csv|*.csv')) then
+      vFileCsv = TextFile.Create(vFileName, fmOpenRead);
+      ClearTrace;
+      vFileCsv.ReadLn;
+      while not vFileCsv.Eof do
+        vLine = vFileCsv.ReadLn;
+        SplitString(vLine, ';', aValue);
+        vCode = Trim(aValue[2]);
+        rNsp = FindRecord(Газета, 'ExtId="' + vCode + '"');
+        if (rNsp = nil) then
+          Trace('Не найдена запись ExtId="' + vCode + '"');
+        else
+          rNsp.КомплектРГБ = (Trim(aValue[3]) <> nil);
+          RecordPostIfNeed(rNsp);
+        fi;
+      od;
+    fi;
+  end;
+
+
+
+-- 2_Обработчики событий картотеки0. --
+
+  proc картотека_ПриПеремещении(Record :Record);
+    inherited картотека_ПриПеремещении(Record);
+    ВычислитьЧислоНомеровЗаСмену;
+    if (Record <> nil) then
+      UpdateDate = Record.UpdateDate;
+      UpdateUser = Record.UpdateUser;
+      CreateDate = Record.CreateDate;
+      CreateUser = Record.CreateUser;
+    else
+      UpdateDate = nil;
+      UpdateUser = nil;
+      CreateDate = nil;
+      CreateUser = nil;
+    fi;
+  end;
+
+  func картотека_ПриОткрытииБланка(Action :Integer; Record :Record) :Logical;
+    Result = inherited картотека_ПриОткрытииБланка(Action, Record);
+    ФрагментНазвания = nil;
+    ФрагментПодзаголовка = nil;
+    ОбновитьФильтр;
+  end;
+
+  func картотека_ПередИзменением(Action :Cardfile.ModifyActions; Rec :Record; Group :Record; var AskConfirm :Logical) :Logical;
+    Result = inherited картотека_ПередИзменением(Action, Rec, Group, AskConfirm);
+    if Result then
+      if (Action = Cardfile.DeleteRecord) then -- реакция на удаление
+        if (Record <> nil)  and (Cardfile.SelectedCount = 0) then -- текущая запись одна
+          Result = RI.Газета.OpenRecord(Rec).УдалениеВозможно;
+
+        elsif (Record = nil)  and (Cardfile.SelectedCount > 0) then -- выделено несколько записей
+          Message('Пожалуйста, снимите выделение нескольких записей. Массовое удаление записей в этой форме не предусмотрено.');
+        fi;
+      else
+        Return true;
+      fi;
+    fi;
+  end;
+
+  proc картотека_ПриРисованииСтроки(Rec :Record; Selected :Logical; var Color :Integer; Image :Image);
+    Rec = Rec as РКП_Газеты.Газета;
+    if Rec.Прекращено          then Image.Assign(PageBlack);
+    elsif Rec.ПризнакОтсылки   then Image.Assign(PageYellow);
+    elsif not Rec.КомплектРГБ  then Image.Assign(PageRed);
+    else                            Image.Assign(PageDef);
+    fi;
+  end;
+
+
+-- 2_Обработчики столбцов (полей) картотеки0. --
+
+  func картПоле_ПриВыводе_МестоИздания(Column :CardfileColumn; Rec :РКП_Газеты.Газета; Action :Template.OutputTypes; var Format :String) :Variant;
+    var vCount :Integer;
+    if Column.Visible and (Action = Template.Output) then
+      vCount = Rec.МестаИздания.Count;
+      if (vCount = 1) then
+        Return Rec.МестаИздания.Items[1].МестоИздания.Наим;
+      elsif (vCount = 2) then
+        Return Rec.МестаИздания.Items[1].МестоИздания.Наим + " ; " +
+               Rec.МестаИздания.Items[2].МестоИздания.Наим;
+      elsif (vCount >= 3) then
+        Return Rec.МестаИздания.Items[1].МестоИздания.Наим + " ; " +
+               Rec.МестаИздания.Items[2].МестоИздания.Наим + " ; " +
+               Rec.МестаИздания.Items[3].МестоИздания.Наим;
+      fi;
+    fi;
+  end;
+
+  func картПоле_ПриВыводе_ЯзыкИздания(Column :CardfileColumn; Rec :Record;Action :Template.OutputTypes;var Format :String) :Variant;
+    var vCount :Integer;
+    if Column.Visible and (Action = Template.Output) then
+      vCount = Rec.Языки.Count;
+      if (vCount = 1) then
+        Result = Rec.Языки.Items[1].Язык.Наим;
+      elsif (vCount = 2) then
+        Result = Rec.Языки.Items[1].Язык.Наим + " ; " +
+                 Rec.Языки.Items[2].Язык.Наим;
+      elsif (vCount >= 3 ) then
+        Result = Rec.Языки.Items[1].Язык.Наим + " ; " +
+                 Rec.Языки.Items[2].Язык.Наим + " ; " +
+                 Rec.Языки.Items[3].Язык.Наим;
+      fi;
+    fi;
+  end;
+
+  func картПоле_ПриВыводе_ЧитательскийАдрес(Column :CardfileColumn; Rec :Record;Action :Template.OutputTypes;var Format :String) :Variant;
+    var vCount :Integer;
+    if Column.Visible and (Action = Template.Output) then
+      vCount = Rec.ЧАЦН.Count;
+      if (vCount = 1) then
+        Result = Rec.ЧАЦН.Items[1].ЧАЦН.Наим;
+      elsif (vCount = 2) then
+        Result = Rec.ЧАЦН.Items[1].ЧАЦН.Наим + " ; " +
+                 Rec.ЧАЦН.Items[2].ЧАЦН.Наим;
+      elsif (vCount >= 3) then
+        Result = Rec.ЧАЦН.Items[1].ЧАЦН.Наим + " ; " +
+                 Rec.ЧАЦН.Items[2].ЧАЦН.Наим + " ; " +
+                 Rec.ЧАЦН.Items[3].ЧАЦН.Наим;
+      fi;
+    fi;
+  end;
+
+  func картПоле_ПриВыводе_Тематика(Column :CardfileColumn; Rec :Record;Action :Template.OutputTypes;var Format :String) :Variant;
+    var vCount :Integer;
+    if Column.Visible and (Action = Template.Output) then
+      vCount = Rec.Тематики.Count;
+      if (vCount = 1) then
+        Result = Rec.Тематики.Items[1].Тематика.Наим;
+      elsif (vCount = 2) then
+        Result = Rec.Тематики.Items[1].Тематика.Наим + " ; " +
+                 Rec.Тематики.Items[2].Тематика.Наим;
+      elsif (vCount >= 3) then
+        Result = Rec.Тематики.Items[1].Тематика.Наим + " ; " +
+                 Rec.Тематики.Items[2].Тематика.Наим + " ; " +
+                 Rec.Тематики.Items[3].Тематика.Наим;
+      fi;
+    fi;
+  end;
+
+  func картПоле_ПриВыводе_ПоследнийПолученныйНомер(Column :CardfileColumn; Rec :Record;Action :Template.OutputTypes;var Format :String) :Variant;
+    var RecNom  :Record;
+    if Column.Visible and (Action = Template.Output) then
+      RecNom = РКП_Газеты.Стат.ПоследнийПолученныйНомер(Rec);
+      if (RecNom <> nil) then
+        Return BiblioRecord.ОписаниеНомера(RecNom);
+      fi;
+    fi;
+  end;
+
+
+-- 2_Дополнительные команды0. --
+
+
+-- 2_Вспомогательные методы0. --
+
+  func ПолучитьФильтрКартотеки (var locTreeFilter :String = nil) :String;
+    var aFlt :String[];
+    AddInArray( aFlt, Self.ДополнительныйФильтр );
+    AddInArray( aFlt, ПолучитьФильтр_ПоНазванию );
+    AddInArray( aFlt, ПолучитьФильтр_ПоПодзаголовку );
+    AddInArray( aFlt, ПолучитьФильтр_ПоРегНомеру );
+    Result = MakeFilter(aFlt);
+  end;
+
+  func ПолучитьФильтр_ПоНазванию :String;
+    if (ФрагментНазвания <> nil) then
+      if (ВариантПростогоФильтра = 1) then
+        Return 'Match(НазваниеОсн,"*' + ФрагментНазвания + '*")';
+      else
+        Return 'Match(НазваниеОсн,"' + ФрагментНазвания + '*")';
+      fi;
+    fi;
+  end;
+
+  func ПолучитьФильтр_ПоПодзаголовку :String;
+    if (ФрагментПодзаголовка <> nil) then
+      if  (ВариантПростогоФильтра2 = 1) then
+        Return 'Match(Подзаголовок,"*' + ФрагментПодзаголовка + '*")';
+      else
+        Return 'Match(Подзаголовок,"' + ФрагментПодзаголовка + '*")';
+      fi;
+    fi;
+  end;
+
+  func ПолучитьФильтр_ПоРегНомеру :String;
+    if (ФрагментРегНомера <> nil) then
+      Return 'Match(РегНомер,"*' + ФрагментРегНомера + '*")';
+    fi;
+  end;
+
+  proc ВычислитьЧислоНомеровЗаСмену;
+    if (клУпрИнфОСмене.Contents = SymbolExpanded) then
+      if (SessionInfo.UserRecord <> nil) then
+        if OPPIAccess then
+          НомеровЗаСмену = РКП_Газеты.Стат.ПринятоЕдХраненияЗаСмену(SessionInfo.UserRecord.Name ,Today);
+        else
+          НомеровЗаСмену = РКП_Газеты.Стат.ПринятоНомеровЗаСмену(SessionInfo.UserRecord.Name ,Today);
+        fi;
+      fi;
+    fi;
+  end;
+
+  proc МодифицироватьШаблон;
+    секцИнфОЗаписи2.Visible = (клУпрИнфОЗаписи.Contents = SymbolExpanded);
+    секцИнфОСмене2.Visible  = (клУпрИнфОСмене.Contents = SymbolExpanded);
+    секцИнфОСмене3.Visible  = (клУпрИнфОСмене.Contents = SymbolExpanded);
+  end;
+
+  -- Поиск и при необходимости - создание
+  -- записи с информацией о смене
+  func ПолучитьЗаписьСмены :РКП_СИС.Смена;
+    var UN :String;
+    var aFlt :String[];
+
+    func СменВГоду :Integer;
+      with Query.Create([РКП_СИС.Смена]) do
+        Filter = 'CreateUser="' + UN + '" and Year(CreateDate)=' + Str(Year(Today));
+        Return Count;
+      end;
+    end;
+
+    if (SessionInfo.UserRecord <> nil) then
+      UN = (SessionInfo.UserRecord as Kernel.Settings.User).Name;
+      Оператор = (SessionInfo.UserRecord as Kernel.Settings.User).FullName;
+      AddInArray( aFlt, 'CreateUser="' + UN + '"');
+      AddInArray( aFlt, 'Day(CreateDate)=' + Str(Day(Today)) );
+      AddInArray( aFlt, 'Mon(CreateDate)=' + Str(Mon(Today)) );
+      AddInArray( aFlt, 'Year(CreateDate)=' + Str(Year(Today)) );
+      Result = FindRecord(РКП_СИС.Смена, MakeFilter(aFlt) );
+      if (Result = nil) then
+        Result = РКП_СИС.Смена.Create;
+        Result.НомерСменыВГоду = СменВГоду + 1;
+        Result.Post;
+      fi;
+    fi;
+  end;
+
+  proc УстФорматМаскиПоиска synonym SetFindMaskFormat (ByField :String; locFindMaskFormats :Cardfile.FindMaskFormats = Cardfile.FindFromBegin);
+    var vColumn :CardfileColumn;
+    vColumn = Self.Cardfile.ColumnByField[ByField];
+    if (vColumn <> nil) then
+      vColumn.FindMaskFormat = locFindMaskFormats;
+    fi;
+  end;
+
+  proc УдалитьНеключевыеСтолбцы;
+    var i, ii :Integer;
+    ii = Self.Cardfile.ColumnsCount;
+    for i = ii .. 1 step -1 do
+      if not (Self.Cardfile.Column[i].FieldName in ИменаКлючевыхСтолбцов) then
+        Self.Cardfile.DeleteColumn(i);
+      fi;
+    od;
+  end;
+
+  proc УстановитьОграничениеМинШириныСтолбцов;
+    var i, ii :Integer;
+    ii = Self.Cardfile.ColumnsCount;
+    for i = 1 .. ii do
+      Self.Cardfile.Column[i].MinWidth = 10;
+    od;
+  end;
+
+  proc ИзменитьИконкуОкна;
+    Self.Window.Icon.LoadFromFile(BaseInfo.ProjectByName[Self.ClassProject].Folder + 'Attachments\Icons\inbox_document_text.ico');
+  end;
+
+end

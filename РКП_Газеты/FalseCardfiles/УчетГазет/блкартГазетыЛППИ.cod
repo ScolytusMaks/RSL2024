@@ -1,0 +1,226 @@
+class inherited РКП_СИС.FalseCardBase "Состав ЛППИ";
+
+import СИС2 classes Константы;
+import РКП_СИС classes StringsFunctions, Functions, FilterMaker, Recs;
+
+--{{ 2_Свойства
+
+inclass private
+
+  var КлассИнтерфейса :Class RI.Газета := RI.Газета;
+
+inobject private
+
+  var ГодЛППИ    :Integer;
+  var ВсегоГазет :Integer;
+  var PageDef    :Image;
+  var PageBlack  :Image;
+  var PageYellow :Image;
+  var PageBlue   :Image;
+  var фреймИнфо3 :TemplateFrame;
+
+
+
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inclass public
+
+  proc ПоказатьСоставЛППИ (локГодЛППИ :Integer);
+    var locForm: УчетГазет.блкартГазетыЛППИ;
+    locForm = УчетГазет.блкартГазетыЛППИ.Create;
+    locForm.ГодЛППИ = локГодЛППИ;
+    #NoWarning;
+    locForm.ShowEx(nil, Kernel.Window.ChildWindow);
+  end;
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриСоздании(Context :Variant);
+    crdBuiltIn.CanInsert = false;
+    crdBuiltIn.CanCopy = false;
+    crdBuiltIn.CanDelete = false;
+    inherited шаблон_ПриСоздании(Context);
+    PageDef    = Image.Create; PageDef.LoadFromFile('%Projects%\РКП_СИС\Attachments\Icons\PageDef.ico');
+    PageBlack  = Image.Create; PageBlack.LoadFromFile('%Projects%\РКП_СИС\Attachments\Icons\PageBlack.ico');
+    PageYellow = Image.Create; PageYellow.LoadFromFile('%Projects%\РКП_СИС\Attachments\Icons\PageYellow.ico');
+    PageBlue   = Image.Create; PageBlue.LoadFromFile('%Projects%\РКП_СИС\Attachments\Icons\PageBlue.ico');
+  end;
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    inherited шаблон_ПриОткрытии(Create);
+    ВсегоГазет = crdBuiltIn.Query.Count;
+  end;
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func Поле_ПриВыводе_ГодЛППИ(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    if (ГодЛППИ <> nil) then
+      Return 'ЛППИ зи ' + Str(ГодЛППИ) + ' год';
+    fi;
+  end;
+
+  func Поле_ПриВыводе_БибОписание(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    var cRec :РКП_Газеты.Газета;
+    if (crdBuiltIn.Current <> nil) then
+      cRec = crdBuiltIn.Current as РКП_Газеты.Газета;
+      Result = cRec.Заголовок + Br + cRec.ОписаниеГазеты;
+    fi;
+  end;
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+
+  func картШаблона_ПриНажатии(Sender :TemplateCardfile; Action :Template.ClickTypes; Column :CardfileColumn; Rec :Record) :Logical;
+    Result = inherited crdBuiltIn_OnClick(Sender, Action, Column, Rec);
+  end;
+
+  func картШаблона_ПриЗаписи(Sender :TemplateCardfile; Rec :Record) :Logical;
+    Result = inherited crdBuiltIn_OnPost(Sender, Rec);
+  end;
+
+  proc картШаблона_ПриПеремещении(Sender :TemplateCardfile; Rec :Record);
+    фреймИнфо3.Update;
+  end;
+
+  proc Столбец_ПриРисовании (Column :CardfileColumn; Rec :Record; Selected :Logical; var Color :Integer; Font :Font);
+    --var vFieldNameRecDeprecated :String;
+    if (Column.FieldName in ИменаСлужебныхПолей) then
+      Font.Color = COLOR_GRAYTEXT;
+    fi;
+  end;
+
+  proc картШаблона_ПриРисованииСтроки(Rec :Record; Selected :Logical; var Color :Integer; Image :Image);
+    Rec = Rec as РКП_Газеты.Газета;
+    if Rec.Прекращено        then Image.Assign(PageBlack);
+    elsif Rec.ПризнакОтсылки then Image.Assign(PageYellow);
+    elsif Rec.КомплектРГБ    then Image.Assign(PageBlue);
+    else                          Image.Assign(PageDef);
+    fi;
+  end;
+
+
+-- 2_Вспомогательные методы0. --
+
+  proc ИнициализироватьСтолбцыКартотеки;
+    inherited ИнициализироватьСтолбцыКартотеки;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'ГодЛетописи';
+      Caption = 'Год вкл. в летопись';
+      Hint = 'Год включения в летопись';
+      FieldType = Template.NumericField;
+      Alignment = Template.CenterAlign;
+      Font.Size = crdBuiltIn.Font.Size;
+      Format = '0000;; ';
+      MinWidth = 180;
+      Width = 180;
+      Visible = true;
+      CanEdit = false;
+    end;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'НомерВЛетописи';
+      Caption = '№ в ежегоднике';
+      Hint = 'Номер в ежегоднике';
+      FieldType = Template.NumericField;
+      Alignment = Template.CenterAlign;
+      Font.Size = crdBuiltIn.Font.Size;
+      Format = '##0;; ';
+      MinWidth = 180;
+      Width = 180;
+      Visible = true;
+      CanEdit = false;
+    end;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'ЗаписьВЛетописи';
+      Caption = '№ записи';
+      Hint = 'Запись (по порядку) в ежегоднике';
+      FieldType = Template.NumericField;
+      Alignment = Template.CenterAlign;
+      Font.Size = crdBuiltIn.Font.Size;
+      Format = '##0;; ';
+      MinWidth = 100;
+      Width = 100;
+      Visible = true;
+      CanEdit = false;
+    end;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'РегНомер';
+      Caption = 'Номер ' + Chr(13) + 'гос. регистрации';
+      FieldType = Template.StringField;
+      Alignment = Template.CenterAlign;
+      Font.Size = crdBuiltIn.Font.Size;
+      MinWidth = 240;
+      Width = 240;
+      Visible = false;
+      CanEdit = false;
+    end;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'НазваниеОсн';
+      Caption = 'Название (основное)';
+      FieldType = Template.StringField;
+      Alignment = Template.LeftAlign;
+      Font.Size = crdBuiltIn.Font.Size;
+      MinWidth = 300;
+      Width = 0;
+      Visible = true;
+      CanEdit = false;
+    end;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'НазваниеНацЯз';
+      Caption = 'Название на национальном языке';
+      FieldType = Template.StringField;
+      Alignment = Template.LeftAlign;
+      Font.Size = crdBuiltIn.Font.Size;
+      MinWidth = 200;
+      Width = 0;
+      Visible = false;
+      CanEdit = false;
+    end;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'НазваниеИнЯз';
+      Caption = 'Название на иностранном языке';
+      FieldType = Template.StringField;
+      Alignment = Template.LeftAlign;
+      Font.Size = crdBuiltIn.Font.Size;
+      MinWidth = 200;
+      Width = 0;
+      Visible = false;
+      CanEdit = false;
+    end;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'Подзаголовок';
+      Caption = 'Подзаголовок';
+      FieldType = Template.StringField;
+      Alignment = Template.LeftAlign;
+      Font.Size = crdBuiltIn.Font.Size;
+      MinWidth = 300;
+      Width = 0;
+      Visible = true;
+      CanEdit = false;
+    end;
+  end;
+
+  func СоздатьФильтр :String;
+    var aFlt :String[];
+    AddInArray( aFlt, 'ГодЛетописи=' + Str(Self.ГодЛППИ) );
+    Result = MakeFilter(aFlt);
+  end;
+
+  proc УстановитьДоступностьОбъектовШаблона;
+    кнЗакрыть.Enabled       = true;
+    кнЗакрыть.Caption       = if(SelectMode, 'Отмена', 'Закрыть');
+    кнВыбрать.Enabled       = SelectMode;
+    кнДобавить.Enabled      = crdBuiltIn.CanInsert;
+    кнДублировать.Enabled   = crdBuiltIn.CanCopy;
+    кнНоваяГруппа.Enabled   = crdBuiltIn.Hierarchical;
+    кнПреобразовать.Enabled = crdBuiltIn.CanGroupSignModify;
+    кнРедактировать.Enabled = crdBuiltIn.CanEdit ;
+    кнУдалить.Enabled       = crdBuiltIn.CanDelete;
+  end;
+
+
+
+end

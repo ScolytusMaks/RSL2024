@@ -1,0 +1,16 @@
+Class inherited РКП_СИС.CardBaseType0 "Отчеты о пополнении БД";
+
+
+inclass private
+
+  var КлассИнтерфейса :Class МашинаРеквизитов.Базовые.интЗапись = RI.СправкаПополненияБД;
+
+
+inobject private
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    Self.Запретить_Дублирование = true;
+    inherited шаблон_ПриОткрытии(Create);
+  end;
+
+end

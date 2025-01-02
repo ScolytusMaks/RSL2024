@@ -1,0 +1,31 @@
+class inherited RI.—правочники.intBaseType1 '»нтерфейс записи (справочник, тип 1)';
+
+inclass public
+
+  func —в€занный ласс«аписей: Class BaseRefType1;
+    Result = спр¬ оллектив;
+  end;
+
+  func Create: RI.—правочники.¬ремќрг олл;
+    Result = inherited Create;
+    Result.Record = спр¬ оллектив.Create;
+  end;
+
+  func ќткрытьѕо«аписи synonym OpenRecord(locRecord: спр¬ оллектив): RI.—правочники.¬ремќрг олл;
+    Result = inherited Create;
+    Result.Record = locRecord;
+  end;
+
+  func Ѕланк–едакторѕо”молчанию: Class —правочники.editBaseType1;
+    Result = —правочники.ред¬ремќрг олл;
+  end;
+
+  func  артотекаѕо”молчанию: Class —правочники.CardBaseType1;
+    Result = —правочники.карт¬ремќрг олл;
+  end;
+
+inobject public
+
+  Record: спр¬ оллектив;
+
+end

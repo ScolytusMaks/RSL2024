@@ -1,0 +1,27 @@
+﻿group "AbstractRecord";
+
+  abstract record BaseInput inherited СИС2.Базовая.БазоваяЗапись title "Базовая запись с кодом и именем";
+    field LastUpdateUser     :String(40) title "Изменил";        -- Последний пользователь, внесший значимые изменения
+    field LastUpdateDate     :Date       title "Дата изменения"; -- Дата внесения значимых изменений
+  end;
+
+  abstract record StoredReport inherited СИС2.Базовая.БазоваяЗапись title "Базовая запись для отчета с сохранением периода";
+    field ЗаГод              :Integer;
+    field НомерОтчета        :Integer;
+    field ЗаДату             :Integer; -- варианты стандартных периодов
+    field ЗаДату1            :Logical;
+    field ЗаДату2            :Logical;
+    field ЗаДату3            :Logical;
+    field ЗаДату4            :Logical;
+    field ЗаДату5            :Logical;
+    field ЗаДату6            :Logical;
+    field СтандартныйПериод  :Integer; -- служебное поле
+    field ДатаН              :Date    title "Дата начала периода запроса";
+    field ДатаК              :Date    title "Дата окончания периода запроса";
+    field ПериодЗапроса      :String  title "Период запроса"; -- строковое представление периода запросе
+    field Библиограф         :String  title "Библиограф"; -- Полное имя пользователя
+    field Комментарий        :String  title "Комментарий";
+    field ИзмененияЗапрещены :Logical title "Изменения запрещены";
+  end;
+
+end;

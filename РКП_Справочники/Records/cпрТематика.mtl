@@ -1,0 +1,3 @@
+record спрТематика inherited BaseRefType3 title "Тематики, читательский адрес";
+  field ЦельАнализа :Integer title "Тематика/читательский адрес/целевое назначение";
+end;

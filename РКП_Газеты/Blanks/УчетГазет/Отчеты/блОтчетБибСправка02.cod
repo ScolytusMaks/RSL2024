@@ -1,0 +1,445 @@
+class inherited СИС2.БазовыйБланк "Справка о статистических показателях";
+
+import СИС2 classes Функции, СтроковыеФункции;
+
+inclass public
+
+inobject private
+
+--{{ 2_Свойства
+
+  -- Именованные объекты шаблона--
+  фреймУсловияОтбора     : TemplateFrame;
+  фреймНастройкаСтолбцов : TemplateFrame;
+  фреймРезультат         : TemplateFrame;
+  секцУсловияОтбора      : TemplateSection;
+  секцШапкаСПР           : TemplateSection;
+  секцТелоСПР            : TemplateSection;
+  секцИтогоСПР           : TemplateSection;
+  кнНастройка            : Button;
+
+  -- Настройка видимости --
+  stored var Фл_Ном          :Logical; stored var ШР_НОМ          :Integer;
+  stored var Фл_ГосРег       :Logical; stored var ШР_ГОСРЕГ       :Integer;
+  stored var Фл_ISSN         :Logical; stored var ШР_ISSN         :Integer;
+  stored var Фл_НАЗВ         :Logical; stored var ШР_НАЗВ         :Integer;
+  stored var Фл_НАЗВ_ИН      :Logical; stored var ШР_НАЗВ_ИН      :Integer;
+  stored var Фл_НАЗВ_НАЦ     :Logical; stored var ШР_НАЗВ_НАЦ     :Integer;
+  stored var Фл_ПОДЗАГ       :Logical; stored var ШР_ПОДЗАГ       :Integer;
+  stored var Фл_ГЕО          :Logical; stored var ШР_ГЕО          :Integer;
+  stored var Фл_Номера       :Logical; stored var ШР_Номера       :Integer;
+  stored var Фл_Кол_Ном      :Logical; stored var ШР_Кол_Ном      :Integer;
+  stored var Фл_Ср_Раз_Тираж :Logical; stored var ШР_СР_РАЗ_ТИРАЖ :Integer;
+  stored var Фл_Год_Тираж    :Logical; stored var ШР_ГОД_ТИРАЖ    :Integer;
+
+  var ПоказатьНастройку      :Logical;
+
+  -- Условия отбора --
+  var ГодВыпуска :Integer;
+  var МестоИздания :РКП_Справочники.СпрГеография;
+
+  -- Результат отбора как набор массивов --
+
+  NNN          :Integer[]; -- Порядковый номер строки
+  ГОСРЕГ       :String[]; -- Номер госрегистрации
+  ISSN         :String[]; -- ISSN
+  НАЗВ         :String[]; -- Название
+  НАЗВ_ИН      :String[]; -- Название (ин.)
+  НАЗВ_НАЦ     :String[]; -- Название (нац.)
+  ПОДЗАГ       :String[]; -- Подзаголовок
+  ГЕО          :РКП_Справочники.СпрГеография[]; -- Место издания
+  НОМЕРА       :String[]; -- Номера
+  КОЛ_НОМ      :Integer[]; -- Кол-во номеров
+  СР_РАЗ_ТИРАЖ :Numeric[]; -- Средний разовый тираж
+  ГОД_ТИРАЖ    :Numeric[]; -- Годовой тираж
+  Газета       :РКП_Газеты.Газета[]; -- Издание
+
+  КОЛ_ИЗД_ИТОГО      :Integer = LengthOfArray(NNN);
+  КОЛ_НОМ_ИТОГО      :Integer = Int(SumOfArray(КОЛ_НОМ));
+  СР_РАЗ_ТИРАЖ_ИТОГО :Numeric = SumOfArray(СР_РАЗ_ТИРАЖ);
+  ГОД_ТИРАЖ_ИТОГО    :Numeric = SumOfArray(ГОД_ТИРАЖ);
+
+
+
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inclass public
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    if not true in [Фл_Ном, Фл_ГосРег, Фл_ISSN, Фл_НАЗВ, Фл_НАЗВ_ИН, Фл_НАЗВ_НАЦ, Фл_ПОДЗАГ, Фл_ГЕО, Фл_Номера, Фл_Кол_Ном, Фл_Ср_Раз_Тираж, Фл_Год_Тираж] then
+      НастройкаСтолбцовПоУмолчанию;
+    fi;
+    фреймУсловияОтбора.Visible = true;
+    фреймНастройкаСтолбцов.Visible = false;
+    ВидСекцииУсловияотбора;
+    ОчиститьРезультаты;
+    ОформитьОтчет;
+  end;
+
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func КнВосстановитьНастройкуСтолбцов(Cell :TemplateCell;Action :Template.ClickTypes) :Logical;
+    НастройкаСтолбцовПоУмолчанию;
+  end;
+
+  func ОтрытьГазету(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var Index :Integer;
+    var UForm :РКП_Газеты.УчетГазет.редГазета;
+    Index = Cell.Frame;
+    UForm = РКП_Газеты.УчетГазет.редГазета.Create;
+    UForm.ShowEx(Газета[Index], Window.ModalWindow);
+  end;
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+  proc КнНастройка_ПриНажатии(Sender :Button);
+    if (ПоказатьНастройку = false) then
+      фреймУсловияОтбора.Visible     = false;
+      фреймНастройкаСтолбцов.Visible = true;
+      фреймРезультат.Visible         = false;
+    else
+      фреймУсловияОтбора.Visible     = true;
+      фреймНастройкаСтолбцов.Visible = false;
+      фреймРезультат.Visible         = true;
+      ОформитьОтчет;
+    fi;
+    ПоказатьНастройку = (not ПоказатьНастройку);
+  end;
+
+  proc КнРасчет_ПриНажатии(Sender :Button);
+    var локФорма :РКП_Газеты.УчетГазет.Запросы.блОтборГазетСпр2;
+    локФорма  = РКП_Газеты.УчетГазет.Запросы.блОтборГазетСпр2.Create;
+    локФорма.МестоИздания = МестоИздания;
+    локФорма.ГодВыпуска   = ГодВыпуска;
+    if  CmOk = локФорма.Show(Window.ModalWindow)        then
+      МестоИздания = локФорма.МестоИздания;
+      ГодВыпуска   = локФорма.ГодВыпуска;
+      ПостроениеОтчета(локФорма.ПолучитьУсловиеОтбораГазет);
+      ПоказатьНастройку = true;
+      КнНастройка_ПриНажатии(кнНастройка);
+      кнНастройка.State = false;
+      ОформитьОтчет;
+    fi;
+    ВидСекцииУсловияотбора;
+  end;
+
+  stored var ПутьЭкспорта :String;
+
+  proc кнЭкспортПриНажатии(Sender :Button);
+    var locCell :TemplateCell;
+    locCell = Template.CellByField['NNN'];
+    locCell.SetFocus;
+    ExecuteCommand('Kernel.File.Export');
+  end;
+
+-- 2_Вспомогательные методы0. --
+
+  proc ВидСекцииУсловияотбора;
+    var r, rr :Integer;
+    var locCell :TemplateCell;
+    rr = секцУсловияОтбора.RowsCount;
+    for r = 1 .. rr do
+      секцУсловияОтбора.Row[r].Visible = true;
+    od;
+    if (МестоИздания = nil) then
+      locCell = секцУсловияОтбора.CellByField['МестоИздания'];
+      if (locCell <> nil) then
+        секцУсловияОтбора.Row[locCell.Row].Visible = false;
+      fi;
+    fi;
+  end;
+
+  proc ОформитьОтчет;
+    ОформитьСтолбец ('NNN',          Фл_Ном,          ШР_НОМ);
+    ОформитьСтолбец ('ГОСРЕГ',       Фл_ГосРег,       ШР_ГОСРЕГ);
+    ОформитьСтолбец ('ISSN',         Фл_ISSN,         ШР_ISSN);
+    ОформитьСтолбец ('НАЗВ',         Фл_НАЗВ,         ШР_НАЗВ);
+    ОформитьСтолбец ('НАЗВ_ИН',      Фл_НАЗВ_ИН,      ШР_НАЗВ_ИН);
+    ОформитьСтолбец ('НАЗВ_НАЦ',     Фл_НАЗВ_НАЦ,     ШР_НАЗВ_НАЦ);
+    ОформитьСтолбец ('ПОДЗАГ',       Фл_ПОДЗАГ,       ШР_ПОДЗАГ);
+    ОформитьСтолбец ('ГЕО',          Фл_ГЕО,          ШР_ГЕО);
+    ОформитьСтолбец ('НОМЕРА',       Фл_НОМЕРА,       ШР_НОМЕРА);
+    ОформитьСтолбец ('КОЛ_НОМ',      Фл_КОЛ_НОМ,      ШР_КОЛ_НОМ);
+    ОформитьСтолбец ('СР_РАЗ_ТИРАЖ', Фл_СР_РАЗ_ТИРАЖ, ШР_СР_РАЗ_ТИРАЖ);
+    ОформитьСтолбец ('ГОД_ТИРАЖ',    Фл_ГОД_ТИРАЖ,    ШР_ГОД_ТИРАЖ);
+  end;
+
+  proc ОформитьСтолбец (vFieldName :String; isVisible :Logical; vWidth :Integer);
+    var locCell :TemplateCell;
+    var nc :Integer;
+    locCell = СекцТелоСПР.CellByField[vFieldName];
+    if (locCell <> nil) then
+      nc = locCell.Column;
+      секцТелоСПР.Column[nc].Visible = isVisible;
+      секцШапкаСПР.Column[nc].Visible = isVisible;
+      секцИтогоСПР.Column[nc].Visible = isVisible;
+      if isVisible then
+        секцТелоСПР.Column[nc].Width = vWidth as numeric;
+        секцШапкаСПР.Column[nc].Width = vWidth as numeric;
+        секцИтогоСПР.Column[nc].Width = vWidth as numeric;
+      fi;
+    fi;
+  end;
+
+  proc НастройкаСтолбцовПоУмолчанию;
+    Фл_Ном          = true ;            ШР_НОМ          =  15;
+    Фл_ГосРег       = false;            ШР_ГОСРЕГ       =  30;
+    Фл_ISSN         = false;            ШР_ISSN         =  20;
+    Фл_НАЗВ         = true ;            ШР_НАЗВ         =  80;
+    Фл_НАЗВ_ИН      = false;            ШР_НАЗВ_ИН      =  40;
+    Фл_НАЗВ_НАЦ     = false;            ШР_НАЗВ_НАЦ     =  40;
+    Фл_ПОДЗАГ       = false;            ШР_ПОДЗАГ       =  60;
+    Фл_ГЕО          = true ;            ШР_ГЕО          =  40;
+    Фл_Номера       = true ;            ШР_Номера       = 120;
+    Фл_Кол_Ном      = true ;            ШР_Кол_Ном      =  20;
+    Фл_Ср_Раз_Тираж = true ;            ШР_СР_РАЗ_ТИРАЖ =  20;
+    Фл_Год_Тираж    = true ;            ШР_ГОД_ТИРАЖ    =  20;
+  end;
+
+  proc ПостроениеОтчета (vNspFilter :String);
+    ОчиститьРезультаты;
+    ВыбратьДанные(vNspFilter);
+  end;
+
+  proc ОчиститьРезультаты;
+    NNN          = nil;
+    ГОСРЕГ       = nil;
+    ISSN         = nil;
+    НАЗВ         = nil;
+    НАЗВ_ИН      = nil;
+    НАЗВ_НАЦ     = nil;
+    ПОДЗАГ       = nil;
+    ГЕО          = nil;
+    НОМЕРА       = nil;
+    КОЛ_НОМ      = nil;
+    СР_РАЗ_ТИРАЖ = nil;
+    ГОД_ТИРАЖ    = nil;
+    Газета       = nil;
+    СекцТелоСПР.Count = nil;
+  end;
+
+  proc ВыбратьДанные (vNspFilter :String);
+    var k, kk, j :Integer;
+    var cRecord :РКП_Газеты.Газета;
+    var aResult :Variant[];
+    with Query.Create([РКП_Газеты.Газета]) do
+      Order = 'НазваниеОсн';
+      Filter = vNspFilter;
+      Hint('Выполнение запроса...');
+      Select;
+      Hint(' ');
+      kk = Count;
+      while not Eof do
+        k = k + 1;
+        Hint('Выборка данных...', k, kk);
+        cRecord = Current as РКП_Газеты.Газета;
+        ---
+        aResult = ПолучитьСтатистикуВыпуска_ПоНомерам(cRecord);
+        if (aResult[2] as Integer > 0) then
+          j = j + 1;
+          if Фл_НОМЕРА then
+            НОМЕРА[j] = aResult[5] as String;
+          fi;
+          if Фл_КОЛ_НОМ then
+            КОЛ_НОМ[j] = aResult[2] as Integer;
+          fi;
+          if Фл_СР_РАЗ_ТИРАЖ then
+            СР_РАЗ_ТИРАЖ[j] = Round(aResult[3] as Numeric, 1);
+          fi;
+          if Фл_ГОД_ТИРАЖ then
+            ГОД_ТИРАЖ[j] = Round(aResult[4] as Numeric, 1);
+          fi;
+          Газета[j] = cRecord;
+          ---
+
+          if Фл_Ном then
+            NNN[j] = j;
+          fi;
+          if Фл_ГОСРЕГ then
+            ГОСРЕГ[j] = cRecord.РегНомер;
+          fi;
+          if Фл_ISSN then
+            ISSN[j] = cRecord.ISSN;
+          fi;
+          if Фл_НАЗВ then
+            НАЗВ[j] = cRecord.НазваниеОсн;
+          fi;
+          if Фл_НАЗВ_ИН then
+            НАЗВ_ИН[j] = cRecord.НазваниеИнЯз;
+          fi;
+          if Фл_НАЗВ_НАЦ then
+            НАЗВ_НАЦ[j] = cRecord.НазваниеНацЯз;
+          fi;
+          if Фл_ПОДЗАГ then
+            ПОДЗАГ[j] = cRecord.Подзаголовок;
+          fi;
+          if Фл_ГЕО then
+            if (cRecord.МестаИздания.Count > 0) then
+              ГЕО[j] = cRecord.МестаИздания.Items[1].МестоИздания;
+            fi;
+          fi;
+        fi;
+        Next;
+      od;
+    end;
+    СекцТелоСПР.Count = j;
+  end;
+
+  func ПолучитьСтатистикуВыпуска_ПоНомерам (vNewspaper :РКП_Газеты.Газета) :Variant[];
+    var aFlt :String[];
+    var aResult :Variant[];
+    --var cRecord :РКП_Газеты.НомерГазеты;
+    --var vTxt :String;
+    with Query.Create([РКП_Газеты.НомерГазеты]) do
+      aFlt[1] = 'Газета=' + vNewspaper.DocIDStr;
+      aFlt[2] = 'ГодВыпуска=' + Str(ГодВыпуска);
+      aFlt[3] = 'not НеПолучен';
+      aFlt[4] = 'isGroup=0';
+      aFlt[5] = 'not(СозданОЛГС and НеПолучен)';
+      --aFlt[5] = 'not ЛожныйНомер';
+      Filter = СложитьСтрокиФильтраПоИ(aFlt);
+      aResult = CalcAggregates('Count,Sum(Тираж)') as Variant[];
+      if ((aResult[1] as Integer) > 0) then
+        Result[1] = 1;
+        Result[2] = aResult[1] as Integer;
+        Result[3] = ((aResult[2] as Numeric) / 1000) / (aResult[1] as Integer);
+        Result[4] = (aResult[2] as Numeric) / 1000;
+        if Фл_Номера then
+          --LoadingFieldsMode = СИС2.Константы.mdNone;
+          --LoadingFields     = 'Номер';
+          --Order = 'СерияНумерации;Номер';
+          --Select;
+          --while not Eof do
+          --  cRecord = Current as РКП_Газеты.НомерГазеты;
+          --  if (vTxt = nil) then
+          --    vTxt = Trim(cRecord.Номер);
+          --  else
+          --    vTxt = vTxt + ',' + Trim(cRecord.Номер);
+          --  fi;
+          --  Next;
+          --od;
+          --Result[5] = vTxt;
+          Result[5] = ПолучитьСписокНомеров(Filter);
+        else
+          Result[5] = '';
+        fi;
+      else
+        Result[1] = 0;
+        Result[2] = 0;
+        Result[3] = 0.0;
+        Result[4] = 0.0;
+        Result[5] = '';
+      fi;
+    end;
+  end;
+
+  func ПолучитьСписокНомеров (vFlt :String) :String;
+    var aSer :Integer[];
+    var s, ss :Integer;
+    var vRes :String;
+    aSer = ПолучитьСписокСерий(vFlt);
+    ss = LengthOfArray(aSer);
+    for  s = 1 .. ss do
+      vRes = ПолучитьСписокНомеровСерии(vFlt,  aSer[s]);
+      if (vRes <> nil) then
+        if (Result = nil) then
+          Result = vRes;
+        else
+          Result = Result + Chr(13) + vRes;
+        fi;
+      fi;
+    od;
+  end;
+
+  func ПолучитьСписокСерий (vFlt :String) :Integer[];
+    var j :Integer;
+    var cRecord :РКП_Газеты.НомерГазеты;
+    with Query.Create([РКП_Газеты.НомерГазеты]) do
+      Filter = vFlt;
+      LoadingFieldsMode = СИС2.Константы.mdNone;
+      LoadingFields     = 'СерияНумерации';
+      Order = 'СерияНумерации';
+      Select;
+      while not Eof do
+        cRecord = Current as РКП_Газеты.НомерГазеты;
+        if (Result = nil) then
+          j = 1;
+          Result[j] = cRecord.СерияНумерации;
+        else
+          if (Result[j] <> cRecord.СерияНумерации) then
+            j = j + 1;
+            Result[j] = cRecord.СерияНумерации;
+          fi;
+        fi;
+        Next;
+      od;
+    end;
+  end;
+
+  func ПолучитьСписокНомеровСерии (vFlt :String; vSerNom :Integer) :String;
+    var cRecord :РКП_Газеты.НомерГазеты;
+    var vNomStr :String;
+    with Query.Create([РКП_Газеты.НомерГазеты]) do
+      Filter = vFlt + ' and СерияНумерации=' + Str(vSerNom);
+      LoadingFieldsMode = СИС2.Константы.mdNone;
+      LoadingFields     = 'Номер';
+      Order = 'Номер';
+      Select;
+      while not Eof do
+        cRecord = Current as РКП_Газеты.НомерГазеты;
+        vNomStr = ПолучитьНомерНомера(cRecord.Номер);
+        if (Result = nil) then
+          Result = vNomStr;
+        else
+          Result = Result + ',' + vNomStr;
+        fi;
+        Next;
+      od;
+    end;
+  end;
+
+  func ПолучитьНомерНомера (vBaseNomStr :String) :String;
+    var p, pp :Integer;
+    var vLit :String;
+    vBaseNomStr = Trim(vBaseNomStr);
+    pp = Length(vBaseNomStr);
+    for p = 1 .. pp do
+      vLit = SubStr(vBaseNomStr, p, 1);
+      if not (vLit in [' ', Chr(13), Chr(10)]) then
+        Result = Result + vLit;
+      fi;
+    od;
+    p = Pos('--', Result);
+    if (p > 0) then
+      Result = Replace('-', Result, p);
+    fi;
+  end;
+
+
+  proc кнПроверка1ПриНажатии(Sender :Button);
+    var k :Integer;
+    var vRTotal :РКП_Газеты.ВыпускГазеты;
+    for k = 1 .. СекцТелоСПР.Count do
+      if (Газета[k] <> nil) then
+        vRTotal = РКП_СИС.Recs.FindRecord(РКП_Газеты.ВыпускГазеты, 'ГодВыпуска=' + Str(ГодВыпуска) + ' and Газета=' + Газета[k].DocIDStr);
+        if (vRTotal <> nil) then
+          if ( КОЛ_НОМ[k]<>vRTotal.НомеровПолучено ) then
+            Trace(НАЗВ[k]);
+          fi;
+        else
+          Trace(НАЗВ[k]);
+        fi;
+      fi;
+    od;
+  end;
+
+
+
+end

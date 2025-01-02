@@ -1,0 +1,120 @@
+class inherited РКП_Газеты.УчетГазет.картГазеты "Непрекращенные издания (газеты)";
+
+inclass
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+
+  proc шаблон_ПриСоздании(Context :Variant);
+    inherited шаблон_ПриСоздании(Context);
+    Self.Cardfile.CanInsert = false;
+    Self.Cardfile.CanDelete = false;
+    фреймИнформацияОЗаписи.Visible = false;
+    фреймИнформацияОЗаписи.UseSplitter = false;
+    фреймИнформацияОСмене.Visible = false;
+    фреймИнформацияОСмене.UseSplitter = false;
+  end;
+
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+  proc кнРедактировать_ПриНажатии(Sender :Button);
+    if (Self.Cardfile.Current <> nil) then
+      #NoWarning;
+      РКП_Статьи.Статьи.редГазета.ShowFormEx( Self.Cardfile.Current, Kernel.Window.ModalWindow );
+    fi;
+  end;
+
+-- 2_Обработчики столбцов (полей) картотеки0. --
+
+  proc картПоле_ПриВыходе_РосписьСтатей(Column :CardfileColumn; Rec :Record);
+    -- Реакция на окончание редактирования в ячейке
+    var q1,q2:query;
+    var r1,r2:record;
+    if Rec.РосписьСтатей=true then --создание группы в записи "Роспись"
+      if Rec.НазваниеЛГС = nil then   
+        Rec.НазваниеЛГС = Rec.НазваниеОсн;
+        Rec.Post;
+      fi;
+      q1                = Query.Create([Роспись]);
+      q1.Filter         = "Газета = "+Str(Rec);
+      q1.Select;
+      if q1.Count=0 then
+        --BeginTransaction([РКП_Статьи.Роспись]);
+        r1              = РКП_Статьи.Роспись.Create;
+        r1.Газета       = Rec;
+        r1.isGroup      = True;
+        r1.НазваниеОсн  = Rec.НазваниеЛГС;
+        r1.Post;
+        --EndTransaction;
+      fi;
+      q1.Close;
+    else
+      q1                = Query.Create([Роспись]);
+      q1.Filter         = "Газета = "+Str(Rec)+" and isGroup=0";
+      q1.Select;
+      if q1.Count>0  then
+        Message("В базе данных уже имеются описанные газетные статьи из издания ''"+Rec.НазваниеОсн+"''. Исключение из списка невозможно!");
+        Rec.РосписьСтатей=true;
+      else
+        q2              = Query.Create([Роспись]);
+        q2.Filter       = "Газета = "+Str(Rec)+" and isGroup=-1";
+        q2.Select;
+        if q2.Count>0  then
+          q2.First;
+          r2            = q2.Current;
+          BeginTransaction([РКП_Статьи.Роспись]);
+          r2.Delete;
+          EndTransaction;
+        fi;
+        q2.Close;
+      fi;
+      q1.Close;
+    fi;
+  end;
+
+  proc картПоле_ПриВыходе_НазваниеЛГС(Column :CardfileColumn; Rec :Record);
+    --переименование группы в таблице "Роспись"
+    var q1        : query;
+    var r1        : record;
+    q1                = Query.Create([Роспись]);
+    q1.Filter         = "Газета = "+Str(Rec);
+    q1.Select;
+    if q1.Count=1 then
+      --BeginTransaction([РКП_Статьи.Роспись]);
+      q1.First;
+      r1                      =  q1.Current;
+      if r1.НазваниеОсн       <> Rec.НазваниеЛГС      then
+        r1.НазваниеОсн        =  Rec.НазваниеЛГС;
+      fi;
+      --EndTransaction;
+    fi;
+    q1.Close;
+  end;
+
+  func картПоле_ПриПроверке_РосписьСтатей(Column :CardfileColumn; Rec :Record;var Value :Variant) :Logical;
+    if Value = true               then
+      if Rec.КодИздания = nil     then
+        Message("Пожалуйста, сначала введите условный код газеты!");
+        Return false;
+      else
+        Return true;
+      fi;
+    else
+      Return true;
+    fi;
+  end;
+
+
+-- 2_Вспомогательные методы0. --
+
+  proc МодифицироватьШаблон;
+  end;
+
+  proc ИзменитьИконкуОкна;
+  end;
+
+
+end

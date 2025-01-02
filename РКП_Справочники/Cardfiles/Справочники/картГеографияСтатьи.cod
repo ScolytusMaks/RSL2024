@@ -1,0 +1,8 @@
+Class inherited Справочники.CardBaseType1 "Географические рубрики";
+
+inclass private
+
+  var КлассИнтерфейса :Class RI.Справочники.intBaseType1 = RI.Справочники.ГеографияСтатьи;
+
+
+end

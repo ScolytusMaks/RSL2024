@@ -1,0 +1,143 @@
+class "Сождание листа ПК";
+Import РКП_Статьи Classes ОригиналМакет.СтильПК;
+Import РКП_Статьи Classes ОригиналМакет.ОбработкаТекста;
+
+inclass
+  proc Создание(ПК:TextFile;
+                СтраницаПК[]:string;
+                ЗаголовокПК[]:string;
+                ТекстПК[]:string;
+                НомерПК[]:string;
+                УДКПК[]:string;
+                РКППК[]:string;
+                ББКПК[]:string;
+                ЗаписьПК[]:record
+                );
+  var Txt:string;
+  var k:integer;
+  var ВариантФорматирования:integer; --0-втяжка абзаца, 1 - втяжка красной строки
+  for k = 1..5                                                  do
+        ПК.WriteLn("");
+        --номера страниц+заголовок+описание статьи
+        ПК.WriteLn("{\trowd\trrh-2685\intbl");
+        ПК.WriteLn("\cellx5650");
+        ПК.WriteLn("\cellx7200");
+        ПК.WriteLn("\cellx12880");
+        --карточка А............................................................................................
+        if СтраницаПК[k]<>""                                    then --вставка номера страницы длинной карточки
+                ПК.WriteLn("{"+styl4+"\b{"+СтраницаПК[k]+".}\b0\par}");
+        end;
+        ВариантФорматирования=0;
+        if  ЗаписьПК[k]<>nil                                    then
+        if  ЗаписьПК[k].НазваниеСтатьи<>ЗаписьПК[k].Заголовок   then --названеие статьи НЕ равно заголовку
+        ВариантФорматирования=1;
+        end;
+        end;
+
+        if  ВариантФорматирования=1                             then --названеие статьи НЕ равно заголовку
+        Txt=ЗаголовокПК[k];        Txt=ЗаменаДвойныхПробелов(Txt);        Txt=ВставкаСпецСимволов(Txt);
+        if SubStr(Txt,Length(ExtractWord(Txt,1))+1,1)=","       then --изменение формата фамилии
+          Txt=ExtractWord(Txt,1)+", "+ExtractWord(Txt,2)+"                    "+ExtractWord(Txt,3)+"                    .";
+        else
+          if СтраницаПК[k]<>"" and СтраницаПК[k]<>"1"           then --сокращение заголовка при длинных карточках
+            Txt=ExtractWord(Txt,1)+"...";
+          end;
+        end;
+                ПК.WriteLn("{"+styl0+"\b{"+Txt+"}\b0\par");
+
+        else                                                        -- название статьи РАВНО заголовку ->> выделение только первого слова
+        Txt=ЗаголовокПК[k];        Txt=ЗаменаДвойныхПробелов(Txt);        Txt=ВставкаСпецСимволов(Txt);
+        if Length(ExtractWord(Txt,1))>3                         then
+                ПК.WriteLn("{"+styl00+"{\b"+ExtractWord(Txt,1)+" \b0"+SubStr(Txt,Length(ExtractWord(Txt,1))+1,Length(Txt))+" }");
+        else
+                ПК.WriteLn("{"+styl00+"{\b"+ExtractWord(Txt,1)+" "+ExtractWord(Txt,2)+" \b0"+SubStr(Txt,Length(ExtractWord(Txt,1))+Length(ExtractWord(Txt,2))+2,Length(Txt))+" }");
+        end;
+        end;
+
+        Txt=ТекстПК[k];        Txt=ЗаменаДвойныхПробелов(Txt);        Txt=ВставкаСпецСимволов(Txt);
+        Txt=ВставкаРазрываСтроки(Txt);
+        Txt=Trim(Txt);
+        if SubStr(Txt,Length(Txt),1)='.':
+          Txt = SubStr(Txt,1,Length(Txt)-1);
+        end;
+        if СтраницаПК[k]=""                                     then --изменение стиля длинной карточки
+                ПК.WriteLn(    styl1+"{"+Txt+"}\cell}\cell");
+        else
+                ПК.WriteLn(    styl11+"{"+Txt+"}\cell}\cell");
+        end;
+        --карточка Б............................................................................................
+        if СтраницаПК[k+5]<>""                                  then --вставка номера страницы длинной карточки
+                ПК.WriteLn("{"+styl4+"\b{"+СтраницаПК[k+5]+".}\b0\par}");
+        end;
+        ВариантФорматирования=0;
+        if  ЗаписьПК[k+5]<>nil                                  then
+        if  ЗаписьПК[k+5].НазваниеСтатьи<>ЗаписьПК[k+5].Заголовок   then --названеие статьи НЕ равно заголовку
+        ВариантФорматирования=1;
+        end;
+        end;
+
+        if  ВариантФорматирования=1                             then --названеие статьи НЕ равно заголовку
+        Txt=ЗаголовокПК[k+5];        Txt=ЗаменаДвойныхПробелов(Txt);        Txt=ВставкаСпецСимволов(Txt);
+        if SubStr(Txt,Length(ExtractWord(Txt,1))+1,1)=","       then --изменение формата фамилии
+          Txt=ExtractWord(Txt,1)+", "+          ExtractWord(Txt,2)+"                    "+          ExtractWord(Txt,3)+"                    .";
+        else
+          if СтраницаПК[k+5]<>"" and СтраницаПК[k+5]<>"1"       then --сокращение заголовка при длинных карточках
+            Txt=ExtractWord(Txt,1)+"...";
+          end;
+        end;
+                ПК.WriteLn("{"+styl0+"\b{"+Txt+"}\b0\par");
+        else                                                        -- название статьи РАВНО заголовку ->> выделение только первого слова
+        Txt=ЗаголовокПК[k+5];     Txt=ЗаменаДвойныхПробелов(Txt);        Txt=ВставкаСпецСимволов(Txt);
+          if СтраницаПК[k+5]<>"" and СтраницаПК[k+5]<>"1"       then --сокращение заголовка при длинных карточках
+            Txt=ExtractWord(Txt,1)+"...";
+          end;
+        if Length(ExtractWord(Txt,1))>3                         then
+                ПК.WriteLn("{"+styl00+"{\b"+ExtractWord(Txt,1)+" \b0"+SubStr(Txt,Length(ExtractWord(Txt,1))+1,Length(Txt))+" }");
+        else
+                ПК.WriteLn("{"+styl00+"{\b"+ExtractWord(Txt,1)+" "+ExtractWord(Txt,2)+" \b0"+SubStr(Txt,Length(ExtractWord(Txt,1))+Length(ExtractWord(Txt,2))+2,Length(Txt))+" }");
+        end;
+        end;
+
+        Txt=ТекстПК[k+5];        Txt=ЗаменаДвойныхПробелов(Txt);        Txt=ВставкаСпецСимволов(Txt);
+        Txt=ВставкаРазрываСтроки(Txt);
+        Txt=Trim(Txt);
+        if SubStr(Txt,Length(Txt),1)='.':
+          Txt = SubStr(Txt,1,Length(Txt)-1);
+        end;
+        if СтраницаПК[k+5]=""                                   then --изменение стиля длинной карточки
+                ПК.WriteLn(    styl1+"{"+Txt+"}\cell}");
+        else
+                ПК.WriteLn(    styl11+"{"+Txt+"}\cell}");
+        end;
+                ПК.WriteLn("\row\pard}");
+        --Номер карточки+УДК+РКП+ББК
+                ПК.WriteLn("{\trowd\trrh-567\intbl");
+                ПК.WriteLn("\cellx2500");
+                ПК.WriteLn("\cellx5650");
+                ПК.WriteLn("\cellx7200");
+                ПК.WriteLn("\cellx10000");
+                ПК.WriteLn("\cellx12880");
+                ПК.WriteLn("{"+styl2+"{"+НомерПК[k]+"} \par ");
+                ПК.WriteLn(" "+styl2+  "{"+РКППК[k]+"} \cell}");
+                ПК.WriteLn("{"+styl3+"{"  +УДКПК[k]+"} \par");
+                ПК.WriteLn(" "+styl3+"{"  +ББКПК[k]+"} \cell}");
+                ПК.WriteLn( "\cell");
+                ПК.WriteLn("{"+styl2+"{"+НомерПК[k+5]+"} \par ");
+                ПК.WriteLn(" "+styl2+  "{"+РКППК[k+5]+"} \cell}");
+                ПК.WriteLn("{"+styl3+"{"  +УДКПК[k+5]+"} \par");
+                ПК.WriteLn(" "+styl3+"{"  +ББКПК[k+5]+"} \cell}");
+                ПК.WriteLn("\row\pard}");
+                ПК.WriteLn("");
+                if k=1                                  then
+                ПК.WriteLn("{"+styl5+"\par}");
+                else
+                ПК.WriteLn("{"+styl6+"\par }");
+                ПК.WriteLn("{"+styl5+"\par}");
+                end;
+                ПК.WriteLn("");
+  end; --for k
+  End;--Создание
+
+inobject
+
+end

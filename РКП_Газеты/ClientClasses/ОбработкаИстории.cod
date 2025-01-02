@@ -1,0 +1,459 @@
+class "";
+
+
+inclass  Public
+  КоличествоПолейИстории:integer=14;--Количество полей, для которых сохраняется история
+  OldValueFieldS[]      :String;
+  OldValueFieldR[]      :Record;
+  NewValueFieldS[]      :String;
+  NewValueFieldR[]      :Record;
+  LastRecordHistory[]   :Record;
+
+
+inclass  Public
+  НомерРежима           :integer;
+  Газета                :Record;
+  ПоследнееЗначение     :String;
+
+
+  func  НомерПоляПоСекции(ИмяСекции_:string):integer;
+    if     ИмяСекции_     = "секцНазваниеОсн"                   then    Return  0;
+    elsif  ИмяСекции_     = "секцНазваниеИнЯз"                  then    Return  1;
+    elsif  ИмяСекции_     = "секцНазваниеНацЯз"                 then    Return  2;
+    elsif  ИмяСекции_     = "секцПодзаголовок"                  then    Return  3;
+    elsif  ИмяСекции_     = "секцУчредитель"                    then    Return  4;
+    elsif  ИмяСекции_     = "секцУчредители"                    then    Return  4;
+    elsif  ИмяСекции_     = "секцМестаИздания"                  then    Return  5;
+    elsif  ИмяСекции_     = "секцМестоИздания"                  then    Return  5;
+    elsif  ИмяСекции_     = "секцРедакция"                      then    Return  6;
+    elsif  ИмяСекции_     = "секцРедактор"                      then    Return  7;
+    elsif  ИмяСекции_     = "секцТипИздания"                    then    Return  8;
+    elsif  ИмяСекции_     = "секцТерриторияРаспространения"     then    Return  9;
+    elsif  ИмяСекции_     = "секцТематики"                      then    Return 10;
+    elsif  ИмяСекции_     = "секцТематика"                      then    Return 10;
+    elsif  ИмяСекции_     = "секцЦелевыеНазначения"             then    Return 11;
+    elsif  ИмяСекции_     = "секцЧАЦН"                          then    Return 11;
+    elsif  ИмяСекции_     = "секцЯзыки"                         then    Return 12;
+    elsif  ИмяСекции_     = "секцЯзык"                          then    Return 12;
+    elsif  ИмяСекции_     = "секцПериодичность"                 then    Return 13;
+    else                                                                Return -1;
+    end;
+  end;
+
+  func НаимПоляПоНомеру(Номерполя:integer):string;
+    if          Номерполя = 0   then    Return  "Название";
+    elsif       Номерполя = 1   then    Return  "Название (ин.яз.)";
+    elsif       Номерполя = 2   then    Return  "Название (нац.яз.)";
+    elsif       Номерполя = 3   then    Return  "Подзаголовок";
+    elsif       Номерполя = 4   then    Return  "Учредитель (учредители)";
+    elsif       Номерполя = 5   then    Return  "Место издания";
+    elsif       Номерполя = 6   then    Return  "Адрес редакции";
+    elsif       Номерполя = 7   then    Return  "Редактор";
+    elsif       Номерполя = 8   then    Return  "Тип издания";
+    elsif       Номерполя = 9   then    Return  "Территория распространения";
+    elsif       Номерполя =10   then    Return  "Тематика";
+    elsif       Номерполя =11   then    Return  "Целевое назначение";
+    elsif       Номерполя =12   then    Return  "Язык издания";
+    elsif       Номерполя =13   then    Return  "Периодичность выхода";
+    else
+                                        Return  "Поле не определено";
+    end;
+  end;
+
+
+  proc СоздатьМассивыСтарыхЗначений(Издание:record);
+  var k                 : integer;
+    --очистка
+    OldValueFieldS      = nil;
+    OldValueFieldR      = nil;
+    --заполнение
+    for k = 1..КоличествоПолейИстории   do
+      if        k = 1   then    OldValueFieldS[k] = Издание.НазваниеОсн;        OldValueFieldR[k] = nil;
+      elsif     k = 2   then    OldValueFieldS[k] = Издание.НазваниеИнЯз;       OldValueFieldR[k] = nil;
+      elsif     k = 3   then    OldValueFieldS[k] = Издание.НазваниеНацЯз;      OldValueFieldR[k] = nil;
+      elsif     k = 4   then    OldValueFieldS[k] = Издание.Подзаголовок;       OldValueFieldR[k] = nil;
+      elsif     k = 5   then    OldValueFieldS[k] = Издание.Учред;              OldValueFieldR[k] = nil;
+      elsif     k = 6   then
+        if Издание.МестаИздания.Count>0 then
+          OldValueFieldS[k] = Издание.МестаИздания.Items[1].МестоИздания.Наим;        OldValueFieldR[k] = Издание.МестаИздания.Items[1].МестоИздания;
+        else
+          OldValueFieldS[k] = "";                                                               OldValueFieldR[k] = nil;
+        end;
+      elsif     k = 7   then    OldValueFieldS[k] = Издание.Редакция.Наим;  OldValueFieldR[k] = Издание.Редакция;
+      elsif     k = 8   then    OldValueFieldS[k] = Издание.РедакторГазеты; OldValueFieldR[k] = nil;
+      elsif     k = 9   then
+        if Издание.ТипИздания = 0 then
+                                OldValueFieldS[k] = "Газета";                   OldValueFieldR[k] = nil;
+        else
+                                OldValueFieldS[k] = "МПГ";                      OldValueFieldR[k] = nil;
+        end;
+      elsif     k =10   then    OldValueFieldS[k] = Издание.ТерриторияРаспространения.Наим;     OldValueFieldR[k] = Издание.ТерриторияРаспространения;
+      elsif     k =11   then    
+        if Издание.Тематики.Count>0 then
+          OldValueFieldS[k] = Издание.Тематики.Items[1].Тематика.Наим;      OldValueFieldR[k] = Издание.Тематики.Items[1].Тематика;
+        else
+          OldValueFieldS[k] = "";                                                     OldValueFieldR[k] = nil;
+        end;
+      elsif     k =12   then
+        if Издание.ЧАЦН.Count>0 then
+          OldValueFieldS[k] = Издание.ЧАЦН.Items[1].ЧАЦН.Наим;              OldValueFieldR[k] = Издание.ЧАЦН.Items[1].ЧАЦН;
+        else
+          OldValueFieldS[k] = "";                                                     OldValueFieldR[k] = nil;
+        end;
+      elsif     k =13   then
+        if Издание.Языки.Count>0 then
+          OldValueFieldS[k] = Издание.Языки.Items[1].Язык.Наим;             OldValueFieldR[k] = Издание.Языки.Items[1].Язык;
+        else
+          OldValueFieldS[k] = "";                                                     OldValueFieldR[k] = nil;
+        end;
+      elsif     k =14   then    OldValueFieldS[k] = Издание.Периодичность;  OldValueFieldR[k] = nil;
+      end;
+    end;
+  end;--СоздатьМассивыСтарыхЗначений;
+
+  proc СоздатьМассивыНовыхЗначений(Издание:record);
+  var k                 : integer;
+    --очистка
+    NewValueFieldS      = nil;
+    NewValueFieldR      = nil;
+    --заполнение
+    for k = 1..КоличествоПолейИстории   do
+      if        k = 1   then    NewValueFieldS[k] = Издание.НазваниеОсн;        NewValueFieldR[k] = nil;
+      elsif     k = 2   then    NewValueFieldS[k] = Издание.НазваниеИнЯз;       NewValueFieldR[k] = nil;
+      elsif     k = 3   then    NewValueFieldS[k] = Издание.НазваниеНацЯз;      NewValueFieldR[k] = nil;
+      elsif     k = 4   then    NewValueFieldS[k] = Издание.Подзаголовок;       NewValueFieldR[k] = nil;
+      elsif     k = 5   then    NewValueFieldS[k] = Издание.Учред;              NewValueFieldR[k] = nil;
+
+      elsif     k = 6   then
+        if Издание.МестаИздания.Count>0 then
+          NewValueFieldS[k] = Издание.МестаИздания.Items[1].МестоИздания.Наим;        NewValueFieldR[k] = Издание.МестаИздания.Items[1].МестоИздания;
+        else
+          NewValueFieldS[k] = "";                                                               NewValueFieldR[k] = nil;
+        end;
+      elsif     k = 7   then    NewValueFieldS[k] = Издание.Редакция.Наим;            NewValueFieldR[k] = Издание.Редакция;
+      elsif     k = 8   then    NewValueFieldS[k] = Издание.РедакторГазеты; NewValueFieldR[k] = nil;
+      elsif     k = 9   then
+        if Издание.ТипИздания = 0 then
+                                NewValueFieldS[k] = "Газета";                   NewValueFieldR[k] = nil;
+        else
+                                NewValueFieldS[k] = "МПГ";                      NewValueFieldR[k] = nil;
+        end;
+      elsif     k =10   then    NewValueFieldS[k] = Издание.ТерриторияРаспространения.Наим;     NewValueFieldR[k] = Издание.ТерриторияРаспространения;
+      elsif     k =11   then    
+        if Издание.Тематики.Count>0 then
+          NewValueFieldS[k] = Издание.Тематики.Items[1].Тематика.Наим;      NewValueFieldR[k] = Издание.Тематики.Items[1].Тематика;
+        else
+          NewValueFieldS[k] = "";                                                     NewValueFieldR[k] = nil;
+        end;
+      elsif     k =12   then
+        if Издание.ЧАЦН.Count>0 then
+          NewValueFieldS[k] = Издание.ЧАЦН.Items[1].ЧАЦН.Наим;              NewValueFieldR[k] = Издание.ЧАЦН.Items[1].ЧАЦН;
+        else
+          NewValueFieldS[k] = "";                                                     NewValueFieldR[k] = nil;
+        end;
+      elsif     k =13   then
+        if Издание.Языки.Count>0 then
+          NewValueFieldS[k] = Издание.Языки.Items[1].Язык.Наим;             NewValueFieldR[k] = Издание.Языки.Items[1].Язык;
+        else
+          NewValueFieldS[k] = "";                                                     NewValueFieldR[k] = nil;
+        end;
+      elsif     k =14   then    NewValueFieldS[k] = Издание.Периодичность;  NewValueFieldR[k] = nil;
+      end;
+    end;
+  end;--СоздатьМассивыНовыхЗначений;
+
+  proc СоздатьНачалоИстории(Издание:record);
+    var k       : integer;
+    var Q       : Query;
+    var N       : record;
+    var R       : record;
+    if not РКП_СИС.Recs.ExistPostingAccessConstraint(РКП_Газеты.ИсторияГазеты) then
+      N   = РКП_Газеты.Стат.ПервыйПолученныйНомер(Издание);
+      if N <> nil                 then
+        for k = 1..КоличествоПолейИстории do
+          Q                       = Query.Create([РКП_Газеты.ИсторияГазеты]);
+          Q.Filter                = "Газета="+Str(Издание)+" and НомерПоля="+Str(k-1);
+          Q.Select;
+          if Q.Count = 0 then
+            R                     = РКП_Газеты.ИсторияГазеты.Create;
+            R.Газета              = Издание;
+            R.НомерПоля           = (k-1);
+            R.НомерИзменений      = 1;
+            R.СНомера             = N;
+            R.Значение            = OldValueFieldS[k];
+            R.Справ               = OldValueFieldR[k];
+            if k=9                        then
+              if OldValueFieldS[k]='МПГ'  then
+                R.ТипИздания      =1;
+              else
+                R.ТипИздания      =0;
+              end;
+            end;
+            R.UpdateDate          = Now(true);
+            R.UpdateUser          = SessionInfo.UserName;
+            R.Post;
+          end;
+          Q.Close;
+        end;
+      end;
+    fi;
+  end; --СоздатьНачалоИстории
+
+  func АнализИзменений(Издание:record):logical;
+    var k               : integer;
+    var ТекстСообщения  : string;
+    var Решение         : integer;
+    var r1              : record;
+    var N               : record;
+    var R               : record;
+    var Q               : Query;
+    var ФильтрПолей     : string; --доп. фильтр на номера полей истории
+    LastRecordHistory   = nil;
+    N   = РКП_Газеты.Стат.ПервыйПолученныйНомер(Издание);
+    if N <> nil                                         then
+      for k = 1..КоличествоПолейИстории                 do
+        if   OldValueFieldS[k]  <> NewValueFieldS[k]    then
+          if ТекстСообщения     = nil                   then
+            ТекстСообщения      = "Были изменены поля:"+Chr(13);
+            ТекстСообщения      = ТекстСообщения+"< "+НаимПоляПоНомеру(k-1)+" >"+Chr(13);
+          else
+            ТекстСообщения      = ТекстСообщения+"< "+НаимПоляПоНомеру(k-1)+" >"+Chr(13);
+          end;
+          --
+          if  ФильтрПолей       = nil                   then
+            ФильтрПолей         = "НомерПоля="+Str(k-1);
+          else
+            ФильтрПолей         = ФильтрПолей+" or "+"НомерПоля="+Str(k-1);
+          end;
+        end;
+      LastRecordHistory[k]      = РКП_Газеты.Стат.ПоследнееИзменениеИстории(Издание,k-1);
+      end; --do
+      if  ТекстСообщения        <> nil                  then
+        Решение = Enquiry("",
+                          ТекстСообщения+"Выберите вариант обработки истории изменений:",
+                          ["Выбрать номер, с которого начались изменения",
+                           "Добавить строку истории со ссылкой на последний полученный номер",
+                           "Заменить последнюю строку истории"]
+                          );
+        --Вычисление вспомогательных параметоров
+        if (Решение < 2) and (Решение > 0) then  -- выбрать номер
+          if ( CmOk = РКП_Газеты.УчетГазет.картНомераВыбор.ВыполнитьВыбор(Издание, nil, r1) ) then
+            --Проверка на наличие более раниих записей
+            Q  =  Query.Create([РКП_Газеты.ИсторияГазеты]);
+            Q.Filter = "Газета=" + Str(Издание);
+            if (ФильтрПолей <> nil) then
+              Q.Filter = Q.Filter + " and (" + ФильтрПолей + ")";
+            fi;
+            Q.LoadingFieldsMode = СИС2.Константы.mdNone;
+            Q.LoadingFields     = "СНомера.ГодВыпуска;СНомера.СерияНумерации;СНомера.Номер";
+            Q.Order             = "СНомера.ГодВыпуска;СНомера.СерияНумерации;СНомера.Номер";
+            Q.Select;
+            if (Q.Count > 0) then
+              Q.Last;
+              if (Q.Current.СНомера <> nil) then
+                if (r1 <> nil) then
+                  if  (Q.Current.СНомера.ГодВыпуска >= r1.ГодВыпуска)
+                  and (Q.Current.СНомера.СерияНумерации >= r1.СерияНумерации)
+                  and (Q.Current.СНомера.Номер > r1.Номер) then
+                    Message("В истории издания есть записи об изменении в более поздних номерах ( N"+
+                            Q.Current.СНомера.Номер+" за "+
+                            Str(Q.Current.СНомера.ГодВыпуска)+
+                            "год )!"+Chr(13)+
+                            "Возможные варианты действий:"+Chr(13)+
+                            "- Повторить выбор номера"+Chr(13)+
+                            "- Добавить историю со ссылкой на последний полученный номер"+Chr(13)+
+                            "- Заменить последнюю строку истории");
+                    r1 = nil;
+                    Return false;
+                  fi;
+                fi;
+              fi;
+            fi;
+          fi;
+        elsif Решение =2                                then  -- в последний номер
+          r1 = РКП_Газеты.Стат.ПоследнийПолученныйНомер(Издание);
+--          R  = LastRecordHistory[k];
+--          if r1 = R     then --т.е. если последний полученный номер=последней ссылке в истории
+--          end;
+        elsif Решение =0                                then  --отказ
+          Return false;
+        end;
+
+        --Собственно запись
+        if  Решение <= 2                                        then   -- ссылка на выбранный или последний номер
+          if  r1 <> nil                                         then   -- номер выбран
+            for k = 1..КоличествоПолейИстории                   do
+              if   OldValueFieldS[k]    <> NewValueFieldS[k]    then
+                if LastRecordHistory[k].СНомера <>r1            then   -- если последний полученный номер еще не присутствует в истории
+                  R                     = РКП_Газеты.ИсторияГазеты.Create;
+                  R.Газета              = Издание;
+                  R.НомерПоля           = (k-1);
+                  R.НомерИзменений      = РКП_Газеты.Стат.НомерПоследнихИзмененийИстории(Издание,k-1)+1;
+                  R.СНомера             = r1;
+                  R.Значение            = NewValueFieldS[k];
+                  R.Справ               = NewValueFieldR[k];
+                  if k=9                        then
+                    if NewValueFieldS[k]='МПГ'  then
+                      R.ТипИздания      =1;
+                    else
+                      R.ТипИздания      =0;
+                    end;
+                  end;
+                  R.UpdateDate          = Now(true);
+                  R.UpdateUser          = SessionInfo.UserName;
+                  R.Post;
+                else                                                    -- если последний полученный номер УЖЕ присутствует в истории
+                  R                     = LastRecordHistory[k];
+                  R.Значение            = NewValueFieldS[k];
+                  R.Справ               = NewValueFieldR[k];
+                  if k=9                        then
+                    if NewValueFieldS[k]='МПГ'  then
+                      R.ТипИздания      =1;
+                    else
+                      R.ТипИздания      =0;
+                    end;
+                  end;
+                  R.UpdateDate          = Now(true);
+                  R.UpdateUser          = SessionInfo.UserName;
+                  if (R.State = R.Edited)
+                  or (R.State = R.Created)    then
+                    R.Post;
+                  end;
+                end;
+              end;
+            end;
+          else                                                  -- номер не выбран
+            Message("Номер не выбран! Внесенные изменения не сохраняются!");
+          end;
+        else                                                    -- в последнюю строку истории
+            for k = 1..КоличествоПолейИстории                   do
+              if   OldValueFieldS[k]    <> NewValueFieldS[k]    then
+                R                       = LastRecordHistory[k];
+                R.Значение              = NewValueFieldS[k];
+                R.Справ                 = NewValueFieldR[k];
+                R.UpdateDate            = Now(true);
+                R.UpdateUser            = SessionInfo.UserName;
+                if (R.State = R.Edited)
+                or (R.State = R.Created)    then
+                  R.Post;
+                end;
+              end;
+            end;
+        end;
+      end; --ТекстСообщения          <> nil
+    end; --N <> nil
+    Return true;
+  end;
+
+
+  func ПроверкаСоответствия(ЗаписьГазеты:record;НомерПоляИстории:integer):logical;
+  --проверка соответствия информации в карточке газеты и в истории
+    var Q               : query;
+    Result              = true;--при нулевой истории или если не доказано обратное, соответствие считается истиным
+     Q                  = Query.Create([РКП_Газеты.ИсторияГазеты]);
+     Q.Filter           = "НомерПоля="+Str(НомерПоляИстории)+" and Газета="+Str(ЗаписьГазеты);
+     Q.Order            = "НомерИзменений";
+     Q.Select;
+     if Q.Count>0                                                       then
+       Q.Last;
+       if          НомерПоляИстории = 0                                 then    --Return  "Название";
+         if Q.Current.Значение<>ЗаписьГазеты.НазваниеОсн                and
+           Q.Current.Значение<>nil                                      then
+           Result       = false;
+         end;
+       elsif       НомерПоляИстории = 1                                 then    --Return  "Название (ин.яз.)";
+         if Q.Current.Значение<>ЗаписьГазеты.НазваниеИнЯз               and
+           Q.Current.Значение<>nil                                      then
+           Result       = false;
+         end;
+       elsif       НомерПоляИстории = 2                                 then    --Return  "Название (нац.яз.)";
+         if Q.Current.Значение<>ЗаписьГазеты.НазваниеНацЯз              and
+           Q.Current.Значение<>nil                                      then
+           Result       = false;
+         end;
+       elsif       НомерПоляИстории = 3                                 then    --Return  "Подзаголовок";
+         if Q.Current.Значение<>ЗаписьГазеты.Подзаголовок               and
+           Q.Current.Значение<>nil                                      then
+           Result       = false;
+         end;
+       elsif       НомерПоляИстории = 4                                 then    --Return  "Учредитель (учредители)";
+         if Q.Current.Значение<>ЗаписьГазеты.Учред                      and
+           Q.Current.Значение<>nil                                      then
+           Result       = false;
+         end;
+       elsif       НомерПоляИстории = 5                                 then    --Return  "Место издания";
+         if ЗаписьГазеты.МестаИздания.Count>0                           and
+         Q.Current.Справ<>nil                                           then
+         if Q.Current.Справ<>ЗаписьГазеты.МестаИздания.Items[1].МестоИздания            then
+           Result       = false;
+         end;
+         end;
+       elsif       НомерПоляИстории = 6                                 then    --Return  "Адрес редакции";
+         if Q.Current.Справ<>ЗаписьГазеты.Редакция                      and
+           Q.Current.Справ<>nil                                         then
+           Result       = false;
+         end;
+       elsif       НомерПоляИстории = 7                                 then    --Return  "Редактор";
+         if Q.Current.Значение<>ЗаписьГазеты.РедакторГазеты             and
+           Q.Current.Значение<>nil                                      then
+           Result       = false;
+         end;
+       elsif       НомерПоляИстории = 8                                 then    --Return  "Тип издания";
+         if ЗаписьГазеты.ТипИздания=0                                   then
+         if Q.Current.Значение<>"Газета"                                and
+           Q.Current.Значение<>nil                                      then
+           Result       = false;
+         end;
+         else
+         if Q.Current.Значение<>"МПГ"                                   and
+           Q.Current.Значение<>nil                                      then
+           Result       = false;
+         end;
+         end;
+       elsif       НомерПоляИстории = 9   then    --Return  "Территория распространения";
+         if Q.Current.Справ<>ЗаписьГазеты.ТерриторияРаспространения     and
+           Q.Current.Справ<>nil                                         then
+           Result       = false;
+         end;
+       elsif       НомерПоляИстории =10   then    --Return  "Тематика";
+         if ЗаписьГазеты.Тематики.Count>0                               and
+         Q.Current.Справ<>nil                                           then
+         if Q.Current.Справ<>ЗаписьГазеты.Тематики.Items[1].Тематика    then
+           Result       = false;
+         end;
+         end;
+       elsif       НомерПоляИстории =11   then    --Return  "Целевое назначение";
+         if ЗаписьГазеты.ЧАЦН.Count>0                                   and
+         Q.Current.Справ<>nil                                           then
+         if Q.Current.Справ<>ЗаписьГазеты.ЧАЦН.Items[1].ЧАЦН            then
+           Result       = false;
+         end;
+         end;
+       elsif       НомерПоляИстории =12   then    --Return  "Язык издания";
+         if ЗаписьГазеты.Языки.Count>0                                  and
+         Q.Current.Справ<>nil                                           then
+         if Q.Current.Справ<>ЗаписьГазеты.Языки.Items[1].Язык           then
+           Result       = false;
+         end;
+         end;
+       elsif       НомерПоляИстории =13   then    --Return  "Периодичность выхода";
+         if Q.Current.Значение<>ЗаписьГазеты.Периодичность              and
+           Q.Current.Значение<>nil                                      then
+           Result       = false;
+         end;
+       end;
+     end;
+    Return Result;
+  end;
+
+
+inobject  Public
+
+
+
+
+
+
+
+
+end

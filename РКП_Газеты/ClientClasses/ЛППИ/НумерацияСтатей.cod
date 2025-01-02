@@ -1,0 +1,113 @@
+class "";
+
+inclass
+  proc Выполнение(ГодЛППИ:integer);
+    var Q               : Query;        
+    var z,zz,l,ll       : integer;
+    var i,j,jj,k,kk     : integer;
+    var ОсновноеНазвание: string;
+    var ПроектЕгНазвания: string;
+    var Simvol          : string;
+    --0. Обновление служебного поля
+    Hint('Подготовка...');
+    Q                   = Query.Create([РКП_Газеты.Газета]);
+    Q.Filter            = 'ГодЛетописи='+Str(ГодЛППИ);
+    Q.Select;
+    zz                  = Q.Count;
+      While not Q.Eof do
+        ПроектЕгНазвания = '';
+        ОсновноеНазвание= Q.Current.НазваниеОсн;
+        ll              = Length(ОсновноеНазвание);
+        for l = 1..ll do
+          Simvol        = SubStr(ОсновноеНазвание,l,1);
+          if Simvol= ' ' then           Simvol = '_';          end;
+          if Simvol= '.' then           Simvol = '';           end;
+          if Simvol= '-' then           Simvol = '';           end;
+          if Simvol= '!' then           Simvol = '';           end;
+          if Simvol= '?' then           Simvol = '';           end;
+          if Simvol= '>' then           Simvol = '';           end;
+          if Simvol= '<' then           Simvol = '';           end;
+          if Simvol= '"' then           Simvol = '';           end;
+          if Simvol= "'" then           Simvol = '';           end;
+          if Simvol= "`" then           Simvol = '';           end;
+          if Simvol= "(" then           Simvol = '';           end;
+          if Simvol= ")" then           Simvol = '';           end;
+          if Simvol= "{" then           Simvol = '';           end;
+          if Simvol= "}" then           Simvol = '';           end;
+          if Simvol= "[" then           Simvol = '';           end;
+          if Simvol= "]" then           Simvol = '';           end;
+          ПроектЕгНазвания = ПроектЕгНазвания+Simvol;
+        end;
+        Q.Current.НазваниеОснЕГ         = ПроектЕгНазвания;
+        z                               = z+1;
+        Hint(str(z)+'/'+str(zz)+'  ['+Q.Current.НазваниеОсн+']');
+        Q.Next;
+      end;
+    Q.Close;
+
+    --1. Разбиение массива записей на порции в соотв. с правилами сортировки
+    for z = 1..8                                do
+      Q                 = Query.Create([РКП_Газеты.Газета]);
+      Q.LoadingFields = 'РКП_Газеты.Газета.НазваниеОсн;'+
+                        'РКП_Газеты.Газета.НазваниеОснЕг;'+
+                        'РКП_Газеты.Газета.ПризнакОтсылки;'+
+                        'РКП_Газеты.Газета.ГодЛетописи;'+
+                        'РКП_Газеты.Газета.ЗаписьВЛетописи;'+
+                        'РКП_Газеты.Газета.НомерВЛетописи';
+
+      Q.Order           = "НазваниеОснЕГ";
+      if    z = 1                               then
+        Q.Filter        = "Up(SubStr(НазваниеОснЕг,1,1))>='А' and Up(SubStr(НазваниеОснЕг,1,1))<='Я' and ГодЛетописи="+Str(ГодЛППИ);
+      elsif z = 2                               then
+        Q.Filter        = "Up(SubStr(НазваниеОснЕг,1,1))>='A' and Up(SubStr(НазваниеОснЕг,1,1))<='Z' and ГодЛетописи="+Str(ГодЛППИ);
+      elsif z = 3                               then
+        Q.Filter        = "Up(SubStr(НазваниеОснЕг,1,1))>='0' and Up(SubStr(НазваниеОснЕг,1,1))<='9' and ГодЛетописи="+Str(ГодЛППИ);
+      elsif z = 4                               then
+        Q.Filter        = "Up(SubStr(НазваниеОснЕг,1,1))='"+'"'+"' and ГодЛетописи="+Str(ГодЛППИ);
+      elsif z = 5                               then
+        Q.Filter        = "Up(SubStr(НазваниеОснЕг,1,1))='@' and ГодЛетописи="+Str(ГодЛППИ);
+      elsif z = 6                               then
+        Q.Filter        = "Up(SubStr(НазваниеОснЕг,1,1))='+' and ГодЛетописи="+Str(ГодЛППИ);
+      elsif z = 7                               then
+        Q.Filter        = "Up(SubStr(НазваниеОснЕг,1,1))='-' and ГодЛетописи="+Str(ГодЛППИ);
+      elsif z = 8                               then
+        Q.Filter        = "Up(SubStr(НазваниеОснЕг,1,1))='=' and ГодЛетописи="+Str(ГодЛППИ);
+      end;
+      Q.Select;
+      zz                = Q.Count;
+      jj                = jj+zz;
+      --Q.First;
+        While not Q.Eof do
+          Hint("Нумерация...",kk+k,jj);
+          i                             = i+1;
+          Q.Current.ЗаписьВЛетописи     = i;
+          if Q.Current.ПризнакОтсылки=false     then
+            j                           = j+1;
+            Q.Current.НомерВЛетописи    = j;
+          else
+            Q.Current.НомерВЛетописи    = 0;
+          end;
+          Q.Next;
+        end;
+
+--        for k = 1..zz                           do
+--          Hint("Нумерация...",kk+k,jj);
+--          i                             = i+1;
+--          Q.Current.ЗаписьВЛетописи     = i;
+--          if Q.Current.ПризнакОтсылки=false     then
+--            j                           = j+1;
+--            Q.Current.НомерВЛетописи    = j;
+--          else
+--            Q.Current.НомерВЛетописи    = 0;
+--          end;
+--          Q.Next;
+--        end;
+
+        kk              = kk+k-1;
+      Q.Close;
+    end;--Разбиение массива записей на порции
+  end;
+
+inobject
+
+end

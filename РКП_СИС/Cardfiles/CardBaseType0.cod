@@ -1,0 +1,153 @@
+class inherited МашинаРеквизитов.Базовые.картСИнтерфейсом "";
+
+import СИС2 classes Константы, Исключения;
+import РКП_СИС Classes Functions, FilterMaker;
+
+inclass private
+
+  var ИменаСлужебныхПолей :String[] = ['DocId','ExtId','CreateDate','ModifyDate','UpdateDate','CreateUser','UpdateUser'];
+  var ПонизитьЦветУстаревшихДанных :Logical := true;
+  stored var ПоказатьУстаревшее :Integer;
+
+inobject private
+
+  var фреймОстальное :TemplateFrame;
+  var фреймФильтр    :TemplateFrame;
+  var FrameNil       :TemplateFrame;
+  var Фрагмент       :String;
+  var SimilarDataViewsMode :Logical; -- Режим просмотра похожих данных
+  var SimilarFilter  :String;
+
+inobject private
+
+  proc шаблон_ПриСоздании(Context :Variant);
+    inherited шаблон_ПриСоздании(Context);
+  end;
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    var c, cc :Integer;
+    var locColumn :CardFileColumn;
+    inherited шаблон_ПриОткрытии(Create);
+    cc = Self.Cardfile.ColumnsCount;
+    for c = 1 .. cc do
+      locColumn = Self.Cardfile.Column[c];
+      if locColumn.FieldName in ИменаСлужебныхПолей then
+        locColumn.OnDraw = 'Столбец_ПриРисовании';
+      fi;
+    od;
+    if ПонизитьЦветУстаревшихДанных then
+      for c = 1 .. cc do
+        locColumn = Self.Cardfile.Column[c];
+        if (locColumn.OnDraw = nil) then
+          locColumn.OnDraw = 'Столбец_ПриРисовании';
+        fi;
+      od;
+    fi;
+    УстановитьЗаписьПриОткрытии;
+  end;
+
+  -- 2_Обработчики событий 0картотеки. --
+
+  proc Столбец_ПриРисовании (Column :CardfileColumn; Rec :Record; Selected :Logical; var Color :Integer; Font :Font);
+    var vFieldNameRecDeprecated :String;
+    if (Column.FieldName in ИменаСлужебныхПолей) then
+      Font.Color = COLOR_GRAYTEXT;
+    fi;
+    vFieldNameRecDeprecated = КлассИнтерфейса.GetClassField('ИмяПоляНеПрименяется');
+    if (Rec.GetField(vFieldNameRecDeprecated) as logical) then
+      Font.Color = COLOR_GRAYTEXT;
+      Font.Italic = true;
+    fi;
+  end;
+
+  -- 2_Обработчики событий клеток шаблона0. --
+
+  func Поле_Фильтр_ПриНажатии (Cell: TemplateCell; Action: Template.ClickTypes): Logical;
+    if (Cell.Contents = 'ПоказатьУстаревшее') then
+      if (ПоказатьУстаревшее in [0, 1]) then
+        ПоказатьУстаревшее = -1;
+      else
+        ПоказатьУстаревшее = 1;
+      fi;
+    fi;
+    ОбновитьФильтр;
+  end;
+
+  func Поле_Фильтр_ПриВыводе (Cell: TemplateCell; Value: Variant; Action: Template.OutputTypes; var Format: String): Variant;
+    if (Cell.Contents = 'ПоказатьУстаревшее') then
+      Result = ПоказатьУстаревшее in [0,1];
+    fi;
+  end;
+
+  proc Поле_Фильтр_ПриВыходе(Cell :TemplateCell; Index :Integer);
+    ОбновитьФильтр;
+  end;
+
+-- _Прочие методы. --
+
+  proc НастроитьДоступностьИВидимостьКнопок;
+    inherited НастроитьДоступностьИВидимостьКнопок;
+    кнЗакрыть.Caption = if(кнВыбрать.Enabled, 'Отмена', 'Закрыть');
+  end;
+
+  func ПолучитьФильтрКартотеки (var locTreeFilter :String = nil) :String;
+    var aFlt :String[];
+    AddInArray( aFlt, ПолучитьФильтрУстаревшиеЗаписи );
+    AddInArray( aFlt, ПолучитьФильтрПоФрагменту );
+    AddInArray( aFlt, SimilarFilter );
+    Result = MakeFilter(aFlt);
+  end;
+
+  func ПолучитьФильтрУстаревшиеЗаписи :String;
+    var vFieldName :String;
+    vFieldName = КлассИнтерфейса.GetClassField('ИмяПоляНеПрименяется');
+    if (vFieldName = nil) then
+      vFieldName = 'НеПрименяется';
+    fi;
+    Result = if(ПоказатьУстаревшее in [0,1], nil, 'not ' + vFieldName);
+  end;
+
+  func ПолучитьФильтрПоФрагменту :String;
+    Result = if((Фрагмент <> nil), 'Match(' + КлассИнтерфейса.GetClassField('ИмяПоляНаим') +  ',"*' + Фрагмент +'*")', nil);
+  end;
+
+  proc РазрешитьСкрыватьШаблон;
+    CanHideTemplate = true;
+  end;
+
+  proc УстановитьПараметрыПоУмолчанию;
+    ВосстановитьСортировку = true;
+  end;
+
+  proc УстановитьЗаписьПриОткрытии;
+    if (Self.Cardfile.Filter <> nil) then
+      with Query.Create(Self.Cardfile.Records) do
+        Order = Self.Cardfile.Order;
+        Filter = Self.Cardfile.Filter;
+        Select;
+        while not Eof do
+          if not (РКП_СИС.Recs.RecordsInGroupExists(Current, Filter)) then
+            Self.Cardfile.Current = Current;
+            Break;
+          fi;
+          Next;
+        od;
+      end;
+      
+    fi;
+--    var locCell :TemplateCell;
+--    locCell = Template.CellByField['Фрагмент'];
+--    if (locCell <> nil) then
+--      locCell.SetFocus;
+--    fi;
+--    --if (Self.фреймПанельКоманд <> nil) then
+--    --  Self.фреймПанельКоманд.Update;
+--    --fi;
+--    if SelectMode and (crdBuiltIn <> nil) then
+--      crdBuiltIn.SetFocus;
+--    fi;
+  end;
+
+
+
+end

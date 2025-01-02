@@ -1,0 +1,142 @@
+class inherited МашинаРеквизитов.Базовые.картСИнтерфейсом "Единицы хранения";
+
+import СИС2 classes Константы, Исключения;
+import РКП_СИС Classes Profile, Functions, FilterMaker, StringsFunctions, StdCode;
+
+--{{ 2_Свойства
+inclass private
+
+  var КлассИнтерфейса :Class МашинаРеквизитов.Базовые.интЗапись = РКП_Газеты.RI.ЕдиницаХранения;
+
+  stored var МоиЗаписи :Logical;
+  stored var ДатаУчета :Date;
+
+inobject private
+
+  var Фрагмент :String;
+  var ГодВыпуска: Integer;
+  var ФрагментНомера: String;
+  var ИсключитьЗаписи: Integer[];
+  var ТолькоНормСост: Logical; -- только записи в нормальном состоянии (не созданные, не редактируемые)
+--}}
+
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inclass public
+
+  func ВыполнитьВыбор (var локРезультатВыбора: РКП_Газеты.ЕдиницаХранения; допПараметры :Variant[2]; допФильтр :String; локТолькоВыбор: logical = true): Integer;
+    var locForm: УчетГазет.картЕдиницаХранения;
+    var алтРезультатВыбора: РКП_Газеты.ЕдиницаХранения;
+    locForm = УчетГазет.картЕдиницаХранения.Create;
+    locForm.УстСвойстваДоп(допПараметры);
+    if локТолькоВыбор:
+      locForm.SetField('Запретить_Добавление', true);
+      locForm.SetField('Запретить_ДобавлениеГрупп', true);
+      locForm.SetField('Запретить_Дублирование', true);
+      locForm.SetField('Запретить_Удаление', true);
+      locForm.SetField('Запретить_Перенос', true);
+      locForm.SetField('Запретить_Копирование', true);
+      locForm.SetField('Запретить_Преобразование', true);
+    fi;
+    if locForm.ТолькоНормСост then
+      алтРезультатВыбора = локРезультатВыбора;
+      if CmOk = locForm.ShowEx(алтРезультатВыбора, допФильтр, Kernel.Window.ModalWindow) then
+        if (алтРезультатВыбора.State = Kernel.Record.Normal) then
+          локРезультатВыбора = алтРезультатВыбора;
+          Return CmOk;
+        else
+          Message('Выбранная запись находится в некорректном или измененном состоянии!');
+        fi;
+      fi;
+    else
+      if CmOk = locForm.ShowEx(локРезультатВыбора, допФильтр, Kernel.Window.ModalWindow) then
+        Return CmOk;
+      fi;
+    fi;
+  end;
+
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    inherited шаблон_ПриОткрытии(Create);
+    Self.Window.Height = Int(ScreenHeight / 1.5);
+    Self.Window.Width = Int(ScreenWidth / 2);
+  end;
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  proc Поле_Фильтр_ПриВыходе(Cell :TemplateCell; Index :Integer);
+    ОбновитьФильтр;
+  end;
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+
+-- 2_Обработчики событий картотеки0. --
+
+
+-- 2_Обработчики столбцов (полей) картотеки0. --
+
+
+-- 2_Дополнительные команды0. --
+
+
+-- 2_Вспомогательные методы0. --
+
+  func ПолучитьФильтрКартотеки (var locTreeFilter :String = nil) :String;
+    var aFlt :String[];
+    AddInArray( aFlt, ПолучитьФильтрТолькоМоиЗаписи );
+    AddInArray( aFlt, ПолучитьФильтрПоФрагменту );
+    AddInArray( aFlt, ПолучитьФильтрПоГоду );
+    AddInArray( aFlt, ПолучитьФильтрПоФрагментуНомера );
+    AddInArray( aFlt, ПолучитьФильтрПоДатеУчета );
+    AddInArray( aFlt, ПолучитьФильтрИсключитьЗаписи );
+    Result = MakeFilter(aFlt);
+  end;
+
+  func ПолучитьФильтрТолькоМоиЗаписи :String;
+    Result = if(МоиЗаписи, 'CreateUser="' + SessionInfo.UserRecord.Name + '"', nil);
+  end;
+
+  func ПолучитьФильтрПоФрагменту :String;
+    Result = if((Фрагмент <> nil), 'Match(НомерГазеты.Газета.НазваниеОсн,"*' + Фрагмент +'*")', nil);
+  end;
+
+  func ПолучитьФильтрПоГоду :String;
+    Result = if((ГодВыпуска <> nil), 'НомерГазеты.ГодВыпуска=' + Str(ГодВыпуска), nil);
+  end;
+
+  func ПолучитьФильтрПоФрагментуНомера :String;
+    Result = if((ФрагментНомера <> nil), 'НомерГазеты.Номер="' + FixCode10(ФрагментНомера) +'"', nil);
+  end;
+
+  func ПолучитьФильтрПоДатеУчета :String;
+    Result = if((ДатаУчета <> nil), 'ДатаПоступления=' + Str(ДатаУчета), nil);
+  end;
+
+  func ПолучитьФильтрИсключитьЗаписи :String;
+    Result = if((ИсключитьЗаписи <> nil), 'not (DocId in ' + ToStr(ИсключитьЗаписи) + ')', nil);
+  end;
+
+
+  -- Установка свойств объекта по дополнительным параметрам конструктора "ВыполнитьВыбор"
+  proc УстСвойстваДоп(addParam :Variant[2]);
+    var i, ii :Integer;
+    var aValue :Variant[];
+    ii = LengthOfArray(addParam);
+    for i = 1 .. ii do
+      aValue = addParam[i] as Variant[];
+      try
+        Self.SetField(aValue[1], aValue[2]);
+      except
+      end;
+    od;
+  end;
+
+
+
+end

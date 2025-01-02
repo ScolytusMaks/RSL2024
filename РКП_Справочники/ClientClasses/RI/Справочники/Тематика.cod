@@ -1,0 +1,31 @@
+class inherited RI.Справочники.intBaseType3 'Интерфейс записи (справочник, тип 3)';
+
+import РКП_СИС Classes Functions, Recs;
+
+inclass public
+
+  var ХешируемыеПоля       :String[] = ['Код', 'ЦельАнализа'];
+
+  func СвязанныйКлассЗаписей: Class BaseRefType3;
+    Result = спрТематика;
+  end;
+
+  func Create: RI.Справочники.Тематика;
+    Result = inherited Create;
+    Result.Record = спрТематика.Create;
+  end;
+
+  func ОткрытьПоЗаписи synonym OpenRecord(locRecord: спрТематика): RI.Справочники.Тематика;
+    Result = inherited Create;
+    Result.Record = locRecord;
+  end;
+
+  func БланкРедакторПоУмолчанию: Class Справочники.editBaseType3;
+    Result = Справочники.редТематика;
+  end;
+
+inobject public
+
+  Record: спрТематика;
+
+end

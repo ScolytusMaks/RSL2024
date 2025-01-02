@@ -1,0 +1,30 @@
+﻿class "";
+
+inclass public
+
+  type tPeriodicityCategory synonym типКатегорияПериодичности = (pcUnDef = 0, pcInDay, pcInWeek, pcInMonth, pcInYear, pcTotal=-1);
+
+  PeriodicityCategory synonym КатегорияПериодичности: variant[2] =
+    [[pcUnDef,  'Неопределенно'],    -- 0
+    [pcInDay,   'В течение дня'],    -- 1
+    [pcInWeek,  'В течение недели'], -- 2
+    [pcInMonth, 'В течение месяца'], -- 3
+    [pcInYear,  'В течение года']];  -- 4
+
+
+  type tFilterByField synonym типФильтрНаПоле = (fltByCodeField = 0, fltByNameField);
+
+  type tFragmentToFilter synonym типФрагментаДляФильтра = (fltByBegin= 0, fltBySubStr, fltExactMatch);
+
+  type tCompetence synonym типКомпетенция = (кмпРазработчик = 0,
+                                             кмпАдминистратор,
+                                             кмпРуководитель,
+                                             кмпОППИзав,
+                                             кмпОППИсотр,
+                                             кмпОРГПзав,
+                                             кмпОРГПсотр,
+                                             кмпГЛГСзав,
+                                             кмпГЛГСсотр);
+
+
+end

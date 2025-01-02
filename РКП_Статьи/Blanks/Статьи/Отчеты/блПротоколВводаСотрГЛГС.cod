@@ -1,0 +1,193 @@
+class inherited РКП_СИС.блОтчетОРаботеБазовый "Отчет о работе библиографа (гр.ЛГС)";
+
+import РКП_СИС classes StdCode, Recs, Functions, FilterMaker, Def, StringsFunctions, RI.intBase;
+
+--{{ 2_Свойства
+
+inobject private
+
+  var КомпетенцииВОтчете :tCompetence[] := [кмпГЛГСзав, кмпГЛГСсотр];
+
+  var НомерСмены         :Integer[];
+  var ДатаСмены          :Date[];
+  var ВведеноСтатей      :Integer[];
+  var ВсегоВведеноСтатей :Integer;
+
+  var секцСтатьи           :TemplateSection;
+
+  var Сотрудник synonym UserName :String := SessionInfo.UserName;
+  var СотрудникПолнИмя           :String := if((SessionInfo.UserRecord <> nil), (SessionInfo.UserRecord as Kernel.Settings.User).FullName, Self.UserName);
+
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inclass public
+
+
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    inherited шаблон_ПриОткрытии(Create);
+    ПостроитьОтчет;
+  end;
+
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func Поле_ПриВыводе_ЗаголовокОкнаФормы(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    Result = 'Протокол ввода данных сотрудника' + Br +
+             СотрудникПолнИмя + Br +
+             '<s-><s->за период с ' + Str(ДатаН) + ' по  ' + Str(ДатаК) + ' включительно';
+  end;
+
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+
+-- 2_Дополнительные команды0. --
+
+
+-- 2_Вспомогательные методы0. --
+
+  func ПостроитьОтчет :Logical;
+    var aUserName :String[];
+    var aUserFullName :String[2];
+    var aResult :Variant[2]; --[[UserName, FullName, vCreateCount, vUpdateCount]]
+    var aWorkShift :Variant[2]; -- номера смен [[vDate, vNumber]]
+    var i :Integer;
+    Result = inherited ПостроитьОтчет;
+    if Result then
+      НомерСмены             = nil;
+      ДатаСмены              = nil;
+      ВведеноСтатей          = nil;
+      ВсегоВведеноСтатей     = nil;
+      секцСтатьи.FramesCount = nil;
+      if (Self.UserName <> nil) then
+        aWorkShift = ПолучитьНомераСмен;
+        --
+        aResult = ПолучитьВыборку(aUserName, 'Роспись');
+        ПроставитьНомераСмен(aResult, aWorkShift);
+        for i = 1 .. LengthOfArray(aResult) do
+          НомерСмены[i]  = aResult[i,2] as Integer;
+          ДатаСмены[i]   = aResult[i,1] as Date;
+          ВведеноСтатей[i]   = aResult[i,3] as Integer;
+          ВсегоВведеноСтатей = ВсегоВведеноСтатей + ВведеноСтатей[i];
+        od;
+        секцСтатьи.FramesCount = LengthOfArray(aResult);
+        --
+      fi;
+    fi;
+  end;
+
+  func ПолучитьНомераСмен :Variant[2]; --[[vDate, vNumber]]
+    var aFlt :String[];
+    var cResult :Variant[];
+    var cRec :РКП_СИС.Смена;
+    var vActionDate  :Date;
+    with Query.Create([РКП_СИС.Смена]) do
+      AddInArray( aFlt, ПолучитьФильтрДат );
+      AddInArray( aFlt, ПолучитьФильтрПользователя );
+      Filter = MakeFilter(aFlt);
+      Select;
+      while not Eof do
+        cRec = Current as РКП_СИС.Смена;
+        vActionDate = cRec.CreateDate;
+        vActionDate = Dat(Day(vActionDate), Mon(vActionDate), Year(vActionDate));
+        cResult = [vActionDate, cRec.НомерСменыВГоду] as Variant[];
+        AddInArray( Result, cResult);
+        Next;
+      od;
+    end;
+    SortArray(Result, [1]);
+  end;
+
+  func ПолучитьФильтрЗапросаЛога( КорИмяКлассаЗаписей :String ) :String;
+    var aFlt :String[];
+    AddInArray( aFlt, ПолучитьФильтрПользователя );
+    AddInArray( aFlt, ПолучитьФильтрКомпетенций );
+    AddInArray( aFlt, ПолучитьФильтрДат );
+    AddInArray( aFlt, ПолучитьФильтрКлассаЗаписей(КорИмяКлассаЗаписей) );
+    Result = MakeFilter( aFlt );
+  end;
+
+  func ПолучитьФильтрКомпетенций :String;
+    var i :Integer;
+    var aFlt :String[];
+    for i = 1 .. LengthOfArray(КомпетенцииВОтчете) do
+      AddInArray( aFlt, 'Match(Competencies, "*|' + Str(КомпетенцииВОтчете[i]) + '|*")' );
+    od;
+    Result = MakeFilter( aFlt, byOr );
+  end;
+
+  func ПолучитьФильтрДат :String;
+    var aFlt :String[];
+    AddInArray( aFlt, 'CreateDate>=' + Str(ДатаН) );
+    AddInArray( aFlt, 'CreateDate<' + Str(ДатаК + 1) );
+    Result = MakeFilter( aFlt );
+  end;
+
+  func ПолучитьФильтрПользователя :String;
+    Return 'CreateUser="' + Self.UserName + '"';
+  end;
+
+  func ПолучитьФильтрКлассаЗаписей( КорИмяКлассаЗаписей :String ) :String;
+    if (КорИмяКлассаЗаписей = 'Роспись') then
+      Result =  'RClass="РКП_Статьи.Роспись"';
+    fi;
+  end;
+
+  func ПолучитьВыборку(aUserName :String[]; КорИмяКлассаЗаписей :String ) :Variant[2];  --[[vActionDate, nil, vCreateCount]]
+    var vActionDate  :Date;
+    var vCreateCount, i :Integer;
+    var cResult :Variant[];
+    var cRec :РКП_СИС.ЛогРабот;
+    if (Self.UserName <> nil) then
+      with Query.Create([РКП_СИС.ЛогРабот]) do
+        Filter = ПолучитьФильтрЗапросаЛога(КорИмяКлассаЗаписей);
+        Select;
+        while not Eof do
+          cRec = Current as РКП_СИС.ЛогРабот;
+          vActionDate = cRec.CreateDate;
+          vActionDate = Dat(Day(vActionDate), Mon(vActionDate), Year(vActionDate));
+          i = SearchInArray(Result, vActionDate, [1], false);
+          if (i > 0) then
+            cResult = Result[i];
+          else
+            i = LengthOfArray(Result) + 1;
+            cResult = [vActionDate, 0, 0];
+          fi;
+          if (КорИмяКлассаЗаписей = 'Роспись') then -- все
+            if (cRec.ActionType = wsRecCreated) and (cRec.StoredValL = false) then
+              vCreateCount = (cResult[3] as Integer) + 1;
+              Result[i] = [vActionDate, 0, vCreateCount];
+            fi;
+          fi;
+          Next;
+        od;
+      end;
+      SortArray(Result, [1]);
+    fi;
+  end;
+
+  proc ПроставитьНомераСмен(var aResult :Variant[2]; aWorkShift :Variant[2]);
+    --var aWorkShift :Variant[2]; -- номера смен [[vDate, vNumber]]
+    var i, j :Integer;
+    var cResult :Variant[];
+    var vActionDate  :Date;
+    aWorkShift = ПолучитьНомераСмен;
+    for i = 1 .. LengthOfArray(aResult) do
+      cResult = aResult[i] as Variant;
+      vActionDate = cResult[1] as Date;
+      j = SearchInArray(aWorkShift, vActionDate, [1], true);
+      if (j > 0) then
+        aResult[i,2] = aWorkShift[j,2] as Integer;
+      fi;
+    od;
+  end;
+
+
+end

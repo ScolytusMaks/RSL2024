@@ -1,0 +1,602 @@
+class inherited СИС2.БазовыйБланк "Базовый статистический отчет";
+
+import СИС2 classes Функции, СтроковыеФункции;
+
+inobject private
+
+--{{ 2_Свойства
+
+  -- Именованые объекты шаблона --
+  var секцЗаголовок       :TemplateSection;
+  var секцПозиции         :TemplateSection;
+  var секцСПО             :TemplateSection;
+  var секцВарианты        :TemplateSection;
+  var секцФО              :TemplateSection;
+  var секцПравилоРасчета  :TemplateSection;
+  var секцВРегионе        :TemplateSection;
+  var секцОписаниеПериода :TemplateSection;
+  -- Поля: --
+  -- Реквизиты --
+  var Библиограф    :String;
+  var ПериодЗапроса :string;
+  -- Условия отбора --
+  var ДатаН   :Date;
+  var ДатаК   :Date;
+  var ЗаДату  :Integer;
+  var ЗаГод   :Integer;
+  var ЗаДату1 :Logical;
+  var ЗаДату2 :Logical;
+  var ЗаДату3 :Logical;
+  var ЗаДату4 :Logical;
+  var ЗаДату5 :Logical;
+  var Округ :РКП_Справочники.СпрГеография;
+  var ИсключитьГородаСубъекты :logical;
+  var ПравилоРасчетаСтатистики :Константы.типПравилоРасчетаСтатистики;
+  -- Служебные --
+  var ОтчетСоздан        :Date;
+  var ФильтрМестаИздания :string;
+  var ОтступСтр2 :String := RepStr(' ', 8);
+  var ОтступСтр3 :String := RepStr(' ', 4);
+  -- Результат отбора как набор массивов --
+  var ЗаписьСтроки         :Record[];
+  var СодержаниеСтроки     :String[];
+  var КолГазет             :Integer[];
+  var КолНомеров           :Integer[];
+  var РазовыйТираж         :Numeric[];
+  var ГодовойТираж         :Numeric[];
+
+  var Сепаратор            :Logical[];
+  var ФильтрПоступлений    :String[];
+  var УровеньПодчиненности :Integer[];
+  var КатегорияМеста       :Integer[];
+  -- Итоги --
+  var ВсегоГазет           :Integer;
+  var ВсегоНомеров         :Integer;
+  var ВсегоРазовыйТираж    :Numeric;
+  var ВсегоГодовойТираж    :Numeric;
+--}}
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+  proc кнЭкспортПриНажатии(Sender :Button);
+    try
+    Template.CellByField['ПериодЗапроса'].SetFocus;
+    except 
+    end;
+    ExecuteCommand('Kernel.File.Export');
+  end;
+
+-- 2_Вспомогательные методы0. --
+
+  func ПериодОтчетаКорректный :Logical;
+    Result = (ДатаН > 01.01.1901) and (ДатаК > 01.01.1901) and (ДатаН <= ДатаК);
+    if not Result then
+      Message('Не заданы или неправильно заданы условия поcтроения отчета!');
+    fi;
+  end;
+
+  func ЭтоРасчетЗаГод :Logical;
+    Result = (ЗаДату4 = true);
+  end;
+
+  func ЭтоОтчетПоРФ :Logical;
+    Return (Округ = nil);
+  end;
+
+  func ЭтоОтчетПоФО :Logical;
+    Return (Округ <> nil);
+  end;
+
+  func ДанныеСтрокиКорректны (vLine :Integer) :Logical;
+    var aTst :Logical[];
+    aTst[1] = (Сепаратор[vLine] = false);
+    aTst[2] = (ФильтрПоступлений[vLine] <> nil);
+    Return not (false in aTst);
+  end;
+
+  proc ПостроениеОтчета_РасчетПозиций;
+    var k, kk :Integer;
+    var aHint :Variant[];
+    kk = секцПозиции.Count;
+    for k = 1 .. kk do
+      Hint('Расчет строки : ' + Trim(СодержаниеСтроки[k]) ,k, kk);
+      aHint[1]  = 'Расчет строки : ' + Trim(СодержаниеСтроки[k]);
+      aHint[2]  = k;
+      aHint[3]  = kk;
+      РасчетПозиции(k, aHint);
+    od;
+    Hint(' ');
+  end;
+
+  proc 2_РасчетПозиции0.(vLine :Integer; aHint :Variant[]);
+    if ДанныеСтрокиКорректны(vLine) then
+      if (ПравилоРасчетаСтатистики = Константы.статПравилоПоПоступлению) then
+        if ЭтоРасчетЗаГод then
+          РасчетПозиции_ПоступленияЗаГод(vLine);
+        else
+          РасчетПозиции_ПоступленияЗаПериод(vLine, aHint);
+        fi;
+      else
+        РасчетПозиции_ВыпускЗаГод(vLine, aHint);
+      fi;
+    fi;
+  end;
+
+  -- Статистика поступлений за год по строке отчета
+
+  proc РасчетПозиции_ПоступленияЗаГод (vLine :Integer);
+    var vFilter :String;
+    var aResult :Variant[];
+    vFilter = РасчетПозиции_ФильтрПоступленийЗаГод(vLine);
+    aResult = РасчетПозиции_ПолучитьСтатистикуПоступленийЗаГод( vFilter );
+    КолГазет[vLine] = aResult[1] as Integer;
+    КолНомеров[vLine] = aResult[2] as Integer;
+    РазовыйТираж[vLine] = aResult[3] as Numeric;
+    ГодовойТираж[vLine] = aResult[4] as Numeric;
+  end;
+
+  func РасчетПозиции_ПолучитьСтатистикуПоступленийЗаГод (vFilter :String) :Variant[];
+    with Query.Create([РКП_Газеты.ПоступлениеГазеты]) do
+      Filter = vFilter;
+      LoadingFields = "НомеровПолучено;ГодовойТираж;СреднийРазовыйТираж";
+      Result = CalcAggregates('Count,Sum(НомеровПолучено),Sum(СреднийРазовыйТираж),Sum(ГодовойТираж)') as Variant[];
+    end;
+  end;
+
+  -- Статистика поступлений за произвольный период по строке отчета
+
+  proc РасчетПозиции_ПоступленияЗаПериод (vLine :Integer; aHint :Variant[]);
+    var aResult :Variant[];
+    var j, jj :Integer;
+    with Query.Create([РКП_Газеты.ПоступлениеГазеты]) do
+      Filter = РасчетПозиции_ФильтрПоступленийЗаГод(vLine);
+      LoadingFieldsMode = СИС2.Константы.mdNone;
+      LoadingFields = 'Газета';
+      Select;
+      jj = Count;
+      while not Eof do
+        j = j + 1;
+        Hint(aHint[1] as string + ' [ ' + Str(j) + '/' + Str(jj) + ' ]' , aHint[2] as integer, aHint[3] as integer);
+        aResult = РасчетПозиции_ПолучитьСтатистикуПоступленийПоНомерам((Current as РКП_Газеты.ПоступлениеГазеты).Газета);
+        КолГазет[vLine]       = КолГазет[vLine]     + aResult[1] as Integer;
+        КолНомеров[vLine]     = КолНомеров[vLine]   + aResult[2] as Integer;
+        РазовыйТираж[vLine]   = РазовыйТираж[vLine] + aResult[3] as Numeric;
+        ГодовойТираж[vLine]   = ГодовойТираж[vLine] + aResult[4] as Numeric;
+        Next;
+      od;
+    end;
+  end;
+
+  func РасчетПозиции_ПолучитьСтатистикуПоступленийПоНомерам (vNewspaper :РКП_Газеты.Газета) :Variant[];
+    var aFlt :String[];
+    var aResult :Variant[];
+    with Query.Create([РКП_Газеты.НомерГазеты]) do
+      aFlt[1] = 'Газета=' + vNewspaper.DocIDStr;
+      aFlt[2] = 'ДатаПринятияНаХранение>=' + Str(ДатаН, 'dd.mm.yyyy');
+      aFlt[3] = 'ДатаПринятияНаХранение<' + Str(ДатаК + 1, 'dd.mm.yyyy');
+      aFlt[4] = 'not НеПолучен';
+      aFlt[5] = 'isGroup=0';
+      aFlt[6] = 'not(СозданОЛГС and НеПолучен)';
+      --aFlt[6] = 'not ЛожныйНомер';
+      Filter = СложитьСтрокиФильтраПоИ(aFlt);
+      aResult = CalcAggregates('Count,Sum(Тираж)') as Variant[];
+      if ((aResult[1] as Integer) > 0) then
+        Result[1] = 1;
+        Result[2] = aResult[1] as Integer;
+        Result[3] = ((aResult[2] as Numeric) / 1000) / (aResult[1] as Integer);
+        Result[4] = (aResult[2] as Numeric) / 1000;
+      else
+        Result[1] = 0;
+        Result[2] = 0;
+        Result[3] = 0.0;
+        Result[4] = 0.0;
+      fi;
+    end;
+  end;
+
+  -- Статистика выпуска за год по строке отчета
+
+  proc РасчетПозиции_ВыпускЗаГод (vLine :Integer; aHint :Variant[]);
+    var aResult :Variant[];
+    var j, jj :Integer;
+    with Query.Create([РКП_Газеты.ПоступлениеГазеты]) do
+      Filter = РасчетПозиции_ФильтрПоступленийЗаГод(vLine);
+      LoadingFieldsMode = СИС2.Константы.mdNone;
+      LoadingFields = 'Газета';
+      Select;
+      jj = Count;
+      while not Eof do
+        j = j + 1;
+        Hint(aHint[1] as string + ' [ ' + Str(j) + '/' + Str(jj) + ' ]' , aHint[2] as integer, aHint[3] as integer);
+        aResult = РасчетПозиции_ПолучитьСтатистикуВыпускаЗаГод((Current as РКП_Газеты.ПоступлениеГазеты).Газета);
+        КолГазет[vLine]       = КолГазет[vLine]     + aResult[1] as Integer;
+        КолНомеров[vLine]     = КолНомеров[vLine]   + aResult[2] as Integer;
+        РазовыйТираж[vLine]   = РазовыйТираж[vLine] + aResult[3] as Numeric;
+        ГодовойТираж[vLine]   = ГодовойТираж[vLine] + aResult[4] as Numeric;
+        Next;
+      od;
+    end;
+  end;
+
+  func РасчетПозиции_ПолучитьСтатистикуВыпускаЗаГод (vNewspaper :РКП_Газеты.Газета; vYear :Integer = 0) :Variant[];
+    -- по номерам --
+    var aFlt :String[];
+    var aResult :Variant[];
+    var cRecord :РКП_Газеты.ВыпускГазеты;
+    -- быстрее
+    with Query.Create([РКП_Газеты.ВыпускГазеты]) do
+      aFlt[1] = 'Газета=' + vNewspaper.DocIDStr;
+      if (vYear = 0) then
+        aFlt[2] = 'ГодВыпуска=' + Str(ЗаГод);
+      else
+        aFlt[2] = 'ГодВыпуска=' + Str(vYear);
+      fi;
+      aFlt[3] = 'НомеровПолучено>0';
+      Filter = СложитьСтрокиФильтраПоИ(aFlt);
+      LoadingFieldsMode = СИС2.Константы.mdNone;
+      --OpenHint[Query.Packeting] = true;
+      --PacketSize = 2;
+      LoadingFields = 'НомеровПолучено;СреднийРазовыйТираж;ГодовойТираж';
+      Select;
+      if RecordsExists:
+        cRecord = Current as РКП_Газеты.ВыпускГазеты;
+        if not nil in [cRecord.НомеровПолучено, cRecord.СреднийРазовыйТираж, cRecord.ГодовойТираж] then
+          Result[1] = 1;
+          Result[2] = cRecord.НомеровПолучено;
+          Result[3] = cRecord.СреднийРазовыйТираж;
+          Result[4] = cRecord.ГодовойТираж;
+        fi;
+      fi;
+    end;
+    -- медленнее
+    if (Result = nil) then
+      with Query.Create([РКП_Газеты.НомерГазеты]) do
+        aFlt[1] = 'Газета=' + vNewspaper.DocIDStr;
+        if (vYear = 0) then
+          aFlt[2] = 'ГодВыпуска=' + Str(ЗаГод);
+        else
+          aFlt[2] = 'ГодВыпуска=' + Str(vYear);
+        fi;
+        aFlt[3] = 'not НеПолучен';
+        aFlt[4] = 'isGroup=0';
+        aFlt[5] = 'not(СозданОЛГС and НеПолучен)';
+        --aFlt[6] = 'not ЛожныйНомер';
+        Filter = СложитьСтрокиФильтраПоИ(aFlt);
+        aResult = CalcAggregates('Count,Sum(Тираж)') as Variant[];
+        if ((aResult[1] as Integer) > 0) then
+          Result[1] = 1;
+          Result[2] = aResult[1] as Integer;
+          Result[3] = ((aResult[2] as Numeric) / 1000) / (aResult[1] as Integer);
+          Result[3] = Round(Result[3] as Numeric, 1);
+          Result[4] = (aResult[2] as Numeric) / 1000;
+          Result[4] = Round(Result[4] as Numeric, 1);
+        else
+          Result[1] = 0;
+          Result[2] = 0;
+          Result[3] = 0.0;
+          Result[4] = 0.0;
+        fi;
+      end;
+    fi;
+  end;
+
+  func РасчетПозиции_ФильтрПоступленийЗаГод(vLine :Integer) :String;
+    var aFlt :String[];
+    if (Округ = nil) then
+      aFlt[1] = 'ГодПоступления=' + Str(Year(ДатаН));
+      aFlt[2] = ФильтрПоступлений[vLine];
+      aFlt[3] = 'НомеровПолучено>0';
+    else
+      aFlt[1] = 'ГодПоступления=' + Str(Year(ДатаН));
+      aFlt[2] = ФильтрПоступлений[vLine];
+      aFlt[3] = ФильтрМестаИздания;
+      aFlt[4] = 'НомеровПолучено>0';
+    fi;
+    Result = СложитьСтрокиФильтраПоИ(aFlt);
+  end;
+
+
+
+inobject public
+  -----------------------------------
+  -----------------------------------
+  -------------------------------------------------------------------------------
+
+  proc СоздатьФильтрМестаИздания;
+    var DocID_ :string;
+    var aFlt :String[];
+    ФильтрМестаИздания = nil;
+    if (Округ <> nil) then
+      DocID_ = Str(Округ.DocID);
+      aFlt[1] = "МестоИздания.GroupDoc.GroupDoc.GroupDoc.GroupDoc.DocID=" + DocID_;
+      aFlt[2] = "МестоИздания.GroupDoc.GroupDoc.GroupDoc.DocID=" + DocID_;
+      aFlt[3] = "МестоИздания.GroupDoc.GroupDoc.DocID=" + DocID_;
+      aFlt[4] = "МестоИздания.GroupDoc.DocID=" + DocID_;
+      aFlt[5] = "МестоИздания.DocID=" + DocID_;
+      ФильтрМестаИздания = СИС2.СтроковыеФункции.СложитьСтрокиФильтраПоИли(aFlt);
+      if (Округ.Категория = 6) then --проверка на корректность
+        ИсключитьГородаСубъекты = false;
+      fi;
+      if ИсключитьГородаСубъекты then
+        aFlt = nil;
+        aFlt[1] = ФильтрМестаИздания;
+        aFlt[2] = "МестоИздания.GroupDoc.Категория<>6";
+        aFlt[3] = "МестоИздания.Категория<>6";
+        ФильтрМестаИздания = СИС2.СтроковыеФункции.СложитьСтрокиФильтраПоИ(aFlt);
+      fi;
+    fi;
+  end;
+
+  proc ОчиститьРезультатыРасчета;
+    секцПозиции.Count     = nil;
+    СодержаниеСтроки      = nil;
+    ЗаписьСтроки          = nil;
+    КолГазет              = nil;
+    КолНомеров            = nil;
+    РазовыйТираж          = nil;
+    ГодовойТираж          = nil;
+    ВсегоГазет            = nil;
+    ВсегоНомеров          = nil;
+    ВсегоРазовыйТираж     = nil;
+    ВсегоГодовойТираж     = nil;
+    Сепаратор             = nil;
+    ФильтрПоступлений     = nil;
+    УровеньПодчиненности  = nil;
+    КатегорияМеста        = nil;
+  end;
+
+  proc УдалитьПустыеСтроки;
+    var k, kk, z, j :Integer;
+    var РешениеУдалить :Logical;
+    kk = секцПозиции.Count;
+    for k = 1 .. kk do
+      z = kk + 1- k;
+      if (СодержаниеСтроки[z] = nil) then
+        СодержаниеСтроки[z] = "Не определено";
+      fi;
+      if (Pos("  ", СодержаниеСтроки[z]) > 0) then
+        Сепаратор[z] = false;
+      fi;
+      РешениеУдалить = true;
+      if (КолНомеров[z] <> nil) or (Сепаратор[z] = true) then
+        РешениеУдалить = false;
+      fi;
+      if (РешениеУдалить) then
+        DeleteFromArray(ЗаписьСтроки,          z);
+        DeleteFromArray(СодержаниеСтроки,      z);
+        DeleteFromArray(КолГазет,              z);
+        DeleteFromArray(КолНомеров,            z);
+        DeleteFromArray(РазовыйТираж,          z);
+        DeleteFromArray(ГодовойТираж,          z);
+        DeleteFromArray(Сепаратор,             z);
+        DeleteFromArray(ФильтрПоступлений,     z);
+        DeleteFromArray(УровеньПодчиненности,  z);
+        DeleteFromArray(КатегорияМеста,        z);
+      else
+        j = j + 1;
+      fi;
+    od;
+    секцПозиции.Count = j;
+  end;
+
+
+--{ Обработчики событий бланка
+
+  proc ПостроитьОтчет(Sender :Button);
+    if (Template.CurrentEdit <> nil) then
+      Template.EndEdit(true);
+      Template.Update;
+      Message ('Пожалуйста, завершите ввод условий построения отчета!');
+      Return;
+    fi;
+    ПостроениеОтчета;
+  end;
+
+  proc ПостроениеОтчета;
+    ОтчетСоздан = Now;
+    if (SessionInfo.UserRecord <> nil) then
+      Библиограф = SessionInfo.UserRecord.FullName;
+    fi;
+    ОчиститьРезультатыРасчета;
+    if (Округ <> nil) then
+      СоздатьФильтрМестаИздания;
+      секцВРегионе.Visible = true;
+    else
+      секцВРегионе.Visible = false;
+    fi;
+  end;
+
+  func СменаВариантаПериода(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    if (ЗаГод > 1801) and (ЗаГод < 2999) then
+      ЗаДату1 = false;
+      ЗаДату2 = false;
+      ЗаДату3 = false;
+      ЗаДату4 = false;
+      ЗаДату5 = false;
+      ЗаДату  = nil;
+      секцСПО.Visible = false;
+      секцОписаниеПериода.Printed= false;
+      секцВарианты.CellByField["ЗаДату1"].Font.Bold = false;
+      секцВарианты.CellByField["ЗаДату2"].Font.Bold = false;
+      секцВарианты.CellByField["ЗаДату3"].Font.Bold = false;
+      секцВарианты.CellByField["ЗаДату4"].Font.Bold = false;
+      секцВарианты.CellByField["ЗаДату5"].Font.Bold = false;
+      if (Cell.Contents = "ЗаДату1") then
+        ЗаДату = 0;
+        ЗаДату1 = true;
+        секцВарианты.CellByField["ЗаДату1"].Font.Bold = true;
+        ДатаН = РКП_СИС.СтандартныйПериод.Начало1Квартала(ЗаГод);
+        ДатаК = РКП_СИС.СтандартныйПериод.Начало2Квартала(ЗаГод) - 1;
+        ПериодЗапроса = "I квартале " + Str(ЗаГод) + " г.";
+        ОчиститьРезультатыРасчета;
+      elsif (Cell.Contents = "ЗаДату2") then
+        ЗаДату = 1;
+        ЗаДату2 = true;
+        секцВарианты.CellByField["ЗаДату2"].Font.Bold = true;
+        ДатаН = РКП_СИС.СтандартныйПериод.Начало1Квартала(ЗаГод);
+        ДатаК = РКП_СИС.СтандартныйПериод.Начало3Квартала(ЗаГод) - 1;
+        ПериодЗапроса = "I-II квартале " + Str(ЗаГод) + " г.";
+        ОчиститьРезультатыРасчета;
+      elsif (Cell.Contents = "ЗаДату3") then
+        ЗаДату = 2;
+        ЗаДату3 = true;
+        секцВарианты.CellByField["ЗаДату3"].Font.Bold = true;
+        ДатаН = РКП_СИС.СтандартныйПериод.Начало1Квартала(ЗаГод);
+        ДатаК = РКП_СИС.СтандартныйПериод.Начало4Квартала(ЗаГод) - 1;
+        ПериодЗапроса = "I-III квартале " + Str(ЗаГод) + " г.";
+        ОчиститьРезультатыРасчета;
+      elsif (Cell.Contents = "ЗаДату4") then
+        ЗаДату = 3;
+        ЗаДату4 = true;
+        секцВарианты.CellByField["ЗаДату4"].Font.Bold = true;
+        ДатаН = Dat(1,1,ЗаГод);
+        ДатаК = РКП_СИС.СтандартныйПериод.Конец4Квартала(ЗаГод) - 1;
+        ПериодЗапроса = Str(ЗаГод) + " г.";
+        ОчиститьРезультатыРасчета;
+      elsif (Cell.Contents = "ЗаДату5") then
+        ЗаДату = 4;
+        ЗаДату5 = true;
+        секцВарианты.CellByField["ЗаДату5"].Font.Bold = true;
+        if (ДатаН > 01.01.1901) and (ДатаК > 01.01.1901) and (ДатаН <= ДатаК) then
+          ДатаН = Dat(Day(ДатаН), Mon(ДатаН), ЗаГод);
+          ДатаК = Dat(Day(ДатаК), Mon(ДатаК), ЗаГод);
+        else
+          ДатаН = Dat(1, 1, ЗаГод);
+          ДатаК = РКП_СИС.СтандартныйПериод.Конец4Квартала(ЗаГод) - 1;
+        fi;
+        секцОписаниеПериода.Printed = true;
+        секцСПО.Visible = true;
+        ПериодЗапроса = Str(ЗаГод) + " г.";
+        ОчиститьРезультатыРасчета;
+      fi;
+      УстДоступность_ПравилоРасчетаСтатистики;
+    else
+      Message("Пожалуста, укажите корректный год запроса!");
+    fi;
+    Result = False;
+  end;
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    --var Res:logical;
+    inherited шаблон_ПриОткрытии(Create);
+    if  (ЗаГод = nil) then
+      ЗаГод = Year(today) - 1;
+    fi;
+    СменаВариантаПериода(секцВарианты.CellByField["ЗаДату4"],Template.SingleClick);
+    if   Округ  <> nil  then
+      секцВРегионе.Visible      =       true;
+    else
+      секцВРегионе.Visible      =       false;
+    end;
+    ОчиститьРезультатыРасчета;
+    УстДоступность_ИсключитьГородаСубъекты;
+--    Window.LoadIcon("%Projects%\РКП_СИС\Icons\Отчет_ОРГ.ico");
+  end;
+
+
+
+  func ПолеГодПриОбзоре(Cell :TemplateCell; Value :Variant; var NewValue :Variant) :Logical;
+    var vYear :Integer;
+    if (CmOk = РКП_СИС.Сервис.блВыборГода.ВыполнитьВыбор(vYear)) then
+      NewValue     = vYear;
+    --if  CmOk = OpenBlank("РКП_СИС.Сервис.блВыборГода",Window.ModalWindow) then
+      --NewValue     = РКП_СИС.Сервис.блВыборГода.Решение;
+      ЗаГод        = NewValue;
+      Template.EndEdit(True);
+      --if Value>1901 then
+      --  РКП_СИС.Сервис.блВыборГода.ВыбранныйГод = Value;
+      --else
+      --  РКП_СИС.Сервис.блВыборГода.ВыбранныйГод = Year(Today)-1;
+      --end;
+      if          ЗаДату = 0      then
+        Result = СменаВариантаПериода(секцВарианты.CellByField["ЗаДату1"],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      elsif       ЗаДату = 1      then
+        Result = СменаВариантаПериода(секцВарианты.CellByField["ЗаДату2"],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      elsif       ЗаДату = 2      then
+        Result = СменаВариантаПериода(секцВарианты.CellByField["ЗаДату3"],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      elsif       ЗаДату = 3      then
+        Result = СменаВариантаПериода(секцВарианты.CellByField["ЗаДату4"],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      elsif       ЗаДату = 4      then
+        Result = СменаВариантаПериода(секцВарианты.CellByField["ЗаДату5"],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      else
+        Result = false;
+      end;
+    else
+      Result = false;
+    end;
+  end;
+
+  proc ПолеЗаГодПриВыходе(Cell :TemplateCell; Index :Integer);
+      if          ЗаДату = 0      then
+        СменаВариантаПериода(секцВарианты.CellByField["ЗаДату1"],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      elsif       ЗаДату = 1      then
+        СменаВариантаПериода(секцВарианты.CellByField["ЗаДату2"],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      elsif       ЗаДату = 2      then
+        СменаВариантаПериода(секцВарианты.CellByField["ЗаДату3"],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      elsif       ЗаДату = 3      then
+        СменаВариантаПериода(секцВарианты.CellByField["ЗаДату4"],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      elsif       ЗаДату = 4      then
+        СменаВариантаПериода(секцВарианты.CellByField["ЗаДату5"],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      end;
+  end;
+
+
+  proc ПолеОкругПриВыходе(Cell :TemplateCell; Index :Integer);
+    ОчиститьРезультатыРасчета;
+    УстДоступность_ИсключитьГородаСубъекты;
+  end;
+
+  proc ПолеСтатПравилоПриВыходе(Cell :TemplateCell; Index :Integer);
+    ОчиститьРезультатыРасчета;
+  end;
+
+  proc УстДоступность_ИсключитьГородаСубъекты;
+    var locCell :TemplateCell;
+    if (секцФО <> nil) then
+      locCell = секцФО.CellByField['ИсключитьГородаСубъекты'];
+      if (locCell <> nil) then
+        if (Округ = nil) then
+          ИсключитьГородаСубъекты = false;
+          locCell.Enabled = false;
+        else
+          locCell.Enabled = true;
+        fi;
+      fi;
+    fi;
+  end;
+
+  proc УстДоступность_ПравилоРасчетаСтатистики;
+    var locCell :TemplateCell;
+    if (секцПравилоРасчета <> nil) then
+      locCell = секцПравилоРасчета.CellByField['ПравилоРасчетаСтатистики'];
+      if (locCell <> nil) then
+        if (ЗаДату <> 3) then
+          ПравилоРасчетаСтатистики = nil;
+          locCell.Enabled = false;
+        else
+          locCell.Enabled = true;
+        fi;
+      fi;
+    fi;
+  end;
+
+--}
+
+
+end

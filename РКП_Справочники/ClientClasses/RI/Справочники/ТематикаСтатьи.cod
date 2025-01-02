@@ -1,0 +1,34 @@
+class inherited RI.Справочники.intBaseType3 'Интерфейс записи (справочник, тип 3)';
+
+import РКП_СИС Classes Functions, Recs;
+
+inclass public
+
+  var ОбязательныеПоля     :String[] = ['Код', 'Наим', 'КрНаим'];
+  var ХешируемыеПоля       :String[] = ['Код'];
+
+  type tFilterByHeadingType synonym типФильтрПоТипуРубрик = (fltByHeadingTypeAny = 0, fltByHeadingTypeSyst, fltByHeadingTypeTemp);
+
+  func СвязанныйКлассЗаписей: Class BaseRefType3;
+    Result = спрТематикаСтатьи;
+  end;
+
+  func Create: RI.Справочники.ТематикаСтатьи;
+    Result = inherited Create;
+    Result.Record = спрТематикаСтатьи.Create;
+  end;
+
+  func ОткрытьПоЗаписи synonym OpenRecord(locRecord: спрТематикаСтатьи): RI.Справочники.ТематикаСтатьи;
+    Result = inherited Create;
+    Result.Record = locRecord;
+  end;
+
+  func БланкРедакторПоУмолчанию: Class Справочники.editBaseType3;
+    Result = Справочники.редТематикаСтатьи;
+  end;
+
+inobject public
+
+  Record: спрТематикаСтатьи;
+
+end

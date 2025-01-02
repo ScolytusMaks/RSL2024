@@ -1,0 +1,9 @@
+﻿-- Здась - упрощенный лог, предназаеченный для сохранения сведений о кол-ве редактированных записей за календарный день
+  record ЛогРабот inherited СИС2.Базовая.БазоваяЗапись title "";
+    field RClass       :String title "";
+    field RID          :Integer title "";
+    field ActionType   :Integer title "";
+    field Competencies :String title ""; -- Коды компетенций пользователя на момент формирования записи
+    field StoredValI   :Integer title "";
+    field StoredValL   :Logical title "";
+  end;

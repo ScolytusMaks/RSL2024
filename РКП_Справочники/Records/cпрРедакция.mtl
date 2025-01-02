@@ -1,0 +1,4 @@
+record спрРедакция inherited BaseRefType1 title "Редакции";
+  field НаселенныйПункт :СпрГеография title "Населенный пункт";
+  --field Наим :String title "Почтовый адрес";
+end;

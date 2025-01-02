@@ -1,0 +1,9 @@
+record СправкаПоПоследнемуНомеру        inherited СИС2.Базовая.БазоваяЗапись title "Справка по последнему полученному номеру";
+  field ТипИздания  :Integer title "Тип издания"; -- 0 : газета; 1 : МПГ
+  field ГодВыпуска  :Integer title "Год выпуска";
+  field ДатаЗапроса :Date    title "Дата запроса";
+  field Литера      :String  title "Литера"; -- первая буква названия
+  struct Позиции array Integer title "Позиции";
+    field Номер :НомерГазеты title   "Номер";
+  end;
+end;

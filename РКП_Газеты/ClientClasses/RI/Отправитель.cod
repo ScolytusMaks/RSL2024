@@ -1,0 +1,50 @@
+extends Ѕазовый.ƒанные.инт—убъект;
+
+inclass public
+
+  func Ѕланк–едакторѕо”молчанию :Class BlankForm;
+    Return ”чет√азет.—правочники.редќтправитель;
+  end;
+
+  func  артотекаѕо”молчанию: Class CardForm;
+    Result = ”чет√азет.—правочники.картќтправители;
+  end;
+
+inobject public
+
+  proc »нициализироватьѕо”молчанию synonym InitByDefault;
+    Init('Ќовый отправитель', Record.ExtID);
+    with Record do
+      if ( раткое»м€ = nil) and (»м€ <> nil) then
+         раткое»м€ = »м€;
+      fi;
+    end;
+  end;
+
+inobject private
+
+  proc ƒействи€ѕриƒублировании;
+    extended ƒействи€ѕриƒублировании;
+    Record.»ЌЌ = nil;
+    Record. од = Record.ExtID;
+  end;
+
+  proc «аписать synonym Post( аƒиалоговый–ежим :Logical = False );
+    if (Record.ёрјдрес = nil) and (Record.јдрес‘актический = nil) and (Record.јдресѕочтовый = nil) then
+      Record.јдрес = nil;
+    else
+      if (Record.јдресѕочтовый <> nil) then    Record.јдрес = Record.јдресѕочтовый; fi;
+      if (Record.јдрес‘актический <> nil) then Record.јдрес = Record.јдрес‘актический; fi;
+      if (Record.ёрјдрес <> nil) then          Record.јдрес = Record.ёрјдрес; fi;
+    fi;
+    if (Record. раткое»м€ = nil) and (Record.ѕолн»м€ = nil) then
+      Record.»м€ = nil;
+    else
+      if (Record. раткое»м€ <> nil) then Record.»м€ = Record. раткое»м€; fi;
+      if (Record.ѕолн»м€ <> nil) then    Record.»м€ = Record.ѕолн»м€; fi;
+    fi;
+    extended Post;
+  end;
+
+
+end

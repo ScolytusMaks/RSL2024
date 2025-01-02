@@ -1,0 +1,105 @@
+class inherited РКП_Газеты.УчетГазет.Отчеты.блОтчетСтатРГБазовый1 "Последний полученный номер", editor СправкаПоПоследнемуНомеру;
+
+inclass
+
+inobject
+
+    Библиограф                  : string;
+var НомерСтроки[]               : integer;
+var МестоИздания[]              : string;
+var ПоследнийПолученныйНомер[]  : string;
+--------------------------------------------------------------------------------
+
+--{ Обработчики событий бланка
+
+  func  МестоИзданияГазеты(Rec:record):string;
+    if          Rec.МестаИздания.Count        = 1 then
+      Result =Rec.МестаИздания.Items[1].МестоИздания.Наим;
+    elsif       Rec.МестаИздания.Count        = 2 then
+      Result =Rec.МестаИздания.Items[1].МестоИздания.Наим+" ; "+
+              Rec.МестаИздания.Items[2].МестоИздания.Наим;
+    elsif       Rec.МестаИздания.Count        >=3 then
+      Result =Rec.МестаИздания.Items[1].МестоИздания.Наим+" ; "+
+              Rec.МестаИздания.Items[2].МестоИздания.Наим+" ; "+
+              Rec.МестаИздания.Items[3].МестоИздания.Наим;
+    end;
+  end;
+
+
+  proc СчитатьПодтаблицу;
+  var k         : integer;
+  var ResultD   : date;
+  var ResultS   : string;
+  var ValNom    : string;
+  var ResultI   : integer;
+    for k = 1..Record.Позиции.Count do
+      Hint("Чтение записи...",k,Record.Позиции.Count);
+      НомерСтроки[k]                    = k;
+      МестоИздания[k]                   = МестоИзданияГазеты(Record.Позиции.Items[k].Номер.Газета);
+      ResultD                           = Record.Позиции.Items[k].Номер.ДатаВыхода;
+      ResultI                           = Record.Позиции.Items[k].Номер.ТочностьДатыВыхода;
+      ValNom                            = Record.Позиции.Items[k].Номер.ВаловыйНомер;
+      if ValNom<>""                     then
+        ValNom                          = " ("+ValNom+") ";
+      end;
+      if ResultD>01.01.0100             then
+        if    ResultI=0                 then
+          ResultS                       = Record.Позиции.Items[k].Номер.Номер +ValNom+
+                                          " от "+
+                                          Str(ResultD);
+        elsif ResultI=1                 then
+          ResultS                       = Record.Позиции.Items[k].Номер.Номер +ValNom+
+                                          " от "+
+                                          РКП_СИС.DateDescription.Месяца(Mon(ResultD))+
+                                          " "+
+                                          Str(Year(ResultD))+
+                                          " г.";
+        elsif ResultI=2                 then
+          ResultS                       = Record.Позиции.Items[k].Номер.Номер +ValNom+
+                                          " от "+
+                                          Str(Year(ResultD))+
+                                          " г.";
+        end;
+      else
+          ResultS                       = Record.Позиции.Items[k].Номер.Номер+ValNom;
+      end;
+      ПоследнийПолученныйНомер[k]       = ResultS;
+    end;
+  end;
+
+
+
+  proc ПостроитьОтчет(Sender :Button);
+  var Номер_[]  : record;
+  var n         : integer;
+    Record.Позиции.Clear;
+    ПоследнийНомер.ВыполнениеЗапроса(Литера,ГодВыпуска,ТипИздания,Номер_);
+    for n = 1..LengthOfArray(Номер_)    do
+       Record.Позиции.Add;
+       Record.Позиции.Items[n].Номер    = Номер_[n];
+    end;
+    if Record.Modified=true             then
+    Record.Post;
+    end;
+  end;
+
+  func ПолеСодержаниеСтрокиПриНажатии(Cell :TemplateCell;Action :Template.ClickTypes) :Logical;
+    OpenBlankEditor("РКП_Газеты.УчетГазет.редГазета",Record.Позиции.Items[Cell.Frame].Номер.Газета);
+    Result = True; -- Разрешаем стандартную обработку
+  end;
+
+
+
+  proc шаблон_ПриСчитывании;
+    СчитатьПодтаблицу;
+    if ДатаЗапроса<>nil         then
+      Window.Caption = "Последний полученный номер по состоянию на "+Str(ДатаЗапроса);
+    else
+      Window.Caption = "Последний полученный номер";
+    end;
+  end;
+
+--}
+
+
+end

@@ -1,0 +1,11 @@
+record спр¬ќрганизаци€ inherited BaseRefType1 title "¬ременные организации";
+end;
+
+record спр¬ оллектив   inherited BaseRefType1 title "¬ременные организации - коллективы (основное деление)";
+end;
+
+record спр¬—труктѕодр  inherited BaseRefType1 title "¬ременные организации - структурные подразделени€";
+end;
+
+record спр¬¬ремѕодр    inherited BaseRefType1 title "¬ременные организации - временные подразделени€";
+end;

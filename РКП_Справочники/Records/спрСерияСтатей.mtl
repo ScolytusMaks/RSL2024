@@ -1,0 +1,2 @@
+record спрСерияСтатей inherited BaseRefType1 title "Серия статей";
+end;

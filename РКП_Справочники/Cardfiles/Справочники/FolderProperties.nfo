@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Properties Version="1"/>
+<Items>
+  <Item Name="картГеография"/>
+  <Item Name="картРедакция"/>
+  <Item Name="картСерияСтатей"/>
+  <Item Name="картГеографияСтатьи"/>
+  <Item Name="картЛица"/>
+  <Item Name="картПостОрг"/>
+  <Item Name="картПостОргКолл"/>
+  <Item Name="картПостОргСП"/>
+  <Item Name="картПостОргВП"/>
+  <Item Name="картВремОрг"/>
+  <Item Name="картВремОргКолл"/>
+  <Item Name="картВремОргСП"/>
+  <Item Name="картВремОргВП"/>
+  <Item Name="картЯзыкИздания"/>
+  <Item Name="картЯзыкОригинала"/>
+</Items>

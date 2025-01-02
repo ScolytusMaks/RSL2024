@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Properties Version="1"/>
+<Items>
+  <Item Name="Администратор.csv"/>
+  <Item Name="Руководитель.csv"/>
+  <Item Name="ОРГПзав.csv"/>
+  <Item Name="ОРГПсотр.csv"/>
+  <Item Name="ОППИзав.csv"/>
+  <Item Name="ОППИсотр.csv"/>
+  <Item Name="ГЛГСзав.csv"/>
+  <Item Name="ГЛГСсотр.csv"/>
+</Items>

@@ -1,0 +1,26 @@
+Class inherited Справочники.editBaseType1 "Адрес редакции" , editor спрРедакция;
+
+
+--{{ 2_Свойства
+
+inobject private
+
+  var Интерфейс :RI.Справочники.Редакция;
+
+--}}
+
+-- 2_Обработчики событий 0клеток 2шаблона0. --
+
+  proc Поле_ПриВыходе_Наим(Cell :TemplateCell; Index :Integer);
+    if (Cell.Contents in Интерфейс.ХешируемыеПоля) then
+      Hash = Интерфейс.GetHashByRecord(Self.Record);
+    fi;
+  end;
+
+-- 2_Вспомогательные методы0. --
+
+   proc УстановитьФокусНаПервоеПолеВвода;
+    Template.CellByField['НаселенныйПункт'].SetFocus;
+   end;
+
+end

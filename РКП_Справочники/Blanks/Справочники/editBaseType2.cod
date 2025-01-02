@@ -1,0 +1,54 @@
+class inherited Справочники.editBaseType1 "", editor BaseRefType2;
+
+--import РКП_СИС Classes Functions, StringsFunctions, Recs, FilterMaker;
+
+--{{ 2_Свойства
+
+inobject private
+
+  Интерфейс :РКП_Справочники.RI.Справочники.intBaseType2;
+  --frInternalInfo :TemplateFrame;
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inobject private
+
+  proc ПросмотрПохожихЗаписей( aFilter :String; WinStyle :Window.WindowStyles = Kernel.Window.ModalWindow; addParam :Variant = nil );
+    var aChildClasses :Class[] Справочники.FalseCardType2;
+    var vClass :Class Справочники.FalseCardType2;
+    var vForm :Справочники.FalseCardType2;
+    var i :Integer;
+    var MInfoTest, MInfoSelf :MethodInfo;
+    aChildClasses = Справочники.FalseCardType2.ChildClasses(true) as Class[] Справочники.FalseCardType2;
+    for i = 1 .. LengthOfArray(aChildClasses) do
+      vClass = aChildClasses[i];
+      MInfoTest = vClass.ClassInfo.MemberByName('КлассИнтерфейса');
+      MInfoSelf = Self.ClassInfo.MemberByName('Интерфейс');
+      if MInfoTest.ResultType = MInfoSelf.ResultType then
+        vForm = vClass.Create;
+        vForm.SimilarFilter = aFilter;
+        vForm.SimilarDataViewsMode = true;
+        #NoWarning;
+        vForm.ShowEx(nil, WinStyle);
+      fi;
+    od;
+  end;
+
+-- 2_Обработчики событий шаблона0. --
+
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+
+-- 2_Дополнительные команды0. --
+
+
+-- 2_Вспомогательные методы0. --
+
+
+
+end

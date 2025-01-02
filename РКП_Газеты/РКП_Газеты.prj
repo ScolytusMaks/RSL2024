@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project Version="1">
+  <Options Caption="Учет газет и МП" Comment="#21" Version="005" Author="Copyright © 2008-2023 ООО &quot;Арго&quot;, Самсоненко М.А." Code="0" SubCode="0" WebCode="0" WebSubCode="0" Frontal="True"/>
+  <Usage>
+    <Project Name="РКП_Справочники"/>
+  </Usage>
+  <Groups>
+    <Group Name="AbstractRecords" Type="Documents" Disabled="False"/>
+    <Group Name="WorksRecords" Type="Documents" Disabled="False"/>
+    <Group Name="ReportsRecords" Type="Documents" Disabled="False"/>
+    <Group Name="ServerClasses" Type="Classes" Disabled="False"/>
+    <Group Name="ClientClasses" Type="Classes" Disabled="False"/>
+    <Group Name="Cardfiles" Type="Cards" Disabled="False"/>
+    <Group Name="FalseCardfiles" Type="Blanks" Disabled="False"/>
+    <Group Name="Blanks" Type="Blanks" Disabled="False"/>
+    <Group Name="Attachments" Type="Other" Disabled="False"/>
+    <Group Name="Help" Type="Helps" Disabled="False"/>
+    <Group Name="PrintSettings" Type="Other" Disabled="False"/>
+    <Group Name="Icons" Type="Other" Disabled="False"/>
+    <Group Name="OldDocs" Type="Other" Disabled="True"/>
+  </Groups>
+</Project>

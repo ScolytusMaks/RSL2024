@@ -1,0 +1,101 @@
+class inherited МашинаРеквизитов.Базовые.картСИнтерфейсом "Выбор номера";
+-- Урезанный интерфейс, не предполагающий наследование от полного
+
+import РКП_СИС classes Functions, FilterMaker;
+
+--{{ 2_Свойства
+
+inclass public
+
+  var КлассИнтерфейса :Class МашинаРеквизитов.Базовые.интЗапись = RI.НомерГазеты;
+
+inobject private
+
+  var Издание :Газета;
+  var ФильтрГазеты :String;
+  var ФильтрНомеров :String;
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inclass public
+
+  func ВыполнитьВыбор (rNsp :Газета; vIssueFilter :String; var vRec :НомерГазеты) :Integer;
+    var vCrdForm :УчетГазет.картНомераВыбор;
+    vCrdForm = УчетГазет.картНомераВыбор.Create;
+    vCrdForm.Издание = rNsp;
+    vCrdForm.УстФильтрГазеты(rNsp, vIssueFilter);
+    vCrdForm.ФильтрНомеров = vIssueFilter;
+    if (cmOk = vCrdForm.ShowEx(vRec, , Kernel.Window.ModalWindow)) then
+      Result = cmOk;
+    fi;
+  end;
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    inherited шаблон_ПриОткрытии(Create);
+    CardFile.TreeRoot = "Газета/год";
+    if (Издание <> nil) then
+      РКП_Газеты.ГруппаНомеров.ПоГодам.CreateGroupsByYears(Издание);
+      РКП_Газеты.ГруппаНомеров.ПоГазете.CreateGroupsByNsp(Издание);
+      CardFile.ShowHierarchy = true;
+      CardFile.TreeFilter = ФильтрГазеты;
+      CardFile.Filter     = ФильтрНомеров;
+    else
+      Message('Картотека открыта без фильтра!');
+    fi;
+  end;
+
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+
+-- 2_Обработчики событий картотеки0. --
+
+
+-- 2_Обработчики столбцов (полей) картотеки0. --
+
+
+-- 2_Дополнительные команды0. --
+
+
+-- 2_Вспомогательные методы0. --
+
+inobject private
+
+  proc УстФильтрГазеты(rNsp :Газета; vIssueFilter :String);
+    var aFlt :String[];
+    var vFltMaker :FilterMaker;
+    if (vIssueFilter = nil) then
+      AddInArray( aFlt, 'Газета=' + rNsp.DocIDStr );
+      AddInArray( aFlt, 'ФункцияГруппы=-2' );
+      AddInArray( aFlt, 'isGroup=-1' );
+      ФильтрГазеты = MakeFilter(aFlt);
+    else
+      vFltMaker = FilterMaker.CreateExt(['Газета=' + rNsp.DocIDStr, vIssueFilter]);
+      ФильтрГазеты = vFltMaker.ПолучитьФильтрГрупп([НомерГазеты]);
+    fi;
+  end;
+
+  proc УстФильтрНомеров(rNsp :Газета; vIssueFilter :String);
+    var aFlt :String[];
+    if (vIssueFilter = nil) then
+      AddInArray( aFlt, 'Газета=' + rNsp.DocIDStr );
+      AddInArray( aFlt, 'ФункцияГруппы in [0,-1]' );
+      ФильтрНомеров = MakeFilter(aFlt);
+    else
+      AddInArray( aFlt, 'Газета=' + rNsp.DocIDStr );
+      AddInArray( aFlt, 'ФункцияГруппы in [0,-1]' );
+      AddInArray( aFlt, vIssueFilter );
+      ФильтрНомеров = FltMaker.MakeFilter(aFlt);
+    fi;
+  end;
+
+
+end

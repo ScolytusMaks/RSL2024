@@ -1,0 +1,369 @@
+class inherited СИС2.БазовыйБланк "Библиографическая справка";
+#Warning "Не сохраняется настройка в бл.<Библиографическая справка>";--надо сохранять в .dbt
+inclass   Private
+--Настройка видимости и ширины столбцов
+  Фл_01                 : logical;      Шр_01           : integer;
+  Фл_02                 : logical;      Шр_02           : integer;
+  Фл_03                 : logical;      Шр_03           : integer;
+  Фл_04                 : logical;      Шр_04           : integer;
+  Фл_05                 : logical;      Шр_05           : integer;
+  Фл_06                 : logical;      Шр_06           : integer;
+  Фл_07                 : logical;      Шр_07           : integer;
+  Фл_08                 : logical;      Шр_08           : integer;
+  Фл_09                 : logical;      Шр_09           : integer;
+  Фл_10                 : logical;      Шр_10           : integer;
+  Фл_11                 : logical;      Шр_11           : integer;
+  Фл_12                 : logical;      Шр_12           : integer;
+  Фл_13                 : logical;      Шр_13           : integer;
+  Фл_14                 : logical;      Шр_14           : integer;
+  Фл_15                 : logical;      Шр_15           : integer;
+  Фл_16                 : logical;      Шр_16           : integer;
+  Фл_17                 : logical;      Шр_17           : integer;
+  Фл_18                 : logical;      Шр_18           : integer;
+  Фл_19                 : logical;      Шр_19           : integer;
+  Фл_20                 : logical;      Шр_20           : integer;
+  Фл_21                 : logical;      Шр_21           : integer;
+  Фл_22                 : logical;      Шр_22           : integer;
+  Фл_23                 : logical;      Шр_23           : integer;
+
+inobject
+  ПоказатьНастройку             : logical;
+  фреймУсловияОтбора            : TemplateFrame;
+  фреймНастройкаСтолбцов        : TemplateFrame;
+  фреймРезультат                : TemplateFrame;
+  секцУсловияОтбора             : Section;
+  СекцШапкаСПР                  : Section;
+  СекцТелоСПР                   : Section;
+  кнНастройка                   : Button;
+
+--Описание условий в шапке справки
+  ОписаниеУсл_а         : string;
+  ОписаниеУсл_б         : string;
+  ОписаниеУсл_в         : string;
+  ОписаниеУсл_г         : integer;
+  ОписаниеУсл_д         : integer;
+  ОписаниеУсл_е         : string;
+  ОписаниеУсл_ж         : integer;
+  ОписаниеУсл_з         : string;
+  ОписаниеУсл_и         : string;
+  ОписаниеУсл_к         : string;
+  ОписаниеУсл_л         : string;
+  ОписаниеУсл_м         : integer;
+  ОписаниеУсл_н         : integer;
+  ОписаниеУсл_о         : integer;
+--Область вывода
+  Out_00[]              : integer;
+  Out_01[]              : integer;
+  Out_02[]              : integer;
+  Out_03[]              : integer;
+  Out_04[]              : integer;
+  Out_05[]              : integer;
+  Out_06[]              : string;
+  Out_07[]              : string;
+  Out_08[]              : string;
+  Out_09[]              : string;
+  Out_10[]              : string;
+  Out_11[]              : string;
+  Out_12[]              : string;
+  Out_13[]              : string;
+  Out_14[]              : string;
+  Out_15[]              : integer;
+  Out_16[]              : string;
+  Out_17[]              : string;
+  Out_18[]              : string;
+  Out_19[]              : string;
+  Out_20[]              : string;
+  Out_21[]              : string;
+  Out_22[]              : string;
+  Out_23[]              : string;
+  ГазетнаяСтатья[]      : РКП_Статьи.Роспись;
+--------------------------------------------------------------------------------
+  proc ВидСекцииУсловияотбора;
+    секцУсловияОтбора.Row[1].Visible    = true;
+    секцУсловияОтбора.Row[2].Visible    = true;
+    секцУсловияОтбора.Row[3].Visible    = true;
+    секцУсловияОтбора.Row[4].Visible    = true;
+    секцУсловияОтбора.Row[5].Visible    = true;
+    секцУсловияОтбора.Row[6].Visible    = true;
+    секцУсловияОтбора.Row[7].Visible    = true;
+    секцУсловияОтбора.Row[8].Visible    = true;
+    секцУсловияОтбора.Row[9].Visible    = true;
+    секцУсловияОтбора.Row[10].Visible   = true;
+    секцУсловияОтбора.Row[11].Visible   = true;
+    секцУсловияОтбора.Row[12].Visible   = true;
+    секцУсловияОтбора.Row[13].Visible   = true;
+    секцУсловияОтбора.Row[14].Visible   = true;
+    секцУсловияОтбора.Row[15].Visible   = true;
+    if ОписаниеУсл_а = "<Все>"                 then
+      секцУсловияОтбора.Row[1].Visible  = false;
+      секцУсловияОтбора.Row[2].Visible  = false;
+    end;
+    if ОписаниеУсл_б = "<Все>"                  then      секцУсловияОтбора.Row[3].Visible  = false;    end;
+    if ОписаниеУсл_в = "<Все>"                  then      секцУсловияОтбора.Row[4].Visible  = false;    end;
+    if ОписаниеУсл_г = nil                      then      секцУсловияОтбора.Row[5].Visible  = false;    end;
+    if ОписаниеУсл_д = nil                      then      секцУсловияОтбора.Row[6].Visible  = false;    end;
+    if ОписаниеУсл_е = "<Все>"                  then      секцУсловияОтбора.Row[7].Visible  = false;    end;
+    if ОписаниеУсл_ж = nil                      then      секцУсловияОтбора.Row[8].Visible  = false;    end;
+    if ОписаниеУсл_з = "<Все>"                  then      секцУсловияОтбора.Row[9].Visible  = false;    end;
+    if ОписаниеУсл_и = "<Все>"                  then      секцУсловияОтбора.Row[10].Visible = false;    end;
+    if ОписаниеУсл_к = "<Все>"                  then      секцУсловияОтбора.Row[11].Visible = false;    end;
+    if ОписаниеУсл_л = "<Все>"                  then      секцУсловияОтбора.Row[12].Visible = false;    end;
+    if ОписаниеУсл_м = nil                      then      секцУсловияОтбора.Row[13].Visible = false;    end;
+    if ОписаниеУсл_н = nil                      then      секцУсловияОтбора.Row[14].Visible = false;    end;
+    if ОписаниеУсл_о = nil                      then      секцУсловияОтбора.Row[15].Visible = false;    end;
+  end; --ВидСекцииУсловияотбора
+
+  Proc ОформитьОтчет;
+    СекцШапкаСПР.Column[2].Visible  = False; СекцТелоСПР.Column[2].Visible  = False;
+    СекцШапкаСПР.Column[3].Visible  = False; СекцТелоСПР.Column[3].Visible  = False;
+    СекцШапкаСПР.Column[4].Visible  = False; СекцТелоСПР.Column[4].Visible  = False;
+    СекцШапкаСПР.Column[5].Visible  = False; СекцТелоСПР.Column[5].Visible  = False;
+    СекцШапкаСПР.Column[6].Visible  = False; СекцТелоСПР.Column[6].Visible  = False;
+    СекцШапкаСПР.Column[7].Visible  = False; СекцТелоСПР.Column[7].Visible  = False;
+    СекцШапкаСПР.Column[8].Visible  = False; СекцТелоСПР.Column[8].Visible  = False;
+    СекцШапкаСПР.Column[9].Visible  = False; СекцТелоСПР.Column[9].Visible  = False;
+    СекцШапкаСПР.Column[10].Visible = False; СекцТелоСПР.Column[10].Visible = False;
+    СекцШапкаСПР.Column[11].Visible = False; СекцТелоСПР.Column[11].Visible = False;
+    СекцШапкаСПР.Column[12].Visible = False; СекцТелоСПР.Column[12].Visible = False;
+    СекцШапкаСПР.Column[13].Visible = False; СекцТелоСПР.Column[13].Visible = False;
+    СекцШапкаСПР.Column[14].Visible = False; СекцТелоСПР.Column[14].Visible = False;
+    СекцШапкаСПР.Column[15].Visible = False; СекцТелоСПР.Column[15].Visible = False;
+    СекцШапкаСПР.Column[16].Visible = False; СекцТелоСПР.Column[16].Visible = False;
+    СекцШапкаСПР.Column[17].Visible = False; СекцТелоСПР.Column[17].Visible = False;
+    СекцШапкаСПР.Column[18].Visible = False; СекцТелоСПР.Column[18].Visible = False;
+    СекцШапкаСПР.Column[19].Visible = False; СекцТелоСПР.Column[19].Visible = False;
+    СекцШапкаСПР.Column[20].Visible = False; СекцТелоСПР.Column[20].Visible = False;
+    СекцШапкаСПР.Column[21].Visible = False; СекцТелоСПР.Column[21].Visible = False;
+    СекцШапкаСПР.Column[22].Visible = False; СекцТелоСПР.Column[22].Visible = False;
+    СекцШапкаСПР.Column[23].Visible = False; СекцТелоСПР.Column[23].Visible = False;
+    СекцШапкаСПР.Column[24].Visible = False; СекцТелоСПР.Column[24].Visible = False;
+    if Фл_01=true then СекцШапкаСПР.Column[2].Visible  = True;  СекцТелоСПР.Column[2].Visible  = True; СекцШапкаСПР.Column[2].Width  = Шр_01;  СекцТелоСПР.Column[2].Width  = Шр_01;  end;
+    if Фл_02=true then СекцШапкаСПР.Column[3].Visible  = True;  СекцТелоСПР.Column[3].Visible  = True; СекцШапкаСПР.Column[3].Width  = Шр_02;  СекцТелоСПР.Column[3].Width  = Шр_02;  end;
+    if Фл_03=true then СекцШапкаСПР.Column[4].Visible  = True;  СекцТелоСПР.Column[4].Visible  = True; СекцШапкаСПР.Column[4].Width  = Шр_03;  СекцТелоСПР.Column[4].Width  = Шр_03;  end;
+    if Фл_04=true then СекцШапкаСПР.Column[5].Visible  = True;  СекцТелоСПР.Column[5].Visible  = True; СекцШапкаСПР.Column[5].Width  = Шр_04;  СекцТелоСПР.Column[5].Width  = Шр_04;  end;
+    if Фл_05=true then СекцШапкаСПР.Column[6].Visible  = True;  СекцТелоСПР.Column[6].Visible  = True; СекцШапкаСПР.Column[6].Width  = Шр_05;  СекцТелоСПР.Column[6].Width  = Шр_05;  end;
+    if Фл_06=true then СекцШапкаСПР.Column[7].Visible  = True;  СекцТелоСПР.Column[7].Visible  = True; СекцШапкаСПР.Column[7].Width  = Шр_06;  СекцТелоСПР.Column[7].Width  = Шр_06;  end;
+    if Фл_07=true then СекцШапкаСПР.Column[8].Visible  = True;  СекцТелоСПР.Column[8].Visible  = True; СекцШапкаСПР.Column[8].Width  = Шр_07;  СекцТелоСПР.Column[8].Width  = Шр_07;  end;
+    if Фл_08=true then СекцШапкаСПР.Column[9].Visible  = True;  СекцТелоСПР.Column[9].Visible  = True; СекцШапкаСПР.Column[9].Width  = Шр_08;  СекцТелоСПР.Column[9].Width  = Шр_08;  end;
+    if Фл_09=true then СекцШапкаСПР.Column[10].Visible = True;  СекцТелоСПР.Column[10].Visible = True; СекцШапкаСПР.Column[10].Width = Шр_09;  СекцТелоСПР.Column[10].Width = Шр_09;  end;
+    if Фл_10=true then СекцШапкаСПР.Column[11].Visible = True;  СекцТелоСПР.Column[11].Visible = True; СекцШапкаСПР.Column[11].Width = Шр_10;  СекцТелоСПР.Column[11].Width = Шр_10;  end;
+    if Фл_11=true then СекцШапкаСПР.Column[12].Visible = True;  СекцТелоСПР.Column[12].Visible = True; СекцШапкаСПР.Column[12].Width = Шр_11;  СекцТелоСПР.Column[12].Width = Шр_11;  end;
+    if Фл_12=true then СекцШапкаСПР.Column[13].Visible = True;  СекцТелоСПР.Column[13].Visible = True; СекцШапкаСПР.Column[13].Width = Шр_12;  СекцТелоСПР.Column[13].Width = Шр_12;  end;
+    if Фл_13=true then СекцШапкаСПР.Column[14].Visible = True;  СекцТелоСПР.Column[14].Visible = True; СекцШапкаСПР.Column[14].Width = Шр_13;  СекцТелоСПР.Column[14].Width = Шр_13;  end;
+    if Фл_14=true then СекцШапкаСПР.Column[15].Visible = True;  СекцТелоСПР.Column[15].Visible = True; СекцШапкаСПР.Column[15].Width = Шр_14;  СекцТелоСПР.Column[15].Width = Шр_14;  end;
+    if Фл_15=true then СекцШапкаСПР.Column[16].Visible = True;  СекцТелоСПР.Column[16].Visible = True; СекцШапкаСПР.Column[16].Width = Шр_15;  СекцТелоСПР.Column[16].Width = Шр_15;  end;
+    if Фл_16=true then СекцШапкаСПР.Column[17].Visible = True;  СекцТелоСПР.Column[17].Visible = True; СекцШапкаСПР.Column[17].Width = Шр_16;  СекцТелоСПР.Column[17].Width = Шр_16;  end;
+    if Фл_17=true then СекцШапкаСПР.Column[18].Visible = True;  СекцТелоСПР.Column[18].Visible = True; СекцШапкаСПР.Column[18].Width = Шр_17;  СекцТелоСПР.Column[18].Width = Шр_17;  end;
+    if Фл_18=true then СекцШапкаСПР.Column[19].Visible = True;  СекцТелоСПР.Column[19].Visible = True; СекцШапкаСПР.Column[19].Width = Шр_18;  СекцТелоСПР.Column[19].Width = Шр_18;  end;
+    if Фл_19=true then СекцШапкаСПР.Column[20].Visible = True;  СекцТелоСПР.Column[20].Visible = True; СекцШапкаСПР.Column[20].Width = Шр_19;  СекцТелоСПР.Column[20].Width = Шр_19;  end;
+    if Фл_20=true then СекцШапкаСПР.Column[21].Visible = True;  СекцТелоСПР.Column[21].Visible = True; СекцШапкаСПР.Column[21].Width = Шр_20;  СекцТелоСПР.Column[21].Width = Шр_20;  end;
+    if Фл_21=true then СекцШапкаСПР.Column[22].Visible = True;  СекцТелоСПР.Column[22].Visible = True; СекцШапкаСПР.Column[22].Width = Шр_21;  СекцТелоСПР.Column[22].Width = Шр_21;  end;
+    if Фл_22=true then СекцШапкаСПР.Column[23].Visible = True;  СекцТелоСПР.Column[23].Visible = True; СекцШапкаСПР.Column[23].Width = Шр_22;  СекцТелоСПР.Column[23].Width = Шр_22;  end;
+    if Фл_23=true then СекцШапкаСПР.Column[24].Visible = True;  СекцТелоСПР.Column[24].Visible = True; СекцШапкаСПР.Column[24].Width = Шр_23;  СекцТелоСПР.Column[24].Width = Шр_23;  end;
+  end; --ОформитьОтчет;
+
+  proc НастройкаСтолбцовПоУмолчанию;
+    Фл_01=true;         Шр_01=10;
+    Фл_02=true;         Шр_02=10;
+    Фл_03=true;         Шр_03=15;
+    Фл_04=false;        Шр_04=10;
+    Фл_05=false;        Шр_05=15;
+    Фл_06=false;        Шр_06=20;
+    Фл_07=true;         Шр_07=50;
+    Фл_08=false;        Шр_08=20;
+    Фл_09=false;        Шр_09=50;
+    Фл_10=true;         Шр_10=70;
+    Фл_11=true;         Шр_11=100;
+    Фл_12=true;         Шр_12=60;
+    Фл_13=false;        Шр_13=60;
+    Фл_14=true;         Шр_14=60;
+    Фл_15=true;         Шр_15=10;
+    Фл_16=true;         Шр_16=10;
+    Фл_17=false;        Шр_17=20;
+    Фл_18=false;        Шр_18=20;
+    Фл_19=false;        Шр_19=40;
+    Фл_20=false;        Шр_20=40;
+    Фл_21=false;        Шр_21=30;
+    Фл_22=false;        Шр_22=10;
+    Фл_23=false;        Шр_23=60;
+  end; --НастройкаСтолбцовПоУмолчанию;
+
+--{ Обработчики событий бланка
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    try
+    self.LoadObject("БибСправкаСтатьи01.dbt");
+    except
+    НастройкаСтолбцовПоУмолчанию;
+    end;
+    фреймУсловияОтбора.Visible          = true;
+    фреймНастройкаСтолбцов.Visible      = false;
+    ВидСекцииУсловияотбора;
+    ОформитьОтчет;
+  end;--шаблон_ПриОткрытии;
+
+  proc КнНастройка_ПриНажатии(Sender :Button);
+    if ПоказатьНастройку = false then
+      фреймУсловияОтбора.Visible        = false;
+      фреймНастройкаСтолбцов.Visible    = true;
+      фреймРезультат.Visible            = false;
+      ПоказатьНастройку                 = true;
+    else
+      фреймУсловияОтбора.Visible        = true;
+      фреймНастройкаСтолбцов.Visible    = false;
+      фреймРезультат.Visible            = true;
+      ПоказатьНастройку                 = false;
+      ОформитьОтчет;
+    end;
+  end;--КнНастройка_ПриНажатии;
+
+  --===================================================================================
+  proc ПостроениеОтчета(ФильтрСтатей:string);
+    var Q               : query;
+    var k               : integer;
+    var r               : record;
+    --
+    Out_00      = nil;     Out_08      = nil;    Out_16      = nil;
+    Out_01      = nil;     Out_09      = nil;    Out_17      = nil;
+    Out_02      = nil;     Out_10      = nil;    Out_18      = nil;
+    Out_03      = nil;     Out_11      = nil;    Out_19      = nil;
+    Out_04      = nil;     Out_12      = nil;    Out_20      = nil;
+    Out_05      = nil;     Out_13      = nil;    Out_21      = nil;
+    Out_06      = nil;     Out_14      = nil;    Out_22      = nil;
+    Out_07      = nil;     Out_15      = nil;    Out_23      = nil;
+    ГазетнаяСтатья      = nil;
+      Q                 = Query.Create([РКП_Статьи.Роспись]);
+      Q.Order           = "Заголовок";
+      Q.Filter          = ФильтрСтатей;
+      Q.Select;
+      Q.First;
+        for k =  1..Q.Count                     do
+          Hint("Выборка данных...",k,Q.Count);
+          Out_00[k]             = k;
+          r                     = Q.Current;
+          ГазетнаяСтатья[k]     = r;
+          Out_01[k]             = r.ГодЛетописи;
+          Out_02[k]             = r.ВыпускЛетописи;
+          Out_03[k]             = r.НомерЗаписиВВыпускеГЛ;
+          Out_04[k]             = r.ВыпускКарточек;
+          Out_05[k]             = r.НомерЗаписиВВыпускеПК;
+          if r.ИндексУДК.Count>0                then
+          Out_06[k]             = r.ИндексУДК.Items[1].РубрикаУДК.КодУДК;
+          Out_07[k]             = r.ИндексУДК.Items[1].РубрикаУДК.Наим;
+          end;
+          if r.ИндексББК.Count>0                then
+          Out_08[k]             = r.ИндексББК.Items[1].РубрикаББК.КодББК;
+          Out_09[k]             = r.ИндексББК.Items[1].РубрикаББК.Наим;
+          end;
+          Out_10[k]             = r.Заголовок;
+          Out_11[k]             = r.ОписаниеСтатьи;
+          Out_12[k]             = r.Ответственность1;
+          Out_13[k]             = r.Ответственность2;
+          Out_14[k]             = r.НазваниеОсн;
+          if r.НомераГазеты.Count>0             then
+          Out_15[k]             = r.НомераГазеты.Items[1].ГодВыпуска;
+          end;
+          Out_16[k]             = r.НомераВыхода;
+          Out_17[k]             = r.ДатыВыхода;
+          Out_18[k]             = r.СтраницыСтатьи;
+          if r.ИндексГео.Count>0                then
+          Out_19[k]             = r.ИндексГео.Items[1].РубрикаГео.Наим;
+          Out_20[k]             = r.ИндексГео.Items[1].ПодРубрикаСист.КрНаим;
+          end;
+          if r.СерииСтатей.Count>0              then
+          Out_21[k]             = r.СерииСтатей.Items[1].НазваниеСерии.Наим;
+          Out_22[k]             = r.СерииСтатей.Items[1].НомерСерии;
+          end;
+          if r.ПримОЗаглавииСерии<>nil          then
+            if Out_23[k]<>nil                   then
+          Out_23[k]             = Out_23[k]+"; "+r.ПримОЗаглавииСерии;
+            else
+          Out_23[k]             = r.ПримОЗаглавииСерии;
+            end;
+          end;
+          if r.ПримОбАвторахСтатьи<>nil         then
+            if Out_23[k]<>nil                   then
+          Out_23[k]             = Out_23[k]+"; "+r.ПримОбАвторахСтатьи;
+            else
+          Out_23[k]             = r.ПримОбАвторахСтатьи;
+            end;
+          end;
+          if r.ПримОСвязиСтатьиСДр<>nil         then
+            if Out_23[k]<>nil                   then
+          Out_23[k]             = Out_23[k]+"; "+r.ПримОСвязиСтатьиСДр;
+            else
+          Out_23[k]             = r.ПримОСвязиСтатьиСДр;
+            end;
+          end;
+          if r.ПримОСодержанииСтатьи<>nil       then
+            if Out_23[k]<>nil                   then
+          Out_23[k]             = Out_23[k]+"; "+r.ПримОСодержанииСтатьи;
+            else
+          Out_23[k]             = r.ПримОСодержанииСтатьи;
+            end;
+          end;
+          if r.ПримОПриложении<>nil             then
+            if Out_23[k]<>nil                   then
+          Out_23[k]             = Out_23[k]+"; "+r.ПримОПриложении;
+            else
+          Out_23[k]             = r.ПримОПриложении;
+            end;
+          end;
+          Q.Next;
+        end;--цикл
+        СекцТелоСПР.Count       = Q.Count;
+      Q.Close;
+
+  end;--ПостроениеОтчета;
+  --===================================================================================
+
+  proc КнРасчет_ПриНажатии(Sender :Button);
+    var BlankForQuery   : BlankForm;
+    BlankForQuery               = РКП_Статьи.Статьи.Запросы.блОтборСтатейСпр1.Create;
+    if  CmOk = BlankForQuery.Show(Window.ModalWindow)         then
+      ОписаниеУсл_а             = BlankForQuery.АвторСтатьи;
+      ОписаниеУсл_б             = BlankForQuery.МестоИзданияГазеты;
+      ОписаниеУсл_в             = BlankForQuery.Газета;
+      ОписаниеУсл_г             = BlankForQuery.ГодГазетыС;
+      ОписаниеУсл_д             = BlankForQuery.ГодГазетыПо;
+      ОписаниеУсл_е             = BlankForQuery.НомерГазеты;
+      ОписаниеУсл_ж             = BlankForQuery.НедостающиеНомера;
+      ОписаниеУсл_з             = BlankForQuery.УДК;
+      ОписаниеУсл_и             = BlankForQuery.ББК;
+      ОписаниеУсл_к             = BlankForQuery.ГеоРубрика;
+      ОписаниеУсл_л             = BlankForQuery.СистПодРубрика;
+      ОписаниеУсл_м             = BlankForQuery.ВыпускЛГСгод;
+      ОписаниеУсл_н             = BlankForQuery.ВыпускЛГСномер;
+      ОписаниеУсл_о             = BlankForQuery.ВыпускПК;
+        -----------------
+        ПостроениеОтчета(BlankForQuery.ФильтрСтатей);
+        -----------------
+      ПоказатьНастройку         = true;
+      КнНастройка_ПриНажатии(кнНастройка);
+      кнНастройка.State         = false;
+      ОформитьОтчет;
+    end;
+    ВидСекцииУсловияотбора;
+  end;--КнРасчет_ПриНажатии;
+
+  func КнВосстановитьНастройкуСтолбцов(Cell :TemplateCell;Action :Template.ClickTypes) :Logical;
+    НастройкаСтолбцовПоУмолчанию;
+    Result = False;
+  end;
+
+  func ОтрытьСтатью(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var Index   : integer;
+    var UForm   : BlankForm;
+    Index       = Cell.Frame;
+    UForm       = РКП_Статьи.Статьи.редСтатья.Create;
+    UForm.ShowEx(ГазетнаяСтатья[Index],Window.ModalWindow);
+    Result = True; -- Разрешаем стандартную обработку
+  end;
+
+  proc шаблон_ПриЗакрытии(Destroy :Logical);
+    self.SaveClass("БибСправкаСтатьи01.dbt");
+  end;
+
+--}
+
+end

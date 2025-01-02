@@ -1,0 +1,112 @@
+Class inherited —правочники.editBaseType1 "ћесто издани€" , editor спр√еографи€;
+
+
+--{{ 2_—войства
+
+
+inobject private
+
+  var »нтерфейс :RI.—правочники.√еографи€;
+
+  var Level     :Integer;
+
+  var фреймјдм—туртура          :TemplateFrame;
+  var фреймЎаблоны              :TemplateFrame;
+  var секц«аголовокјдм—труктура :TemplateSection;
+  var секцјдм—татус”ровень1     :TemplateSection;
+  var секцјдм—татус”ровень2     :TemplateSection;
+  var секцјдм—татус”ровень3     :TemplateSection;
+  var секцјдм—татус”ровень4     :TemplateSection;
+  var секцјдм—татус”ровень5     :TemplateSection;
+  var секцƒопƒанные             :TemplateSection;
+
+--}}
+
+
+-- 2_ќбработчики событий шаблона0. --
+
+  proc шаблон_ѕри—читывании;
+    var vCell :TemplateCell;
+    inherited шаблон_ѕри—читывании;
+    vCell = SectionCellByContents (секцјдм—татус”ровень1, ' атегори€');                                       UpdateFieldList(vCell, Def.TerrEntityLevel1);
+    vCell = SectionCellByContents (секцјдм—татус”ровень2, 'GroupDoc. атегори€');                              UpdateFieldList(vCell, Def.TerrEntity);
+    vCell = SectionCellByContents (секцјдм—татус”ровень2, ' атегори€');                                       UpdateFieldList(vCell, Def.TerrEntityLevel2);
+    vCell = SectionCellByContents (секцјдм—татус”ровень3, 'GroupDoc.GroupDoc. атегори€');                     UpdateFieldList(vCell, Def.TerrEntity);
+    vCell = SectionCellByContents (секцјдм—татус”ровень3, 'GroupDoc. атегори€');                              UpdateFieldList(vCell, Def.TerrEntity);
+    vCell = SectionCellByContents (секцјдм—татус”ровень3, ' атегори€');                                       UpdateFieldList(vCell, Def.TerrEntityLevel3);
+    vCell = SectionCellByContents (секцјдм—татус”ровень4, 'GroupDoc.GroupDoc.GroupDoc. атегори€');            UpdateFieldList(vCell, Def.TerrEntity);
+    vCell = SectionCellByContents (секцјдм—татус”ровень4, 'GroupDoc.GroupDoc. атегори€');                     UpdateFieldList(vCell, Def.TerrEntity);
+    vCell = SectionCellByContents (секцјдм—татус”ровень4, 'GroupDoc. атегори€');                              UpdateFieldList(vCell, Def.TerrEntity);
+    vCell = SectionCellByContents (секцјдм—татус”ровень4, ' атегори€');                                       UpdateFieldList(vCell, Def.TerrEntityLevel4);
+    vCell = SectionCellByContents (секцјдм—татус”ровень5, 'GroupDoc.GroupDoc.GroupDoc.GroupDoc. атегори€');   UpdateFieldList(vCell, Def.TerrEntity);
+    vCell = SectionCellByContents (секцјдм—татус”ровень5, 'GroupDoc.GroupDoc.GroupDoc. атегори€');            UpdateFieldList(vCell, Def.TerrEntity);
+    vCell = SectionCellByContents (секцјдм—татус”ровень5, 'GroupDoc.GroupDoc. атегори€');                     UpdateFieldList(vCell, Def.TerrEntity);
+    vCell = SectionCellByContents (секцјдм—татус”ровень5, 'GroupDoc. атегори€');                              UpdateFieldList(vCell, Def.TerrEntity);
+    vCell = SectionCellByContents (секцјдм—татус”ровень5, ' атегори€');                                       UpdateFieldList(vCell, Def.TerrEntityLevel5);
+    ћодифицироватьЎаблон;
+  end;
+
+  func шаблон_ѕриѕроверке :Logical;
+    Result = inherited шаблон_ѕриѕроверке;
+  end;
+
+-- 2_ќбработчики событий 0клеток 2шаблона0. --
+
+  proc ѕоле_ѕри¬ыходе_Ќаим(Cell :TemplateCell; Index :Integer);
+    if Cell.Contents = 'Ќаим' then
+      if (Ќаим—окр = nil) then
+        Ќаим—окр = Ќаим;
+        ЌаимЅибл = BiblioRecord.Ќаим√ео(Record);
+        Hash = »нтерфейс.GetHashByRecord(Self.Record);
+      fi;
+    fi;
+  end;
+
+  proc ѕоле_ѕри¬ыходе_Ќаим—окр(Cell :TemplateCell; Index :Integer);
+    ЌаимЅибл = BiblioRecord.Ќаим√ео(Record);
+    Hash = »нтерфейс.GetHashByRecord(Self.Record);
+  end;
+
+  proc ѕолеќбл_÷ентр_ѕри¬ыходе(Cell :TemplateCell; Index :Integer);
+    ЌаимЅибл = BiblioRecord.Ќаим√ео(Record);
+    Hash = »нтерфейс.GetHashByRecord(Self.Record);
+  end;
+
+
+-- 2_¬спомогательные методы0. --
+
+   proc ”становить‘окусЌаѕервоеѕоле¬вода;
+    --Template.CellByField['»м€'].SetFocus;
+   end;
+
+   proc ћодифицироватьЎаблон;
+     фреймјдм—туртура.Clear;
+     Level = – ѕ_—»—.Recs.RecordsLevel(Self.Record);
+     if (Level in [1,2,3,4]) or ((Level = 5) and (not isGroup)) then
+       CloneSection(фреймјдм—туртура, 'секц«аголовокјдм—труктура', фреймЎаблоны);
+     fi;
+     if (Level in [5]) and not isGroup then
+       CloneSection(фреймјдм—туртура, 'секц«аголовокјдм—труктура', фреймЎаблоны);
+     fi;
+     if (Level = 1) then
+       CloneSection(фреймјдм—туртура, 'секцјдм—татус”ровень1', фреймЎаблоны);
+     elsif (Level = 2) then
+       CloneSection(фреймјдм—туртура, 'секцјдм—татус”ровень2', фреймЎаблоны);
+     elsif (Level = 3) then
+       CloneSection(фреймјдм—туртура, 'секцјдм—татус”ровень3', фреймЎаблоны);
+     elsif (Level = 4) then
+       CloneSection(фреймјдм—туртура, 'секцјдм—татус”ровень4', фреймЎаблоны);
+     elsif (Level = 5) and not isGroup then
+       CloneSection(фреймјдм—туртура, 'секцјдм—татус”ровень5', фреймЎаблоны);
+     elsif (Level = 5) and isGroup then
+       CloneSection(фреймјдм—туртура, 'секцќграничение1', фреймЎаблоны);
+     elsif (Level > 5) then
+       CloneSection(фреймјдм—туртура, 'секцќграничение2', фреймЎаблоны);
+     fi;
+     if (Level in [1,2,3,4]) or ((Level = 5) and (not isGroup)) then
+       CloneSection(фреймјдм—туртура, 'секцƒопƒанные',         фреймЎаблоны);
+     fi;
+   end;
+
+
+end

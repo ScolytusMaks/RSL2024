@@ -1,0 +1,145 @@
+﻿class inherited СИС2.ФункцииДокумента "";
+
+inclass public
+
+  -- Возвращает первую запись с учетом фильтра и сортировки; запрос оптимизирован.
+  func FindRecord(locClass: class Record; locFilter: String; locOrder: String = nil): Record;
+    with Query.Create([locClass]) do
+      Filter = locFilter;
+      Order = locOrder;
+      LoadingFieldsMode = СИС2.Константы.mdNone;
+      OpenHint[Query.Packeting] = true;
+      PacketSize = 2;
+      Select;
+      if RecordsExists:
+        Return Current;
+      fi;
+    end;
+  end;
+
+  -- Возвращает первую запись с учетом фильтра и сортировки + кол-во записей.
+  func FindRecordExt(locClass: class Record; locFilter: String; locOrder: String = nil; var vCount :Integer): Record;
+    with Query.Create([locClass]) do
+      Filter = locFilter;
+      Order = locOrder;
+      LoadingFieldsMode = СИС2.Константы.mdNone;
+      Select;
+      vCount = Count;
+      if (vCount > 0) then
+        Return Current;
+      fi;
+    end;
+  end;
+
+  func RecordsExistsInFilter(locClass: class Record; locFilter: String) :Logical;
+    with Query.Create([locClass]) do
+      Filter = locFilter;
+      Return RecordsExists;
+    end;
+  end;
+
+  func RecordsLevel (R :Record) :integer;
+    -- Возвращает уровень вложенности элемента иерархической картотеки.
+    -- Минимальное значение 1 соответствует самой верхней родительской группе
+    var vGroupPath :String;
+    Result = 1;
+    if (R.State in [Record.Created,Record.Duplicated]) then
+      Result = Result + RecordsLevel(R.GroupDoc);
+    else
+      vGroupPath = R.GroupPath;
+      if (vGroupPath <> nil) then
+        Result = ValuesCount(vGroupPath);
+      fi;
+    fi;
+  end;
+
+  -- Группа содержит записи с учетом фильтра (для позиционирования в иерархических картотеках)
+  func RecordsInGroupExists (Rec :Record; MainFilter :String) :Logical;
+    var aFlt :String[];
+    if (Rec.ClassInfo.ClassRef as Class Record).Hierarchical then
+      if (Rec.IsGroup) then
+        aFlt[1] = 'GroupDoc=' + Rec.DocIDStr;
+        aFlt[2] = MainFilter;
+        with Query.Create([Rec.ClassInfo.ClassRef] as Class[] Record) do
+          Filter = FltMaker.MakeFilter(aFlt);
+          Return RecordsExists;
+        end;
+      fi;
+    fi;
+  end;
+
+  proc УдалитьВсеЗаписи synonym DeleteAllRecords (Q: Query);
+    var ВернутьСостояниеЗапроса: logical;
+    if (not Q.IncludeDeleted):
+      Q.IncludeDeleted = true;
+      ВернутьСостояниеЗапроса = true;
+    fi;
+    Q.First;
+    BeginTransaction(Q.Records);
+      while not Q.EOF do
+        if Q.Current.Deleted = false:
+          try
+            Q.Current.Delete;
+          except
+            SetError(0 , 'Запись ' + Str(Q.Current) + ' не удалена.');
+          end;
+        fi;
+        Q.Next;
+      end;
+    EndTransaction;
+    if ВернутьСостояниеЗапроса:
+      Q.IncludeDeleted = false;
+    fi;
+  end;
+
+  -- Метод не только переводит запись в состояние редактирования, но и устанавливает признак модифицированности
+  proc ИзменитьЗапись synonym RecordModify (locRecord: Record);
+    if (locRecord <> nil):
+      RecordEdit(locRecord);
+      if (not locRecord.Modified):
+        locRecord.Modified = true;
+      fi;
+    fi;
+  end;
+
+  func ЕстьОграничениеДоступа_НаЗапись synonym ExistPostingAccessConstraint(RClass :Class Record) :Logical;
+    var j, jj :Integer;
+    var cConstraint :Constraint;
+    jj = RClass.UserConstraintsCount;
+    for j = 1 .. jj do
+      cConstraint = RClass.UserConstraint[j];
+      if (cConstraint.OnPost) and (cConstraint.Constraint = 'False') then
+        Return true;
+      fi;
+    od;
+  end;
+
+  func ЕстьОграничениеДоступа_НаРедактирование synonym ExistEditingAccessConstraint(RClass :Class Record) :Logical;
+    var j, jj :Integer;
+    var cConstraint :Constraint;
+    jj = RClass.UserConstraintsCount;
+    for j = 1 .. jj do
+      cConstraint = RClass.UserConstraint[j];
+      if (cConstraint.OnEdit) and (cConstraint.Constraint = 'False') then
+        Return true;
+      fi;
+    od;
+  end;
+
+  func ЕстьОграничениеДоступа_НаУдаление synonym ExistDeletingAccessConstraint(RClass :Class Record) :Logical;
+    var j, jj :Integer;
+    var cConstraint :Constraint;
+    jj = rClass.UserConstraintsCount;
+    for j = 1 .. jj do
+      cConstraint = rClass.UserConstraint[j];
+      if (cConstraint.OnDelete) and (cConstraint.Constraint = 'False') then
+        Return true;
+      fi;
+    od;
+  end;
+
+
+
+
+
+end

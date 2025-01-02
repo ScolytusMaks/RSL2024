@@ -1,0 +1,212 @@
+class inherited РКП_Статьи.Статьи.редвыпускЛГС_09 "Подготовка выпуска ЛГС", editor ВыпускЛГС;
+
+inclass
+
+inobject
+секцСортУДК     : section;
+секцУ_Имен      : section;
+секцУ_Гео       : section;
+секцУ_Газ       : section;
+секцСтатистикаПК: section;
+
+DatGK[]         : date;
+NomGK[]         : integer;
+KolGK[]         : integer;
+CloGK[]         : logical;
+InformGK[]      : string;
+
+--------------------------------------------------------------------------------
+  proc СобратьСтатистикуПК;
+    var Q       : Query;
+    var k,i     : integer;
+    var dt1,dt0 : date;
+    секцСтатистикаПК.Count      = 0;
+    DatGK                       = nil;
+    NomGK                       = nil;
+    KolGK                       = nil;
+    CloGK                       = nil;
+    InformGK                    = nil;
+    Q                           = Query.Create([РКП_Статьи.Роспись]);
+    Q.Filter                    = "ГодЛетописи="+Str(ГодЛетописи)+
+                                  " and ВыпускЛетописи="+Str(ВыпускЛетописи)+
+                                  " and ДатаКарточек<>nil";
+    Q.Order                     = "ДатаКарточек";
+    Q.Select;
+    Q.First;
+      for k = 1..Q.Count        do
+        dt1                     = Q.Current.ДатаКарточек;
+        if dt1<>dt0             then
+          i                     = i+1;
+          DatGK[i]              = dt1;
+        end;
+        dt0                     = dt1;
+        Q.Next;
+      end;
+    секцСтатистикаПК.Count      = i;
+    Q.Close;
+    for i = 1..секцСтатистикаПК.Count           do
+      Q                         = Query.Create([РКП_Статьи.Роспись]);
+      Q.Filter                  = "ГодЛетописи="+Str(ГодЛетописи)+
+                                  " and ВыпускЛетописи="+Str(ВыпускЛетописи)+
+                                  " and ДатаКарточек="+Str(DatGK[i]);
+      Q.Select;
+        KolGK[i]                = Q.Count;
+        Q.First;
+        --if i=1                  then
+          NomGK[i]              = Q.Current.ВыпускКарточек;
+          CloGK[i]              = Q.Current.СтатусПК;
+          InformGK[i]           = Str(DatGK[i]);
+          if NomGK[i]<>nil      then
+            InformGK[i]         = InformGK[i]+'    №  '+Str(NomGK[i]);
+          else
+            InformGK[i]         = InformGK[i]+'    №  -';
+          end;
+          if KolGK[i]<>nil      then
+            InformGK[i]         = InformGK[i]+'  /  '+Str(KolGK[i]);
+          else
+            InformGK[i]         = InformGK[i]+'  /  -';
+          end;
+        --end;
+      Q.Close;
+    end;
+  end;
+
+
+--{ Обработчики событий бланка
+
+  func СоздатьВыпуск(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var kk              : integer;
+    Hint("Обработка данных...",1,10);
+    --Изменение стиля
+    РКП_Статьи.ОригиналМакет.Стиль.Читка=ПечатьКодаББК;
+    -----------------
+    if ПроверкаКорректности = true      then
+      kk = Нумерация;
+    Hint("Обработка данных...",2,10);
+      СозданиеУказателяУДК;
+    Hint("Обработка данных...",3,10);
+      СозданиеУказателяИмен;
+    Hint("Обработка данных...",4,10);
+      СозданиеУказателяГео;
+    Hint("Обработка данных...",5,10);
+      СозданиеУказателяГазет;
+    Hint("Обработка данных...",6,10);
+      if ВыпускЛетописи=52              then
+        СозданиеУказателяВТР;
+      end;
+    Hint("Обработка данных...",7,10);
+      СозданиеСодержания;
+    Hint("Обработка данных...",8,10);
+      СозданиеОригиналМакета;
+    Hint("Обработка данных...",9,10);
+      ФормированиеФайла;
+    Hint("Обработка данных...",10,10);
+      СобратьСтатистикуПК;
+      if kk > 0           then
+        Message("Количество статей, включенных в выпуск:"+Chr(13)+Chr(13)+"           "+Str(kk)+".");
+        ДатаЗаписиВФайл = today;
+      end;
+      Result              = false;
+    end;
+  end;--СоздатьВыпуск
+
+  func Test000(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+      --Изменение стиля
+      РКП_Статьи.ОригиналМакет.Стиль.Читка=ПечатьКодаББК;
+      -----------------
+      СозданиеОригиналМакета;
+    Result = True; 
+  end;
+
+
+  func ПросмотрСтатей(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var CardForEdit     : CardForm;
+    CardForEdit                 = РКП_Статьи.Статьи.картРосписьСтатейПросмотр.Create;
+    CardForEdit.ГодВыпуска      = ГодЛетописи;
+    CardForEdit.НомерВыпуска    = ВыпускЛетописи;
+    --CardForEdit.ShowEx(nil, 'isGroup = 0', Window.ChildWindow);
+    #NoWarning;
+    CardForEdit.ShowFormEx(nil,"ГодЛетописи="+Str(ГодЛетописи)+" and ВыпускЛетописи="+Str(ВыпускЛетописи),Window.ChildWindow);
+    Result = True;
+  end;
+
+  func ОткрытьОригиналМакетIn(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    OpenEditor(ФайлЛетописи);--отладка
+    Result = True; 
+  end;
+
+  func ОткрытьОригиналМакетOut(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    ExecuteProgram(ФайлЛетописи);--рабоч
+    Result = True; 
+  end;
+
+  func ОткрытьОригиналМакетFold(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    ExecuteProgram(ПапкаЛетописи);--рабоч
+    Result = True; 
+  end;
+
+  func ОткрытьЭкспортFold(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    ExecuteProgram(ПапкаФайлаЭкспрта);
+    Result = True; 
+  end;
+
+  proc ПолеВыпускСверстанПриВыходе(Cell :TemplateCell; Index :Integer);
+  var Q                 : Query;
+  var k                 : integer;
+  var Rec               : record;
+      Q                                 = Query.Create([РКП_Статьи.Роспись]);
+      Q.Filter                          = "ГодЛетописи="+Str(ГодЛетописи)+
+                                          " and ВыпускЛетописи="+Str(ВыпускЛетописи);
+      Q.Select;
+      Q.First;
+        for k = 1..Q.Count                              do
+          Hint("Выполнение...",k,Q.Count);
+          Rec                           = Q.Current;
+          if  Rec.СтатусГЛ <> ЛетописьСверстана         then
+            Rec.СтатусГЛ                = ЛетописьСверстана;
+          end;
+          if ЛетописьСверстана = false                  then
+            Rec.ДатаЗаписиВФайлГЛ       = nil;
+          else
+            Rec.ДатаЗаписиВФайлГЛ       = ДатаЗаписиВФайл;
+          end;
+          if Rec.State = Rec.Edited                      then
+            Rec.Post;
+          end;
+          Q.Next;
+        end;
+      Q.Close;
+  end;
+
+
+  proc Шаблон_ПриСчит;
+    --Изменение стиля
+    РКП_Статьи.ОригиналМакет.Стиль.Читка=ПечатьКодаББК;
+    -----------------
+    СобратьСтатистикуПК;
+  end;
+
+  func ПросмотрГК(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var Q               : Query;
+    var Index           : integer;
+      Index             = Cell.Frame;
+      Q                 = Query.Create([РКП_Статьи.ВыпускПК]);
+      Q.Filter          = "ДатаВыпуска="+Str(DatGK[Index]);
+      Q.Select;
+      if Q.Count>0      then
+        Q.First;
+        OpenBlankEditor("Статьи.редВыпускПК",Q.Current,Window.ModalWindow);
+        СобратьСтатистикуПК;
+      end;
+      Q.Close;
+    Result = false;
+  end;
+
+  func ОбновитьФайл(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+      ФормированиеФайла;
+    Result = True; -- Разрешаем стандартную обработку
+  end;
+
+--}
+
+end

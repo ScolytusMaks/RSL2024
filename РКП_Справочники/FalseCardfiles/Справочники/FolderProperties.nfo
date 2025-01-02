@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Properties Version="1"/>
+<Items>
+  <Item Name="FalseCardType1"/>
+  <Item Name="FalseCardType2"/>
+  <Item Name="FalseCardType3"/>
+  <Item Name="блкартТематика"/>
+  <Item Name="блкартТерриторияРаспространения"/>
+  <Item Name="блкартЖанр"/>
+  <Item Name="блкартТематикаСтатьи"/>
+  <Item Name="блкартББК"/>
+  <Item Name="блкартАдресРедакции"/>
+</Items>

@@ -1,0 +1,464 @@
+class inherited СИС2.БазовыйБланк "";
+
+import СИС2 classes Константы, Исключения;
+import РКП_СИС Classes StringsFunctions, Functions, Recs, FilterMaker;
+import Classes Def;
+
+--{{ 2_Свойства
+
+inclass private
+
+  var КлассИнтерфейса :Class МашинаРеквизитов.Базовые.интЗапись := МашинаРеквизитов.Базовые.интЗапись;
+  var ИменаСлужебныхПолей :String[] := ['DocId','ExtId','CreateDate','ModifyDate','UpdateDate','CreateUser','UpdateUser'];
+  var ПонизитьЦветУстаревшихДанных :Logical := true;
+  var ФорматФильтраПоФрагменту :integer; -- 0:начало, 1:фрагмент, 2:точно
+  stored var ПоказатьУстаревшее :Integer;
+
+inobject private
+
+  var кнЗакрыть :Button;
+  var кнВыбрать :Button;
+  var кнДобавить :Button;
+  var кнДублировать :Button;
+  var кнНоваяГруппа :Button;
+  var кнПреобразовать :Button;
+  var кнРедактировать :Button;
+  var кнУдалить :Button;
+  var crdBuiltIn :TemplateCardfile;
+  var фреймКартотека :TemplateFrame;
+  var фреймПанельКоманд :TemplateFrame;
+  var фреймКнопокЗакрытьВыбрать :TemplateFrame;
+  var SelectMode :Logical;
+  var SelectedRecord :СИС2.Базовая.БазоваяЗапись; -- Выбранное значение
+  var FormInOpen :Logical; -- Флаг, взводимый в момент открытия для принудительной перерисовки после открытия
+  var Фрагмент :String;
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inclass public
+
+  func ВыполнитьВыбор (var vSelectRes :СИС2.Базовая.БазоваяЗапись; addParam :Variant[2] = nil) :Integer;
+    var vForm: FalseCardBase;
+    vForm = Self.Create;
+    vForm.SelectMode = true;
+    if (addParam <> nil) then
+      _vForm.УстСвойстваДоп(addParam);
+    fi;
+    vForm.crdBuiltIn.SetFocus;
+    #NoWarning;
+    if CmOk = vForm.ShowEx(nil, Kernel.Window.ModalWindow) then
+      vSelectRes = vForm.SelectedRecord;
+      Return CmOk;
+    fi;
+  end;
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриСоздании(Context :Variant);
+    inherited шаблон_ПриСоздании(Context);
+    ИнициализироватьКартотеку;
+  end;
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    inherited шаблон_ПриОткрытии(Create);
+    УстановитьДоступностьОбъектовШаблона;
+    ОбновитьФильтр;
+    УстРазмерОкна;
+    УстановитьФокусПриОткрытии;
+    FormInOpen = true;
+    Template.BeginModify;
+  end;
+
+  proc шаблон_ПриПеремещении;
+    if FormInOpen then
+      Self.Template.Update;
+      FormInOpen = false;
+      Template.EndModify;
+    fi;
+  end;
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func Поле_Фильтр_ПриНажатии (Cell: TemplateCell; Action: Template.ClickTypes): Logical;
+    if (Cell.Contents = 'ПоказатьУстаревшее') then
+      if (ПоказатьУстаревшее in [0, 1]) then
+        ПоказатьУстаревшее = -1;
+      else
+        ПоказатьУстаревшее = 1;
+      fi;
+    fi;
+    ОбновитьФильтр;
+  end;
+
+  func Поле_Фильтр_ПриВыводе (Cell: TemplateCell; Value: Variant; Action: Template.OutputTypes; var Format: String): Variant;
+    if (Cell.Contents = 'ПоказатьУстаревшее') then
+      Result = ПоказатьУстаревшее in [0,1];
+    fi;
+  end;
+
+  proc Поле_Фильтр_ПриВыходе(Cell :TemplateCell; Index :Integer);
+    ОбновитьФильтр;
+  end;
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+  proc кнОК_ПриНажатии(Sender :Button);
+    if SelectMode then
+      Close(cmCancel);
+    else
+      inherited кнОК_ПриНажатии(Sender);
+    fi;
+  end;
+
+
+  proc кнВыбрать_ПриНажатии(Sender :Button);
+    if (Self.crdBuiltIn.Current <> nil) then
+      Self.SelectedRecord = Self.crdBuiltIn.Current;
+      Self.Close(cmOk);
+    else
+      if (Self.crdBuiltIn.SelectedCount > 0) then
+        Self.SelectedRecord = Self.crdBuiltIn.Selected[1];
+        Self.Close(cmOk);
+      fi;
+    fi;
+  end;
+
+  proc кнДобавить_ПриНажатии(Sender :Button);
+    var vNewRec :СИС2.Базовая.БазоваяЗапись;
+    vNewRec = КлассИнтерфейса.СвязанныйКлассЗаписей.Create;
+    if (vNewRec <> nil) then
+      #NoWarning;
+      КлассИнтерфейса.БланкРедакторПоУмолчанию.ShowFormEx(vNewRec, Window.PopupWindow);
+    fi;
+  end;
+
+  proc кнДублировать_ПриНажатии(Sender :Button);
+    var vNewRec :СИС2.Базовая.БазоваяЗапись;
+    Template.CurrentObject = crdBuiltIn;
+    if (crdBuiltIn.SelectedCount > 0) then
+      crdBuiltIn.Current = crdBuiltIn.Selected[1];
+      crdBuiltIn.DeselectRecords;
+    fi;
+    if (crdBuiltIn.Current <> nil) then
+      vNewRec = crdBuiltIn.Current.Clone;
+      #NoWarning;
+      КлассИнтерфейса.БланкРедакторПоУмолчанию.ShowFormEx(vNewRec, Window.PopupWindow);
+      --ExecuteCommand('Kernel.Card.Run.CloneRec');
+    fi;
+  end;
+
+  proc кнНоваяГруппа_ПриНажатии(Sender :Button);
+  end;
+
+  proc кнПреобразовать_ПриНажатии(Sender :Button);
+  end;
+
+  proc кнРедактировать_ПриНажатии(Sender :Button);
+    var vEdtFrm :Class BlankForm;
+    Template.CurrentObject = crdBuiltIn;
+    if (crdBuiltIn.SelectedCount > 0) then
+      crdBuiltIn.Current = crdBuiltIn.Selected[1];
+      crdBuiltIn.DeselectRecords;
+    fi;
+    if (crdBuiltIn.Current <> nil) then
+      vEdtFrm = crdBuiltIn.Editors[1];
+      if (vEdtFrm <> nil) then
+        #NoWarning;
+        vEdtFrm.ShowFormEx(crdBuiltIn.Current, Window.ModalWindow);
+      fi;
+    fi;
+  end;
+
+  proc кнУдалить_ПриНажатии(Sender :Button);
+    var aRec :СИС2.Базовая.БазоваяЗапись[];
+    var i, ii :Integer;
+    Template.CurrentObject = crdBuiltIn;
+    ii = crdBuiltIn.SelectedCount;
+    if (ii > 0) then
+      for i = 1 .. ii do
+        РКП_СИС.Functions.AddInArray(aRec, crdBuiltIn.Selected[i]);
+      od;
+      for i = 1 .. ii do
+        РКП_СИС.Recs.RecordDeleteEx(aRec[i], true);
+      od;
+    fi;
+    if (crdBuiltIn.Current <> nil) then
+      ExecuteCommand('Kernel.Card.Run.DeleteRec');
+    fi;
+  end;
+
+  func crdBuiltIn_OnClick(Sender :TemplateCardfile; Action :Template.ClickTypes; Column :CardfileColumn; Rec :Record) :Logical;
+    var vEdtFrm :Class BlankForm;
+    if SelectMode then
+      if (Action in [Template.DoubleClick,Template.EnterPressed]) then
+        if (Self.crdBuiltIn.Current <> nil) then
+          Self.SelectedRecord = Self.crdBuiltIn.Current;
+          Self.Close(cmOk);
+        else
+          if (Self.crdBuiltIn.SelectedCount > 0) then
+            Self.SelectedRecord = Self.crdBuiltIn.Selected[1];
+            Self.Close(cmOk);
+          fi;
+        fi;
+      else
+        Return false;
+      fi;
+    else
+      if (crdBuiltIn.SelectedCount > 0) then
+        crdBuiltIn.Current = crdBuiltIn.Selected[1];
+        crdBuiltIn.DeselectRecords;
+      fi;
+      if (Action in [Template.DoubleClick,Template.EnterPressed]) then
+        if (crdBuiltIn.Current <> nil) then
+          vEdtFrm = crdBuiltIn.Editors[1];
+          if (vEdtFrm <> nil) then
+            #NoWarning;
+            vEdtFrm.ShowFormEx(crdBuiltIn.Current, Window.ModalWindow);
+          fi;
+        fi;
+      fi;
+      Return false;
+    fi;
+  end;
+
+  func crdBuiltIn_OnPost(Sender :TemplateCardfile; Rec :Record) :Logical;
+    with КлассИнтерфейса.OpenRecord(Rec) do
+      try
+        Post;
+      finally
+        if (КодПоследнегоИсключения <> '') then
+          with crdBuiltIn do
+            CurrentColumn = ColumnByField[КодПоследнегоИсключения];
+          end;
+        fi;
+      end;
+    end;
+  end;
+
+  proc кнНастройка_ПриНажатии(Sender :Button);
+  end;
+
+  proc Столбец_ПриРисовании (Column :CardfileColumn; Rec :Record; Selected :Logical; var Color :Integer; Font :Font);
+    var vFieldNameRecDeprecated :String;
+    if (Column.FieldName in ИменаСлужебныхПолей) then
+      Font.Color = COLOR_GRAYTEXT;
+    fi;
+    vFieldNameRecDeprecated = КлассИнтерфейса.GetClassField('ИмяПоляНеПрименяется');
+    if (Rec.GetField(vFieldNameRecDeprecated) as logical) then
+      Font.Color = СИС2.Константы.COLOR_GRAYTEXT;
+      Font.Italic = true;
+    fi;
+  end;
+
+
+-- 2_Вспомогательные методы0. --
+  proc УстановитьФокусНаПервоеПолеВвода;
+  end;
+
+  proc УстановитьФокусПриОткрытии;
+    var locCell :TemplateCell;
+    locCell = Template.CellByField['Фрагмент'];
+    if (locCell <> nil) then
+      locCell.SetFocus;
+    fi;
+    if SelectMode and (crdBuiltIn <> nil) then
+      crdBuiltIn.SetFocus;
+    fi;
+  end;
+
+
+  proc ИнициализироватьКартотеку;
+    var c, cc :Integer;
+    var locColumn :CardFileColumn;
+    crdBuiltIn.UserFilterOn = true;
+    if (crdBuiltIn.ColumnsCount = 0):
+      crdBuiltIn.Font.Size = 9;
+      crdBuiltIn.Font.Name = 'Tahoma';
+      crdBuiltIn.UseUserFilter = true;
+      ИнициализироватьДоступностьЗаписей;
+      _ИнициализироватьСтолбцыКартотеки.;
+      УстСортировкуЗаписейКартотеки;
+      cc = crdBuiltIn.ColumnsCount;
+      for c = 1 .. cc do
+        locColumn = crdBuiltIn.Column[c];
+        if (locColumn.OnDraw = nil) then
+          locColumn.OnDraw = 'Столбец_ПриРисовании';
+        fi;
+      od;
+      crdBuiltIn.Align = true;
+    fi;
+  end;
+
+  -- Отражение прав доступа к записям на UI или корректировка прав доступа на на уровне реализации UI
+  proc ИнициализироватьДоступностьЗаписей;
+    crdBuiltIn.CanEdit = true;
+    if Self.crdBuiltIn.CanInsert and ЕстьОграничениеДоступа_НаЗапись then
+      Self.crdBuiltIn.CanInsert = false;
+    fi;
+    if Self.crdBuiltIn.CanEdit and ЕстьОграничениеДоступа_НаРедактирование then
+      Self.crdBuiltIn.CanEdit = false;
+    fi;
+    if Self.crdBuiltIn.CanDelete and ЕстьОграничениеДоступа_НаУдаление then
+      Self.crdBuiltIn.CanDelete = false;
+    fi;
+  end;
+
+  proc ИнициализироватьСтолбцыКартотеки;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'DocId';
+      Caption = 'ID';
+      FieldType = Template.StringField;
+      Alignment = Template.RightAlign;
+      Font.Size = crdBuiltIn.Font.Size;
+      MinWidth = 20;
+      Width = 50;
+      Visible = false;
+      CanEdit = false;
+    end;
+  end;
+
+  proc УстРазмерОкна;
+    var minHeight, minWidth :Integer;
+    if SelectMode then
+      minHeight = Int(ScreenHeight / 2);
+      minWidth  = Int(ScreenWidth / 2);
+      if (Self.Window.Height < minHeight) then
+        Self.Window.Height = minHeight;
+      fi;
+      if (Self.Window.Width < minWidth) then
+        Self.Window.Width = minWidth;
+      fi;
+    fi;
+  end;
+
+  proc УстСортировкуЗаписейКартотеки;
+    -- реализуется в наследниках
+  end;
+
+  -- Установка свойств объекта по дополнительным параметрам конструктора "ВыполнитьВыбор"
+  proc УстСвойстваДоп(addParam :Variant[2]);
+    var i, ii :Integer;
+    var aValue :Variant[];
+    var vPropertyName :String;
+    var vPropertyValue :Variant;
+    ii = LengthOfArray(addParam);
+    for i = 1 .. ii do
+      aValue = addParam[i] as Variant[];
+      vPropertyName = (aValue[1] as String);
+      vPropertyValue = (aValue[2] as Variant);
+      try
+        if (Self.ClassInfo.MemberByName(vPropertyName) as MethodInfo).InClassProperty then
+          Self.SetClassField(vPropertyName, vPropertyValue);
+        else
+          Self.SetField(vPropertyName, vPropertyValue);
+        fi;
+      except
+      end;
+    od;
+  end;
+
+  proc УстановитьДоступностьОбъектовШаблона;
+    кнЗакрыть.Enabled       = true;
+    кнЗакрыть.Caption       = if(SelectMode, 'Отмена', 'Закрыть');
+    кнВыбрать.Enabled       = SelectMode;
+    кнДобавить.Enabled      = crdBuiltIn.CanInsert;
+    кнДублировать.Enabled   = crdBuiltIn.CanCopy;
+    кнНоваяГруппа.Enabled   = crdBuiltIn.Hierarchical;
+    кнПреобразовать.Enabled = crdBuiltIn.CanGroupSignModify;
+    --кнРедактировать.Enabled = crdBuiltIn.CanEdit;
+    кнРедактировать.Caption = if(crdBuiltIn.CanEdit, '&Редактировать', '&Просмотреть');
+    кнУдалить.Enabled       = crdBuiltIn.CanDelete;
+  end;
+
+  proc ОбновитьФильтр;
+    try
+      crdBuiltIn.UserFilter = СоздатьФильтр;
+    except
+      SetError(0, 'В фильтре использованы недопустимые символы!');
+    end;
+  end;
+
+  func СоздатьФильтр :String;
+    var aFlt :String[];
+    AddInArray( aFlt, ПолучитьФильтрУстаревшиеЗаписи );
+    AddInArray( aFlt, ПолучитьФильтрПоФрагменту );
+    Result = MakeFilter(aFlt);
+  end;
+
+  func ПолучитьФильтрУстаревшиеЗаписи :String;
+    var vFieldNameRecDeprecated :String;
+    try
+      vFieldNameRecDeprecated = КлассИнтерфейса.GetClassField('ИмяПоляНеПрименяется');
+      Result = if(ПоказатьУстаревшее in [0,1], nil, 'not ' + vFieldNameRecDeprecated);
+    except
+    end;
+  end;
+
+  func ПолучитьФильтрПоФрагменту :String;
+    var vFieldNameName :String;
+    try
+      vFieldNameName = КлассИнтерфейса.GetClassField('ИмяПоляНаим');
+      Result = 'Match(' + vFieldNameName + ',"*' + Фрагмент +'*")';
+    except
+    end;
+  end;
+
+  func ЕстьОграничениеДоступа_НаЗапись :Logical;
+    var r, rr :Integer;
+    var j, jj :Integer;
+    var rClass :Class Record;
+    var cConstraint :Constraint;
+    rr = LengthOfArray(Self.crdBuiltIn.Records);
+    for r = 1 ..  rr do
+      rClass = Self.crdBuiltIn.Records[r];
+      jj = rClass.UserConstraintsCount;
+      for j = 1 .. jj do
+        cConstraint = rClass.UserConstraint[j];
+        if (cConstraint.OnPost) and (cConstraint.Constraint = 'False') then
+          Return true;
+        fi;
+      od;
+    od;
+  end;
+
+  func ЕстьОграничениеДоступа_НаРедактирование :Logical;
+    var r, rr :Integer;
+    var j, jj :Integer;
+    var rClass :Class Record;
+    var cConstraint :Constraint;
+    rr = LengthOfArray(Self.crdBuiltIn.Records);
+    for r = 1 ..  rr do
+      rClass = Self.crdBuiltIn.Records[r];
+      jj = rClass.UserConstraintsCount;
+      for j = 1 .. jj do
+        cConstraint = rClass.UserConstraint[j];
+        if (cConstraint.OnEdit) and (cConstraint.Constraint = 'False') then
+          Return true;
+        fi;
+      od;
+    od;
+  end;
+
+  func ЕстьОграничениеДоступа_НаУдаление :Logical;
+    var r, rr :Integer;
+    var j, jj :Integer;
+    var rClass :Class Record;
+    var cConstraint :Constraint;
+    rr = LengthOfArray(Self.crdBuiltIn.Records);
+    for r = 1 ..  rr do
+      rClass = Self.crdBuiltIn.Records[r];
+      jj = rClass.UserConstraintsCount;
+      for j = 1 .. jj do
+        cConstraint = rClass.UserConstraint[j];
+        if (cConstraint.OnDelete) and (cConstraint.Constraint = 'False') then
+          Return true;
+        fi;
+      od;
+    od;
+  end;
+
+
+end

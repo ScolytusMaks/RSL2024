@@ -1,0 +1,90 @@
+Class inherited Справочники.editBaseType1 "Персоналия" , editor спрЛица;
+
+import РКП_СИС Classes StringsFunctions;
+
+
+--{{ 2_Свойства
+inobject private
+
+  var Интерфейс :RI.Справочники.Лица;
+
+--}}
+
+
+-- 2_Обработчики событий шаблона0. --
+
+  func шаблон_ПриПроверке :Logical;
+    var aTest :Logical[];
+    aTest[1] = (Trim(Наим) <> nil);
+    aTest[2] = (Trim(Имя) <> nil);
+    aTest[3] = (Trim(Отчество) <> nil);
+    aTest[4] = (Trim(Инициалы) <> nil);
+    aTest[5] = (Trim(Частица) <> nil);
+    Result = (true in aTest);
+    if (not Result) then
+      Message('Хотя бы одно из полей, ' +
+              'несущих элементы идентифицирующией лицо информации, ' +
+              'должно быть заполнено!' + Br +
+              'Пожалуйста, исправьте или откажитесь от сохранения записи.');
+      Return;
+    else
+      Result = inherited шаблон_ПриПроверке;
+    fi;
+  end;
+
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  proc Поле_ПриВыходе_Частица(Cell :TemplateCell; Index :Integer);
+    Hash = Интерфейс.GetHashByRecord(Self.Record);
+  end;
+
+  func Поле_ПриПроверке_Наим(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    Value = Trim(Value);
+    Value = Up(SubStr(Value, 1, 1)) + SubStr(Value, 2);
+    Return true;
+  end;
+
+  proc Поле_ПриВыходе_Наим(Cell :TemplateCell; Index :Integer);
+    Hash = Интерфейс.GetHashByRecord(Self.Record);
+  end;
+
+  func Поле_ПриПроверке_Имя(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    Value = Trim(Value);
+    Value = Up(SubStr(Value, 1, 1)) + SubStr(Value, 2);
+    Return true;
+  end;
+
+  proc Поле_ПриВыходе_Имя(Cell :TemplateCell; Index :Integer);
+    ОбновитьИнициалы;
+    Hash = Интерфейс.GetHashByRecord(Self.Record);
+  end;
+
+  func Поле_ПриПроверке_Отчество(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    Value = Trim(Value);
+    Value = Up(SubStr(Value, 1, 1)) + SubStr(Value, 2);
+    Return true;
+  end;
+
+  proc Поле_ПриВыходе_Отчество(Cell :TemplateCell; Index :Integer);
+    ОбновитьИнициалы;
+    Hash = Интерфейс.GetHashByRecord(Self.Record);
+  end;
+
+  proc Поле_ПриВыходе_Инициалы(Cell :TemplateCell; Index :Integer);
+    Hash = Интерфейс.GetHashByRecord(Self.Record);
+  end;
+
+-- 2_Вспомогательные методы0. --
+
+  proc ОбновитьИнициалы;
+    if not (nil in [Имя, Отчество]) then
+      Инициалы = SubStr(Имя, 1, 1) + '. ' + SubStr(Отчество, 1, 1) + '.';
+    elsif (Имя <> nil) and (Отчество = nil) then
+      Инициалы = SubStr(Имя, 1, 1) + '.';
+    else
+      Инициалы = nil;
+    fi;
+  end;
+
+end

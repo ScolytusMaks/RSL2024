@@ -1,0 +1,681 @@
+Class inherited МашинаРеквизитов.Базовые.блРедакторСИнтерфейсом "Номер газеты" , editor НомерГазеты;
+
+import РКП_СИС classes Profile, Def, StringsFunctions, StdCode, Recs, Functions, FilterMaker;
+import classes Константы;
+
+inclass public
+
+inobject private
+
+--{{ 2_Свойства
+
+  var Интерфейс :РКП_Газеты.RI.НомерГазеты;
+
+  var СерияНумерации0          :Logical;
+  var СерияНумерации1          :Logical;
+  var СерияНумерации2          :Logical;
+  var СерияНумерации3          :Logical;
+  var СерияНумерации4          :Logical;
+  var СерияНумерации5          :Logical;
+  var СерияНумерации6          :Logical;
+  var СерияНумерации7          :Logical;
+  var СерияНумерации8          :Logical;
+  var СерияНумерации9          :Logical;
+  var фреймИдентификация       :TemplateFrame;
+  var фреймПоступления         :TemplateFrame;
+  var фреймРегистрация         :TemplateFrame;
+  var секцСерияНумерации       :TemplateSection;
+  var секцСерияНумерацииДоп    :TemplateSection;
+  var секцИдентификация        :TemplateSection;
+  var секцТочностьДаты         :TemplateSection;
+  var секцДатаВыхода           :TemplateSection;
+  var ТочностьВыходаДень       :Logical;
+  var ТочностьВыходаМесяц      :Logical;
+  var ТочностьВыходаГод        :Logical;
+  var НенумерованныйВыпуск     :Logical;
+  var секцПримечание           :TemplateSection;
+  var секцПоступленияЗаголовок :TemplateSection;
+  var секцПоступления          :TemplateSection;
+  var клДобавитьПоступления    :TemplateCell = SectionCellByContents(секцПоступленияЗаголовок, '+');
+  var клУдалитьПоступления     :TemplateCell = SectionCellByContents(секцПоступления, 'x');
+  var КолЭкзОб                 :Integer;
+
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inclass public
+
+  func OpenRecordExt synonym ОткрытьПоЗаписиРасш(Rec :РКП_Газеты.НомерГазеты) :Integer;
+    var vEdtFrm :РКП_Газеты.УчетГазет.редНомерГазеты;
+    vEdtFrm = РКП_Газеты.УчетГазет.редНомерГазеты.Create;
+    if (CmOk = vEdtFrm.ShowEx(Rec, Kernel.Window.ModalWindow)) then
+      Return cmOk;
+    fi;
+  end;
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриСоздании(Context :Variant);
+    inherited шаблон_ПриСоздании(Context);
+    if OPPIAccess then
+      Template.HelpContext =  'РКП_Газеты.РГБ.УчетФактическихПоступлений.КарточкаНомера.htm';
+    else
+      Template.HelpContext =  'РКП_Газеты.РГБ.Регистрация.КарточкаНомера.htm';
+    fi;
+  end;
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    --Template.BeginModify;
+    inherited шаблон_ПриОткрытии(Create);
+    ШаблонМодифицирован = true;
+    --Template.EndModify;
+  end;
+
+  proc шаблон_ПриСчитывании;
+    Self.Template.BeginModify;
+    inherited шаблон_ПриСчитывании;
+    УстФлаги_СерияНумерации;
+    УстФлаги_ТочностьДатыВыхода;
+    ПрочитатьПоступления;
+    КолЭкзОб = РКП_Справочники.Справочники.КОЭ.КоличествоДляГазеты(Газета, ГодВыпуска);
+    МодифицироватьШаблон;
+    Self.Template.Update;
+    Self.Template.EndModify;
+  end;
+
+  func шаблон_ПриПроверке :Logical;
+    if (Trim(Номер) = nil) then
+      Номер = UnnumberedIssue;
+      НенумерованныйВыпуск = true;
+    fi;
+    if (Тираж < 1) and (not НеПолучен) then
+      Message('Пожалуйста, заполните поле "Тираж номера"!' + Br +
+              'Нулевой тираж возможен только у не поступивших (незарегистрированных) номеров.');
+      фреймИдентификация.CellByField['Тираж'].SetFocus;
+    else
+      Result = true;
+    fi;
+    if Result and (not ЛожныйНомер) and (not НенумерованныйВыпуск) then
+      Result = Интерфейс.ПроверитьУникальность;
+    fi;
+    if Result then
+      Result = inherited шаблон_ПриПроверке;
+    else
+
+    fi;
+  end;
+
+  func шаблон_ПередЗакрытием(ModalResult :Integer) :Logical;
+    -- Проверка корректности данных о поступивших номерах, отправка записей на сервер
+    var r :Integer;
+    var locRowTag :РКП_Газеты.ЕдиницаХранения;
+    var aTxt :String[];
+    if секцПоступления.Visible then
+      Result = true;
+      for r = 1 .. секцПоступления.RowsCount do
+        if (секцПоступления.Row[r].Tag is РКП_Газеты.ЕдиницаХранения) then
+          locRowTag = секцПоступления.Row[r].Tag as РКП_Газеты.ЕдиницаХранения;
+          if (locRowTag.Количество < 1) then
+            aTxt[1] = 'Таблица "Количество экземпляров, принятое на хранение"';
+            aTxt[2] = 'не должна содержать позиций с нулевым или отрицательным';
+            aTxt[3] = 'количеством принятых экземпляров.';
+            aTxt[4] = 'Пожалуйста, внесите корректные данные или удалите';
+            aTxt[5] = 'лишние строки.';
+            Message(ArrayToText(aTxt));
+            Result = false;
+            Return;
+          fi;
+        fi;
+      od;
+      if Result then
+        for r = 1 .. секцПоступления.RowsCount do
+          if (секцПоступления.Row[r].Tag is РКП_Газеты.ЕдиницаХранения) then
+            locRowTag = секцПоступления.Row[r].Tag as РКП_Газеты.ЕдиницаХранения;
+            RI.ЕдиницаХранения.OpenRecord(locRowTag).Post;
+          fi;
+        od;
+      fi;
+    else
+      Return true;
+    fi;
+  end;
+
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func Поле_ПриПроверке_КолЭкз(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    if (Value as Integer) < 1 then
+      Message('Количество экземпляров газеты не может быть нулевым или отрицательным!');
+    else
+      Return true;
+    fi;
+  end;
+
+  func Поле_ПриВводе_КолЭкз(Cell :TemplateCell; Value :Variant) :Logical;
+    var locRowTag :РКП_Газеты.ЕдиницаХранения;
+    locRowTag = GetRowTag(Cell);
+    if (locRowTag <> nil) then
+      locRowTag.Количество = (Value as Integer);
+      Return true;
+    fi;
+  end;
+
+  func Поле_ПриОбзоре_КолЭкз(Cell :TemplateCell; Value :Variant; var NewValue :Variant) :Logical;
+    var locRowTag :РКП_Газеты.ЕдиницаХранения;
+    locRowTag = GetRowTag(Cell);
+    if (locRowTag <> nil) then
+      Template.EndEdit(true);
+      locRowTag.Количество = NewValue;
+      #NoWarning;
+      УчетГазет.редЕдиницаХранения.ShowFormEx(locRowTag, Kernel.Window.ModalWindow);
+      NewValue = locRowTag.Количество;
+      Template.EndEdit(true);
+    fi;
+  end;
+
+  func Поле_ПриВыводе_ЗаголовокОкнаФормы(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    if (Газета <> nil) then
+      Result = Газета.НазваниеОсн;
+      Result = Result + Br;
+      Result = Result + '<s+><s+><s+>' + Str(ГодВыпуска) + '<s.>' + Br + Br;
+      if (Номер <> nil) then
+        if (Номер = UnnumberedIssue) then
+          Result = Result + BiblioRecord.ОписаниеНомера(Record);
+        else
+          Result = Result + '№ ' + BiblioRecord.ОписаниеНомера(Record);
+        fi;
+      else
+        Result = Result + '<cf:red>Номер не указан';
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриВыводе_ДатаВыхода(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    if (ТочностьДатыВыхода = 0) then
+      Cell.FieldFormat = 'dd.mm.yyyy';
+    elsif (ТочностьДатыВыхода = 1) then
+      if (Mon(ДатаВыхода) = 01) then       Cell.FieldFormat = 'yyyy, январь';
+      elsif (Mon(ДатаВыхода) = 02) then    Cell.FieldFormat = 'yyyy, февраль';
+      elsif (Mon(ДатаВыхода) = 03) then    Cell.FieldFormat = 'yyyy, март';
+      elsif (Mon(ДатаВыхода) = 04) then    Cell.FieldFormat = 'yyyy, апрель';
+      elsif (Mon(ДатаВыхода) = 05) then    Cell.FieldFormat = 'yyyy, май';
+      elsif (Mon(ДатаВыхода) = 06) then    Cell.FieldFormat = 'yyyy, июнь';
+      elsif (Mon(ДатаВыхода) = 07) then    Cell.FieldFormat = 'yyyy, июль';
+      elsif (Mon(ДатаВыхода) = 08) then    Cell.FieldFormat = 'yyyy, август';
+      elsif (Mon(ДатаВыхода) = 09) then    Cell.FieldFormat = 'yyyy, сентябрь';
+      elsif (Mon(ДатаВыхода) = 10) then    Cell.FieldFormat = 'yyyy, октябрь';
+      elsif (Mon(ДатаВыхода) = 11) then    Cell.FieldFormat = 'yyyy, ноябрь';
+      elsif (Mon(ДатаВыхода) = 12) then    Cell.FieldFormat = 'yyyy, декабрь';
+      fi;
+    elsif (ТочностьДатыВыхода = 2) then
+      Cell.FieldFormat = 'yyyy г.';
+    fi;
+    Return ДатаВыхода;
+  end;
+
+  func Поле_ПриВыводе_Поступление(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    var locRowTag :РКП_Газеты.ЕдиницаХранения;
+    var aTxt :String[];
+    locRowTag = GetRowTag(Cell);
+    if (locRowTag <> nil) then
+      if (Cell.Contents = 'УчетныйДокумент') then
+        if (locRowTag.УчетныйДокумент.ТипУД <> nil) then
+          AddInArray( aTxt, locRowTag.УчетныйДокумент.ТипУД.Код );
+        fi;
+        if (locRowTag.УчетныйДокумент.НомерУД  <> nil) then
+          AddInArray( aTxt, '№' );
+          AddInArray( aTxt, locRowTag.УчетныйДокумент.НомерУД );
+        fi;
+        if (locRowTag.УчетныйДокумент.ДатаУД <> nil) then
+          AddInArray( aTxt, 'от' );
+          AddInArray( aTxt, Str(locRowTag.УчетныйДокумент.ДатаУД) );
+        fi;
+        Return МассивСтрокВСтрокуРасш (aTxt, false,' ', false);
+      elsif (Cell.Contents = 'ТипУд') then
+        Return locRowTag.УчетныйДокумент.ТипУД.Код as String;
+      elsif (Cell.Contents = 'НомерУд') then
+        Return locRowTag.УчетныйДокумент.НомерУД as String;
+      elsif (Cell.Contents = 'ДатаУд') then
+        Return locRowTag.УчетныйДокумент.ДатаУД as Date;
+      elsif (Cell.Contents = 'КолЭкз') then
+        Return locRowTag.Количество as Integer;
+      elsif (Cell.Contents = 'ДатаПоступления') then
+        Return locRowTag.ДатаПоступления as Date;
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриВыводе_ПринятоЭкземпляров(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    var r :Integer;
+    var locRowTag :РКП_Газеты.ЕдиницаХранения;
+    var locRes :Integer;
+    if секцПоступления.Visible then
+      for r = 1 .. секцПоступления.RowsCount do
+        if (секцПоступления.Row[r].Tag is РКП_Газеты.ЕдиницаХранения) then
+          locRowTag = (секцПоступления.Row[r].Tag as РКП_Газеты.ЕдиницаХранения);
+          locRes = locRes + locRowTag.Количество;
+        fi;
+      od;
+      Return locRes;
+    fi;
+  end;
+
+
+  proc Поле_ПриРисовании_Серия(Cell :TemplateCell; Selected :Logical; var Color :Integer; var FieldColor :Integer; Font :Font);
+    Font.Bold = (СерияНумерации = Int(Cell.Owner.Column[Cell.Column].Caption));
+    if Font.Bold then
+      Font.Color = СИС2.Константы.clBlue;
+      Cell.Bevel = Template.ClientBevel;
+    else
+      Cell.Bevel = Template.NoneBevel;
+    fi;
+  end;
+
+  proc Поле_ПриРисовании_ТочностьВыхода(Cell :TemplateCell; Selected :Logical; var Color :Integer; var FieldColor :Integer; Font :Font);
+    Font.Bold = (ТочностьДатыВыхода = Int(секцТочностьДаты.Column[Cell.Column].Caption));
+    if Font.Bold then
+      Font.Color = СИС2.Константы.clBlue;
+      Cell.Bevel = Template.ClientBevel;
+    else
+      --Font.Color = СИС2.Константы.clGray;
+      Cell.Bevel = Template.NoneBevel;
+    fi;
+  end;
+
+  proc Поле_ПриРисовании_ДатаВыхода(Cell :TemplateCell; Selected :Logical; var Color :Integer; var FieldColor :Integer; Font :Font);
+    if (ТочностьДатыВыхода > 0) or (not Cell.Enabled) then
+      ПриРисовании_КакПолеВывода(Cell, Selected, Color, FieldColor, Font);
+    fi;
+  end;
+
+  func Поле_ПриНажатии_Серия(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var vSeriesBefore, vSeriesNew :Integer;
+    vSeriesBefore = СерияНумерации;
+    vSeriesNew = Int(Cell.Owner.Column[Cell.Column].Caption);
+    if (vSeriesBefore <> vSeriesNew) then
+      RecordModify(Record);
+      Self.Template.BeginModify;
+      СерияНумерации = vSeriesNew;
+      УстФлаги_СерияНумерации;
+      Self.Template.Update;
+      Self.Template.EndModify;
+      Template.CellByField['Номер'].SetFocus;
+    fi;
+  end;
+
+  proc Поле_ПриРисовании(Cell :TemplateCell; Selected :Logical; var Color :Integer; var FieldColor :Integer; Font :Font);
+    if (not Cell.Enabled) then
+      inherited ПриРисовании_КакПолеВывода(Cell, Selected, Color, FieldColor, Font);
+    fi;
+  end;
+
+  func Поле_ПриНажатии_ТочностьВыхода(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var vAccuracyBefore, vAccuracyNew :Integer;
+    Self.Template.BeginModify;
+    vAccuracyBefore = ТочностьДатыВыхода;
+    vAccuracyNew = Int(секцТочностьДаты.Column[Cell.Column].Caption);
+    if (vAccuracyBefore <> vAccuracyNew) then
+      РКП_СИС.Recs.RecordModify(Record);
+      ТочностьДатыВыхода = vAccuracyNew;
+      УстФлаги_ТочностьДатыВыхода;
+      if (ТочностьДатыВыхода = 1) and (ДатаВыхода <> nil) then
+        --ДатаВыхода = Dat(1, (Mon(ДатаВыхода)), ГодВыпуска);
+      elsif (ТочностьДатыВыхода = 2) then
+        --ДатаВыхода = Dat(1, 1, ГодВыпуска);
+      fi;
+    fi;
+    Self.Template.Update;
+    Self.Template.EndModify;
+  end;
+
+  func Поле_ПриНажатии_Флаг(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    if (Cell.Contents = 'НеПолучен') then
+      RecordModify(Self.Record);
+      НеПолучен = not НеПолучен;
+      Интерфейс.РегистрацияНомера;
+      if (not НеПолучен) and (Тираж = 0) then
+        секцИдентификация.CellByField['Тираж'].SetFocus;
+      fi;
+    elsif (Cell.Contents = 'ЛожныйНомер') then
+      RecordModify(Self.Record);
+      ЛожныйНомер = not ЛожныйНомер;
+    elsif (Cell.Contents = 'НенумерованныйВыпуск') then
+      RecordModify(Self.Record);
+      НенумерованныйВыпуск = not НенумерованныйВыпуск;
+    2  0if НенумерованныйВыпуск then
+      2  0Номер = UnnumberedIssue;
+    2  0else
+      2  0Номер =2 0nil;
+    2  0fi;
+    elsif (Cell.Contents = 'ПрекращениеИздания') then
+      if RecordEdited(Self.Record) then
+        if (cmOk = EnqOkCancel('Для выполнения этого действия запись должна быть сохранена. Продолжить?')) then
+          ПрекращениеИздания = not ПрекращениеИздания;
+          Интерфейс.Post;
+        fi;
+      else
+        RecordModify(Self.Record);
+        ПрекращениеИздания = not ПрекращениеИздания;
+        Интерфейс.Post;
+      fi;
+      --Интерфейс.СменитьСтатусПрекращения;
+    fi;
+  end;
+
+  func Поле_ПриНажатии_ДобавитьПозицию(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var newRec :РКП_Газеты.ЕдиницаХранения;
+    var newRow, c :Integer;
+    var newCell :TemplateCell;
+    newRec = РКП_Газеты.ЕдиницаХранения.Create;
+    newRec.НомерГазеты = Self.Record;
+    newRec.ДатаПоступления = Today;
+    if секцПоступления.Visible then
+      newRow = секцПоступления.RowsCount + 1;
+      секцПоступления.RowsCount = newRow;
+      for c = 1 .. секцПоступления.ColumnsCount do
+        newCell = секцПоступления.Cell[c, newRow];
+        newCell.Assign(секцПоступления.Cell[c, 1]);
+      od;
+      секцПоступления.Row[newRow].Tag = newRec;
+    else
+      секцПоступления.Visible = true;
+      секцПоступления.Row[1].Tag = newRec;
+    fi;
+    c = CellColumn(секцПоступления.CellByField['КолЭкз']).Number;
+    newRow = секцПоступления.RowsCount;
+    секцПоступления.Cell[c, newRow].SetFocus;
+  end;
+
+  func Поле_ПриНажатии_УдалитьПозицию(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var locRowTag :РКП_Газеты.ЕдиницаХранения;
+    locRowTag = GetRowTag(Cell);
+    if (locRowTag <> nil) then
+      try
+        РКП_СИС.Recs.RecordDeleteEx(locRowTag ,true);
+        Интерфейс.ОбновитьКоличествоЕдХран;
+      finally
+        if (секцПоступления.RowsCount > 1) then
+          секцПоступления.DeleteRow(Cell.Row);
+        else
+          секцПоступления.Visible = false;
+        fi;
+      end;
+    fi;
+    --var locRowTag :РКП_Газеты.ЕдиницаХранения;
+    --locRowTag = GetRowTag(Cell);
+    --if (locRowTag <> nil) then
+    --  try
+    --    РКП_СИС.Recs.RecordDeleteEx(locRowTag ,true);
+    --    Интерфейс.ОбновитьКоличествоЕдХран;
+    --  finally
+    --    ПрочитатьПоступления;
+    --  end;
+    --fi;
+  end;
+
+  func Поле_ПриНажатии_ИзменитьПозицию(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+     
+    Result = True; 
+  end;
+
+  func Поле_ПриВходе_УчДок(Cell :TemplateCell; Index :Integer; Action :Template.EnterTypes) :Logical;
+    var locRowTag :РКП_Газеты.ЕдиницаХранения;
+    var rDoc :РКП_Газеты.УчетныйДокумент;
+    var aTxt :String[];
+    locRowTag = GetRowTag(Cell);
+    if (Action = Template.Clear) then
+      if (locRowTag.УчетныйДокумент <> nil) then
+        AddInArray( aTxt, 'Информация о поступлении уже включена в учетный документ.' );
+        AddInArray( aTxt, 'Изменения строки не допускаются.' );
+        Message(ArrayToText(aTxt));
+      fi;
+    else
+      if (locRowTag.УчетныйДокумент = nil) then
+        AddInArray( aTxt, 'После выбора учетного документа изменения в строке будут недоступны.' );
+        AddInArray( aTxt, 'Продолжить?' );
+        if cmOk = EnqOkCancel( ArrayToText(aTxt) ) then
+          if (cmOk = УчетГазет.картУчетныйДокумент.ВыполнитьВыбор(rDoc)) then
+            locRowTag.УчетныйДокумент = rDoc;
+            locRowTag.ДатаПодшивки = Today;
+            секцПоступления.Cell[1, Index].Enabled = false;
+            --секцПоступления.Cell[2, Index].Enabled = false;
+          fi;
+        fi;
+      elsif (locRowTag.УчетныйДокумент <> nil) then
+        AddInArray( aTxt, 'Информация о поступлении уже включена в учетный документ.' );
+        AddInArray( aTxt, 'Изменения строки не допускаются.' );
+        Message(ArrayToText(aTxt));
+        --секцПоступления.Cell[2, Index].Enabled = false;
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриВходе_ДатаВыхода(Cell :TemplateCell; Index :Integer; Action :Template.EnterTypes) :Logical;
+    var vY, vM, vChoice :Integer;
+    var newDate :Date;
+    if (Action = Template.Clear) then
+      ДатаВыхода = nil;
+    else
+      if (ТочностьДатыВыхода = 0) then
+        Return true;
+      elsif (ТочностьДатыВыхода = 1) then
+        vY = ГодВыпуска;
+        if (CmOk = РКП_СИС.Сервис.блВыборМесяца.ВыполнитьВыбор(vY, vM)) then
+          newDate = Dat(1, vM, vY);
+          if Year((newDate as Date)) = ГодВыпуска then
+            ДатаВыхода = newDate;
+          else
+            vChoice = Enquiry('Подтверждение',
+                              'Дата выхода номера не лежит в пределах ' + Str(ГодВыпуска) + ' года!' + Br +
+                              'Пожалуйста, подтвердите или измените значение.',
+                              ['Да, всё верно', 'Отмена']);
+            if (vChoice = 1) then
+              ДатаВыхода = newDate;
+            fi;
+          fi;
+        fi;
+      elsif (ТочностьДатыВыхода = 2) then
+        if (ГодВыпуска <> nil) then
+          vY = ГодВыпуска;
+          if (CmOk = РКП_СИС.Сервис.блВыборГода.ВыполнитьВыбор(vY)) then
+            newDate = Dat(1, 1, vY);
+            if Year((newDate as Date)) = ГодВыпуска then
+              ДатаВыхода = newDate;
+            else
+              vChoice = Enquiry('Подтверждение',
+                                'Дата выхода номера не лежит в пределах ' + Str(ГодВыпуска) + ' года!' + Br +
+                                'Пожалуйста, подтвердите или измените значение.',
+                                ['Да, всё верно', 'Отмена']);
+              if (vChoice = 1) then
+                ДатаВыхода = newDate;
+              fi;
+            fi;
+          fi;
+        fi;
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриВходе_КолЭкз(Cell :TemplateCell; Index :Integer; Action :Template.EnterTypes) :Logical;
+    var locRowTag :РКП_Газеты.ЕдиницаХранения;
+    var aTxt :String[];
+    locRowTag = GetRowTag(Cell);
+    if (locRowTag <> nil) then
+      if Action = Template.Clear then
+        locRowTag.Количество = 0;
+        Template.EndEdit;
+      else
+        if (locRowTag.УчетныйДокумент <> nil) then
+          AddInArray( aTxt, 'Информация о поступлении уже включена в учетный документ.' );
+          AddInArray( aTxt, 'При изменении количества изменится сумма в учетном документе.' );
+          AddInArray( aTxt, 'Продолжить?' );
+          if cmOk = EnqOkCancel( ArrayToText(aTxt) ) then
+            Return true;
+          fi;
+        else
+          Return true;
+        fi;
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриВводе_Номер(Cell :TemplateCell; Value :Variant) :Logical;
+    var sValue :String;
+    if (Value = nil) then
+    2  0sValue =2 0UnnumberedIssue;
+    else
+      sValue = Trim(Value as String);
+      if (Pos('ненум', sValue) > 0) then
+      2  0sValue =2 0UnnumberedIssue;
+      else
+        sValue = FixCode10(sValue);
+      fi;
+    fi;
+    if (Номер <> sValue) then
+      RecordModify(Self.Record);
+      Номер = sValue;
+      НенумерованныйВыпуск = (sValue =2 0UnnumberedIssue);
+    fi;
+  end;
+
+  func Поле_ПриВводе_ВаловыйНомер(Cell :TemplateCell; Value :Variant) :Logical;
+    var sValue :String;
+    if (Value <> nil) then
+      sValue = FixCode10(Value as String);
+    fi;
+    if (ВаловыйНомер <> sValue) then
+      RecordModify(Self.Record);
+      ВаловыйНомер = sValue;
+    fi;
+  end;
+
+  func Поле_ПриПроверке_Тираж(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    Result = (Value as Integer >= 0);
+    if (not Result) then
+      Message('Недопустим ввод отрицательных значений тиража!');
+      
+    fi;
+  end;
+
+  func Поле_ПриПроверке_ДатаВыхода(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    var vChoice :Integer;
+    if Year((Value as Date)) <> ГодВыпуска then
+      vChoice = Enquiry('Подтверждение',
+                        'Дата выхода номера не лежит в пределах ' + Str(ГодВыпуска) + ' года!' + Br +
+                        'Пожалуйста, подтвердите или измените значение.',
+                        ['Да, всё верно', 'Отмена']);
+      Return (vChoice = 1);
+    else
+      Return true;
+    fi;
+  end;
+
+  proc Поле_ПриВыходе_Флаг(Cell :TemplateCell; Index :Integer);
+    if (Cell.Contents = 'НеПолучен') then
+    fi;
+  end;
+
+  proc Поле_ПриВыходе(Cell :TemplateCell; Index :Integer);
+    if (Cell.Contents = 'Номер')           then Template.CellByField['ВаловыйНомер'].SetFocus;
+    elsif (Cell.Contents = 'ВаловыйНомер') then Template.CellByField['Тираж'].SetFocus;
+    elsif (Cell.Contents = 'Тираж')        then Template.CellByField['ДатаВыхода'].SetFocus;
+    elsif (Cell.Contents = 'ДатаВыхода')   then Template.CellByField['Комментарий'].SetFocus;
+    fi;
+  end;
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+
+-- 2_Дополнительные команды0. --
+
+-- 2_Вспомогательные методы0. --
+
+  proc УстановитьФокусНаПервоеПолеВвода;
+    Template.CellByField['Номер'].SetFocus;
+  end;
+
+  var ШаблонМодифицирован :Logical;
+
+  proc МодифицироватьШаблон;
+    if not ШаблонМодифицирован then
+      if (Record.State in [Kernel.Record.Created, Kernel.Record.Duplicated]) then
+        кнОК.Caption = 'Ввод';
+      else
+        кнОК.Caption = 'Закрыть';
+      fi;
+      фреймРегистрация.CellByField['СозданОЛГС'].Enabled = false;
+      if GLGSAccess then
+        SetSectionDisabled(секцСерияНумерации);
+        SetSectionDisabled(секцСерияНумерацииДоп);
+        SetSectionDisabled(секцИдентификация);
+        секцИдентификация.CellByField['Номер'].Enabled = Self.Record.СозданОЛГС;
+        SetSectionDisabled(секцТочностьДаты);
+        секцДатаВыхода.CellByField['ДатаВыхода'].Enabled = Self.Record.СозданОЛГС;
+        фреймПоступления.Visible = false;
+      else
+        фреймИдентификация.CellByField['НеПолучен'].Enabled = (FullAccess or ORGPAccess);
+        фреймИдентификация.CellByField['ВаловыйНомер'].Enabled       = (FullAccess or ORGPAccess);
+        фреймИдентификация.CellByField['ПрекращениеИздания'].Enabled = (FullAccess or ORGPAccess);
+        фреймИдентификация.CellByField['Тираж'].Enabled              = (FullAccess or ORGPAccess);
+        фреймПоступления.CellByField['Цена'].Enabled                 = (FullAccess or ORGPAccess);
+      fi;
+    else
+      ШаблонМодифицирован = false;
+    fi;
+  end;
+
+  -- Преобразование целочисленного значения в набор флагов для визуализации
+  proc УстФлаги_СерияНумерации;
+    СерияНумерации0 = (СерияНумерации = 0);
+    СерияНумерации1 = (СерияНумерации = 1);
+    СерияНумерации2 = (СерияНумерации = 2);
+    СерияНумерации3 = (СерияНумерации = 3);
+    СерияНумерации4 = (СерияНумерации = 4);
+    СерияНумерации5 = (СерияНумерации = 5);
+    СерияНумерации6 = (СерияНумерации = 6);
+    СерияНумерации7 = (СерияНумерации = 7);
+    СерияНумерации8 = (СерияНумерации = 8);
+    СерияНумерации9 = (СерияНумерации = 9);
+  end;
+
+  proc УстФлаги_ТочностьДатыВыхода;
+    ТочностьВыходаДень  = (ТочностьДатыВыхода = 0);
+    ТочностьВыходаМесяц = (ТочностьДатыВыхода = 1);
+    ТочностьВыходаГод   = (ТочностьДатыВыхода = 2);
+  end;
+
+  proc ПрочитатьПоступления;
+    var aRec :РКП_Газеты.ЕдиницаХранения[];
+    var r, rr :Integer;
+    Template.BeginModify;
+    секцПоступления.Visible = false;
+    секцПоступления.RowsCount = 1;
+    #NoWarning;
+    aRec = Интерфейс.ПолучитьЕдХран(nil);
+    if (aRec <> nil) then
+      секцПоступления.Visible = true;
+      rr = LengthOfArray(aRec);
+      if ( rr > 1 ) then
+        CloneFirstRows(секцПоступления, rr);
+      fi;
+      for r = 1 .. rr do
+        секцПоступления.Row[r].Tag = aRec[r];
+        секцПоступления.Cell[1,r].Enabled = (aRec[r].УчетныйДокумент = nil);
+        --секцПоступления.Cell[2,r].Enabled = (aRec[r].УчетныйДокумент = nil);
+      od;
+    fi;
+    Template.EndModify;
+  end;
+
+  func GetRowTag synonym ПолучитьТегСтроки (Cell :TemplateCell) :РКП_Газеты.ЕдиницаХранения;
+    var locRow :TemplateRow;
+    locRow = Cell.Owner.Row[Cell.Row];
+    if (locRow.Tag is РКП_Газеты.ЕдиницаХранения) then
+      Return (locRow.Tag as РКП_Газеты.ЕдиницаХранения);
+    fi;
+  end;
+
+end

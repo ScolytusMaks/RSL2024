@@ -1,0 +1,37 @@
+class inherited RI.—правочники.intBaseType1 '»нтерфейс записи (справочник, тип 1)';
+
+import – ѕ_—»— Classes Functions, Recs;
+
+inclass public
+
+  var ќб€зательныеѕол€     :String[] = [];
+  var ’ешируемыеѕол€       :String[] = ['„астица','Ќаим','»м€','ќтчество','»нициалы'];
+
+  func —в€занный ласс«аписей: Class BaseRefType1;
+    Result = спрЋица;
+  end;
+
+  func Create: RI.—правочники.Ћица;
+    Result = inherited Create;
+    Result.Record = спрЋица.Create;
+  end;
+
+  func ќткрытьѕо«аписи synonym OpenRecord(locRecord: спрЋица): RI.—правочники.Ћица;
+    Result = inherited Create;
+    Result.Record = locRecord;
+  end;
+
+  func Ѕланк–едакторѕо”молчанию: Class —правочники.editBaseType1;
+    Result = —правочники.редѕерсонали€;
+  end;
+
+  func  артотекаѕо”молчанию: Class —правочники.CardBaseType1;
+    Result = —правочники.картЋица;
+  end;
+
+inobject public
+
+  Record: спрЋица;
+
+
+end

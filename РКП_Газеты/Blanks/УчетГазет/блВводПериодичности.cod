@@ -1,0 +1,175 @@
+class inherited СИС2.БазовыйБланк "Периодичность выхода";
+
+inobject private
+
+--{{ 2_Свойства
+
+  var АктуальноеНазвание     :String;
+  var КатегорияПериодичности :Integer;
+  var КоличествоВПериоде     :Integer;
+  var КоличествоВПериоде_    :Integer;
+  var Периодичность          :String;
+  var секцПериодичность      :TemplateSection;
+  --var КоличествоВПериоде_       :integer;
+--}}
+
+inclass public
+
+-- 2_Конструкторы, визуализаторы0. --
+
+  func ВыполнитьВвод (var локКатегорияПериодичности :Integer;
+                      var локКоличествоВПериоде :Integer;
+                      var локОписание :String = nil) :Integer;
+    var vForm :УчетГазет.блВводПериодичности;
+    vForm = УчетГазет.блВводПериодичности.Create;
+    if локОписание = nil then
+      vForm.КатегорияПериодичности = локКатегорияПериодичности;
+      vForm.КоличествоВПериоде = локКоличествоВПериоде;
+    else
+      with РКП_Справочники.BiblioRecord do
+        vForm.КатегорияПериодичности = PeriodicityCategory(локОписание) as integer;
+        vForm.КоличествоВПериоде = QuantityInPeriod(локОписание);
+      end;
+    fi;
+    #NoWarning;
+    if (cmOk = vForm.ShowEx(nil, Kernel.Window.ModalWindow)) then
+      локКатегорияПериодичности = vForm.КатегорияПериодичности;
+      локКоличествоВПериоде     = vForm.КоличествоВПериоде;
+      локОписание               = vForm.Периодичность;
+      Return CmOk;
+    fi;
+  end;
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    inherited шаблон_ПриОткрытии(Create);
+    ВидСекцииПериодичность; -- Корректные значения периодичности
+  end;
+
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  proc ПолеКоличествоВПериоде_ПриРисовании(Cell :TemplateCell; Selected :Logical; var Color :Integer; var FieldColor :Integer; Font :Font);
+    if Cell.ReadOnly or (not Cell.Enabled) then
+      inherited ПриРисовании_КакЗапрещенное(Cell, Selected, Color, FieldColor, Font);
+    else
+      inherited ПриРисовании_КакПолеВыбора(Cell, Selected, Color, FieldColor, Font);
+    fi;
+  end;
+
+  func ПолеПриПроверке(Cell :TemplateCell; Index :Integer; var Value :Variant):Logical;
+    if (Value <= 4) then
+      if (КатегорияПериодичности <> Value) then
+        КатегорияПериодичности  = Value;
+        КоличествоВПериоде  = 1;
+        ВидСекцииПериодичность;
+        Result = true; -- Разрешаем сохранить изменения в поле
+      fi;
+    fi;
+  end;
+
+  proc ПолеПриВыходе(Cell :TemplateCell; Index :Integer);
+    var vDescription :String;
+    vDescription = РКП_Справочники.BiblioRecord.ПериодичностьВыхода(КоличествоВПериоде_ + 1, КатегорияПериодичности as РКП_Справочники.Def.tPeriodicityCategory);
+    if (Cell.Contents = 'КатегорияПериодичности') then
+      if (Периодичность <> vDescription) then
+        Периодичность = vDescription;
+      fi;
+    elsif (Cell.Contents = 'КоличествоВПериоде_') then
+ 2  0   КоличествоВПериоде =2 0КоличествоВПериоде_ + 1;
+      if (Периодичность <> vDescription) then
+        Периодичность = vDescription;
+      fi;
+    end;
+  end;
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+  proc ВвестиПоследнее(Sender :Button);
+    Close(CmOk);
+  end;
+
+  proc НеПрименять(Sender :Button);
+    Close(CmCancel);
+  end;
+
+-- 2_Дополнительные команды0. --
+
+
+-- 2_Вспомогательные методы0. --
+
+  proc ВидСекцииПериодичность;
+    -- процедура управляет видом секции, описывающей периодичность,
+    -- не позволяя оператору вводить недопустимые значения
+    var CellPeriod :TemplateCell;
+    var vDescription :String;
+    CellPeriod = секцПериодичность.CellByField['КоличествоВПериоде_'];
+    CellPeriod.List.Clear;
+    --КоличествоВПериоде = nil;
+    if (КатегорияПериодичности = 0) then -- Неопределенно
+      CellPeriod.ReadOnly = true;
+    else
+      CellPeriod.ReadOnly = false;
+      if (КатегорияПериодичности = 1) then -- В течение дня
+        КоличествоВПериоде_ = (КоличествоВПериоде - 1);
+        CellPeriod.List.Add('1 раз');
+        CellPeriod.List.Add('2 раза');
+      elsif (КатегорияПериодичности = 2) then -- В течение недели
+        КоличествоВПериоде_ = (КоличествоВПериоде - 1);
+        CellPeriod.List.Add('1 раз');
+        CellPeriod.List.Add('2 раза');
+        CellPeriod.List.Add('3 раза');
+        CellPeriod.List.Add('4 раза');
+        CellPeriod.List.Add('5 раз');
+        CellPeriod.List.Add('6 раз');
+        CellPeriod.List.Add('7 раз');
+      elsif (КатегорияПериодичности = 3) then -- В течение месяца
+        КоличествоВПериоде_ = (КоличествоВПериоде - 1);
+        CellPeriod.List.Add('1 раз');
+        CellPeriod.List.Add('2 раза');
+        CellPeriod.List.Add('3 раза');
+        CellPeriod.List.Add('4 раза');
+        CellPeriod.List.Add('5 раз');
+        CellPeriod.List.Add('6 раз');
+        CellPeriod.List.Add('7 раз');
+        CellPeriod.List.Add('8 раз');
+      elsif (КатегорияПериодичности = 4) then -- В течение года
+        КоличествоВПериоде_ = (КоличествоВПериоде - 1);
+        CellPeriod.List.Add('1 раз');
+        CellPeriod.List.Add('2 раза');
+        CellPeriod.List.Add('3 раза');
+        CellPeriod.List.Add('4 раза');
+        CellPeriod.List.Add('5 раз');
+        CellPeriod.List.Add('6 раз');
+        CellPeriod.List.Add('7 раз');
+        CellPeriod.List.Add('8 раз');
+        CellPeriod.List.Add('9 раз');
+        CellPeriod.List.Add('10 раз');
+        CellPeriod.List.Add('11 раз');
+        CellPeriod.List.Add('12 раз');
+      else
+        Message('Недопустимое значение периодичности!');
+        КатегорияПериодичности = 0;
+        CellPeriod.ReadOnly = true;
+      fi;
+    fi;
+    vDescription = РКП_Справочники.BiblioRecord.ПериодичностьВыхода(КоличествоВПериоде_ + 1, КатегорияПериодичности as РКП_Справочники.Def.tPeriodicityCategory);
+    if (Периодичность <> vDescription) then
+      Периодичность = vDescription;
+    fi;
+  end;
+
+
+
+
+
+
+
+
+
+--}
+
+end

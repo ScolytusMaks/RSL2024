@@ -1,0 +1,32 @@
+class inherited RI.Справочники.intBaseType1 'Интерфейс записи (справочник, тип 1)';
+
+inclass public
+
+  func СвязанныйКлассЗаписей: Class BaseRefType1;
+    Result = спрСерияСтатей;
+  end;
+
+  func Create: RI.Справочники.СерияСтатей;
+    Result = inherited Create;
+    Result.Record = спрСерияСтатей.Create;
+  end;
+
+  func ОткрытьПоЗаписи synonym OpenRecord(locRecord: спрСерияСтатей): RI.Справочники.СерияСтатей;
+    Result = inherited Create;
+    Result.Record = locRecord;
+  end;
+
+  func БланкРедакторПоУмолчанию: Class Справочники.editBaseType1;
+    Result = Справочники.редСерияСтатей;
+  end;
+
+  func КартотекаПоУмолчанию: Class Справочники.CardBaseType1;
+    Result = Справочники.картСерияСтатей;
+  end;
+
+inobject public
+
+  Record: спрСерияСтатей;
+
+
+end

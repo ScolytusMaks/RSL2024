@@ -1,0 +1,61 @@
+class "";
+
+inclass public
+
+  proc Создание (ЛГС :TextFile; ЗаписьЛГС :ВыпускЛГС);
+    var k :Integer;
+    var Q :Query;
+    var СтрокаТекста :String;
+    ЛГС.WriteLn("\page");
+    ЛГС.Write  ("\par\pard" + ОригиналМакет.Стиль.styl2 + "\qc ");
+    ЛГС.Write  ("{\b Список газет, материалы из которых отражаются\b0}\line");
+    ЛГС.Write  ("{\b в \'abЛетописи газетных статей\'bb за \b0}");
+    ЛГС.Write  ("{\b " + Str(ЗаписьЛГС.ГодЛетописи) + "\b0}");
+    ЛГС.Write  ("{\b  год\b0}");
+    ЛГС.WriteLn("\ds2");
+    --
+    Q = Query.Create([РКП_Газеты.Газета]);
+    Q.Filter = "РосписьСтатей=true and ПриложениеКГазете=nil";
+    Q.Order  = "НазваниеЛГС";
+    Q.Select;
+    ЛГС.WriteLn ("\par\pard" + ОригиналМакет.Стиль.styl3 + "\ql {");
+    while not Q.Eof do
+      k = k + 1;
+      ЛГС.WriteLn("\tab " + Str(k) + ". ");
+      СтрокаТекста = Trim(Q.Current.НазваниеЛГС);
+      if (Q.Current.Подзаголовок <> nil) then
+        СтрокаТекста = СтрокаТекста + " : " + Trim(Q.Current.Подзаголовок);
+        if (SubStr(СтрокаТекста, Length(СтрокаТекста), 1) <> ".") then
+          СтрокаТекста = СтрокаТекста + ".";
+        fi;
+      else
+        if (SubStr(СтрокаТекста, Length(СтрокаТекста), 1) <> ".") then
+          СтрокаТекста = СтрокаТекста + ".";
+        fi;
+      fi;
+      if (Q.Current.МестаИздания.Count > 0) then
+        if (Q.Current.МестаИздания.Items[1].МестоИздания.НаимБибл <> nil) then
+          СтрокаТекста = СтрокаТекста + " \endash " + " " + Trim(Q.Current.МестаИздания.Items[1].МестоИздания.НаимБибл);
+        else
+          СтрокаТекста = СтрокаТекста + " \endash " + " " + Trim(Q.Current.МестаИздания.Items[1].МестоИздания.Наим) + ".";
+        fi;
+      fi;
+      if (Q.Current.ISSN <> nil) then
+        if Match(Q.Current.ISSN, "????-????") then
+          СтрокаТекста = СтрокаТекста + " \endash  ISSN " + Trim(Q.Current.ISSN);
+        fi;
+      fi;
+      if (SubStr(СтрокаТекста, Length(СтрокаТекста), 1) <> ".") then
+        СтрокаТекста = СтрокаТекста + ".";
+      fi;
+      СтрокаТекста = РКП_Статьи.ОригиналМакет.ОбработкаТекста.ВставкаСпецСимволов(СтрокаТекста);
+      ЛГС.Write(СтрокаТекста);
+      --
+      ЛГС.WriteLn("\par");
+      Q.Next;
+    od;
+    ЛГС.WriteLn("}\pds3");
+  end;
+
+
+end

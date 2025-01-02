@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Properties Version="1"/>
+<Items>
+  <Item Name="спрСерияПриложений"/>
+  <Item Name="Газета"/>
+  <Item Name="Роспись"/>
+  <Item Name="ВыпускЛГС"/>
+  <Item Name="ВыпускПК"/>
+  <Item Name="ПротоколВводаОЛГС"/>
+</Items>

@@ -1,0 +1,197 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Layout Version="7">
+  <Commands/>
+  <Menus>
+    <Menu Name="FMainMenu">
+      <Item Name="File">
+        <Item Command="Kernel.File.Open"/>
+        <Item Command="Kernel.File.OpenInfobase"/>
+        <Item Command="Kernel.File.CloseAll"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.File.Import"/>
+        <Item Command="Kernel.File.Export"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Setup.PrintSetup"/>
+        <Item Command="Kernel.File.PrintPreview"/>
+        <Item Command="Kernel.File.Print"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.File.ClosedDocs"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Service.Quit"/>
+      </Item>
+      <Item Name="Edit">
+        <Item Command="Kernel.Edit.Undo"/>
+        <Item Command="Kernel.Edit.Redo"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Edit.Cut"/>
+        <Item Command="Kernel.Edit.Copy"/>
+        <Item Command="Kernel.Edit.Paste"/>
+        <Item Command="Kernel.Edit.Delete"/>
+        <Item Command="Kernel.Edit.Clipboard"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Find.Find"/>
+        <Item Command="Kernel.Find.FindNext"/>
+        <Item Command="Kernel.Find.Goto"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Setup.FormatSetup"/>
+        <Item Command="Kernel.Edit.Properties"/>
+      </Item>
+      <Item Caption="Справочники">
+        <Item Command="Infobase.РКП.Справочники.География"/>
+        <Item Command="Infobase.РКП.Справочники.АдресРедакции"/>
+        <Item Command="Infobase.РКП.Справочники.ТипУд"/>
+        <Item Command="Infobase.РКП.Справочники.Тематика"/>
+        <Item Command="Infobase.РКП.Справочники.ТерриторияРаспространения"/>
+        <Item Command="Infobase.РКП.Справочники.ЯзыкИздания"/>
+      </Item>
+      <Item Caption="Данные">
+        <Item Command="Infobase.РКП.ОРГП.РеестрГазет"/>
+        <Item Command="Infobase.РКП.ОРГП.ФильтрРеестраГазет"/>
+        <Item Command="Infobase.РКП.ОППИ.Документы.Прием"/>
+      </Item>
+      <Item Caption="Отчеты">
+        <Item Command="Infobase.РКП.ОРГП.Отчеты.ОРаботеОРГП"/>
+        <Item Command="Infobase.РКП.ОППИ.Отчеты.ОРаботеОППИ"/>
+        <Item Command="Infobase.РКП.ОРГП.Отчеты.ПополнениеБД"/>
+        <Item Caption="-"/>
+        <Item Command="Infobase.РКП.ОРГП.Отчеты.БибСправка01"/>
+        <Item Command="Infobase.РКП.ОРГП.Отчеты.БибСправка02"/>
+        <Item Command="Infobase.РКП.ОРГП.Отчеты.ОПоследнемНомере"/>
+        <Item Caption="-"/>
+        <Item Caption="Статистические отчеты">
+          <Item Command="Infobase.РКП.ОРГП.Отчеты.ВыпускПоМИ"/>
+          <Item Command="Infobase.РКП.ОРГП.Отчеты.ВыпускЧАЦН"/>
+          <Item Command="Infobase.РКП.ОРГП.Отчеты.ВыпускПоТем"/>
+          <Item Command="Infobase.РКП.ОРГП.Отчеты.ВыпускПоЯз"/>
+          <Item Command="Infobase.РКП.ОРГП.Отчеты.ВыпускВсехГазет"/>
+          <Item Command="Infobase.РКП.ОРГП.Отчеты.ВыпускПоПер"/>
+          <Item Command="Infobase.РКП.ОРГП.Отчеты.ВыпускПоМИ2"/>
+          <Item Command="Infobase.РКП.ОРГП.Отчеты.ВыпускОНГРФ"/>
+          <Item Command="Infobase.РКП.ОРГП.Отчеты.ВыпускПоТР"/>
+        </Item>
+      </Item>
+      <Item Caption="Экспорт">
+        <Item Command="Infobase.РКП.ОРГП.Экспорт.Газет"/>
+        <Item Command="Infobase.РКП.ОРГП.Экспорт.Номеров"/>
+        <Item Caption="-"/>
+        <Item Command="Infobase.РКП.ОРГП.Экспорт.ЛППИ"/>
+      </Item>
+      <Item Name="Service">
+        <Item Command="Kernel.Service.Administration"/>
+        <Item Caption="-"/>
+        <Item Command="Infobase.РКП.ОРГП.Сервис.УдалениеНулевыхПоступлений"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Service.ImportRec"/>
+        <Item Command="Kernel.Service.ExportRec"/>
+        <Item Command="Kernel.Service.InfobaseExplorer"/>
+        <Item Command="Kernel.Service.HistoryLog"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Setup.Toolbar"/>
+        <Item Command="Kernel.Setup.WindowBar"/>
+        <Item Command="Kernel.Setup.StatusBar"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Service.Calculator"/>
+        <Item Command="Kernel.Service.Calendar"/>
+        <Item Command="Kernel.Service.Messages"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Setup.ProgramSetup"/>
+      </Item>
+      <Item Name="Windows">
+        <Item Command="Kernel.Window.New"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Window.Cascade"/>
+        <Item Command="Kernel.Window.Tile"/>
+        <Item Command="Kernel.Window.TileTwo"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Window.Next"/>
+        <Item Command="Kernel.Window.Prev"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Window.Close"/>
+        <Item Command="Kernel.Window.CloseAll"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Window.Select"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Window.List"/>
+      </Item>
+      <Item Name="Help">
+        <Item Command="Kernel.Help.About"/>
+      </Item>
+    </Menu>
+  </Menus>
+  <Toolbars>
+    <FixedToolbars>
+      <Toolbar>
+        <Button Command="Infobase.РКП.ОРГП.РеестрГазет"/>
+        <Button Command="Infobase.РКП.ОРГП.ФильтрРеестраГазет"/>
+        <Divider/>
+        <Button Command="Kernel.Find.Find"/>
+        <Divider/>
+        <Button Command="Kernel.Card.Run.PrevRec"/>
+        <Button Command="Kernel.Card.Run.NextRec"/>
+        <Divider/>
+        <Button Command="Kernel.Card.Run.Post"/>
+        <Divider/>
+        <Button Command="Kernel.Edit.Copy"/>
+        <Button Command="Kernel.Edit.Cut"/>
+        <Button Command="Kernel.Edit.Undo"/>
+        <Divider/>
+        <Button Command="Kernel.File.PrintPreview"/>
+        <Divider/>
+        <Button Command="Kernel.View.Scale"/>
+      </Toolbar>
+      <Toolbar>
+        <Button Command="Infobase.РКП.ОППИ.Документы.Прием"/>
+        <Button Command="Kernel.Service.Quit"/>
+        <Divider/>
+        <Button Command="Kernel.Find.FindNext"/>
+        <Divider/>
+        <Button Command="Kernel.Card.Run.FirstRec"/>
+        <Button Command="Kernel.Card.Run.LastRec"/>
+        <Divider/>
+        <Button Command="Kernel.Card.Run.Cancel"/>
+        <Divider/>
+        <Button Command="Kernel.Edit.Paste"/>
+        <Button Command="Kernel.Edit.Delete"/>
+        <Button Command="Kernel.Edit.Redo"/>
+        <Divider/>
+        <Button Command="Kernel.File.Print"/>
+        <Divider/>
+        <Button Command="Kernel.Service.Calendar"/>
+        <Button Command="Kernel.Service.Calculator"/>
+      </Toolbar>
+    </FixedToolbars>
+    <ScrollToolbars>
+      <Toolbar Name="Справочники">
+        <Button Command="Infobase.РКП.Справочники.География"/>
+        <Button Command="Infobase.РКП.Справочники.АдресРедакции"/>
+        <Button Command="Infobase.РКП.Справочники.Тематика"/>
+        <Button Command="Infobase.РКП.Справочники.ЯзыкИздания"/>
+      </Toolbar>
+      <Toolbar Name="Отчеты">
+        <Button Command="Infobase.РКП.ОРГП.Отчеты.ВыпускПоМИ"/>
+        <Button Command="Infobase.РКП.ОРГП.Отчеты.ВыпускЧАЦН"/>
+        <Button Command="Infobase.РКП.ОРГП.Отчеты.ВыпускПоТем"/>
+        <Button Command="Infobase.РКП.ОРГП.Отчеты.ВыпускПоЯз"/>
+        <Button Command="Infobase.РКП.ОРГП.Отчеты.ВыпускВсехГазет"/>
+        <Button Command="Infobase.РКП.ОРГП.Отчеты.ВыпускПоПер"/>
+        <Button Command="Infobase.РКП.ОРГП.Отчеты.ВыпускПоМИ2"/>
+        <Button Command="Infobase.РКП.ОРГП.Отчеты.ВыпускОНГРФ"/>
+        <Button Command="Infobase.РКП.ОРГП.Отчеты.ВыпускПоТР"/>
+        <Divider/>
+        <Button Command="Infobase.РКП.ОРГП.Отчеты.БибСправка01"/>
+        <Button Command="Infobase.РКП.ОРГП.Отчеты.БибСправка02"/>
+        <Button Command="Infobase.РКП.ОРГП.Отчеты.ОПоследнемНомере"/>
+        <Button Command="Infobase.РКП.ОРГП.Отчеты.ПополнениеБД"/>
+        <Button Command="Infobase.РКП.ОРГП.Отчеты.ОРаботеОРГП"/>
+        <Button Command="Infobase.РКП.ОППИ.Отчеты.ОРаботеОППИ"/>
+      </Toolbar>
+      <Toolbar Name="Экспорт">
+        <Button Command="Infobase.РКП.ОРГП.Экспорт.Газет"/>
+        <Button Command="Infobase.РКП.ОРГП.Экспорт.Номеров"/>
+        <Divider/>
+        <Button Command="Infobase.РКП.ОРГП.Экспорт.ЛППИ"/>
+      </Toolbar>
+    </ScrollToolbars>
+  </Toolbars>
+  <Keyboards/>
+</Layout>

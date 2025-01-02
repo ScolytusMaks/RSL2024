@@ -1,0 +1,27 @@
+Class "Процедуры автозапуска при старте сессии";
+
+  Import СИС2 Classes Переменные;
+
+InClass Public
+
+  proc АвтозапускДоСчитыванияНастроек;
+  var Rec:record;
+    if ПроцессЗагрузкиПрерван then
+      return;
+    end;
+    --ИконкаПрограммы = BaseInfo.ProjectByName[ClassProject].Folder + 'Приложения\Контроль.ico';
+    --Управление.Старт.АвтозапускДоСчитыванияНастроек;
+      --if РКП_Статьи.Статьи.картРоспись.Evaluate.Visible = false        then
+        РКП_Статьи.Статьи.картРосписьСтатей.ShowFormEx(Rec,"",Window.ChildWindow);
+      --end;
+  end;
+
+
+  proc АвтозапускПослеСчитыванияНастроек;
+    if ПроцессЗагрузкиПрерван then
+      return;
+    end;
+  end;
+
+
+End

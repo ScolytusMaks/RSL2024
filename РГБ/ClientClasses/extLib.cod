@@ -1,0 +1,19 @@
+extends ћашина–еквизитов.Ѕиблио "";
+
+inclass public
+
+  -- ќтмена регистрации схемы доступа, зарегистрированной ранее в других проектах
+  proc ”далить—хемуƒоступа( const aProjectName :String; const aName :String);
+    var locShemaName :String;
+    var Index :Integer;
+    locShemaName = aProjectName + '.' + aName;
+    Index = SearchInArray(—хемыƒоступа, locShemaName);
+    if (Index > 0) then
+      DeleteFromArray(—хемыƒоступа, Index);
+      DeleteFromArray(ќписани€—хемƒоступа, Index);
+      DeleteFromArray(‘айлы»нтерфейсов, Index);
+    fi;
+  end;
+
+
+end

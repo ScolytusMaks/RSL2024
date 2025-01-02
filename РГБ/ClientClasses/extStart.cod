@@ -1,0 +1,17 @@
+extends Ѕазовый.—тарт "";
+
+inclass public
+
+  proc јвтозапускѕосле—читывани€Ќастроек;
+    var shiName :String;
+    extended јвтозапускѕосле—читывани€Ќастроек;
+    with ћашина–еквизитов.”правлениеƒоступом.интѕраваѕользовател€.OpenRecord(SessionInfo.RoleRecord) do
+      shiName = »м€»нтерфейсной—хемы»з–оли;
+    end;
+    if (shiName <> nil) then
+      LoadInterfaceSchema('%Projects%\–√Ѕ\Interfaces\' + ExtractWord(shiName, 2) + '.shi');
+    fi;
+  end;
+
+
+end

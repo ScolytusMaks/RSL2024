@@ -1,0 +1,51 @@
+class inherited РКП_СИС.RI.intBase "";
+
+import РКП_СИС Classes Functions, StringsFunctions, Recs, FilterMaker;
+
+inclass public
+
+  var ТекстРодительный :String = 'записи';
+
+
+inclass public
+
+  func СвязанныйКлассЗаписей: Class СИС2.Базовая.БазоваяЗапись;
+    Result = РКП_Газеты.ПротоколВводаОРГП;
+  end;
+
+  func Create: RI.ПротоколВводаОРГП;
+    Result = inherited Create;
+    Result.Record = РКП_Газеты.ПротоколВводаОРГП.Create;
+  end;
+
+  func ОткрытьПоЗаписи synonym OpenRecord(aRec :РКП_Газеты.ПротоколВводаОРГП): РКП_Газеты.RI.ПротоколВводаОРГП;
+    Result = inherited Create;
+    Result.Record = aRec;
+  end;
+
+
+  func БланкРедакторПоУмолчанию: Class BlankForm;
+    Result = РКП_Газеты.УчетГазет.Отчеты.редПротоколВводаОРГП;
+  end;
+
+  func КартотекаПоУмолчанию: Class CardForm;
+    Result = РКП_Газеты.УчетГазет.Отчеты.картПротоколВводаОРГП;
+  end;
+
+inobject public
+
+  Record: РКП_Газеты.ПротоколВводаОРГП;
+
+  proc ИнициализироватьПоУмолчанию synonym InitByDefault;
+    Init;
+  end;
+
+  proc Инициализировать synonym Init;
+    Assert(Record.State = Kernel.Record.Created);
+  end;
+
+inobject public
+
+
+
+end

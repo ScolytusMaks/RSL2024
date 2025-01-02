@@ -1,0 +1,51 @@
+class inherited Справочники.FalseCardType2 "Жанры";
+
+import РКП_СИС Classes StringsFunctions, Functions, Recs, FilterMaker;
+import Classes Def;
+
+
+--{{ 2_Свойства
+
+inclass private
+
+  var КлассИнтерфейса :Class RI.Справочники.Жанр := RI.Справочники.Жанр;
+
+inobject private
+
+  var SelectedRecord :спрЖанр; -- Проброс выбранного значения
+
+--}}
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+-- 2_Вспомогательные методы0. --
+
+  proc ИнициализироватьСтолбцыКартотеки;
+    inherited ИнициализироватьСтолбцыКартотеки;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'Наим';
+      Caption = 'Наименование';
+      FieldType = Template.StringField;
+      Alignment = Template.LeftAlign;
+      Font.Size = crdBuiltIn.Font.Size;
+      MinWidth = 100;
+      Width = 0;
+      CanEdit = false;
+    end;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'НеПрименяется';
+      Caption = 'Не применяется';
+      Hint = 'Более не применяется';
+      FieldType = Template.LogicalField;
+      Alignment = Template.CenterAlign;
+      MinWidth = 160;
+      Width = 160;
+      Visible = false;
+      CanEdit = false;
+    end;
+  end;
+
+
+end

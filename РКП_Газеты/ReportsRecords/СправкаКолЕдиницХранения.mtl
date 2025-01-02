@@ -1,0 +1,29 @@
+  -- Справка о пополнении базы данных - V1 --
+
+record СправкаКолЕдиницХранения inherited РКП_СИС.AbstractRecord.StoredReport title "Справка о пополнении БД - v1";
+  struct Позиции array Integer title "Позиции";  -- структура может содержать различное наполнение
+    field Газета            :Газета         title "Газета";
+    field Издание           :String         title "Газета";
+    field ЕдиницХранения    :Integer        title "Введено номеров газет";
+    field НомераГазет       :String(8000)   title "Номера газет";
+    field КолГазет          :Integer        title "Количество номеров газет";
+  end;
+  field ВсегоЕдиницХранения :Integer        title "Всего введено номеров газет";
+  field ВсегоЕдиницИзданий  :Integer        title "Всего редактировано газет";
+end;
+
+-- Справка о пополнении базы данных - V2 --
+
+record СправкаПополненияБД inherited РКП_СИС.AbstractRecord.StoredReport title "Справка о пополнении БД";
+  field ВсегоЕдиницХранения :Integer        title "Всего введено номеров газет";
+  field ВсегоЕдиницИзданий  :Integer        title "Всего редактировано газет";
+end;
+
+record ПозицияПополненияБД inherited СИС2.Базовая.БазоваяЗапись title "Позиция справки о пополнении БД";
+  field Справка        :СправкаПополненияБД title "Справка";
+  field Газета         :Газета              title "Газета";
+  field Наименование   :String              title "Наименование издания";
+  field НомераГазет    :String(8000)        title "Номера газет";
+  field ЕдиницХранения :Integer             title "Принято на хранение номеров газет";
+  Indexed By Справка;
+end;

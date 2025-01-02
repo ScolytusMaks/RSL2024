@@ -1,0 +1,349 @@
+class inherited СИС2.картБазовая "Номера газет";
+Import СИС2           Classes Константы;
+--Import РКП_СИС        Classes КодСортировки;
+--Import РКП_Газеты     Classes ОбработкаИстории;
+Import РКП_СИС        Classes StdCode;
+
+inclass Private
+
+
+inobject Private
+
+ГодВыпуска_     : integer;
+Газета_         : record;
+UserName_       : string;--имя пользователя
+
+  func ПроверитьУникальность(R:record): Logical;
+    var РезультатПроверки       : Logical;
+    var Q                       : Query;
+    var ТекстСообщения          : String;
+    --Проверка на наличие в БД такого же номера с определением - какой отдел ввел
+    if R.ЛожныйНомер=false                                      then
+    if Pos("ненум",R.Номер)=0                                   and
+      R.Номер<>""                                               and
+      R.ЛожныйНомер=false                                       then--добавлено 22.06.2009
+      РезультатПроверки                 = false;
+      Q                                 = Query.Create([РКП_Газеты.НомерГазеты]);
+      Q.Filter                          = "Газета ="+Str(R.Газета)+" and "+
+                                          "ГодВыпуска="+Str(R.ГодВыпуска)+" and "+
+                                          "СерияНумерации="+Str(R.СерияНумерации)+" and "+
+                                          "Номер='"+R.Номер+"'"+" and "+
+                                          "ЛожныйНомер=false"+" and "+ --добавлено 22.06.2009
+                                          "DocId<>"+Str(R.DocId);
+      Q.Filter                          = '('+Q.Filter+') and not(СозданОЛГС and НеПолучен)';--добавлено 16.11.2009
+
+      Q.LoadingFieldsMode               = mdNone;
+      Q.Select;
+      if Q.Count > 0                                            then
+        Q.First;
+        РезультатПроверки               = true;
+        if R.СерияНумерации=0                                   then
+          ТекстСообщения                = R.Номер+" ("+Str(R.ГодВыпуска)+")";
+        else--СерияНумерации>0
+          ТекстСообщения                = R.Номер+"["+Str(R.СерияНумерации)+"] ("+Str(R.ГодВыпуска)+")";
+        end;
+        if Q.Current.СозданОЛГС = true                          then
+          ТекстСообщения                = ТекстСообщения+"[Л Г С]";
+        end;
+        if Q.Current.ДатаПринятияНаХранение<>nil                then
+          ТекстСообщения                = "Номер газеты "+
+                                          ТекстСообщения+
+                                          " был внесен в базу данных ранее ("+
+                                          Str(Q.Current.ДатаПринятияНаХранение)+
+                                          ").";
+        else
+          ТекстСообщения                = "Номер газеты "+
+                                          ТекстСообщения+
+                                          " был внесен в базу данных ранее.";
+        end;
+      end;
+      Q.Close;
+    end;
+    end;
+    if  РезультатПроверки = true        then
+      Message(ТекстСообщения);
+    end;
+    Return РезультатПроверки;
+  end;
+
+  proc УдалениеИстории(Rec:record);
+    var Q               : Query;
+    var k               : integer;
+    Q                   = Query.Create([РКП_Газеты.ИсторияГазеты]);
+    Q.Filter            = "СНомера="+Str(Rec);
+    Q.IncludeDeleted    = true;
+    Q.Select;
+    BeginTransaction([РКП_Газеты.ИсторияГазеты]);
+    Q.First;
+    for k = 1..Q.Count                  do
+      if Q.Current.Deleted=false        then
+        Q.Current.Delete;
+      end;
+      Q.Next;
+    end;
+    EndTransaction;
+    Q.Close;
+  end;
+
+
+--{ Обработчики событий картотеки
+  proc ЦветПоляПриРедактированииВКлетке(Column :CardfileColumn; Rec :Record;
+                                  Selected :Logical; var Color :Integer;
+                                  Font :Font);
+    -- Изменить цвет фона или шрифт при отрисовке ячейки
+    var R, G, B: Integer;
+    var C:Integer;
+        if CardFile.CanEdit=true then
+          R = 150;      G = 150;      B = 150;      C = R + G*256 + B*256*256;
+          Font.color = C;
+        else
+          R = 0;      G = 0;      B = 0;            C = R + G*256 + B*256*256;
+          Font.color = C;
+        end;
+  end;
+
+  proc CardOnDrawRow(Rec :Record; Selected :Logical; var Color :Integer;Image :Image);
+    if Rec.СозданОЛГС=true                              then
+      Image.LoadFromFile("%Projects%\РКП_СИС\Icons\ЛистBl.ico");
+    elsif Rec.ПрекращениеИздания=true                      then
+      Image.LoadFromFile("%Projects%\РКП_СИС\Icons\ЛистB.ico");
+    else
+      Image.LoadFromFile("%Projects%\РКП_СИС\Icons\ЛистDef.ico");
+    end;
+  end;
+
+  proc кнРедактировать1_ПриНажатии(Sender :Button);
+    if CardFile.CanEdit=false                   then
+      CardFile.CanEdit=true;
+      CardFile.Update;
+      кнРедактировать.Enabled=false;
+    else
+      CardFile.CanEdit=false;
+      CardFile.Update;
+      кнРедактировать.Enabled=true;
+    end;
+    if (CardFile.Current.State = Record.Edited)  or
+       (CardFile.Current.State = Record.Created) then
+      CardFile.Current.Post;
+    end;
+  end;
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+  var r:Variant;
+  var flt,sr,НазваниеГазеты,ГодВыпуска:string;
+  var Q:Query;
+    inherited шаблон_ПриОткрытии(Create);
+    ГодВыпуска_=nil;
+    Газета_    =nil;
+    flt         =CardFile.Filter;
+    if flt<>'' then
+      sr          = SubStr(flt, Pos(":",flt)+1,Pos("}",flt)-Pos(":",flt)-1);
+      Q  = Query.Create([РКП_Газеты.Газета]);
+      if sr <> nil then
+        Q.Filter    = "DocID="+sr;
+      fi;
+      Q.LoadingFields       = "DocID";
+      Q.Select;
+      if Q.Count>0 then
+        r=Q.Current;
+      end;
+      q.Close;
+      if r<>nil then
+        Газета_=r;
+        НазваниеГазеты=r.НазваниеОсн;
+        if Length(НазваниеГазеты)>20 then
+          НазваниеГазеты=SubStr(НазваниеГазеты,1,20)+'... ';
+        end;
+      end;
+      ГодВыпуска_=Int(SubStr(flt,Pos("ГодВыпуска=",flt)+11,4));
+      ГодВыпуска= " ["+SubStr(flt,Pos("ГодВыпуска=",flt)+11,4)+"] ";
+      if          Pos("and НеПолучен=false",      flt) > 0 then
+        Window.Caption = НазваниеГазеты+ГодВыпуска+":  полученные номера";
+      elsif       Pos("and НеПолучен=true" ,      flt) > 0 then
+        Window.Caption = НазваниеГазеты+ГодВыпуска+" : не полученные номера";
+      elsif       Pos("and (СозданОЛГС=true" ,      flt) > 0 then
+        Window.Caption = НазваниеГазеты+ГодВыпуска+" : номера, обработанные сектором ЛГС";
+      else
+        Window.Caption = НазваниеГазеты+ГодВыпуска+" : все номера";
+      end;
+    end;
+    UserName_ = "";
+    if  SessionInfo.UserRecord  <>nil                           then
+      UserName_ = SessionInfo.UserRecord.Name;
+    else
+      UserName_ = "";
+    end;
+    if UserName_ = ""                                           then
+     try
+      UserName_ = SessionInfo.UserName;
+     except
+     end;
+    end;
+  end;
+
+  func СтлбПриПроверке(Column :CardfileColumn; Rec :Record; var Value :Variant) :Logical;
+    var OldValue:string;
+    if   Value<>""                              then
+      Value     = FixCode10(Value);
+    else
+      if Column.FieldName ="Номер"              then
+        Value   = UnnumberedIssue;
+      end;
+    end;
+    if    Column.FieldName ="Номер"             then
+      OldValue=Rec.Номер;
+        if   Value<>Rec.Номер                   then  
+          Rec.Номер         = Value; 
+      end;
+    elsif Column.FieldName ="ВаловыйНомер"      then
+      if   Value<>Rec.ВаловыйНомер              then  
+        Rec.ВаловыйНомер  = Value; 
+      end;
+    end;
+    --Проверка на уникальность
+    Result = not ПроверитьУникальность(Rec);
+    if not Result then
+      Rec.Номер           = OldValue;
+    end;
+  end;
+
+
+  proc шаблон_ПриЗакрытии(Destroy :Logical);
+    var flt             : string;
+    var фГодВыпуска     : integer;
+    flt                 = CardFile.Filter;
+    if (flt <> nil) then
+      фГодВыпуска         = Int(SubStr(flt, Pos("=",flt)+1,4));  --вычисление года выпуска
+      Сервис.ОбработкаСтатистикиПоступлений(flt,фГодВыпуска);
+    fi;
+  end;
+
+  func КартПриСозданииЗаписи(var Record :Record) :Logical;
+    var Решение         : integer;
+    var BlankForEdit    : BlankForm;
+    var TemplateRec     : Record;
+    Решение                             = EnqYesNoCancel('Ввести номера списком?');
+    if    Решение = CmYes               then
+      if cardfile.Current<>nil          then
+        BlankForEdit                    = РКП_Газеты.УчетГазет.блВводНомеровСписком.Create;
+        TemplateRec                     = cardfile.Current;
+        BlankForEdit.ЗаписьИздания      = TemplateRec.Газета;
+        BlankForEdit.Издание            = TemplateRec.Газета.НазваниеОсн;
+        BlankForEdit.ГодВыпуска         = TemplateRec.ГодВыпуска;
+        BlankForEdit.ПринялНаХранение   = UserName_;
+        #NoWarning;
+        BlankForEdit.ShowEx(nil,Window.ModalWindow);
+      else
+        if Газета_<>nil                 then
+        BlankForEdit                    = РКП_Газеты.УчетГазет.блВводНомеровСписком.Create;
+        BlankForEdit.ЗаписьИздания      = Газета_;
+        BlankForEdit.Издание            = Газета_.НазваниеОсн;
+        BlankForEdit.ГодВыпуска         = ГодВыпуска_;
+        BlankForEdit.ПринялНаХранение   = UserName_;
+        #NoWarning;
+        BlankForEdit.ShowEx(nil,Window.ModalWindow);
+        else
+        Message("Пожалуста, попробуйте ввести первый номер без использования списка ввода!");
+        end;
+      end;
+      Return false;
+    elsif Решение = CmNo                then
+      BlankForEdit                      = РКП_Газеты.УчетГазет.редНомерГазеты.Create;
+      Record                            = РКП_Газеты.НомерГазеты.Create;
+      Record.Газета                     = Газета_;     --cardfile.Current.Газета;
+      Record.ГодВыпуска                 = ГодВыпуска_; --cardfile.Current.ГодВыпуска;
+      BlankForEdit.ShowEx(Record,Window.ModalWindow);
+      Return false;
+    else
+      Return false;
+    end;
+  end;
+
+  func ТиражПриПроверке(Column :CardfileColumn; Rec :Record; var Value :Variant):Logical;
+    if Value < 1                then
+      if Rec.НеПолучен = false  then
+        Message("Нулевой тираж возможен только у не поступивших номеров!");
+        Return false;
+      end;
+    end;
+    Return True;
+  end;
+
+  func НеПолученПриПроверке(Column :CardfileColumn; Rec :Record;var Value :Variant) :Logical;
+  var Тираж_,Решение            : Integer;
+  Result=true;
+    if Value = false                            then
+      if Rec.Тираж = 0                          then
+        Решение                         = Input(Тираж_,"Введите тираж выпуска") ;
+        if Решение = cmOk                       then
+          Rec.Тираж                     = Тираж_;
+          Rec.ДатаПринятияНаХранение    = today;
+          Rec.ПринялНаХранение          = UserName_;
+        else
+          Message("Нулевой тираж возможен только у не поступивших номеров!");
+          Result=false;
+        end;
+      else
+        Rec.ДатаПринятияНаХранение      = today;
+        Rec.ПринялНаХранение            = UserName_;
+      end;
+    end;
+  end;
+
+  func ДатаВыходаПриПроверке(Column :CardfileColumn; Rec :Record;var Value :Variant) :Logical;
+    if Value<>nil                       then
+      if Year(Value)<>Rec.ГодВыпуска    then
+          Message("Дата выхода номера должна лежать в пределах "+Str(Rec.ГодВыпуска)+" года!");
+          Return false;
+          Message("Дата выхода номера "+Rec.Номер+" не лежит в пределах "+Str(Rec.ГодВыпуска)+" года!");
+          Return true;
+      end;
+    end;
+    Result = True;   
+  end;
+
+  proc кнРедактировать_ПриНажатии(Sender :Button);
+    inherited кнРедактировать_ПриНажатии(Sender);
+  if  CardFile.Current<>nil                     then
+    if (CardFile.Current.State = Record.Edited) or
+       (CardFile.Current.State = Record.Created)then
+      CardFile.Current.Post;
+    end;
+  end;
+  end;
+
+  proc кнЗакрыть_ПриНажатии(Sender :Button);
+  if CardFile.Current<>nil                      then
+    if (CardFile.Current.State = Record.Edited)  or
+       (CardFile.Current.State = Record.Created) then
+      CardFile.Current.Post;
+    end;
+  end;
+    inherited кнЗакрыть_ПриНажатии(Sender);
+  end;
+
+  func КартПередИзменением(Action :Cardfile.ModifyActions; Record :Record;Group :Record; var AskConfirm :Logical) :Logical;
+  var k : integer;
+    if Record<>nil                                      then
+      if Action = 0                                     then    --реакция на удаление
+        if   Cardfile.SelectedCount=0                   then    --удаляется текущая запись
+          УдалениеИстории(Record);
+        else                                                    --удаляется группа записей
+          for k = 1..Cardfile.SelectedCount             do
+            УдалениеИстории(Cardfile.Selected[k]);
+          end;
+        end;
+      end;
+    end;
+    Result = True;   
+  end;
+
+
+  func Поле1ПриВыводе(Column :CardfileColumn; Rec :Record; Action :Template.OutputTypes; var Format :String) :Variant;
+    if Trim(Rec.GetField('Номер') as string) = '20' then
+      Return 9;
+    fi;
+  end;
+
+
+end

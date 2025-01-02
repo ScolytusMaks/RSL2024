@@ -1,0 +1,12 @@
+Class inherited Справочники.editBaseType1 "Серия статей" , editor спрСерияСтатей;
+
+
+--{{ 2_Свойства
+inobject private
+
+  var Интерфейс :RI.Справочники.СерияСтатей;
+
+--}}
+
+
+end

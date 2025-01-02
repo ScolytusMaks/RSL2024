@@ -1,0 +1,198 @@
+Class inherited МашинаРеквизитов.Базовые.блРедакторСИнтерфейсом "Выпуск издания в течение года" , editor ВыпускГазеты;
+
+import РКП_СИС classes Profile, Def, StringsFunctions, StdCode, Recs, Functions, FilterMaker;
+import classes Константы;
+
+inclass public
+
+inobject private
+
+--{{ 2_Свойства
+
+  var aDigitChar :String[] := ['0','1','2','3','4','5','6','7','8','9'];
+  var секцГодВыпуска1 :TemplateSection;
+  var секцГодВыпуска2 :TemplateSection;
+  var секцГодВыпуска3 :TemplateSection;
+  var фреймВводимыеДанные :TemplateFrame;
+  var фреймРасчетныеДанные :TemplateFrame;
+
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inclass public
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+  func шаблон_ПриПроверке :Logical;
+    var vRec :РКП_Газеты.ВыпускГазеты;
+    Result = inherited шаблон_ПриПроверке;
+    if (Газета <> nil) and (ГодВыпуска <> nil) then
+      vRec = FindRecord(РКП_Газеты.ВыпускГазеты, 'Газета=' + Газета.DocIDStr + ' and ГодВыпуска=' + Str(ГодВыпуска) + ' and DocId<>' + Str(DocId));
+      Result = (vRec = nil);
+      if (not Result) then
+        Message('Год выпуска ' + Str(ГодВыпуска) + ' уже сохранена в базе данных!');
+      fi;
+    else
+      Result = false;
+      Message('Не заполнены поля "Газета" или "Год выпуска"!');
+    fi;
+  end;
+
+
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func Поле_ПриВыводе_ЗаголовокОкнаФормы(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    if (Газета <> nil) then
+      Result = Газета.НазваниеОсн;
+      if not (Self.Record.State in [Kernel.Record.Created,Kernel.Record.Duplicated]) then
+        Result = Result + Br + '<s+><s+>' + Str(ГодВыпуска);
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриВыводе_Формат(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    var Res, Smb :String;
+    var p :Integer;
+    var part2 :Logical;
+    if (Cell.Contents = 'A') then
+      for p = 1 .. Length(ФорматВыпуска) do
+        Smb = SubStr(ФорматВыпуска, p, 1);
+        if SmbIsDigit(Smb) then
+          Res = Res + Smb;
+        else
+          Break;
+        fi;
+      od;
+      if (Res <> nil) then
+        Return Int(Round(Res));
+      else
+        Return 0;
+      fi;
+    elsif (Cell.Contents = 'B') then
+      for p = 1 .. Length(ФорматВыпуска) do
+        Smb = SubStr(ФорматВыпуска, p, 1);
+        if part2 and SmbIsDigit(Smb) then
+          Res = Res + Smb;
+        fi;
+        if (not part2) and (not SmbIsDigit(Smb)) then
+          part2 = true;
+        fi;
+      od;
+      if (Res <> nil) then
+        Return Int(Round(Res));
+      else
+        Return 0;
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриВходе_Формат(Cell :TemplateCell; Index :Integer; Action :Template.EnterTypes) :Logical;
+    var p, pp :Integer;
+    var Smb :String;
+    if (Cell.Contents = 'A') and (Action = Template.Clear) then
+      pp = Length(ФорматВыпуска);
+      for p = 1 .. pp do
+        Smb = SubStr(ФорматВыпуска, p, 1);
+        if not SmbIsDigit(Smb) then
+          Break;
+        fi;
+      od;
+      ФорматВыпуска = SubStr(ФорматВыпуска, p);
+      ПроверитьДанныеФормата;
+    elsif (Cell.Contents = 'A') and (Action <> Template.Clear) then
+      Return true;
+    elsif (Cell.Contents = 'B') and (Action = Template.Clear) then
+      pp = Length(ФорматВыпуска);
+      for p = pp .. 1 step -1 do
+        Smb = SubStr(ФорматВыпуска, p, 1);
+        if not SmbIsDigit(Smb) then
+          Break;
+        fi;
+      od;
+      ФорматВыпуска = SubStr(ФорматВыпуска, 1, p);
+      ПроверитьДанныеФормата;
+    elsif (Cell.Contents = 'B') and (Action <> Template.Clear) then
+      Return true;
+    fi;
+  end;
+
+  func Поле_ПриПроверке_Формат(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    Result = Value is Integer;
+    if not Result then
+      Message('Введенное значение должно быть целым положительным числом!');
+    else
+      if (Value as Integer) < 1 then
+        Result = false;
+        Message('Введенное значение должно быть целым положительным числом!');
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриВводе_Формат(Cell :TemplateCell; Value :Variant) :Logical;
+    if (Cell.Contents = 'A') then
+      ФорматВыпуска = Str(Value) + 'X' + Str(фреймВводимыеДанные.CellByField['B'].Text);
+    elsif (Cell.Contents = 'B') then
+      ФорматВыпуска = Str(фреймВводимыеДанные.CellByField['A'].Text) + 'X' + Str(Value);
+    fi;
+  end;
+
+  proc Поле_ПриВыходе(Cell :TemplateCell; Index :Integer);
+    if (Cell.Contents = 'ГодВыпуска')      then  фреймВводимыеДанные.CellByField['A'].SetFocus;
+    elsif (Cell.Contents = 'ШифрХранения') then  фреймВводимыеДанные.CellByField['A'].SetFocus;
+    elsif (Cell.Contents = 'A')            then  фреймВводимыеДанные.CellByField['B'].SetFocus;
+    elsif (Cell.Contents = 'B')            then  фреймВводимыеДанные.CellByField['ЧислоПолос'].SetFocus;
+    elsif (Cell.Contents = 'ЧислоПолос')   then  фреймВводимыеДанные.CellByField['Комментарий'].SetFocus;
+    fi;
+  end;
+
+
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+
+-- 2_Дополнительные команды0. --
+
+
+-- 2_Вспомогательные методы0. --
+
+  proc МодифицироватьШаблон;
+    if OPPIAccess then
+      секцГодВыпуска1.Visible = (Self.Record.State in [Kernel.Record.Created,Kernel.Record.Duplicated]);
+      секцГодВыпуска2.Visible = false;
+      секцГодВыпуска3.Visible = not секцГодВыпуска2.Visible;
+      секцГодВыпуска3.CellByField['КомплектПолучен'].Enabled = false;
+      фреймВводимыеДанные.Visible = false;
+      фреймРасчетныеДанные.Visible = false;
+    else
+      секцГодВыпуска1.Visible = false;
+      секцГодВыпуска2.Visible = (Self.Record.State in [Kernel.Record.Created,Kernel.Record.Duplicated]);
+      секцГодВыпуска3.Visible = not секцГодВыпуска2.Visible;
+    fi;
+  end;
+
+  func SmbIsDigit(vChar :String) :Logical;
+    Return (vChar in aDigitChar);
+  end;
+
+  proc ПроверитьДанныеФормата;
+    var p :Integer;
+    var Smb :String;
+    var NoDigSmb :Logical;
+    NoDigSmb = true;
+    for p = 1 .. Length(ФорматВыпуска) do
+      Smb = SubStr(ФорматВыпуска, p, 1);
+      if SmbIsDigit(Smb) then
+        NoDigSmb = false;
+        Break;
+      fi;
+    od;
+    if NoDigSmb then
+      ФорматВыпуска = nil;
+    fi;
+  end;
+
+end

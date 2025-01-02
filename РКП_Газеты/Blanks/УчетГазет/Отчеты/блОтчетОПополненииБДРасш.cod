@@ -1,0 +1,300 @@
+--class inherited УчетГазет.Отчеты.блОтчетСтатРГБазовый1 "Отчет о пополнении БД";
+--class inherited УчетГазет.Отчеты.блОтчетСтатРГБазовый3 "Отчет о пополнении БД", editor СправкаКолЕдиницХранения;
+class inherited СИС2.БазовыйБланкРедактор "Отчет о пополнении БД", editor СправкаКолЕдиницХранения;
+inclass
+
+
+inobject
+секцШапка               : Section;
+секцПозиции             : Section;
+секцПозиции_            : Section;
+секцСПО                 : Section;
+секцВарианты            : Section;
+CheckBox1               : CheckBox;
+var Газета_[]           : Record;
+var NomGazet_[]         : string;
+var KolGazet_[]         : integer;
+Nom[]               : Integer;
+
+  func СменаВариантаПериода(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+     if ЗаГод>1801 and ЗаГод<2999 then
+     ЗаДату1                    = false;
+     ЗаДату2                    = false;
+     ЗаДату3                    = false;
+     ЗаДату4                    = false;
+     ЗаДату5                    = false;
+     ЗаДату                     = nil;
+     секцСПО.Row[1].Visible        = false;
+     секцСПО.Row[2].Visible        = false;
+     секцВарианты.CellByField["ЗаДату1"].Font.Bold = false;
+     секцВарианты.CellByField["ЗаДату2"].Font.Bold = false;
+     секцВарианты.CellByField["ЗаДату3"].Font.Bold = false;
+     секцВарианты.CellByField["ЗаДату4"].Font.Bold = false;
+     секцВарианты.CellByField["ЗаДату5"].Font.Bold = false;
+     if         Cell.Contents   = "ЗаДату1"     then
+       ЗаДату                   = 0;
+       ЗаДату1                  = true;
+       секцВарианты.CellByField["ЗаДату1"].Font.Bold = true;
+       ДатаН                    = РКП_СИС.СтандартныйПериод.НачалоГода(today);
+       ДатаК                    = today;
+       ПериодЗапроса            = "в I квартале "+str(ЗаГод)+" г.";
+       ОчиститьРезультатыРасчета;
+     elsif      Cell.Contents = "ЗаДату2"       then
+       ЗаДату                   = 1;
+       ЗаДату2                  = true;
+       секцВарианты.CellByField["ЗаДату2"].Font.Bold = true;
+       ДатаН                    = РКП_СИС.СтандартныйПериод.НачалоМесяца(today);
+       ДатаК                    = today;
+       ПериодЗапроса            = "в I-II квартале "+str(ЗаГод)+" г.";
+       ОчиститьРезультатыРасчета;
+     elsif      Cell.Contents = "ЗаДату3"       then
+       ЗаДату                   = 2;
+       ЗаДату3                  = true;
+       секцВарианты.CellByField["ЗаДату3"].Font.Bold = true;
+       ДатаН                    = РКП_СИС.СтандартныйПериод.НачалоКвартала(today);
+       ДатаК                    = today;
+       ПериодЗапроса            = "в I-III квартале "+str(ЗаГод)+" г.";
+       ОчиститьРезультатыРасчета;
+     elsif      Cell.Contents = "ЗаДату4"       then
+       ЗаДату                   = 3;
+       ЗаДату4                  = true;
+       секцВарианты.CellByField["ЗаДату4"].Font.Bold = true;
+       ДатаН                    = РКП_СИС.СтандартныйПериод.НачалоГода(today);
+       ДатаК                    = today;
+       ПериодЗапроса            = "в "+str(ЗаГод)+" г.";
+       ОчиститьРезультатыРасчета;
+     elsif      Cell.Contents   = "ЗаДату5"     then
+       секцСПО.Row[1].Visible   = true;
+       секцСПО.Row[2].Visible   = true;
+       ЗаДату                   = 4;
+       ЗаДату5                  = true;
+       секцВарианты.CellByField["ЗаДату5"].Font.Bold = true;
+         ДатаН                  = Dat(Day(ДатаН),Mon(ДатаН),ЗаГод);
+         ДатаК                  = Dat(Day(ДатаК),Mon(ДатаК),ЗаГод);
+       ПериодЗапроса            = "с "+str(ДатаН)+" по "+str(ДатаК);
+       ОчиститьРезультатыРасчета;
+     end;
+     else
+     Message("Пожалуста, укажите корректный год запроса!");
+     end;
+    Result = False;
+  end;
+
+  proc ОчиститьРезультатыРасчета;
+      Газета_                                   = nil;
+      секцПозиции_.Count                        = nil;
+      ВсегоЕдиницХранения                       = nil;
+      ВсегоЕдиницИзданий                        = nil;
+      Record.Позиции.Clear;
+      nomgazet_                                 = nil;
+      kolgazet_                                 = nil;
+  end;
+
+--------------------------------------------------------------------------------
+--{ Обработчики событий бланка
+
+  func ПолеГодПриОбзоре(Cell :TemplateCell; Value :Variant; var NewValue :Variant) :Logical;
+    var vYear :Integer;
+    if (CmOk = РКП_СИС.Сервис.блВыборГода.ВыполнитьВыбор(vYear)) then
+    --if  CmOk = OpenBlank("РКП_СИС.Сервис.блВыборГода",Window.ModalWindow) then
+      NewValue     = vYear;
+      ЗаГод        = NewValue;
+      Template.EndEdit(True);
+      --if Value>1901 then
+      --  РКП_СИС.Сервис.блВыборГода.ВыбранныйГод = Value;
+      --else
+      --  РКП_СИС.Сервис.блВыборГода.ВыбранныйГод = Year(Today)-1;
+      --end;
+      if          ЗаДату = 0      then
+        Result = СменаВариантаПериода(секцВарианты.CellByField["ЗаДату1"],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      elsif       ЗаДату = 1      then
+        Result = СменаВариантаПериода(секцВарианты.CellByField["ЗаДату2"],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      elsif       ЗаДату = 2      then
+        Result = СменаВариантаПериода(секцВарианты.CellByField["ЗаДату3"],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      elsif       ЗаДату = 3      then
+        Result = СменаВариантаПериода(секцВарианты.CellByField["ЗаДату4"],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      elsif       ЗаДату = 4      then
+        Result = СменаВариантаПериода(секцВарианты.CellByField["ЗаДату5"],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      else
+        Result = false;
+      end;
+    else
+      Result = false;
+    end;
+  end;
+
+  proc ПолеЗаГодПриВыходе(Cell :TemplateCell; Index :Integer);
+      if          ЗаДату = 0      then
+        СменаВариантаПериода(секцВарианты.CellByField["ЗаДату1"],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      elsif       ЗаДату = 1      then
+        СменаВариантаПериода(секцВарианты.CellByField["ЗаДату2"],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      elsif       ЗаДату = 2      then
+        СменаВариантаПериода(секцВарианты.CellByField["ЗаДату3"],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      elsif       ЗаДату = 3      then
+        СменаВариантаПериода(секцВарианты.CellByField["ЗаДату4"],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      elsif       ЗаДату = 4      then
+        СменаВариантаПериода(секцВарианты.CellByField["ЗаДату5"],Template.ClickTypes(1));
+        ОчиститьРезультатыРасчета;
+      end;
+  end;
+
+
+
+
+  proc ПостроитьОтчет(Sender :Button);
+    var rec             : record;
+    var Q               : query;
+    var k,z             : integer;
+    var val_0,val_1     : record;
+    var nomgazet        : string;
+    var kolgazet        : integer;
+      if (Record.State = Record.Edited)                 or
+         (Record.State = Record.Created)                then
+        Record.Post;
+      end;
+    rec                                         = SessionInfo.UserRecord;
+    if rec <>nil                                        then
+      Библиограф                                = rec.FullName;
+    end;
+    if    ДатаН<>nil                                    and     --проверка корректности условий
+          ДатаК<>nil                                    and
+          ДатаН<=ДатаК                                  then
+      ОчиститьРезультатыРасчета;
+      --анализ номеров
+      --построение списка газет, для которых вводились номера
+      Hint("Открытие запроса к БД...");
+      Q                         = Query.Create([РКП_Газеты.НомерГазеты]);
+      Q.Filter                  = "ФункцияГруппы=0"+
+                                  " and ДатаПринятияНаХранение>="+Str(ДатаН)+
+                                  " and ДатаПринятияНаХранение<"+Str(ДатаК+1)+
+                                  " and ПринялНаХранение<>'Администратор'";
+      Q.LoadingFields           = "Газета";
+      Q.Order                   = "Газета.НазваниеОсн";
+      Q.Select;
+      Q.First;
+      for k =  1..Q.Count               do
+      Hint("Анализ номеров газет...",k,Q.Count);
+        val_1                   = Q.Current.Газета;
+          if val_1<>val_0               or 
+             k=1                        then
+            z                   = z+1;
+            ВсегоЕдиницИзданий  = z;
+            секцПозиции_.InsertFrame(z);
+            InsertInArray(Газета_,z,Q.Current.Газета);
+            if k=1 then
+             nomgazet = trim(str(Q.Current.Номер))+';';
+             kolgazet = 1;
+            else
+             nomgazet = '';
+             kolgazet = 0;
+            end;
+          end;
+        val_0                   = Q.Current.Газета;
+        if k<>1 then
+         nomgazet = nomgazet + trim(str(Q.Current.Номер))+ ';';
+         kolgazet = kolgazet + 1;
+         InsertInArray(nomgazet_,z,nomgazet);
+         InsertInArray(kolgazet_,z,kolgazet);
+        end;
+        Q.Next;
+      end;
+      Hint("Закрытие запроса к БД...");
+      Q.Close;
+--      --расчет--12.01.2009--отказ от построчного расчета
+--      for k =  1..секцПозиции_.Count    do
+--        Hint("Расчет газеты <"+Газета_[k].НазваниеОсн+">",k,секцПозиции_.Count);
+--        Record.Позиции.Add;
+--        Record.Позиции[k].Издание               = Газета_[k].НазваниеОсн+" . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .";
+--        Record.Позиции[k].ЕдиницХранения        = РКП_Газеты.Стат.ПринятоНомеровГазетыЗаПериод(Газета_[k],ДатаН,ДатаК);
+--        ВсегоЕдиницХранения                     = ВсегоЕдиницХранения+Record.Позиции[k].ЕдиницХранения;
+--        Nom[k]                                  = k;
+--      end;
+      --расчет--12.01.2009
+      ВсегоЕдиницХранения                       = РКП_Газеты.Стат.ПринятоНомеровВсегоЗаПериод(ДатаН,ДатаК);
+      if  CmOk=EnqOkCancel("Построить список газет?")           then
+      --сортировка
+--      Hint("Cортировка...");
+--      секцПозиции_.SortBy("Газета_.НазваниеОсн");
+
+      for k =  1..секцПозиции_.Count    do
+        Hint("Расчет газеты <"+Газета_[k].НазваниеОсн+">",k,секцПозиции_.Count);
+        Record.Позиции.Add;
+        Record.Позиции[k].Издание               = Газета_[k].НазваниеОсн;
+        Record.Позиции[k].НомераГазет           = NomGazet_[k];
+        Record.Позиции[k].КолГазет              = KolGazet_[k];
+
+--        Record.Позиции[k].ЕдиницХранения        = РКП_Газеты.Стат.ПринятоНомеровГазетыЗаПериод(Газета_[k],ДатаН,ДатаК);
+--        ВсегоЕдиницХранения                     = ВсегоЕдиницХранения+Record.Позиции[k].ЕдиницХранения;
+        Nom[k]                                  = k;
+      end;
+      end;
+
+
+    else
+      Message("Неверно заданы даты построения отчета!");
+    end;                                        --проверка корректности условий
+  end;
+
+
+  proc шаблон_ПриЗакрытии(Destroy :Logical);
+    inherited шаблон_ПриЗакрытии(Destroy);
+    --self.SaveClass(ИмяФайлаdbt);
+  end;
+
+
+  proc шаблон_ПриСчитывании;
+  var k : integer;
+    inherited шаблон_ПриСчитывании;
+    if Record.State             =  Record.Created then
+      СменаВариантаПериода(секцВарианты.CellByField["ЗаДату5"],Template.SingleClick);
+    end;
+    for k =  1..секцПозиции.Count    do
+      Nom[k]                                  = k;
+    end;
+  end;
+
+
+
+  proc ОписатьПериодЗапроса(Cell :TemplateCell; Index :Integer);
+       ПериодЗапроса            = "с "+str(ДатаН)+" по "+str(ДатаК);
+  end;
+
+
+
+  func FieldNomOnOutput(Cell :TemplateCell; Value :Variant;Action :Template.OutputTypes; var Format :String) :Variant;
+    Result = Slo(Value+1);
+  end;
+
+  proc CheckBox1OnChange(Sender :CheckBox);
+    if sender.state then
+      секцШапка.column[4].visible = true;
+--      секцШапка.column[5].visible = true;
+      секцПозиции.column[4].visible = true;
+--      секцПозиции.column[5].visible = true;
+    else
+      секцШапка.column[4].visible = false;
+--      секцШапка.column[5].visible = false;
+      секцПозиции.column[4].visible = false;
+--      секцПозиции.column[5].visible = false;
+
+    end;
+  end;
+
+  proc BlankOnOpen(Create :Logical);
+    -- Вызывается при открытия окна формы
+    --   Create: True - форма открывается, False - форма восстанавливается при запуске сессии
+  CheckBox1.state = true;
+  end;
+
+--}
+
+end

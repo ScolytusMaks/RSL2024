@@ -1,0 +1,119 @@
+extends МашинаРеквизитов.УправлениеДоступом.блПраваПользователя "";
+import РКП_СИС classes Def, Functions;
+
+inobject private
+
+  proc шаблон_ПриСоздании(Context :Variant);
+    var locSectionCmd, locSectionH, locSectionB :TemplateSection;
+    extended шаблон_ПриСоздании(Context);
+    locSectionCmd = ФреймДоступКЗаписямБД.Section[1];
+    locSectionCmd.InsertRow(2, 2);
+    locSectionCmd.Row[1].AutoHeight = true;
+    locSectionCmd.Row[2].AutoHeight = false;
+    locSectionCmd.Row[2].Height = 0.1;
+    locSectionCmd.Row[3].AutoHeight = true;
+    with locSectionCmd.Cell[2,3] do
+      StaticStyle = Template.StaticButton;
+      Alignment = Template.CenterAlign;
+      Contents = 'По умолчанию';
+      Hint = 'Восстановить значения по умолчанию для выбранных компетенций (РГБ)';
+      OnClick = 'КнопкаДоступПоУмолчанию_ПриНажатии';
+    end;
+    ---
+    locSectionH = ФреймДоступКЗаписямБД.Section[3];
+    locSectionH.Column[1].MaxWidth = locSectionH.Column[1].Width;
+    locSectionH.Column[2].MaxWidth = locSectionH.Column[2].Width;
+    locSectionH.AjustWidth = true;
+    locSectionB = ФреймДоступКЗаписямБД.Section[4];
+    locSectionB.Column[1].MaxWidth = locSectionB.Column[1].Width;
+    locSectionB.Column[2].MaxWidth = locSectionB.Column[2].Width;
+    locSectionB.AjustWidth = true;
+    locSectionB.AjustWidth = true;
+    ---
+    locSectionB = ФреймДоступКЗаписямБД.Section[7];
+    locSectionB.Column[1].MaxWidth = locSectionB.Column[1].Width;
+    locSectionB.Column[2].MaxWidth = locSectionB.Column[2].Width;
+    locSectionB.Column[4].MaxWidth = locSectionB.Column[4].Width;
+    locSectionB.Column[5].MaxWidth = locSectionB.Column[5].Width;
+    locSectionB.Column[5].Visible = false;
+    locSectionB.AjustWidth = true;
+    locSectionB.Cell[2,2].Font.Italic = true;
+    locSectionB.Cell[2,2].Font.Color = СИС2.Константы.clBlue;
+    locSectionH = ФреймДоступКЗаписямБД.Section[6];
+    locSectionH.Column[1].Width = locSectionB.Column[1].Width; locSectionH.Column[1].MaxWidth = locSectionH.Column[1].Width;
+    locSectionH.Column[2].Width = locSectionB.Column[2].Width; locSectionH.Column[2].MaxWidth = locSectionH.Column[2].Width;
+    locSectionH.Column[3].Width = locSectionB.Column[3].Width;
+    locSectionH.Column[4].Width = locSectionB.Column[4].Width; locSectionH.Column[4].MaxWidth = locSectionH.Column[4].Width;
+    locSectionH.InsertColumn(5);
+    locSectionH.Column[5].Width = locSectionB.Column[5].Width; locSectionH.Column[5].MaxWidth = locSectionH.Column[5].Width;
+    locSectionH.Cell[5,1].Border = [1,0,0,0];
+    locSectionH.Column[5].Visible = false;
+    locSectionH.AjustWidth = true;
+  end;
+
+  func ПолеВидыДоступа_ПриВыводе(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :String;
+    if (Интерфейс <> nil) then
+      Result = extended ПолеВидыДоступа_ПриВыводе(Cell, Value, Action, Format);
+    fi;
+  end;
+
+  func КнопкаПроверитьПраваДоступа_ПриНажатии(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    СИС2.Переменные.РежимТестПравДоступа = true;
+    Result = extended КнопкаПроверитьПраваДоступа_ПриНажатии(Cell, Action);
+  end;
+
+  var StoregDefaultAccessRights :String := '%Projects%\РГБ\Attachments\DataAccessRights\';
+
+  func КнопкаДоступПоУмолчанию_ПриНажатии(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var vFile :TextFile;
+    var cLine :String;
+    var локКомпетенции :РКП_СИС.Def.tCompetence[];  -- компетенции, определенные правами доступа
+    var aLineValue :String[];
+    var i :Integer;
+    Интерфейс.Post;
+    РКП_СИС.Recs.RecordModify(Self.Record);
+    Self.Record.ПраваДоступаЗаписей.Clear;
+    локКомпетенции = Интерфейс.ПолучитьКомпетенцииРоли;
+    if (кмпРазработчик in локКомпетенции) then
+      Интерфейс.ПривестиПравоКУмолчанию('Управление.НедоступныПрочиеКлассыЗаписей');
+    elsif (кмпАдминистратор in локКомпетенции) then
+      vFile = TextFile.Create(StoregDefaultAccessRights + 'Администратор.csv', System.fmOpenRead);
+    elsif (кмпРуководитель in локКомпетенции) then
+      vFile = TextFile.Create(StoregDefaultAccessRights + 'Руководитель.csv', System.fmOpenRead);
+    elsif (кмпОРГПзав in локКомпетенции) then
+      vFile = TextFile.Create(StoregDefaultAccessRights + 'ОРГПзав.csv', System.fmOpenRead);
+    elsif (кмпОРГПсотр in локКомпетенции) then
+      vFile = TextFile.Create(StoregDefaultAccessRights + 'ОРГПсотр.csv', System.fmOpenRead);
+    elsif (кмпОППИзав in локКомпетенции) then
+      vFile = TextFile.Create(StoregDefaultAccessRights + 'ОППИзав.csv', System.fmOpenRead);
+    elsif (кмпОППИсотр in локКомпетенции) then
+      vFile = TextFile.Create(StoregDefaultAccessRights + 'ОППИсотр.csv', System.fmOpenRead);
+    elsif (кмпГЛГСзав in локКомпетенции) then
+      vFile = TextFile.Create(StoregDefaultAccessRights + 'ГЛГСзав.csv', System.fmOpenRead);
+    elsif (кмпГЛГСсотр in локКомпетенции) then
+      vFile = TextFile.Create(StoregDefaultAccessRights + 'ГЛГСсотр.csv', System.fmOpenRead);
+    fi;
+    ---
+    if (vFile <> nil) then
+      Интерфейс.УстановитьЗначениеПрава('Управление.НедоступныПрочиеКлассыЗаписей', 1);
+      #NoWarning;
+      vFile.ReadLn;
+      while not vFile.EOF do
+        cLine = vFile.ReadLn;
+        SplitString (cLine, ';', aLineValue);
+        with Self.Record.ПраваДоступаЗаписей.AddEx do
+          ПерекрыватьВышележащие = true;
+          ТипЗаписи = aLineValue[1];
+          try
+          Комментарий = (FindClass(ТипЗаписи) as Class Record).ClassInfo.Description;
+          except
+          end;
+          for  i = 1 .. Length(aLineValue[2]) do
+            ВидыДоступа.Items[ВидыДоступа.Add] = Int(SubStr(aLineValue[2], i, 1));
+          od;
+        end;
+      od;
+    fi;
+  end;
+
+end

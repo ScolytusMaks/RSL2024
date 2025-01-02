@@ -1,0 +1,321 @@
+class inherited Справочники.FalseCardType1 "Адреса редакций";
+
+import РКП_СИС classes Functions, FilterMaker, Recs;
+
+--{{ 2_Свойства
+
+inclass private
+
+  var КлассИнтерфейса :Class RI.Справочники.Редакция := RI.Справочники.Редакция;
+  var LastCurrentGroupGeo :РКП_Справочники.спрГеография;
+
+inobject private
+
+  var crdtreeBuiltIn :CardTree;
+  var SelectedRecord :спрРедакция;
+
+  --stored var ФорматФильтраПоФрагменту :Integer;--0-начало, 1-фрагмент, 2 - точно
+  var ФильтрДереваГео   :String;
+  var ФрагментАдреса1   :String;
+  var ФрагментАдреса2   :String;
+  var ФильтрСправочника :String;
+
+--}}
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриСоздании(Context :Variant);
+    inherited шаблон_ПриСоздании(Context);
+    ИнициализироватьДеревоКартотеки;
+  end;
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    inherited шаблон_ПриОткрытии(Create);
+  end;
+
+  proc шаблон_ПриЗакрытии(Destroy :Logical);
+    inherited шаблон_ПриЗакрытии(Destroy);
+    LastCurrentGroupGeo = crdtreeBuiltIn.CurrentGroup;
+  end;
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func Поле_Фильтр_ПриНажатии (Cell: TemplateCell; Action: Template.ClickTypes): Logical;
+    var r: Integer;
+    if (Cell.Contents = 'ФорматФильтраПоФрагменту') then
+      r = Cell.Row;
+      ФорматФильтраПоФрагменту = (r - 1);
+    else
+      Result = Inherited Поле_Фильтр_ПриНажатии(Cell, Action);
+      Return; -- чтобы не вызывать дважды "ОбновитьФильтр"
+    fi;
+    ОбновитьФильтр;
+  end;
+
+  func Поле_Фильтр_ПриВыводе (Cell: TemplateCell; Value: Variant; Action: Template.OutputTypes; var Format: String): Variant;
+    var r: Integer;
+    if (Cell.Contents = 'ФорматФильтраПоФрагменту') then
+      r = Cell.Row;
+      Cell.Caption = if( (r - 1) = ФорматФильтраПоФрагменту, 'l', '');
+    else
+      Result = Inherited Поле_Фильтр_ПриВыводе(Cell, Value, Action, Format);
+    fi;
+  end;
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+
+  proc кнДобавить_ПриНажатии(Sender :Button);
+    var rAdr, rNewAdr :РКП_Справочники.спрРедакция;
+    var rGeo :РКП_Справочники.СпрГеография;
+    var vEdtFrm :Class BlankForm;
+    rGeo = crdtreeBuiltIn.CurrentGroup; -- Определить, где находится селектор
+    rAdr = crdBuiltIn.Current;
+    if (rAdr = nil) and (rGeo = nil) then -- Если нигде - сообщение
+      Message('Пожалуйста, установите селектор на населенный пункт, в котором находится редакция!');
+    else
+      if (rGeo <> nil) then
+        rNewAdr = РКП_Справочники.СпрРедакция.Create;
+        rNewAdr.НаселенныйПункт = rGeo;
+        rNewAdr.Наим = rGeo.Наим + ', ';
+        vEdtFrm = crdBuiltIn.Editors[1];
+        if CmOk = vEdtFrm.ShowFormEx(rNewAdr, Window.ModalWindow) then
+          crdBuiltIn.Current = rNewAdr;
+          crdBuiltIn.SetFocus;
+        fi;
+      else
+        Message('Пожалуйста, установите селектор на населенный пункт, в котором находится редакция!');
+      fi;
+    fi;
+  end;
+
+  proc кнРедактировать_ПриНажатии(Sender :Button);
+    var rAdr :РКП_Справочники.спрРедакция;
+    var vEdtFrm :Class BlankForm;
+    rAdr = crdBuiltIn.Current;
+    if (rAdr = nil) then
+      Message('Пожалуйста, установите селектор на строку с адресом редакции!');
+    else
+      vEdtFrm = crdBuiltIn.Editors[1];
+      vEdtFrm.ShowFormEx(rAdr, Window.ModalWindow);
+    fi;
+  end;
+
+  proc кнДублировать_ПриНажатии(Sender :Button);
+    var rAdr, rNewAdr :РКП_Справочники.спрРедакция;
+    var vEdtFrm :Class BlankForm;
+    rAdr = crdBuiltIn.Current;
+    if (rAdr = nil) then
+      Message('Пожалуйста, установите селектор на строку с адресом редакции!');
+    else
+      rNewAdr = РКП_Справочники.СпрРедакция.Create;
+      rNewAdr.НаселенныйПункт = rAdr.НаселенныйПункт;
+      rNewAdr.Наим = rAdr.Наим;
+      rNewAdr.Hash = rAdr.Hash;
+      vEdtFrm = crdBuiltIn.Editors[1];
+      if CmOk = vEdtFrm.ShowFormEx(rNewAdr, Window.ModalWindow) then
+        crdBuiltIn.Current = rNewAdr;
+        crdBuiltIn.SetFocus;
+      fi;
+    fi;
+  end;
+
+  proc кнУдалить_ПриНажатии(Sender :Button);
+    var rAdr :РКП_Справочники.спрРедакция;
+    rAdr = crdBuiltIn.Current;
+    if (rAdr = nil) then
+      Message('Пожалуйста, установите селектор на строку с адресом редакции!');
+    else
+      try
+        crdBuiltIn.Delete;
+      except
+        Message('Пожалуйста, повторите попытку удаления! Если запись не удаляется, то, возможно, она используется в базе данных.');
+      end;
+    fi;
+  end;
+
+
+  proc crdtreeBuiltIn_OnMove(Sender :CardTree);
+    var aFlt :String[];
+    if (crdtreeBuiltIn.CurrentGroup <> nil) then
+      AddInArray( aFlt, 'НаселенныйПункт=' + crdtreeBuiltIn.CurrentGroup.DocIDStr );
+      if (ФрагментАдреса1 <> nil) then
+        AddInArray( aFlt, 'Match(Наим,"*' + ФрагментАдреса1 + '*")' );
+      fi;
+      if (ФрагментАдреса2 <> nil) then
+        AddInArray( aFlt, 'Match(Наим,"*' + ФрагментАдреса2 + '*")' );
+      fi;
+      AddInArray( aFlt, ПолучитьФильтрУстаревшиеЗаписи );
+      crdBuiltIn.Filter = MakeFilter(aFlt);
+    else
+      crdBuiltIn.Filter = 'false';
+    fi;
+  end;
+
+-- 2_Вспомогательные методы0. --
+
+  proc ИнициализироватьДеревоКартотеки;
+    crdtreeBuiltIn.Font.Size = 9;
+    crdtreeBuiltIn.Font.Name = 'Tahoma';
+    crdtreeBuiltIn.TreeRoot  = "Административная подчиненность";
+    crdtreeBuiltIn.Align = true;
+  end;
+
+  proc ИнициализироватьСтолбцыКартотеки;
+    inherited ИнициализироватьСтолбцыКартотеки;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'Наим';
+      Caption = 'Наименование';
+      FieldType = Template.StringField;
+      Alignment = Template.LeftAlign;
+      Font.Size = crdBuiltIn.Font.Size;
+      MinWidth = 100;
+      Width = 0;
+      Visible = true;
+      CanEdit = false;
+    end;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'НеПрименяется';
+      Caption = 'Не применяется';
+      Hint = 'Более не применяется';
+      FieldType = Template.LogicalField;
+      Alignment = Template.CenterAlign;
+      MinWidth = 160;
+      Width = 160;
+      Visible = false;
+      CanEdit = false;
+    end;
+  end;
+
+
+-- 2_Вспомогательные методы0. --
+
+  proc ОбновитьФильтр;
+    var aFlt :String[];
+    var FltMaker :РКП_СИС.FilterMaker;
+    var AggrResult :Variant[2];
+    var aDocId :Integer[];
+    var vMainFlt, vGroupFilter :String;
+    if (true in [ЗаданоУсловиеГео, ЗаданоУсловиеАдр]) then
+      AddInArray( aFlt, ПолучитьФильтрАдреса_ПоНаимГео );
+      AddInArray( aFlt, ПолучитьФильтрАдреса_ПоНаимАдр );
+      AddInArray( aFlt, ПолучитьФильтрУстаревшиеЗаписи );
+      with Query.Create([РКП_Справочники.спрРедакция]) do
+        Filter = MakeFilter(aFlt);
+        AggrResult = CalcAggregates('GroupBy(НаселенныйПункт.DocId)') as Variant[2];
+        aDocId = AggrResult[1] as Integer[];
+      end;
+      vMainFlt = 'DocId in ' + ToStr(aDocId);
+      FltMaker = РКП_СИС.FilterMaker.CreateExt([vMainFlt]);
+      aFlt = nil;
+      vGroupFilter = FltMaker.GetFilterGroups([РКП_Справочники.спрГеография]);
+      if RecordsExistsInFilter(РКП_Справочники.спрГеография, vGroupFilter) then
+        AddInArray( aFlt, vGroupFilter );
+      fi;
+      AddInArray( aFlt, vMainFlt );
+      crdtreeBuiltIn.TreeFilter = MakeFilter(aFlt, byOr);
+    else
+      crdtreeBuiltIn.TreeFilter = nil;
+      crdBuiltIn.Filter = 'false';
+    fi;
+    ПозиционироватьГео;
+  end;
+
+  func ПолучитьФильтрАдреса_ПоНаимГео :String;
+    if (Фрагмент <> nil) then
+      if (ФорматФильтраПоФрагменту = 0) then    Return 'Match(НаселенныйПункт.Наим,"' + Фрагмент + '*")';
+      elsif (ФорматФильтраПоФрагменту = 1) then Return 'Match(НаселенныйПункт.Наим,"*' + Фрагмент + '*")';
+      elsif (ФорматФильтраПоФрагменту = 2) then Return 'НаселенныйПункт.Наим="' + Фрагмент + '"';
+      fi;
+    fi;
+  end;
+
+  func ПолучитьФильтрАдреса_ПоНаимАдр :String;
+    var aFlt :String[];
+    if (ФрагментАдреса1 <> nil) then
+      AddInArray( aFlt, 'Match(Наим,"*' + ФрагментАдреса1 + '*")' );
+    fi;
+    if (ФрагментАдреса2 <> nil) then
+      AddInArray( aFlt, 'Match(Наим,"*' + ФрагментАдреса2 + '*")' );
+    fi;
+    Return MakeFilter(aFlt);
+  end;
+
+  func ЗаданоУсловиеГео :Logical;
+    Return (Фрагмент <> nil);
+  end;
+
+  func ЗаданоУсловиеАдр :Logical;
+    Return true in [(ФрагментАдреса1 <> nil), (ФрагментАдреса2 <> nil)];
+  end;
+
+  proc ПозиционироватьГео;
+    var vSearchCompleted :Logical;
+    if (crdtreeBuiltIn.TreeFilter <> nil) then
+      crdtreeBuiltIn.OnMove = nil;
+      with Query.Create([РКП_Справочники.СпрГеография]) do
+        Filter = crdtreeBuiltIn.TreeFilter + ' and isGroup=0';
+        Order = 'Наим';
+        Select;
+        while not Eof do
+          if ЕстьАдресаВГео(Current) then
+            crdtreeBuiltIn.CurrentGroup = Current;
+            vSearchCompleted = true;
+            Break;
+          fi;
+          Next;
+        od;
+      end;
+      if (not vSearchCompleted) then
+        with Query.Create([РКП_Справочники.СпрГеография]) do
+          Filter = crdtreeBuiltIn.TreeFilter + ' and isGroup=-1';
+          Order = 'Наим';
+          Select;
+          while not Eof do
+            if ЕстьАдресаВГео(Current) then
+              crdtreeBuiltIn.CurrentGroup = Current;
+              Break;
+            fi;
+            Next;
+          od;
+        end;
+      fi;
+      crdBuiltIn.Filter = nil;
+      crdtreeBuiltIn.OnMove = 'crdtreeBuiltIn_OnMove';
+      crdtreeBuiltIn_OnMove(crdtreeBuiltIn);
+    else -- фильтр на дерево не определен
+      if (SelectedRecord = nil) then -- ранее переданное значение не задано
+        if (LastCurrentGroupGeo = nil) then -- форма ранее не открывалась или текущая группа не сохранена
+          with Query.Create([РКП_Справочники.СпрГеография]) do
+            Order = 'Наим';
+            Select;
+            while not Eof do
+              crdtreeBuiltIn.CurrentGroup = Current;
+              Break;
+            od;
+          end;
+        else
+          crdtreeBuiltIn.CurrentGroup = LastCurrentGroupGeo;
+        fi;
+      else
+        try
+          crdtreeBuiltIn.CurrentGroup = SelectedRecord.НаселенныйПункт;
+        except
+          SelectedRecord = nil;
+          ПозиционироватьГео;
+        end;
+      fi;
+      crdtreeBuiltIn.OnMove = 'crdtreeBuiltIn_OnMove';
+      crdtreeBuiltIn_OnMove(crdtreeBuiltIn);
+    fi;
+  end;
+
+  func ЕстьАдресаВГео(vSetting :РКП_Справочники.СпрГеография) :Logical;
+    with Query.Create([РКП_Справочники.спрРедакция]) do
+      Filter = 'НаселенныйПункт=' + vSetting.DocIDStr;
+      Return RecordsExists;
+    end;
+  end;
+
+
+end

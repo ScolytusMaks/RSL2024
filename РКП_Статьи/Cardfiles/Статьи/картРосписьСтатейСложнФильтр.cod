@@ -1,0 +1,24 @@
+Class inherited Статьи.картРосписьСтатейПросмотр "Статьи (сложный фильтр)";
+
+import РКП_СИС Classes Functions, FilterMaker;
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриСоздании(Context :Variant);
+    inherited шаблон_ПриСоздании(Context);
+    фреймФильтрПК.Visible = false;
+    фреймФильтрПК.UseSplitter = false;
+  end;
+
+-- 2_Вспомогательные методы0. --
+
+  func ПолучитьФильтрКартотеки (var locTreeFilter :String = nil) :String;
+    var aFlt :String[];
+    AddInArray( aFlt, inherited ПолучитьФильтрКартотеки(locTreeFilter) );
+    AddInArray( aFlt, Self.ДополнительныйФильтр );
+    Result = MakeFilter(aFlt);
+  end;
+
+end

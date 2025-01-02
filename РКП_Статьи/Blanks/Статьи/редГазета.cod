@@ -1,0 +1,28 @@
+class inherited РКП_Газеты.УчетГазет.редГазета "Издание", editor РКП_Газеты.Газета;
+
+inobject private
+
+
+  func шаблон_ПриЗаписи: Logical;
+  --Обновление содержимого поля "НазваниеОсн" для отдела росписи ГС
+    with Query.Create([РКП_Статьи.Роспись]) do
+      Filter = 'Газета=' + Str(Record);
+      Select;
+      while not Eof do
+        if (Current.Газета<>nil):
+          if    ((Current.Газета.НазваниеОсн=Current.Газета.НазваниеЛГС) or (Current.Газета.НазваниеЛГС=nil)):
+            Current.НазваниеОсн = Current.Газета.НазваниеОсн;
+          elsif ((Current.Газета.НазваниеОсн<>Current.Газета.НазваниеЛГС) or (Current.Газета.НазваниеЛГС<>nil)):
+            Current.НазваниеОсн = Current.Газета.НазваниеЛГС;
+          fi;
+          СИС2.ФункцииДокумента.RecordPostIfNeed(Current);
+        fi;
+        Next;
+      end;
+    end;
+    Result = True; -- Продолжить сохранение записи
+  end;
+
+--}
+
+end

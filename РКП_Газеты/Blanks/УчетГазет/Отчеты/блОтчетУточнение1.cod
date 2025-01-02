@@ -1,0 +1,395 @@
+class inherited СИС2.БазовыйБланк "Уточняющий отчет по изданиям";
+
+import СИС2 classes СтроковыеФункции;
+
+inclass public
+
+-- 2_Свойства0. --
+
+  type типДанныеЗапросаУточнения = (дзОписание = 1,
+                                    дзФильтрУточнения = 2,
+                                    дзДатаН = 3,
+                                    дзДатаК = 4,
+                                    дзЗаГод = 5,
+                                    дзПериодЗапроса = 6,
+                                    дзОкруг = 7,
+                                    дзФильтрМестаИздания = 8,
+                                    дзПравилоРасчетаСтатистики = 9
+                                    );
+
+-- 2_Конструкторы, визуализаторы0. --
+
+  proc ShowPopupForm(aRequestData :Variant[]);
+    var vForm :УчетГазет.Отчеты.блОтчетУточнение1;
+    vForm  = УчетГазет.Отчеты.блОтчетУточнение1.CreateEx(aRequestData);
+    #NoWarning;
+    vForm.ShowEx( , Kernel.Window.PopupWindow);
+  end;
+
+  func CreateEx(aRequestData :Variant[]) :УчетГазет.Отчеты.блОтчетУточнение1;
+    Result = УчетГазет.Отчеты.блОтчетУточнение1.Create;
+    Result.УточняющийОтчетПо        = aRequestData[дзОписание] as String;
+    Result.ФильтрУточнения          = aRequestData[дзФильтрУточнения] as String;
+    Result.ДатаН                    = aRequestData[дзДатаН] as Date;
+    Result.ДатаК                    = aRequestData[дзДатаК] as Date;
+    Result.ЗаГод                    = aRequestData[дзЗаГод] as Integer;
+    Result.ПериодЗапроса            = aRequestData[дзПериодЗапроса] as String;
+    Result.Округ                    = aRequestData[дзОкруг] as РКП_Справочники.СпрГеография;
+    Result.ФильтрМестаИздания       = aRequestData[дзФильтрМестаИздания] as String;
+    Result.ПравилоРасчетаСтатистики = aRequestData[дзПравилоРасчетаСтатистики] as Константы.типПравилоРасчетаСтатистики;
+  end;
+
+
+inobject private
+
+-- 2_Свойства0. --
+
+  -- Объекты шаблона --
+  var кнОбновить    :Button;
+  var секцЗаголовок :Section;
+  var секцПозиции   :Section;
+  var секцСПО       :Section;
+  var секцВарианты  :Section;
+  var секцВРегионе  :Section;
+  var Библиограф    :String;
+  var ОтчетСоздан   :Date;
+
+  -- Данные для расчета --
+  var УточняющийОтчетПо  :String;
+  var ФильтрУточнения    :String;
+  var ДатаН :Date;
+  var ДатаК :Date;
+  var ЗаГод :Integer;
+  var ПериодЗапроса :String;
+  var Округ :РКП_Справочники.СпрГеография;
+  var ФильтрМестаИздания :String;
+  var ПравилоРасчетаСтатистики :Константы.типПравилоРасчетаСтатистики;
+
+  -- Результаты расчета --
+  ------------------------------------
+  var ВсегоГазет         :Integer;
+  var ВсегоНомеров       :Integer;
+  var ВсегоРазовыйТираж  :Numeric;
+  var ВсегоГодовойТираж  :Numeric;
+  ------------------------------------
+  var ЗаписьСтроки       :РКП_Газеты.Газета[];
+  var СодержаниеСтроки   :String[];
+  var КолГазет           :Integer[];
+  var КолНомеров         :Integer[];
+  var РазовыйТираж       :Numeric[];
+  var ГодовойТираж       :Numeric[];
+
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    inherited шаблон_ПриОткрытии(Create);
+    УточняющийОтчетПо = Trim(УточняющийОтчетПо);
+    ВидФормы;
+    ПостроениеОтчета;
+
+    --if   Округ  <> nil  then
+    --  секцВРегионе.Visible      =       true;
+    --else
+    --  секцВРегионе.Visible      =       false;
+    --end;
+    --ОчиститьРезультатыРасчета;
+    --ПостроитьОтчет(кнОбновить);
+--  --  Window.LoadIcon("%Projects%\РКП_СИС\Icons\Отчет_ОРГ.ico");
+  end;
+
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func ПолеСодержаниеСтрокиПриНажатии(Cell :TemplateCell;Action :Template.ClickTypes) :Logical;
+    OpenBlankEditor('РКП_Газеты.УчетГазет.редГазета', ЗаписьСтроки[Cell.Frame]);
+    --Result = True; -- Разрешаем стандартную обработку
+  end;
+
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+  proc ПостроитьОтчет(Sender :Button);
+    ПостроениеОтчета;
+  end;
+
+-- 2_Дополнительные команды0. --
+
+
+-- 2_Вспомогательные методы0. --
+
+inobject private
+
+  proc ВидФормы;
+    секцВРегионе.Visible = (Округ <> nil);
+  end;
+
+  proc ПостроениеОтчета;
+    ОчиститьРезультатыРасчета;
+    СоздатьПозиции; -- Построение списка неповторяющихся значений для #СодержаниеСтроки
+    СортироватьПозиции;
+    ВыполнитьРасчетПозиций;
+    ВыполнитьРасчетИтогов;
+    УдалитьПустыеСтроки;
+    ОтчетСоздан = Now;
+    if (SessionInfo.UserRecord <> nil) then
+      Библиограф = SessionInfo.UserRecord.FullName;
+    else
+      Библиограф = SessionInfo.UserName;
+    fi;
+  end;
+
+  proc ОчиститьРезультатыРасчета;
+    секцПозиции.Count = nil;
+    СодержаниеСтроки  = nil;
+    ЗаписьСтроки      = nil;
+    КолГазет          = nil;
+    КолНомеров        = nil;
+    РазовыйТираж      = nil;
+    ГодовойТираж      = nil;
+    ВсегоГазет        = nil;
+    ВсегоНомеров      = nil;
+    ВсегоРазовыйТираж = nil;
+    ВсегоГодовойТираж = nil;
+  end;
+
+  proc СоздатьПозиции;
+    var aFlt :String[];
+    var val0, val1 :РКП_Газеты.Газета;
+    var z :Integer;
+    with Query.Create([РКП_Газеты.ПоступлениеГазеты]) do
+      aFlt[1] = 'ГодПоступления=' + Str(Year(ДатаН));
+      aFlt[2] = ФильтрУточнения;
+      aFlt[3] = ФильтрМестаИздания;
+      aFlt[4] = 'НомеровПолучено>0';
+      aFlt[5] = 'Газета<>nil';
+      Filter = СложитьСтрокиФильтраПоИ(aFlt);
+      Order = 'Газета';
+      Select;
+      while not Eof do
+        val1 = Current.Газета;
+        if (val1 <> val0) then
+          z = z + 1;
+          секцПозиции.InsertFrame(z);
+          InsertInArray(СодержаниеСтроки, z, Current.Газета.НазваниеОсн);
+          InsertInArray(ЗаписьСтроки, z, Current.Газета);
+        fi;
+        val0 = Current.Газета;
+        Next;
+      od;
+    end;
+  end;
+
+  proc СортироватьПозиции;
+    секцПозиции.SortBy('СодержаниеСтроки');
+  end;
+
+  proc ВыполнитьРасчетПозиций;
+    var k, kk :Integer;
+    kk = секцПозиции.Count;
+    for k = 1 .. kk do
+      Hint('Расчет строки "' + ЗаписьСтроки[k].НазваниеОсн + '"', k, kk);
+      РасчетПозиции(k);
+    od;
+  end;
+
+  proc 2_РасчетПозиции0.(vLine :Integer);
+    var aStatData :Variant[];
+    if (ПравилоРасчетаСтатистики = Константы.статПравилоПоПоступлению) then
+      aStatData = ПолучитьСтатистикуПоступлений_ПоНомерам(ЗаписьСтроки[vLine]);
+    elsif (ПравилоРасчетаСтатистики = Константы.статПравилоПоВыпуску) then
+      aStatData = ПолучитьСтатистикуВыпуска_ПоНомерам(ЗаписьСтроки[vLine]);
+    fi;
+    КолГазет[vLine]       = aStatData[1] as integer;
+    КолНомеров[vLine]     = aStatData[2] as integer;
+    РазовыйТираж[vLine]   = aStatData[3] as Numeric;
+    ГодовойТираж[vLine]   = aStatData[4] as Numeric;
+  end;
+
+  func ПолучитьСтатистикуПоступлений_ПоНомерам (vNewspaper :РКП_Газеты.Газета) :Variant[];
+    var aFlt :String[];
+    var aResult :Variant[];
+    with Query.Create([РКП_Газеты.НомерГазеты]) do
+      aFlt[1] = 'Газета=' + vNewspaper.DocIDStr;
+      aFlt[2] = 'ДатаПринятияНаХранение>=' + Str(ДатаН, 'dd.mm.yyyy');
+      aFlt[3] = 'ДатаПринятияНаХранение<' + Str(ДатаК + 1, 'dd.mm.yyyy');
+      aFlt[4] = 'isGroup=0';
+      aFlt[5] = 'not(СозданОЛГС and НеПолучен)';
+      --aFlt[6] = 'not ЛожныйНомер';
+      Filter = СложитьСтрокиФильтраПоИ(aFlt);
+      aResult = CalcAggregates('Count,Sum(Тираж)') as Variant[];
+      if ((aResult[1] as Integer) > 0) then
+        Result[1] = 1;
+        Result[2] = aResult[1] as Integer;
+        Result[3] = ((aResult[2] as Numeric) / 1000) / (aResult[1] as Integer);
+        Result[3] = Round(Result[3] as Numeric, 1);
+        Result[4] = (aResult[2] as Numeric) / 1000;
+        Result[4] = Round(Result[4] as Numeric, 1);
+      else
+        Result[1] = 0;
+        Result[2] = 0;
+        Result[3] = 0.0;
+        Result[4] = 0.0;
+      fi;
+    end;
+  end;
+
+  func ПолучитьСтатистикуВыпуска_ПоНомерам (vNewspaper :РКП_Газеты.Газета) :Variant[];
+    var aFlt :String[];
+    var aResult :Variant[];
+    with Query.Create([РКП_Газеты.НомерГазеты]) do
+      aFlt[1] = 'Газета=' + vNewspaper.DocIDStr;
+      aFlt[2] = 'ГодВыпуска=' + Str(ЗаГод);
+      aFlt[3] = 'isGroup=0';
+      aFlt[4] = 'not(СозданОЛГС and НеПолучен)';
+      --aFlt[5] = 'not ЛожныйНомер';
+      Filter = СложитьСтрокиФильтраПоИ(aFlt);
+      aResult = CalcAggregates('Count,Sum(Тираж)') as Variant[];
+      if ((aResult[1] as Integer) > 0) then
+        Result[1] = 1;
+        Result[2] = aResult[1] as Integer;
+        Result[3] = ((aResult[2] as Numeric) / 1000) / (aResult[1] as Integer);
+        Result[3] = Round(Result[3] as Numeric, 1);
+        Result[4] = (aResult[2] as Numeric) / 1000;
+        Result[4] = Round(Result[4] as Numeric, 1);
+      else
+        Result[1] = 0;
+        Result[2] = 0;
+        Result[3] = 0.0;
+        Result[4] = 0.0;
+      fi;
+    end;
+  end;
+
+  proc ВыполнитьРасчетИтогов;
+    var kk :Integer;
+    kk = секцПозиции.Count;
+    ВсегоГазет        = Int(SumOfArray(КолГазет, kk));
+    ВсегоНомеров      = Int(SumOfArray(КолНомеров, kk));
+    ВсегоРазовыйТираж = SumOfArray(РазовыйТираж, kk);
+    ВсегоГодовойТираж = SumOfArray(ГодовойТираж, kk);
+  end;
+
+  proc УдалитьПустыеСтроки;
+    var k, kk, z, j :Integer;
+    var aTest :Logical[];
+    kk = секцПозиции.Count;
+    for k = 1 .. kk do
+      z = kk + 1 - k;
+      aTest = nil;
+      aTest[1] = (КолГазет[z] = nil);
+      aTest[2] = (КолНомеров[z] = nil);
+      aTest[3] = (РазовыйТираж[z] = nil);
+      aTest[4] = (ГодовойТираж[z] = nil);
+      if not (false in aTest) then
+        DeleteFromArray(ЗаписьСтроки,     z);
+        DeleteFromArray(СодержаниеСтроки, z);
+        DeleteFromArray(КолГазет,         z);
+        DeleteFromArray(КолНомеров,       z);
+        DeleteFromArray(РазовыйТираж,     z);
+        DeleteFromArray(ГодовойТираж,     z);
+      else
+        j = j + 1;
+      fi;
+    od;
+    секцПозиции.Count = j;
+  end;
+
+
+
+
+
+
+inclass public
+
+
+
+inobject
+
+--------------------------------------------------------------------------------
+
+
+
+
+
+
+--------------------------------------------------------------------------------
+--{ Обработчики событий бланка
+
+
+
+  proc _ПостроитьОтчет(Sender :Button);
+  var Q        : query;
+  var k,z      : integer;
+  var val0,val1 : record;
+  var QResult   :Variant[];
+    ОтчетСоздан =       Now;
+    if  SessionInfo.UserRecord  <>nil then
+      Библиограф                = SessionInfo.UserRecord.FullName;
+    end;
+    ОчиститьРезультатыРасчета;
+    --Построение списка неповторяющихся значений для #СодержаниеСтроки
+      Q                         = Query.Create([РКП_Газеты.ПоступлениеГазеты]);
+      if Округ = nil            then
+        Q.Filter                = "ГодПоступления="+Str(Year(ДатаН))+" and ("+ФильтрУточнения+")"+
+                                  " and НомеровПолучено>0";
+      else
+        Q.Filter                = "ГодПоступления="+Str(Year(ДатаН))+" and ("+ФильтрМестаИздания+")"+" and ("+ФильтрУточнения+")"+
+                                  " and НомеровПолучено>0";
+      end;
+      Q.LoadingFields           = "Газета";
+      Q.Order                   = "Газета";
+      Q.Select;
+      Q.First;
+      for k =  1..Q.Count        do
+        val1       = Q.Current.Газета;
+          if val1  <>val0 or k=1 then
+           z      = z+1;
+           секцПозиции.InsertFrame(z);
+           InsertInArray(СодержаниеСтроки,z,Q.Current.Газета.НазваниеОсн);
+           InsertInArray(ЗаписьСтроки,z,Q.Current.Газета);
+          end;
+        val0       = Q.Current.Газета;
+        Q.Next;
+      end;
+      Q.Close;
+    --Сортировка
+    секцПозиции.SortBy("СодержаниеСтроки");
+    --Расчет значений для найденных строк
+    for k = 1..секцПозиции.Count        do
+      Hint("Расчт строки <"+ЗаписьСтроки[k].НазваниеОсн+">",k,секцПозиции.Count);
+      --========== расчет за произвольный период ==========--
+      Q                         = Query.Create([РКП_Газеты.НомерГазеты]);
+      Q.Filter                  = "Газета="+Str(ЗаписьСтроки[k])+
+                                  " and ДатаПринятияНаХранение>="+Str(ДатаН,"dd.mm.yyyy")+
+                                  " and ДатаПринятияНаХранение<="+Str(ДатаК,"dd.mm.yyyy")+
+                                  " and isGroup=0"+
+                                  " and НеПолучен = false";
+      Q.LoadingFields           = "ДатаПринятияНаХранение;Тираж";
+      QResult               = Q.CalcAggregates("Count,Sum(Тираж)") as Variant[];
+      --QResult               = Q.CalcAggregates("Sum(Тираж)");
+        if  QResult[1]>0    then
+          КолГазет[k]       = 1;
+          КолНомеров[k]     = QResult[1];
+--          РазовыйТираж[k]   = Round(((QResult[2]/1000)/QResult[1]),1);
+--          ГодовойТираж[k]   = Round((QResult[2]/1000),1);
+          ГодовойТираж[k]   = Round(QResult[2]/1000,1);
+          РазовыйТираж[k]   = Round(ГодовойТираж[k]/Q.Count,1);
+          --ГодовойТираж[k]   = Round(ГодовойТираж[k],1);
+        end;
+    end;
+    --Вычисление итогов
+    ВсегоГазет                  = Int(SumOfArray(КолГазет,секцПозиции.Count));
+    ВсегоНомеров                = Int(SumOfArray(КолНомеров,секцПозиции.Count));
+    ВсегоРазовыйТираж           = SumOfArray(РазовыйТираж,секцПозиции.Count);
+    ВсегоГодовойТираж           = SumOfArray(ГодовойТираж,секцПозиции.Count);
+    --Удаление строк, не содержащих значений
+    УдалитьПустыеСтроки;
+
+  end;
+
+
+
+--}
+
+end

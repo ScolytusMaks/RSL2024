@@ -1,0 +1,659 @@
+class inherited СИС2.БазовыйБланк "Фильтр отбора газет";
+
+import СИС2 classes Функции, СтроковыеФункции;
+
+--{{ 2_Свойства
+
+inobject public
+
+  -- Элементы условий отбора --
+  ВариантПростогоФильтра    :Integer;
+  ФрагментНазвания          :String;
+  ВклИнЯз                   :Logical;
+  ВариантПростогоФильтра2   :Integer;
+  ФрагментПодзаголовка      :String;
+  ФрагментРегНомера         :String;
+  Прекращение_Все           :Logical;
+  Прекращение_Ложь          :Logical;
+  Прекращение_Истина        :Logical;
+  ВариантПрекращения        :Integer;
+  Отсылки_Все               :Logical;
+  Отсылки_Ложь              :Logical;
+  Отсылки_Истина            :Logical;
+  ВариантОтсылки            :Integer;
+  МестоИздания              :РКП_Справочники.СпрГеография;
+  ФрагментАдреса1           :String;
+  ФрагментАдреса2           :String;
+  ТипИздания                :Integer;
+  КатегорияПериодичности    :Integer;
+  КоличествоВПериоде_       :Integer;
+  КоличествоВПериоде        :Integer;
+  Периодичность             :String;
+  ТерриторияРаспространения :РКП_Справочники.СпрТерриторияРаспространения;
+  Тематика                  :РКП_Справочники.СпрТематика;
+  ЧАЦН                      :РКП_Справочники.СпрТематика;
+  Язык                      :РКП_Справочники.СпрЯзыкИздания;
+  ГодНачалаИздания          :Integer;
+  ГодЛППИ                   :Integer;
+  ГодВыпуска                :Integer;
+
+inobject private
+
+  -- Именованные объекты шаблона --
+  секцПрекращенные  :TemplateSection;
+  секцОтсылки       :TemplateSection;
+  секцПериодичность :TemplateSection;
+
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inclass public
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    inherited шаблон_ПриОткрытии(Create);
+    ВидЛогическихУсловий;
+    ВидСекцииПериодичность;
+  end;
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func Поле_ПриНажатии_СменитьЗначение(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    if          Cell.Contents="Прекращение_Все"         then    ВариантПрекращения=0;
+2    elsif0       Cell.Contents="Прекращение_Ложь"        then    ВариантПрекращения=1;
+2    elsif0       Cell.Contents="Прекращение_Истина"      then    ВариантПрекращения=2;
+2    elsif0       Cell.Contents="Отсылки_Все"             then    ВариантОтсылки=0;
+2    elsif0       Cell.Contents="Отсылки_Ложь"            then    ВариантОтсылки=1;
+2    elsif0       Cell.Contents="Отсылки_Истина"          then    ВариантОтсылки=2;
+    end;
+    ВидЛогическихУсловий;
+    Result = False;
+  end;
+
+  func Поле_ПриОбзоре(Cell :TemplateCell; Value :Variant; var NewValue :Variant) :Logical;
+    var vRefRec :РКП_Справочники.BaseRefType1;
+    var aParam :Variant[2];
+    var vYear :Integer;
+    -- Тематика --
+    if (Cell.Contents = 'Тематика.Наим') then
+      aParam[1] = ['РежимВыбораТематики', true];
+      aParam[2] = ['РежимВыбораЧАЦН', false];
+      aParam[3] = ['Фрагмент', Value];
+      if (cmOk = РКП_Справочники.Справочники2.0блкартТематика.ВыполнитьВыбор(vRefRec, aParam) ) then
+        NewValue = vRefRec;
+        Тематика = vRefRec;
+        Template.EndEdit(true);
+      fi;
+      Return;
+    -- Читательский адрес --
+    elsif (Cell.Contents = 'ЧАЦН.Наим') then
+      aParam[1] = ['РежимВыбораТематики', false];
+      aParam[2] = ['РежимВыбораЧАЦН', true];
+      aParam[3] = ['Фрагмент', Value];
+      if (cmOk = РКП_Справочники.Справочники2.0блкартТематика.ВыполнитьВыбор(vRefRec, aParam) ) then
+        NewValue = vRefRec;
+        ЧАЦН     = vRefRec;
+        Template.EndEdit(true);
+      fi;
+      Return;
+    elsif (Cell.Contents = 'ГодНачалаИздания') then
+      vYear = ГодНачалаИздания;
+      if (cmOk = РКП_СИС.Сервис.блВыборГода.ВыполнитьВыбор(vYear) ) then
+        NewValue         = vYear;
+        ГодНачалаИздания = vYear;
+        Template.EndEdit(true);
+      fi;
+      Return;
+    elsif (Cell.Contents = "ГодЛППИ") then
+      vYear = ГодЛППИ;
+      if (cmOk = РКП_СИС.Сервис.блВыборГода.ВыполнитьВыбор(vYear) ) then
+        NewValue         = vYear;
+        ГодЛППИ          = vYear;
+        Template.EndEdit(true);
+      fi;
+      Return;
+    elsif (Cell.Contents = 'ГодВыпуска') then
+      vYear = ГодВыпуска;
+      if (cmOk = РКП_СИС.Сервис.блВыборГода.ВыполнитьВыбор(vYear) ) then
+        NewValue         = vYear;
+        ГодВыпуска       = vYear;
+        Template.EndEdit(true);
+      fi;
+      Return;
+2    0fi2;
+  end;
+
+  func Поле_ПриНаборе(Cell :TemplateCell; Key :String; Value :Variant;var NewValue :Variant) :Logical;
+    var vRefClass: class Record;
+    var vFindFlt :String;
+    var aParam :Variant[2];
+    var vRefRec :РКП_Справочники.BaseRefType1;
+    var vAnswer, vCountRec :Integer;
+2    --====================================--
+2    --======== Место издания =============--
+2    --====================================--
+    if (Cell.Contents = 'МестоИздания.Наим') then
+      vRefClass = РКП_Справочники.СпрГеография;
+      vFindFlt  = 'Match(Наим,"*' + Value + '*")';
+      vRefRec = РКП_СИС.Recs.FindRecordExt(vRefClass, vFindFlt, , vCountRec);
+      if (vCountRec = 0) then
+        vAnswer = Enquiry('', 'Наименования места издания, похожего на "' + Value +
+                              '", не найдено в справочнике. ' +
+                              'Пожалуйста, выберите действие:',
+                              ['Искать в полном списке','Повторить ввод']);
+        if (vAnswer in [0,2]) then
+          Return;
+        elsif (vAnswer = 1) then
+          if (cmOk = РКП_Справочники.Справочники.картГеография.ВыполнитьВыбор(vRefRec)) then
+            МестоИздания = vRefRec;
+            NewValue = vRefRec;
+            Template.EndEdit(true);
+          fi;
+          Return;
+        fi;
+      elsif (vCountRec = 1) then
+        Return true;
+      elsif (vCountRec > 1) then
+        aParam[1] = ['ТипФрагмента', 1];
+        aParam[2] = ['Фрагмент', Value];
+        if (cmOk = РКП_Справочники.Справочники.картГеография.ВыполнитьВыбор(vRefRec, aParam)) then
+          МестоИздания = vRefRec;
+          NewValue = vRefRec;
+          Template.EndEdit(true);
+        fi;
+        Return;
+      fi;
+2    --=================================================--
+2    --======== Территория распространения =============--
+2    --=================================================--
+    elsif (Cell.Contents = 'ТерриторияРаспространения.Наим')  then
+      vRefClass = РКП_Справочники.СпрТерриторияРаспространения;
+      vFindFlt  = 'Match(Наим,"*' + Value + '*")';
+      vRefRec = РКП_СИС.Recs.FindRecordExt(vRefClass, vFindFlt, , vCountRec);
+      if (vCountRec = 0) then
+        vAnswer = Enquiry('', 'Наименования, похожего на "' + Value +
+                              '", не найдено в справочнике. ' +
+                              'Пожалуйста, выберите действие:',
+                              ['Искать в полном списке','Повторить ввод']);
+        if (vAnswer in [0,2]) then
+          Return;
+        elsif (vAnswer = 1) then
+          vRefRec = ТерриторияРаспространения;
+          aParam[1] = ['Фрагмент', Value];
+          if (cmOk = РКП_Справочники.Справочники.блкартТерриторияРаспространения.ВыполнитьВыбор(vRefRec)) then
+            ТерриторияРаспространения = vRefRec;
+            NewValue = vRefRec;
+            Template.EndEdit(true);
+          fi;
+          Return;
+        fi;
+      elsif (vCountRec = 1) then
+        Return true;
+      elsif (vCountRec > 1) then
+        aParam[1] = ['Фрагмент', Value];
+        if (cmOk = РКП_Справочники.Справочники.блкартТерриторияРаспространения.ВыполнитьВыбор(vRefRec, aParam)) then
+          ТерриторияРаспространения = vRefRec;
+          NewValue = vRefRec;
+          Template.EndEdit(true);
+        fi;
+        Return;
+      fi;
+2    --====================================--
+2    --========   Тематика    =============--
+2    --====================================--
+    elsif (Cell.Contents = 'Тематика.Наим') then
+      vRefClass = РКП_Справочники.СпрТематика;
+      vFindFlt  = 'ЦельАнализа<1 and not НеПрименяется and Match(Наим,"*' + Value + '*")';
+      aParam[1] = ['РежимВыбораТематики', true];
+      aParam[2] = ['РежимВыбораЧАЦН', false];
+      aParam[3] = ['ТипФрагмента', 1];
+      --aParam[4] = ['Фрагмент', Value];
+      vRefRec = РКП_СИС.Recs.FindRecordExt(vRefClass, vFindFlt, , vCountRec);
+      if (vCountRec = 0) then
+        vAnswer = Enquiry('', 'Наименования, похожего на "' + Value +
+                              '", не найдено в справочнике. ' +
+                              'Пожалуйста, выберите действие:',
+                              ['Искать в полном списке','Повторить ввод']);
+        if (vAnswer in [0,2]) then
+          Return;
+        elsif (vAnswer = 1) then
+          vRefRec = Тематика;
+          if (cmOk = РКП_Справочники.Справочники.блкартТематика.ВыполнитьВыбор(vRefRec, aParam)) then
+            Тематика = vRefRec;
+            NewValue = vRefRec;
+            Template.EndEdit(true);
+          fi;
+          Return;
+        fi;
+      elsif (vCountRec = 1) then
+        Return true;
+      elsif (vCountRec > 1) then
+        aParam[4] = ['Фрагмент', Value];
+        if (cmOk = РКП_Справочники.Справочники.блкартТематика.ВыполнитьВыбор(vRefRec, aParam)) then
+          Тематика = vRefRec;
+          NewValue = vRefRec;
+          Template.EndEdit(true);
+        fi;
+        Return;
+      fi;
+2    --============================================================--
+2    --======== 0Читательский адрес/целевое назначение2 =============--
+2    --============================================================--
+    elsif (Cell.Contents = 'ЧАЦН.Наим') then
+      vRefClass = РКП_Справочники.СпрТематика;
+      vFindFlt  = 'ЦельАнализа>0 and not НеПрименяется and Match(Наим,"*' + Value + '*")';
+      aParam[1] = ['РежимВыбораТематики', false];
+      aParam[2] = ['РежимВыбораЧАЦН', true];
+      aParam[3] = ['ТипФрагмента', 1];
+      --aParam[4] = ['Фрагмент', Value];
+      vRefRec = РКП_СИС.Recs.FindRecordExt(vRefClass, vFindFlt, , vCountRec);
+      if (vCountRec = 0) then
+        vAnswer = Enquiry('', 'Наименования, похожего на "' + Value +
+                              '", не найдено в справочнике. ' +
+                              'Пожалуйста, выберите действие:',
+                              ['Искать в полном списке','Повторить ввод']);
+        if (vAnswer in [0,2]) then
+          Return;
+        elsif (vAnswer = 1) then
+          vRefRec = ЧАЦН;
+          if (cmOk = РКП_Справочники.Справочники.блкартТематика.ВыполнитьВыбор(vRefRec, aParam)) then
+            ЧАЦН = vRefRec;
+            NewValue = vRefRec;
+            Template.EndEdit(true);
+          fi;
+          Return;
+        fi;
+      elsif (vCountRec = 1) then
+        Return true;
+      elsif (vCountRec > 1) then
+        aParam[4] = ['Фрагмент', Value];
+        if (cmOk = РКП_Справочники.Справочники.блкартТематика.ВыполнитьВыбор(vRefRec, aParam)) then
+          ЧАЦН = vRefRec;
+          NewValue = vRefRec;
+          Template.EndEdit(true);
+        fi;
+        Return;
+      fi;
+2    --====================================--
+2    --======== Языки издания =============--
+2    --====================================--
+    elsif (Cell.Contents = 'Язык.Наим') then
+      vRefClass = РКП_Справочники.спрЯзыкИздания;
+      vFindFlt  = 'Match(Наим,"*' + Value + '*")';
+      vRefRec = РКП_СИС.Recs.FindRecordExt(vRefClass, vFindFlt, , vCountRec);
+      if (vCountRec = 0) then
+        vAnswer = Enquiry('', 'Наименования языка, похожего на "' + Value +
+                              '", не найдено в справочнике. ' +
+                              'Пожалуйста, выберите действие:',
+                              ['Искать в полном списке','Повторить ввод']);
+        if (vAnswer in [0,2]) then
+          Return;
+        elsif (vAnswer = 1) then
+          vRefRec = Язык;
+          if (cmOk = РКП_Справочники.Справочники.картЯзыкИздания.ВыполнитьВыбор(vRefRec)) then
+            Язык = vRefRec;
+            NewValue = vRefRec;
+            Template.EndEdit(true);
+          fi;
+          Return;
+        fi;
+      elsif (vCountRec = 1) then
+        Return true;
+      elsif (vCountRec > 1) then
+        aParam[1] = ['Фрагмент', Value];
+        if (cmOk = РКП_Справочники.Справочники.картЯзыкИздания.ВыполнитьВыбор(vRefRec, aParam)) then
+          Язык = vRefRec;
+          NewValue = vRefRec;
+          Template.EndEdit(true);
+        fi;
+        Return;
+      fi;
+    fi;
+    Return true;
+  end;
+
+  func Поле_ПриПроверке(Cell :TemplateCell; Index :Integer; var Value :Variant) : Logical;
+    if  Value                   <=5             then
+      if КатегорияПериодичности <>Value         then
+        КатегорияПериодичности  = Value;
+        КоличествоВПериоде      = 1;
+        ВидСекцииПериодичность;
+        Result                  = True;         -- Разрешаем сохранить изменения в поле
+      else
+        Result                  = True;
+      end;
+    else
+      Result                    = False;        -- Не разрешаем сохранить изменения в поле
+    end;
+  end;
+
+  proc Поле_ПриВыходе(Cell :TemplateCell; Index :Integer);
+    2if0          Cell.Contents   = "2КатегорияПериодичности0"      then
+      if Периодичность<> РКП_Справочники.BiblioRecord.ПериодичностьВыхода(КоличествоВПериоде_+1,(КатегорияПериодичности-1) as РКП_Справочники.Def.tPeriodicityCategory) then
+        Периодичность =  РКП_Справочники.BiblioRecord.ПериодичностьВыхода(КоличествоВПериоде_+1,(КатегорияПериодичности-1) as РКП_Справочники.Def.tPeriodicityCategory);
+      end;
+      if 2КатегорияПериодичности0 = 0                             then
+        Периодичность = "Все";
+      end;
+
+    2elsif0       Cell.Contents   = "2КоличествоВПериоде_0"         then
+ 2  0   КоличествоВПериоде        =2 0КоличествоВПериоде_+1;
+    2  0if Периодичность<> РКП_Справочники.BiblioRecord.ПериодичностьВыхода(КоличествоВПериоде_+1,(КатегорияПериодичности-1) as РКП_Справочники.Def.tPeriodicityCategory) then
+      2 0 Периодичность =  РКП_Справочники.BiblioRecord.ПериодичностьВыхода(КоличествоВПериоде_+1,(КатегорияПериодичности-1) as РКП_Справочники.Def.tPeriodicityCategory);
+    2  0end;
+    end;
+  end;
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+  proc кнПриНажатии_ОчиститьВсе(Sender :Button);
+  end;
+
+  proc кнПриНажатии_ОК(Sender :Button);
+    var Frm :УчетГазет.картГазеты;
+    inherited КнОК_ПриНажатии(Sender);
+    Frm = УчетГазет.картГазеты.Create;
+    Frm.ИгнорироватьХранимыеСвойства = true;
+    Frm.SetField('ВариантПростогоФильтра',  Self.ВариантПростогоФильтра);
+    Frm.SetField('ФрагментНазвания',        Self.ФрагментНазвания);
+    Frm.SetField('ВариантПростогоФильтра2', Self.ВариантПростогоФильтра2);
+    Frm.SetField('ФрагментПодзаголовка',    Self.ФрагментПодзаголовка);
+    Frm.SetField('ФрагментРегНомера',       Self.ФрагментРегНомера);
+    #NoWarning;
+    Frm.ShowEx(nil, ПолучитьУсловиеОтбораГазет, Window.ChildWindow);
+  end;
+
+  proc кнПриНажатии_Отменить(Sender :Button);
+    inherited кнОтменить_ПриНажатии(Sender);
+  end;
+
+-- 2_Дополнительные команды0. --
+
+-- 2_Вспомогательные методы0. --
+
+inobject public
+
+  func ПолучитьУсловиеОтбораГазет :String;
+    var aFlt :String[];
+    Hint('Вычисление условий отбора...');
+    --AddInArray(aFlt, ПолучитьУсловие_Название);
+    --AddInArray(aFlt, ПолучитьУсловие_Подзаголовок);
+    --AddInArray(aFlt, ПолучитьУсловие_РегНомер);
+    AddInArray(aFlt, ПолучитьУсловие_Прекращение);
+    AddInArray(aFlt, ПолучитьУсловие_Отсылка);
+    AddInArray(aFlt, ПолучитьУсловие_МестоИздания);
+    AddInArray(aFlt, ПолучитьУсловие_ФрагментАдреса);
+    AddInArray(aFlt, ПолучитьУсловие_ТипИздания);
+    AddInArray(aFlt, ПолучитьУсловие_Периодичность);
+    AddInArray(aFlt, ПолучитьУсловие_ТеррРаспространения);
+    AddInArray(aFlt, ПолучитьУсловие_Тематика);
+    AddInArray(aFlt, ПолучитьУсловие_ЧАЦН);
+    AddInArray(aFlt, ПолучитьУсловие_Язык);
+    AddInArray(aFlt, ПолучитьУсловие_НачалоВыхода);
+    AddInArray(aFlt, ПолучитьУсловие_ГодЛетописи);
+    AddInArray(aFlt, ПолучитьУсловие_ГодВыпуска);
+    Result = РКП_СИС.FilterMaker.MakeFilter(aFlt);
+    Hint(' ');
+  end;
+
+inobject private
+
+  func ПолучитьУсловие_Название :String;
+    var aFlt :String[];
+    if (ФрагментНазвания <> nil) then
+      if (ВариантПростогоФильтра = 0) then
+        AddInArray(aFlt, 'Match(НазваниеОсн,"' + ФрагментНазвания + '*")');
+        if ВклИнЯз then
+          AddInArray(aFlt, 'Match(НазваниеИнЯз,"' + ФрагментНазвания + '*")');
+          AddInArray(aFlt, 'Match(НазваниеНацЯз,"' + ФрагментНазвания + '*")');
+        fi;
+      else
+        AddInArray(aFlt,          'Match(НазваниеОсн,"*' + ФрагментНазвания + '*")');
+        if ВклИнЯз then
+          AddInArray(aFlt, 'Match(НазваниеИнЯз,"*' + ФрагментНазвания + '*")');
+          AddInArray(aFlt, 'Match(НазваниеНацЯз,"*' + ФрагментНазвания + '*")');
+        fi;
+      fi;
+    fi;
+    Return СложитьСтрокиФильтраПоИли(aFlt);
+  end;
+
+  func ПолучитьУсловие_Подзаголовок :String;
+    var aFlt :String[];
+    if (ФрагментПодзаголовка <> nil) then
+      if (ВариантПростогоФильтра2 = 0) then
+        AddInArray(aFlt, 'Match(Подзаголовок,"' + ФрагментПодзаголовка + '*")');
+      else
+        AddInArray(aFlt, 'Match(Подзаголовок,"*' + ФрагментПодзаголовка + '*")');
+      fi;
+    fi;
+    Return СложитьСтрокиФильтраПоИли(aFlt);
+  end;
+
+  func ПолучитьУсловие_РегНомер :String;
+    if (ФрагментРегНомера <> nil) then
+      Return 'Match(РегНомер,"*' + ФрагментРегНомера + '*")';
+    fi;
+  end;
+
+  func ПолучитьУсловие_Прекращение :String;
+    if (ВариантПрекращения = 1) then
+      Return 'not Прекращено';
+    elsif (ВариантПрекращения = 2) then
+      Return 'Прекращено';
+    fi;
+  end;
+
+  func ПолучитьУсловие_Отсылка :String;
+    if (ВариантОтсылки = 1) then
+      Return 'not ПризнакОтсылки';
+    elsif (ВариантОтсылки = 2) then
+      Return 'ПризнакОтсылки';
+    fi;
+  end;
+
+  func ПолучитьУсловие_МестоИздания :String;
+    var aFlt :String[];
+    if (МестоИздания <> nil) then
+      AddInArray(aFlt, 'МестаИздания.Exists(МестоИздания.DocID=' + Str(МестоИздания.DocID) +')');
+      AddInArray(aFlt, 'МестаИздания.Exists(МестоИздания.GroupDoc.DocID=' + Str(МестоИздания.DocID) +')');
+      AddInArray(aFlt, 'МестаИздания.Exists(МестоИздания.GroupDoc.GroupDoc.DocID=' + Str(МестоИздания.DocID) +')');
+      AddInArray(aFlt, 'МестаИздания.Exists(МестоИздания.GroupDoc.GroupDoc.GroupDoc.DocID=' + Str(МестоИздания.DocID) +')');
+      AddInArray(aFlt, 'МестаИздания.Exists(МестоИздания.GroupDoc.GroupDoc.GroupDoc.GroupDoc.DocID=' + Str(МестоИздания.DocID) +')');
+      Return СложитьСтрокиФильтраПоИли(aFlt);
+    fi;
+  end;
+
+  func ПолучитьУсловие_ФрагментАдреса :String;
+    var aFlt :String[];
+    if (ФрагментАдреса1 <> nil) then
+      AddInArray(aFlt, 'Match(Редакция.Адрес,"*' + ФрагментАдреса1 + '*")');
+    fi;
+    if (ФрагментАдреса2 <> nil) then
+      AddInArray(aFlt, 'Match(Редакция.Адрес,"*' + ФрагментАдреса2 + '*")');
+    fi;
+    Return СложитьСтрокиФильтраПоИ(aFlt);
+  end;
+
+  func ПолучитьУсловие_ТипИздания :String;
+    if (ТипИздания = 1) then
+      Return 'ТипИздания=0';
+    elsif (ТипИздания = 2) then
+      Return 'ТипИздания=1';
+    fi;
+  end;
+
+  func ПолучитьУсловие_Периодичность :String;
+    if (Периодичность <> 'Все') and  (Периодичность <> '') then
+      Return 'Периодичность="' + Периодичность + '"';
+    fi;
+  end;
+
+  func ПолучитьУсловие_ТеррРаспространения :String;
+    if (ТерриторияРаспространения <> nil) then
+      Return 'ТерриторияРаспространения=' + Str(ТерриторияРаспространения);
+    fi;
+  end;
+
+  func ПолучитьУсловие_Тематика :String;
+    if (Тематика <> nil) then
+      Return 'Тематики.Exists(Тематика.DocID=' + Str(Тематика.DocID) + ')';
+    fi;
+  end;
+
+  func ПолучитьУсловие_ЧАЦН :String;
+    if (ЧАЦН <> nil) then
+      Return 'ЧАЦН.Exists(ЧАЦН.DocID=' + Str(ЧАЦН.DocID) + ')';
+    fi;
+  end;
+
+  func ПолучитьУсловие_Язык :String;
+    if (Язык <> nil) then
+      Return 'Языки.Exists(Язык.DocID=' + Str(Язык.DocID) + ')';
+    fi;
+  end;
+
+  func ПолучитьУсловие_НачалоВыхода :String;
+    if (ГодНачалаИздания > 1231) then
+      Return 'Year(ДатаВыходаПервогоНомера)=' + Str(ГодНачалаИздания);
+    fi;
+  end;
+
+  func ПолучитьУсловие_ГодЛетописи :String;
+    if (ГодЛППИ > 1231) then
+      Return 'ГодЛетописи=' + Str(ГодЛППИ);
+    fi;
+  end;
+
+  func ПолучитьУсловие_ГодВыпуска :String;
+    var aDocId :Integer[];
+    if (ГодВыпуска > 1231) then
+      with Query.Create([РКП_Газеты.ВыпускГазеты]) do
+        LoadingFieldsMode = СИС2.Константы.mdNone;
+        LoadingFields     = 'Газета.DocId';
+        Filter = 'ГодВыпуска=' + Str(ГодВыпуска);
+        Select;
+        while not Eof do
+          AddInArray(aDocId, (Current as РКП_Газеты.ВыпускГазеты).Газета.DocId);
+          Next;
+        od;
+      end;
+      if (aDocId <> nil) then
+        Return 'DocId in ' + ToStr(aDocId);
+      fi;
+    fi;
+  end;
+
+  proc ВидЛогическихУсловий;
+    if (секцПрекращенные <> nil) then
+      секцПрекращенные.Row[1].visible = false;
+      секцПрекращенные.Row[2].visible = false;
+      секцПрекращенные.Row[3].visible = false;
+      Прекращение_Все    = false;
+      Прекращение_Ложь   = false;
+      Прекращение_Истина = false;
+      if (ВариантПрекращения = 0) then
+        секцПрекращенные.Row[1].visible = true;
+        Прекращение_Все                 = true;
+      elsif (ВариантПрекращения = 1) then
+        секцПрекращенные.Row[2].visible = true;
+        Прекращение_Ложь                = true;
+      elsif (ВариантПрекращения = 2) then
+        секцПрекращенные.Row[3].visible = true;
+        Прекращение_Истина              = true;
+      fi;
+    fi;
+    -------
+    if (секцОтсылки <> nil) then
+      секцОтсылки.Row[1].visible = false;
+      секцОтсылки.Row[2].visible = false;
+      секцОтсылки.Row[3].visible = false;
+      Отсылки_Все    = false;
+      Отсылки_Ложь   = false;
+      Отсылки_Истина = false;
+      if (ВариантОтсылки = 0) then
+        секцОтсылки.Row[1].visible = true;
+        Отсылки_Все                = true;
+      elsif (ВариантОтсылки = 1) then
+        секцОтсылки.Row[2].visible = true;
+        Отсылки_Ложь               = true;
+      elsif (ВариантОтсылки = 2) then
+        секцОтсылки.Row[3].visible = true;
+        Отсылки_Истина             = true;
+      fi;
+    fi;
+  end;
+
+  proc ВидСекцииПериодичность;
+    --процедура управляет видом секции, описывающей периодичность,
+    --не позволяя оператору вводить недопустимые значения
+    var CellPeriod:TemplateCell;
+    if (секцПериодичность <> nil) then
+      CellPeriod                    = секцПериодичность.CellByField["КоличествоВПериоде_"];
+      CellPeriod.List.Clear;
+      КоличествоВПериоде_           = nil;
+      if          КатегорияПериодичности  = 0+1   then           --Неопределенно
+        CellPeriod.ReadOnly = true;
+        CellPeriod.FieldColor=Template.CurrentFrame.Color;
+      else
+        CellPeriod.ReadOnly       = false;
+        CellPeriod.FieldColor     = секцПериодичность.CellByField["КатегорияПериодичности"].FieldColor;
+        if        КатегорияПериодичности  = 1+1   then           --В течение дня
+          КоличествоВПериоде_     = КоличествоВПериоде-1;
+          CellPeriod.List.Add('1 раз');
+          CellPeriod.List.Add('2 раза');
+        elsif     КатегорияПериодичности  = 2+1   then           --В течение недели
+          КоличествоВПериоде_     = КоличествоВПериоде-1;
+          CellPeriod.List.Add('1 раз');
+          CellPeriod.List.Add('2 раза');
+          CellPeriod.List.Add('3 раза');
+          CellPeriod.List.Add('4 раза');
+          CellPeriod.List.Add('5 раз');
+          CellPeriod.List.Add('6 раз');
+          CellPeriod.List.Add('7 раз');
+        elsif     КатегорияПериодичности  = 3+1   then           --В течение месяца
+          КоличествоВПериоде_     = КоличествоВПериоде-1;
+          CellPeriod.List.Add('1 раз');
+          CellPeriod.List.Add('2 раза');
+          CellPeriod.List.Add('3 раза');
+          CellPeriod.List.Add('4 раза');
+          CellPeriod.List.Add('5 раз');
+          CellPeriod.List.Add('6 раз');
+          CellPeriod.List.Add('7 раз');
+          CellPeriod.List.Add('8 раз');
+        elsif     КатегорияПериодичности  = 4+1   then           --В течение года
+          КоличествоВПериоде_     = КоличествоВПериоде-1;
+          CellPeriod.List.Add('1 раз');
+          CellPeriod.List.Add('2 раза');
+          CellPeriod.List.Add('3 раза');
+          CellPeriod.List.Add('4 раза');
+          CellPeriod.List.Add('5 раз');
+          CellPeriod.List.Add('6 раз');
+          CellPeriod.List.Add('7 раз');
+          CellPeriod.List.Add('8 раз');
+          CellPeriod.List.Add('9 раз');
+          CellPeriod.List.Add('10 раз');
+          CellPeriod.List.Add('11 раз');
+          CellPeriod.List.Add('12 раз');
+        else
+          --Message('Недопустимое значение периодичности!');
+          КатегорияПериодичности  = 0;
+          CellPeriod.ReadOnly     = true;
+          CellPeriod.FieldColor   = Template.CurrentFrame.Color;
+        fi;
+      fi;
+      if КатегорияПериодичности>1 then
+        if Периодичность  <>РКП_Справочники.BiblioRecord.ПериодичностьВыхода(КоличествоВПериоде_+1, (КатегорияПериодичности - 1) as РКП_Справочники.Def.tPeriodicityCategory )      then
+          Периодичность   = РКП_Справочники.BiblioRecord.ПериодичностьВыхода(КоличествоВПериоде_+1,(КатегорияПериодичности - 1) as РКП_Справочники.Def.tPeriodicityCategory);
+        fi;
+      else
+        Периодичность   = "Все";
+      fi;
+    fi;
+  end;
+
+end

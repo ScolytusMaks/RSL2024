@@ -1,0 +1,151 @@
+class inherited РКП_СИС.RI.intBase "Интерфейс записи (выпуск газеты за год)";
+
+import РКП_СИС Classes Functions, Recs;
+
+inclass public
+
+  func СвязанныйКлассЗаписей: Class СИС2.Базовая.БазоваяЗапись;
+    Result = РКП_Газеты.ВыпускГазеты;
+  end;
+
+--  func CreateNew(rFinDoc :РКП_Газеты.ВыпускГазеты; nearIntRec :РКП_Газеты.RI.ЕдиницаХранения): РКП_Газеты.RI.ЕдиницаХранения;
+--    Result = Create;
+--    Result.Record.УчетныйДокумент = rFinDoc;
+--    if (nearIntRec <> nil) then
+--      Result.Record.Газета = nearIntRec.Record.Газета;
+--      Result.Record.ГодВыпуска = nearIntRec.Record.ГодВыпуска;
+--    fi;
+--    Result.InitByDefault;
+--  end;
+
+  func Create: РКП_Газеты.RI.ВыпускГазеты;
+    Result = inherited Create;
+    Result.Record = РКП_Газеты.ВыпускГазеты.Create;
+  end;
+
+  func ОткрытьПоЗаписи synonym OpenRecord(locRecord: РКП_Газеты.ВыпускГазеты): РКП_Газеты.RI.ВыпускГазеты;
+    Result = inherited Create;
+    Result.Record = locRecord;
+  end;
+
+  func БланкРедакторПоУмолчанию: Class BlankForm;
+    Result = nil;
+  end;
+
+  func КартотекаПоУмолчанию: Class CardForm;
+    Result = nil;
+  end;
+
+inobject public
+
+  Record: РКП_Газеты.ВыпускГазеты;
+
+  proc ИнициализироватьПоУмолчанию synonym InitByDefault;
+    Init;
+  end;
+
+  proc Инициализировать synonym Init;
+    Assert(Record.State = Kernel.Record.Created);
+  end;
+
+inclass public
+  #Warning 'Не передается в газету инф. о прекращении издания.';
+  proc ОбновитьСтатистику (vNsp :РКП_Газеты.Газета; vYear :Integer; vOpt :РКП_Газеты.RI.Газета.типОпцияПолученияСтатАн);
+    var rStat :РКП_Газеты.ВыпускГазеты;
+    var НомеровПолученоВ, НомеровВыпущеноВ :Integer;
+    var ГодовойТиражВ, СреднийРазовыйТиражВ :Numeric;
+    var cRec :РКП_Газеты.НомерГазеты;
+    var ТочностьДатыПоследнегоПолученного :Integer;
+    var ВалПоследнегоПолученного :String;
+    var НомерПоследнегоПолученного :String;
+    var ДатаПоследнегоПолученного :Date;
+    var aAnlt :Variant[];
+    -- все действия по обработке статистики выпуска выполяняются
+    -- только для года 2006 и позже или ранее 1990 (для БД 1917 года)
+    if (vYear >=2006) or (vYear < 1990) then
+      rStat = ПолучитьЗаписьСтат(vNsp, vYear, false);
+      if (rStat <> nil) then -- Если записи нет, то обработка не происходит, т.к. запись должна создаваться пользователем
+        if not rStat.КомплектПолучен then -- Обработка происходит, если коплект получен не весь
+          -- Вычисление в одном запросе
+          with Query.Create([РКП_Газеты.НомерГазеты]) do
+            with FltMaker.CreateExt do
+              AddCondition( 'isGroup=0' );
+              AddCondition( 'Газета=' + vNsp.DocIDStr );
+              AddCondition( 'ГодВыпуска=' + Str(vYear) );
+              CompressConditionsToOne;
+              AddCondition( 'not(СозданОЛГС and НеПолучен)' );
+              Filter = GetFilter;
+              Order = 'СерияНумерации;Номер';
+              LoadingFieldsMode = СИС2.Константы.mdNone;
+              LoadingFields = 'НеПолучен;Тираж;ТочностьДатыВыхода;ВаловыйНомер;Номер;ДатаВыхода';
+              Select;
+              while not Eof do
+                cRec = Current as РКП_Газеты.НомерГазеты;
+                if (not cRec.НеПолучен) then -- Вычисление тиража выпуска (только зарегистрированные) и последнего номера
+                  НомеровПолученоВ                  = НомеровПолученоВ + 1;
+                  ГодовойТиражВ                     = ГодовойТиражВ + cRec.Тираж;
+                  ТочностьДатыПоследнегоПолученного = cRec.ТочностьДатыВыхода;
+                  ВалПоследнегоПолученного          = cRec.ВаловыйНомер;
+                  НомерПоследнегоПолученного        = cRec.Номер;
+                  ДатаПоследнегоПолученного         = cRec.ДатаВыхода;
+                fi;
+                НомеровВыпущеноВ = НомеровВыпущеноВ + 1; -- Вычисление количества выпущенных номеров (вкл.незарегистрированные)
+                Next;
+              od;
+            end;
+          end;
+          if (НомеровПолученоВ > 0) then
+            ГодовойТиражВ        = ГодовойТиражВ / 1000;
+            СреднийРазовыйТиражВ = Round(ГодовойТиражВ/НомеровПолученоВ, 1);
+            ГодовойТиражВ        = Round(ГодовойТиражВ, 1);
+          fi;
+          -- Аналитика
+          aAnlt = RI.Газета.ПолучитьСтатАналитикуДляГазеты(vNsp, vOpt);
+          with RI.Газета do
+            rStat.СреднийРазовыйТираж               = СреднийРазовыйТиражВ;
+            rStat.ГодовойТираж                      = ГодовойТиражВ;
+            rStat.НомеровВыпущено                   = НомеровВыпущеноВ;
+            rStat.НомеровПолучено                   = НомеровПолученоВ;
+            rStat.Тематика                          = aAnlt[анТематика] as РКП_Справочники.спрТематика;
+            rStat.МестоИздания                      = aAnlt[анМестоИздания] as РКП_Справочники.спрГеография;
+            rStat.ТерриторияРаспространения         = aAnlt[анТерриторияРаспространения] as РКП_Справочники.спрТерриторияРаспространения;
+            rStat.ТипИздания                        = aAnlt[анТипИздания] as Integer;
+            rStat.Язык                              = aAnlt[анЯзык] as РКП_Справочники.спрЯзыкИздания;
+            rStat.ЧАЦН                              = aAnlt[анЧАЦН] as РКП_Справочники.спрТематика;
+            rStat.Жанр                              = aAnlt[анЖанр] as РКП_Справочники.спрЖанр;
+            rStat.НомерПоследнегоПолученного        = НомерПоследнегоПолученного;
+            rStat.ДатаПоследнегоПолученного         = ДатаПоследнегоПолученного;
+            rStat.ВалПоследнегоПолученного          = ВалПоследнегоПолученного;
+            rStat.ТочностьДатыПоследнегоПолученного = ТочностьДатыПоследнегоПолученного;
+            rStat.КатегорияПериодичности            = aAnlt[анКатегорияПериодичности] as Integer;
+            rStat.КоличествоВПериоде                = aAnlt[анКоличествоВПериоде] as Integer;
+            rStat.Периодичность                     = aAnlt[анПериодичность] as String;
+          end;
+          RecordPostIfNeed(rStat);
+        fi;
+      fi;
+    fi;
+  end;
+
+  func ПолучитьЗаписьСтат(vNsp :РКП_Газеты.Газета; vYear :Integer; vCreate :Logical) :РКП_Газеты.ВыпускГазеты;
+    var rStat, rStatPrev :РКП_Газеты.ВыпускГазеты;
+    rStat = FindRecord( РКП_Газеты.ВыпускГазеты, 'Газета=' + vNsp.DocIDStr + ' and ГодВыпуска=' + Str(vYear) );
+    if (rStat <> nil) then
+      Return rStat;
+    else
+      if vCreate then
+        rStat = РКП_Газеты.ВыпускГазеты.Create;
+        rStat.Газета = vNsp;
+        rStat.ГодВыпуска = vYear;
+        rStatPrev = FindRecord( РКП_Газеты.ВыпускГазеты, 'Газета=' + vNsp.DocIDStr + ' and ГодВыпуска<' + Str(vYear), 'ГодВыпуска-' );
+        if (rStatPrev <> nil) then
+          rStat.ФорматВыпуска = rStatPrev.ФорматВыпуска;
+          rStat.ЧислоПолос = rStatPrev.ЧислоПолос;
+        fi;
+        rStat.Post;
+        Return rStat;
+      fi;
+    fi;
+  end;
+
+end

@@ -1,0 +1,105 @@
+Class inherited МашинаРеквизитов.Базовые.блРедакторСИнтерфейсом "Единица хранения" , editor ЕдиницаХранения;
+
+import РКП_СИС classes StdCode, Recs, Functions, FilterMaker, StringsFunctions;
+import classes Константы;
+
+inclass public
+
+inobject private
+
+--{{ 2_Свойства
+
+  var Интерфейс :РКП_Газеты.RI.ЕдиницаХранения;
+  var ПроверкаПередЗакрытиемВкл :Logical;
+
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inclass public
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриСчитывании;
+    inherited шаблон_ПриСчитывании;
+    ПроверкаПередЗакрытиемВкл = true;
+  end;
+
+  func шаблон_ПередЗакрытием(ModalResult :Integer) :Logical;
+    var vCount :Integer;
+    if ПроверкаПередЗакрытиемВкл then
+      try
+        vCount = Int(Template.CellByField['Количество'].Text);
+      except
+      end;
+      if (Template.CellByField['ДатаПоступления'].Text <> nil) and (vCount > 0) then
+        Template.EndEdit(true);
+        Result = True;
+      else
+        Message('Для завершения работы с формой необходимо, чтобы поле "Дата поступления" было заполнено.' + Br +
+        'Кол-во экземпляров должно быть ненулевым неотрицательным значением.');
+      fi;
+    else
+      Return true;
+    end;
+  end;
+
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func Поле_ПриВыводе_ЗаголовокОкнаФормы(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    if (НомерГазеты <> nil) and ((НомерГазеты.Газета <> nil)) then
+      Result = НомерГазеты.Газета.НазваниеОсн;
+      Result = Result + Br;
+      if (НомерГазеты.Номер <> nil) then
+        if (НомерГазеты.Номер = UnnumberedIssue) then
+          Result = Result + BiblioRecord.ОписаниеНомера(НомерГазеты);
+        else
+          Result = Result + '№ ' + BiblioRecord.ОписаниеНомера(НомерГазеты);
+        fi;
+      else
+        Result = Result + '<cf:red>Номер не указан';
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриПроверке_ДатаПоступления(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    Result = (Value as Date <> nil);
+    if (not Result) then
+      Message('Поле обязательно для заполнения!');
+    fi;
+  end;
+
+  func Поле_ПриПроверке_Количество(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    Result = (Value as Integer > 0);
+    if (not Result) then
+      Message('Количество экземпляров газеты не может быть нулевым или отрицательным!');
+    fi;
+  end;
+
+
+  func Поле_ПриВыводе_Цена(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    if (НомерГазеты <> nil) then
+      Result = НомерГазеты.Цена as Numeric;
+    fi;
+  end;
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+  proc кнОтменить_ПриНажатии(Sender :Button);
+    ПроверкаПередЗакрытиемВкл = false;
+    inherited кнОтменить_ПриНажатии(Sender);
+  end;
+
+-- 2_Дополнительные команды0. --
+
+
+-- 2_Вспомогательные методы0. --
+
+  proc УстановитьФокусНаПервоеПолеВвода;
+    Template.CellByField['Количество'].SetFocus;
+  end;
+
+end

@@ -1,0 +1,47 @@
+﻿class inherited NameSplitterSrv;
+
+import classes StringsFunctions;
+import СИС2 classes Функции;
+
+inclass public
+
+  func CreateExt (aRawFullName :String) :NameSplitter;
+    Result = inherited CreateExt(aRawFullName);
+  end;
+
+inobject private
+
+  -- Определить порядок слов
+  proc ChooseWordOrder3;
+    var vTitle, vRequest :String;
+    var vButtonFace :String[];
+    var vChoice :Integer;
+    vTitle   = 'Запрос';
+    vRequest = 'Пожалуйста, выберите правильную форму:' + Br + '"Фамилия", "Имя", "Отчество"';
+    AddInArray(vButtonFace, Format('%s %s %s', [ExtractedWord[1], ExtractedWord[2], ExtractedWord[3]]) );
+    AddInArray(vButtonFace, Format('%s %s %s', [ExtractedWord[2], ExtractedWord[3], ExtractedWord[1]]) );
+    AddInArray(vButtonFace, Format('%s %s %s', [ExtractedWord[3], ExtractedWord[1], ExtractedWord[2]]) );
+    vChoice = Enquiry(vTitle, vRequest, vButtonFace, 1, System.itQuestion);
+    if    (vChoice = 2) then WordsOrder = [2, 3, 1];
+    elsif (vChoice = 3) then WordsOrder = [3, 1, 2];
+    else  SetDefaultWordOrder;
+    fi;
+  end;
+
+  -- Определить порядок слов
+  proc ChooseWordOrder2;
+    var vTitle, vRequest :String;
+    var vButtonFace :String[];
+    var vChoice :Integer;
+    vTitle   = 'Запрос';
+    vRequest = 'Пожалуйста, выберите правильную форму:' + Br + '"Фамилия", "Имя"';
+    AddInArray(vButtonFace, Format('%s %s %s', [ExtractedWord[1], ExtractedWord[2]]) );
+    AddInArray(vButtonFace, Format('%s %s %s', [ExtractedWord[2], ExtractedWord[1]]) );
+    vChoice = Enquiry(vTitle, vRequest, vButtonFace, 1, System.itQuestion);
+    if    (vChoice = 2) then WordsOrder = [2, 1, 3];
+    else  SetDefaultWordOrder;
+    fi;
+  end;
+
+
+end

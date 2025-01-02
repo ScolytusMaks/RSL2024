@@ -1,0 +1,144 @@
+class inherited РКП_СИС.RI.intBase "";
+
+import СИС2 Classes Математика;
+import РКП_СИС Classes Functions, StringsFunctions, Recs, FilterMaker;
+
+inclass public
+
+  var ТекстРодительный :String = 'записи справочника';
+  var ИмяПоляНаим          :String = 'Наим';
+  var ИмяПоляНеПрименяется :String = 'НеПрименяется';
+  var ОбязательныеПоля     :String[] = ['Наим'];
+  var ХешируемыеПоля       :String[] = ['Наим'];
+
+inclass public
+
+  func СвязанныйКлассЗаписей: Class BaseRefType1;
+    Result = nil;
+  end;
+
+  func БланкРедакторПоУмолчанию: Class Справочники.editBaseType1;
+    Result = nil;
+  end;
+
+  func КартотекаПоУмолчанию: Class Справочники.CardBaseType1;
+    Result = nil;
+  end;
+
+  func КартотекаДляВыбора (addParam :Variant = nil) :Class Справочники.CardBaseType1;
+    Result = КартотекаПоУмолчанию;
+  end;
+
+  func ПолучитьХешируемыеПоля :Variant[2];
+    var f :Integer;
+    if (aHashgFields = nil) then
+      for f = 1 .. LengthOfArray(ХешируемыеПоля) do
+        aHashgFields[f] = [ХешируемыеПоля[f], (СвязанныйКлассЗаписей.ClassInfo.MemberByName(ХешируемыеПоля[f]) as FieldInfo).ResultType.VarType];
+      od;
+    fi;
+    Return aHashgFields;
+  end;
+
+inclass private
+
+  var НеХешируемыеСимволы  :String[] = ['.','/','\','(',')',',',';','[',']','{','}','=','+','!','?','<','>','*','@','#','_','%',':','&','-'];
+  var aHashgFields         :Variant[2];
+
+inclass public
+
+  -- обновление хеша записей во всей таблице
+  proc UpdateHashFieldsIfNeed synonym ОбновитьХешВсехЗаписей;
+    var r :Record;
+    var i, ii :Integer;
+    var Tr :СИС2.SmartTransaction;
+    var WasApplay :Logical;
+    if UpdateHashFieldsNeed then
+      ПолучитьХешируемыеПоля;
+      Tr  = СИС2.SmartTransaction.CreateEx([СвязанныйКлассЗаписей], 900);
+      with Query.Create([СвязанныйКлассЗаписей]) do
+        Select;
+        ii = Count;
+        while not Eof do
+          Inc(i);
+          r = Current;
+          r.SetField( 'Hash', GetHashByRecord(r) );
+          РКП_СИС.Recs.RecordPostIfNeed(r);
+          Next;
+          WasApplay = Tr.NextStep;
+          Hint('Обновление хеша значений всех записей...', i, ii);
+        od;
+        if (not WasApplay):
+          Hint('Обновление хеша значений всех записей (сохранение)...', i, ii);
+          Tr.Apply;
+        fi;
+        Hint(' ');
+      end;
+    fi;
+  end;
+
+  -- обновление хеша записей во всей таблице необходимо
+  func UpdateHashFieldsNeed synonym НеобходимоОбновитьХешВсехЗаписей :Logical;
+    with Query.Create([СвязанныйКлассЗаписей]) do
+      Filter = 'Hash=nil';
+      Return RecordsExists;
+    end;
+  end;
+
+  -- вычисление хеша по записи
+  func GetHashByRecord synonym ПолучитьХешПоЗаписи (Rec :BaseRefType1) :String;
+    var f :Integer;
+    var vOriginalVal :String;
+    var vRec :Record;
+    var locHashgFields :Variant[2];
+    locHashgFields = ПолучитьХешируемыеПоля;
+    for f = 1 .. LengthOfArray(locHashgFields) do
+      if (locHashgFields[f,2] = VarString ) then
+        vOriginalVal = vOriginalVal + Rec.GetField(locHashgFields[f,1]);
+      elsif (locHashgFields[f,2] = VarObject ) then
+        vRec = Rec.GetField(locHashgFields[f,1]) as Record;
+        vOriginalVal = vOriginalVal + vRec.ExtID;
+      else
+        vOriginalVal = vOriginalVal + Str(Rec.GetField(locHashgFields[f,1]));
+      fi;
+    od;
+    Result = GetHashFromValue(vOriginalVal);
+  end;
+
+  -- вычисление хеша строкового значения:
+  -- исключение пробелов, замена нехешируемых символов (кроме последнего) на '.', перевод всего в верхний регистр
+  func GetHashFromValue synonym ПолучитьХешЗначения (Original :String) :String;
+    var p, pp :Integer;
+    var vLetter, tmpS :String;
+    pp = Length(Original);
+    p = pp;
+    for p = pp .. 1 step -1 do
+      vLetter = SubStr(Original, p, 1);
+      if not vLetter in [' '] then
+        if vLetter in НеХешируемыеСимволы then
+          if (p < pp) then
+            vLetter = '.';
+          else
+            vLetter = '';
+          fi;
+        fi;
+        Result = vLetter + Result;
+      fi;
+    od;
+    Result = Up(Result);
+    AddCRC32(tmpS, Result);
+    Result = tmpS;
+  end;
+
+
+inobject public
+
+  proc ИнициализироватьПоУмолчанию synonym InitByDefault;
+    Init;
+  end;
+
+  proc Инициализировать synonym Init;
+    Assert(Record.State = Kernel.Record.Created);
+  end;
+
+
+end

@@ -1,0 +1,27 @@
+class "";
+
+
+inclass
+    Стиль_Заголовок1            :string =  "\s0\qj\f0\sl100\sa000\lang1049\fs20\li500\fi-500 ";
+    Стиль_Заголовок2            :string =  "\s00\qj\f0\sl100\sa000\lang1049\fs20\li000\fi500 ";
+    Стиль_Фон                   :string =  "\s1\qj\f0\sl100\sa000\lang1049\fs20\li000\fi500 ";
+    Стиль_Фон2                  :string =  "\s11\qj\f0\sl090\sa000\lang1049\fs18\li000\fi500 ";
+    Стиль_КлассификаторЛ        :string =  "\s2\ql\f0\sl100\sa000\lang1049\fs17\fi000 ";
+    Стиль_КлассификаторП        :string =  "\s3\qr\f0\sl100\sa000\lang1049\fs17\fi000 ";
+    Стиль_НомерСтраницы         :string =  "\s4\qc\f0\sl100\sa000\lang1049\fs20\fi000 ";
+    Стиль_Сепаратор1            :string =  "\s5\ql\f0\sl400\sa000\lang1049\fs82\fi000 ";
+    Стиль_Сепаратор2            :string =  "\s6\ql\f0\sl000\sa000\lang1049\fs10\fi000 ";
+    --синонимы
+    styl0                       :string = Стиль_Заголовок1;
+    styl00                      :string = Стиль_Заголовок2;
+    styl1                       :string = Стиль_Фон;
+    styl11                      :string = Стиль_Фон2;
+    styl2                       :string = Стиль_КлассификаторЛ;
+    styl3                       :string = Стиль_КлассификаторП;
+    styl4                       :string = Стиль_НомерСтраницы;
+    styl5                       :string = Стиль_Сепаратор1;
+    styl6                       :string = Стиль_Сепаратор2;
+
+inobject
+
+end

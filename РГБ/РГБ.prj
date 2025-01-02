@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project Version="1">
+  <Options Caption="РГБ" Comment="Российская государственная библиотека" Version="001" Author="Copyright © 2024 Samsonenko M., ISF" Code="0" SubCode="0" WebCode="0" WebSubCode="0" Frontal="True"/>
+  <Usage>
+    <Project Name="РКП_СИС"/>
+    <Project Name="РКП_Справочники"/>
+    <Project Name="РКП_Газеты"/>
+    <Project Name="РКП_Статьи"/>
+  </Usage>
+  <Groups>
+    <Group Name="ClientClasses" Type="Classes" Disabled="False"/>
+    <Group Name="CustomCommands" Type="Classes" Disabled="False"/>
+    <Group Name="Interfaces" Type="Interfaces" Disabled="False"/>
+    <Group Name="AccessSchemes" Type="Access" Disabled="False"/>
+    <Group Name="Attachments" Type="Other" Disabled="False"/>
+    <Group Name="Blanks" Type="Blanks" Disabled="False"/>
+    <Group Name="Help" Type="Helps" Disabled="False"/>
+  </Groups>
+</Project>

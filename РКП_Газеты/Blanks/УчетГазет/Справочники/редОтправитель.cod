@@ -1,0 +1,182 @@
+Class inherited МашинаРеквизитов.Базовые.блРедакторСИнтерфейсом "Отправитель печатной продукции", editor Базовый.Данные.Субъект;
+
+-- Особенности работы со справочником
+-- При сохранении запись проверяется на уникальность по содержимому поля "Код"
+-- Поле "Код заполняется автоматически. При отсутствии сведений об ИНН в поле записывается значение ExtId.
+-- При заполненном значении ИНН - з ИНН. Т.о. невозможно сохранить записи с одинаковым ИНН, но возможно сохранить записи с пустым ИНН.
+-- Краткое наименование - это наименование из накладной (иного учетного док-та). По умолчанию считается, что полное наименование совпадает с кратким.
+-- Полное наименование заполняется при наличии информации.
+-- В картотеку выводится полное наименование, при отсутствии полного - краткое.
+-- При вводе ИНН, КПП и ОГРН (ОГРНИП) значения проверяются на разряднсть и отсутствие буквенных символов.
+-- Поля в блоке "Адрес" необязательны для заплолнения.
+-- В картотеку адрес выводится со след.приоритетом: юридический, при отсутствии -  фактический, при отсутствии юридического и фактического - почтовый.
+
+
+--{{ _Свойства
+inobject private
+
+  var frInfo :TemplateFrame;
+
+--}}
+
+-- _Конструкторы, визуализаторы. --
+
+inclass public
+
+inobject private
+
+-- _Обработчики событий шаблона. --
+
+  func шаблон_ПриПроверке :Logical;
+    Result = inherited шаблон_ПриПроверке;
+    if Result then
+      Result = (КраткоеИмя <> nil);
+      if (not Result) then
+        Message('Пожалуйста, заполните все обязательные для ввода поля!');
+      fi;
+    fi;
+  end;
+
+
+
+-- _Обработчики событий клеток шаблона. --
+
+  func Поле_ПриВыводе_ЗаголовокОкнаФормы(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+  end;
+
+  func Поле_ПриВходе(Cell :TemplateCell; Index :Integer; Action :Template.EnterTypes) :Logical;
+    if (Cell.Contents = 'КраткоеИмя') and (Action = Template.Clear) then
+      КраткоеИмя = nil;
+      Имя = nil;
+      ПолнИмя = nil;
+      Template.EndEdit(true);
+      Return false;
+    elsif (Cell.Contents = 'ИНН') and (Action = Template.Clear) then
+      ИНН = nil;
+      Код = ExtId;
+      Template.EndEdit(true);
+      Return false;
+    fi;
+    Return true;
+  end;
+
+  func Поле_ПриПроверке_ИНН(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    var i, ii :Integer;
+    var smb :String;
+    Result = (Length(Value as String) in [0,10,12]);
+    if (not Result) then
+      Message('ИНН должен состоять из 10 (для юрлица) или 12 (для физлица) символов!');
+      Return;
+    fi;
+    if Result then
+      ii = Length(Value as String);
+      for i = 1 .. ii do
+        smb = SubStr((Value as String), i, 1);
+        if not (smb in ['0','1','2','3','4','5','6','7','8','9']) then
+          Result = false;
+        fi;
+        if (not Result) then
+          Break;
+        fi;
+      od;
+    fi;
+    if (not Result) then
+      Message('ИНН не должен включать в себя иных символов, кроме цифр!');
+      Return;
+    fi;
+  end;
+
+  func Поле_ПриПроверке_КПП(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    var i, ii :Integer;
+    var smb :String;
+    Result = (Length(Value as String) in [0,9]);
+    if (not Result) then
+      Message('КПП должен содержать 9 символов!');
+      Return;
+    fi;
+    if Result then
+      ii = Length(Value as String);
+      for i = 1 .. ii do
+        smb = SubStr((Value as String), i, 1);
+        if not (smb in ['0','1','2','3','4','5','6','7','8','9']) then
+          Result = false;
+        fi;
+        if (not Result) then
+          Break;
+        fi;
+      od;
+    fi;
+    if (not Result) then
+      Message('КПП не должен включать в себя иных символов, кроме цифр!');
+      Return;
+    fi;
+  end;
+
+  func Поле_ПриПроверке_ОГРН(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    var i, ii :Integer;
+    var smb :String;
+    Result = (Length(Value as String) in [0,13]);
+    if (not Result) then
+      Message('ОГРН должен содержать 13 символов!');
+      Return;
+    fi;
+    if Result then
+      ii = Length(Value as String);
+      for i = 1 .. ii do
+        smb = SubStr((Value as String), i, 1);
+        if not (smb in ['0','1','2','3','4','5','6','7','8','9']) then
+          Result = false;
+        fi;
+        if (not Result) then
+          Break;
+        fi;
+      od;
+    fi;
+    if (not Result) then
+      Message('ОГРН не должен включать в себя иных символов, кроме цифр!');
+      Return;
+    fi;
+  end;
+
+
+  proc Поле_ПриВыходе(Cell :TemplateCell; Index :Integer);
+    if (Cell.Contents = 'КраткоеИмя') then
+      Имя = Cell.Value;
+      if (ПолнИмя = nil) then
+        ПолнИмя = Cell.Value;
+      fi;
+      frInfo.CellByField['ИНН'].SetFocus;
+    elsif (Cell.Contents = 'ПолнИмя') then
+      frInfo.CellByField['ИНН'].SetFocus;
+    elsif (Cell.Contents = 'ТипКонтрагента') then
+      frInfo.CellByField['ИНН'].SetFocus;
+    elsif (Cell.Contents = 'ИНН') and (Cell.Value <> nil) and (Код <> ИНН) then
+      Код = ИНН;
+      frInfo.CellByField['КодПричины'].SetFocus;
+    elsif (Cell.Contents = 'КодПричины') then
+      frInfo.CellByField['ОГРН'].SetFocus;
+    elsif (Cell.Contents = 'ОГРН') then
+      frInfo.CellByField['ЮрАдрес'].SetFocus;
+    elsif (Cell.Contents = 'ЮрАдрес') and (Cell.Value <> nil) then
+      if (АдресФактический = nil) then
+        АдресФактический = Cell.Value;
+      fi;
+      if (АдресПочтовый = nil) then
+        АдресПочтовый = Cell.Value;
+      fi;
+      frInfo.CellByField['Телефон'].SetFocus;
+    fi;
+  end;
+
+
+-- _Обработчики событий прочих объектов шаблона. --
+
+
+-- _Дополнительные команды. --
+
+
+-- _Вспомогательные методы. --
+
+
+
+end

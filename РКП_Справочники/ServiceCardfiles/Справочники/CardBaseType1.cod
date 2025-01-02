@@ -1,0 +1,83 @@
+class inherited РКП_СИС.CardBaseType0 "Справочники тип 1";
+
+import СИС2 classes Константы, Исключения;
+import РКП_СИС Classes Functions, FilterMaker;
+
+inclass public
+
+  var КлассИнтерфейса :Class РКП_Справочники.RI.Справочники.intBaseType1 = AbstractMethod;
+
+  func ВыполнитьВыбор (var vSelectRes :РКП_Справочники.BaseRefType1; addParam :Variant[2] = nil) :Integer;
+    var vForm: РКП_Справочники.Справочники.CardBaseType1;
+    vForm = КлассИнтерфейса.КартотекаДляВыбора.Create;
+    vForm.УстСвойстваДоп(addParam);
+    if CmOk = vForm.ShowEx(vSelectRes, , Kernel.Window.ModalWindow) then
+      Return CmOk;
+    fi;
+  end;
+
+  proc ПросмотрПохожихЗаписей (locFilter :String = nil; WinStyle :Window.WindowStyles = Kernel.Window.ModalWindow; addParam :Variant = nil);
+    var vForm: РКП_Справочники.Справочники.CardBaseType1;
+    vForm = КлассИнтерфейса.КартотекаПоУмолчанию.Create;
+    vForm.SimilarDataViewsMode = true;
+    vForm.SimilarFilter = locFilter;
+    #NoWarning;
+    vForm.ShowEx(nil, nil, WinStyle);
+  end;
+
+
+inobject private
+
+  proc шаблон_ПриСоздании(Context :Variant);
+    СтрокаСортировки = КлассИнтерфейса.GetClassField('ИмяПоляНаим');
+    ВосстановитьСортировку = true;
+    inherited шаблон_ПриСоздании(Context);
+  end;
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    var c, cc :Integer;
+    var locColumn :CardFileColumn;
+    КлассИнтерфейса.UpdateHashFieldsIfNeed;
+    if SimilarDataViewsMode then
+      Запретить_Выбор = true;
+      Запретить_ВыборГрупп = true;
+      Запретить_Добавление = true;
+      Запретить_ДобавлениеГрупп = true;
+      Запретить_Дублирование = true;
+      Self.Window.Caption = Self.Window.Caption + ' (похожие записи)';
+      Self.Window.Height = Int(ScreenHeight / 2);
+      Self.Window.Width = Int(ScreenWidth / 2);
+    fi;
+    inherited шаблон_ПриОткрытии(Create);
+  end;
+
+  -- 2_Обработчики событий 0картотеки. --
+
+
+  -- 2_Обработчики событий клеток шаблона0. --
+
+
+  -- _Прочие методы. --
+
+
+  proc УстановитьПараметрыПоУмолчанию;
+    inherited УстановитьПараметрыПоУмолчанию;
+    СтрокаСортировки = 'Наим';
+  end;
+
+  -- Установка свойств объекта по дополнительным параметрам конструктора "ВыполнитьВыбор"
+  proc УстСвойстваДоп(addParam :Variant[2]);
+    var i, ii :Integer;
+    var aValue :Variant[];
+    ii = LengthOfArray(addParam);
+    for i = 1 .. ii do
+      aValue = addParam[i] as Variant[];
+      try
+        Self.SetField(aValue[1], aValue[2]);
+      except
+      end;
+    od;
+  end;
+
+
+end

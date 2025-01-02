@@ -1,0 +1,68 @@
+class inherited Справочники.FalseCardType3 "Библиотечно-библиографический классификатор";
+
+--import РКП_СИС Classes StringsFunctions, Functions, Recs, FilterMaker;
+--import Classes Def;
+
+--{{ 2_Свойства
+
+inclass private
+
+  var КлассИнтерфейса :Class RI.Справочники.ББК := RI.Справочники.ББК;
+
+inobject private
+
+  var SelectedRecord :спрББК; -- Проброс выбранного значения
+
+--}}
+
+inobject private
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+  proc Столбец_ПриРисовании(Column :CardfileColumn; Rec :Record; Selected :Logical; var Color :Integer; Font :Font);
+    var vCode :String;
+    inherited Столбец_ПриРисовании(Column, Rec, Selected, Color, Font);
+    vCode = Rec.GetField('КодББК') as String;
+    if Match(vCode, '?') or Match(vCode, '??') then
+      Font.Bold = true;
+    fi;
+  end;
+
+-- 2_Вспомогательные методы0. --
+
+  proc ИнициализироватьСтолбцыКартотеки;
+    inherited ИнициализироватьСтолбцыКартотеки;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'Код';
+      Caption = 'Код ББК';
+      FieldType = Template.StringField;
+      Alignment = Template.LeftAlign;
+      Font.Size = crdBuiltIn.Font.Size;
+      MinWidth = 240;
+      Width = 240;
+      CanEdit = false;
+    end;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'Наим';
+      Caption = 'Наименование';
+      FieldType = Template.StringField;
+      Alignment = Template.LeftAlign;
+      Font.Size = crdBuiltIn.Font.Size;
+      MinWidth = 100;
+      Width = 0;
+      CanEdit = false;
+    end;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'НеПрименяется';
+      Caption = 'Не применяется';
+      Hint = 'Более не применяется';
+      FieldType = Template.LogicalField;
+      Alignment = Template.CenterAlign;
+      MinWidth = 160;
+      Width = 160;
+      Visible = false;
+      CanEdit = false;
+    end;
+  end;
+
+end

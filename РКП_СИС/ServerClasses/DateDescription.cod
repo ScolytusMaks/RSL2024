@@ -1,0 +1,219 @@
+﻿class "Описание даты";
+
+inclass public
+
+  func FixStr2(ИсходнаяСтрока :String) :String;
+    --перевод исходной строки в строку о двух символах с ведущим нулем
+    Result = StdCode.FixStr(ИсходнаяСтрока, '0', 2);
+  end;
+
+  func Месяц(НомерМесяца :Integer) :String;
+    -- Выдает русское название месяца в именительном падеже по его
+    -- номеру (1  январь, 2  февраль и т.д.).
+    if    НомерМесяца =  1 then Return 'январь';
+    elsif НомерМесяца =  2 then Return 'февраль';
+    elsif НомерМесяца =  3 then Return 'март';
+    elsif НомерМесяца =  4 then Return 'апрель';
+    elsif НомерМесяца =  5 then Return 'май';
+    elsif НомерМесяца =  6 then Return 'июнь';
+    elsif НомерМесяца =  7 then Return 'июль';
+    elsif НомерМесяца =  8 then Return 'август';
+    elsif НомерМесяца =  9 then Return 'сентябрь';
+    elsif НомерМесяца = 10 then Return 'октябрь';
+    elsif НомерМесяца = 11 then Return 'ноябрь';
+    elsif НомерМесяца = 12 then Return 'декабрь';
+    fi;
+  end;
+
+  func Месяца(НомерМесяца :Integer) :String;
+  --Выдает русское название месяца в родительном падеже по его
+  --номеру (1  января, 2  февраля и т.д.).
+    if    НомерМесяца =  1 then Return 'января';
+    elsif НомерМесяца =  2 then Return 'февраля';
+    elsif НомерМесяца =  3 then Return 'марта';
+    elsif НомерМесяца =  4 then Return 'апреля';
+    elsif НомерМесяца =  5 then Return 'мая';
+    elsif НомерМесяца =  6 then Return 'июня';
+    elsif НомерМесяца =  7 then Return 'июля';
+    elsif НомерМесяца =  8 then Return 'августа';
+    elsif НомерМесяца =  9 then Return 'сентября';
+    elsif НомерМесяца = 10 then Return 'октября';
+    elsif НомерМесяца = 11 then Return 'ноября';
+    elsif НомерМесяца = 12 then Return 'декабря';
+    fi;
+  end;
+
+  type tDateFormat = (dfDDMMYY = 1,     -- (01) 31.05.98
+                      dfDDMMYYг,        -- (02)  31.05.98 г.
+                      dfDDMMYYгода,     -- (03) 31.05.98 года
+                      dfDDMMYYYY,       -- (04) 31.05.1998
+                      dfDDMMYYYYг,      -- (05) 31.05.1998 г.
+                      dfDDMMYYYYгода,   -- (06) 31.05.1998 года
+                      dfDDMMMMYY,       -- (07) 31 мая 98
+                      dfDDMMMMYYг,      -- (08) 31 мая 98 г.
+                      dfDDMMMMYYгода,   -- (09) 31 мая 98 года
+                      dfDDMMMMYYYY,     -- (10) 31 мая 1998
+                      dfDDMMMMYYYYг,    -- (11) 31 мая 1998 г.
+                      dfDDMMMMYYYYгода, -- (12) 31 мая 1998 года
+                      dfYYYYMMM,        -- (13) 1998, май (1998, янв.) (1998, июнь)
+                      dfYYYYMMMM,       -- (14) 1998, май (1998, январь) (1998, июнь)
+                      dfYYYYDDMMM,      -- (15) 1998, мая (1998, янв.) (1998, июня)
+                      dfDMMMMM,         -- (16) 1 мая (1 янв.) (1 июня)
+                      dfMMM,            -- (17) май (янв.) (июнь)
+                      dfYYYYг,          -- (18) 1998 г.
+                      dfYYYY,           -- (19)
+                      dfMMMM);          -- (20) мая (янв.) (июня)
+
+  -- пример вызова: ВСтроку(Сегодня, dfDDMMYY);
+  func ToString synonym ВСтроку (dd :Date; frmt :tDateFormat) :String;
+    -- Представление даты
+    if (dd <> nil) then
+      if    (frmt = dfDDMMYY)         then Return Str(dd, 'dd.mm.yy');             -- 31.05.98
+      elsif (frmt = dfDDMMYYг)        then Return Str(dd, 'dd.mm.yy г.');          -- 31.05.98 г.
+      elsif (frmt = dfDDMMYYгода)     then Return Str(dd, 'dd.mm.yy года');        -- 31.05.98 года
+      elsif (frmt = dfDDMMYYYY)       then Return Str(dd, 'dd.mm.yyyy');           -- 31.05.1998
+      elsif (frmt = dfDDMMYYYYг)      then Return Str(dd, 'dd.mm.yyyy г.');        -- 31.05.1998 г.
+      elsif (frmt = dfDDMMYYYYгода)   then Return Str(dd, 'dd.mm.yyyy года');      -- 31.05.1998 года
+      elsif (frmt = dfDDMMMMYY)       then Return Lo(Str(dd, 'd mmmm yy'));        -- 31 мая 98
+      elsif (frmt = dfDDMMMMYYг)      then Return Lo(Str(dd, 'd mmmm yy г.'));     -- 31 мая 98 г.
+      elsif (frmt = dfDDMMMMYYгода)   then Return Lo(Str(dd, 'd mmmm yy года'));   -- 31 мая 98 года
+      elsif (frmt = dfDDMMMMYYYY)     then Return Lo(Str(dd, 'd mmmm yyyy'));      -- 31 мая 1998
+      elsif (frmt = dfDDMMMMYYYYг)    then Return Lo(Str(dd, 'd mmmm yyyy г.'));   -- 31 мая 1998 г.
+      elsif (frmt = dfDDMMMMYYYYгода) then Return Lo(Str(dd, 'd mmmm yyyy года')); -- 31 мая 1998 года
+      elsif (frmt = dfYYYYMMM) then    -- 1998, янв.
+        if    Mon(dd) =  1 then Return Str(dd, 'yyyy, ') + 'янв.';
+        elsif Mon(dd) =  2 then Return Str(dd, 'yyyy, ') + 'февр.';
+        elsif Mon(dd) =  3 then Return Str(dd, 'yyyy, ') + 'март';
+        elsif Mon(dd) =  4 then Return Str(dd, 'yyyy, ') + 'апр.';
+        elsif Mon(dd) =  5 then Return Str(dd, 'yyyy, ') + 'май';
+        elsif Mon(dd) =  6 then Return Str(dd, 'yyyy, ') + 'июнь';
+        elsif Mon(dd) =  7 then Return Str(dd, 'yyyy, ') + 'июль';
+        elsif Mon(dd) =  8 then Return Str(dd, 'yyyy, ') + 'авг.';
+        elsif Mon(dd) =  9 then Return Str(dd, 'yyyy, ') + 'сент.';
+        elsif Mon(dd) = 10 then Return Str(dd, 'yyyy, ') + 'окт.';
+        elsif Mon(dd) = 11 then Return Str(dd, 'yyyy, ') + 'нояб.';
+        elsif Mon(dd) = 12 then Return Str(dd, 'yyyy, ') + 'дек.';
+        fi;
+      elsif (frmt = dfYYYYMMMM) then    -- 1998, январь
+        if    Mon(dd) =  1 then Return Str(dd, 'yyyy, ') + 'январь';
+        elsif Mon(dd) =  2 then Return Str(dd, 'yyyy, ') + 'февраль';
+        elsif Mon(dd) =  3 then Return Str(dd, 'yyyy, ') + 'март';
+        elsif Mon(dd) =  4 then Return Str(dd, 'yyyy, ') + 'апрель';
+        elsif Mon(dd) =  5 then Return Str(dd, 'yyyy, ') + 'май';
+        elsif Mon(dd) =  6 then Return Str(dd, 'yyyy, ') + 'июнь';
+        elsif Mon(dd) =  7 then Return Str(dd, 'yyyy, ') + 'июль';
+        elsif Mon(dd) =  8 then Return Str(dd, 'yyyy, ') + 'август';
+        elsif Mon(dd) =  9 then Return Str(dd, 'yyyy, ') + 'сентябрь';
+        elsif Mon(dd) = 10 then Return Str(dd, 'yyyy, ') + 'октябрь';
+        elsif Mon(dd) = 11 then Return Str(dd, 'yyyy, ') + 'ноябрь';
+        elsif Mon(dd) = 12 then Return Str(dd, 'yyyy, ') + 'декабрь';
+        fi;
+      elsif (frmt = dfYYYYDDMMM) then    -- 1998, 1 янв.
+        if    Mon(dd) =  1 then Return Str(dd, 'yyyy, d ') + 'янв.';
+        elsif Mon(dd) =  2 then Return Str(dd, 'yyyy, d ') + 'февр.';
+        elsif Mon(dd) =  3 then Return Str(dd, 'yyyy, d ') + 'март';
+        elsif Mon(dd) =  4 then Return Str(dd, 'yyyy, d ') + 'апр.';
+        elsif Mon(dd) =  5 then Return Str(dd, 'yyyy, d ') + 'май';
+        elsif Mon(dd) =  6 then Return Str(dd, 'yyyy, d ') + 'июнь';
+        elsif Mon(dd) =  7 then Return Str(dd, 'yyyy, d ') + 'июль';
+        elsif Mon(dd) =  8 then Return Str(dd, 'yyyy, d ') + 'авг.';
+        elsif Mon(dd) =  9 then Return Str(dd, 'yyyy, d ') + 'сент.';
+        elsif Mon(dd) = 10 then Return Str(dd, 'yyyy, d ') + 'окт.';
+        elsif Mon(dd) = 11 then Return Str(dd, 'yyyy, d ') + 'нояб.';
+        elsif Mon(dd) = 12 then Return Str(dd, 'yyyy, d ') + 'дек.';
+        fi;
+      elsif (frmt = dfDMMMMM) then    -- 1 янв.
+        if    Mon(dd) =  1 then Return Str(dd, 'd ') + 'янв.';
+        elsif Mon(dd) =  2 then Return Str(dd, 'd ') + 'февр.';
+        elsif Mon(dd) =  3 then Return Str(dd, 'd ') + 'март';
+        elsif Mon(dd) =  4 then Return Str(dd, 'd ') + 'апр.';
+        elsif Mon(dd) =  5 then Return Str(dd, 'd ') + 'май';
+        elsif Mon(dd) =  6 then Return Str(dd, 'd ') + 'июнь';
+        elsif Mon(dd) =  7 then Return Str(dd, 'd ') + 'июль';
+        elsif Mon(dd) =  8 then Return Str(dd, 'd ') + 'авг.';
+        elsif Mon(dd) =  9 then Return Str(dd, 'd ') + 'сент.';
+        elsif Mon(dd) = 10 then Return Str(dd, 'd ') + 'окт.';
+        elsif Mon(dd) = 11 then Return Str(dd, 'd ') + 'нояб.';
+        elsif Mon(dd) = 12 then Return Str(dd, 'd ') + 'дек.';
+        fi;
+      elsif (frmt = dfMMM) then  -- янв.
+        if    Mon(dd) =  1 then Return 'янв.';
+        elsif Mon(dd) =  2 then Return 'февр.';
+        elsif Mon(dd) =  3 then Return 'март';
+        elsif Mon(dd) =  4 then Return 'апр.';
+        elsif Mon(dd) =  5 then Return 'май';
+        elsif Mon(dd) =  6 then Return 'июнь';
+        elsif Mon(dd) =  7 then Return 'июль';
+        elsif Mon(dd) =  8 then Return 'авг.';
+        elsif Mon(dd) =  9 then Return 'сент.';
+        elsif Mon(dd) = 10 then Return 'окт.';
+        elsif Mon(dd) = 11 then Return 'нояб.';
+        elsif Mon(dd) = 12 then Return 'дек.';
+        fi;
+      elsif (frmt = dfYYYYг) then Return Str(dd, 'yyyy г.');    -- 1998 г.
+      elsif (frmt = dfYYYY)  then Return Str(dd, 'yyyy');    --  1998
+      elsif (frmt = dfMMMM) then  -- янв., мая, июня
+        if    Mon(dd) =  1 then Return 'янв.';
+        elsif Mon(dd) =  2 then Return 'февр.';
+        elsif Mon(dd) =  3 then Return 'марта';
+        elsif Mon(dd) =  4 then Return 'апр.';
+        elsif Mon(dd) =  5 then Return 'мая';
+        elsif Mon(dd) =  6 then Return 'июня';
+        elsif Mon(dd) =  7 then Return 'июля';
+        elsif Mon(dd) =  8 then Return 'авг.';
+        elsif Mon(dd) =  9 then Return 'сент.';
+        elsif Mon(dd) = 10 then Return 'окт.';
+        elsif Mon(dd) = 11 then Return 'нояб.';
+        elsif Mon(dd) = 12 then Return 'дек.';
+        fi;
+      else
+        Return Str(dd, 'dd.mm.yyyy');
+      fi;
+    fi;
+  end;
+
+  func ПроверитьСтроку (Value :String; var FinValue :String) :Logical;
+    --функция проверяет на корректность введенное строковое значение.
+    --Если значение подходит для формирования даты - возвращает ИСТИНА и исходящее = входящее
+    --Если возможно исправить - возвращает ИСТИНА и исходящее = исправленное входящее
+    --Если невозможно исправить - возвращает ЛОЖЬ
+    --Проедназанчена для предварительной обработки строкового представления дат
+    var aTst :Logical[];
+    try
+      aTst[1] = Pos('.', Value) = 0;
+      aTst[2] = Pos('/', Value) = 0;
+      aTst[3] = Pos('\', Value) = 0;
+      aTst[4] = Pos(',', Value) = 0;
+      if (not false in aTst) then
+        -- Обработка строкового представления дат без разделителей
+        if Length(Value) = 6  then
+          if (Int(SubStr(Value, 5, 2)) > 40) then FinValue = SubStr(Value, 1, 2) + "." + SubStr(Value, 3, 2) + ".19" + SubStr(Value, 5, 2);  -- год больше 40
+            Return true;
+          else                                    FinValue = SubStr(Value, 1, 2) + "." + SubStr(Value, 3, 2) + ".20" + SubStr(Value, 5, 2);  -- год меньше 40
+            Return true;
+          fi;
+        elsif Length(Value) = 5 then              FinValue = SubStr(Value, 1, 2) + "." + SubStr(Value, 3, 2) + ".200" + SubStr(Value, 5, 1);
+          Return true;
+        elsif Length(Value) = 8 then              FinValue = SubStr(Value, 1, 2) + "." + SubStr(Value, 3, 2) + "." + SubStr(Value, 5, 4);
+          Return true;
+        fi;
+      else
+        -- Обработка строкового представления дат с разделителями
+        if Length(Value) = 10 then                FinValue = SubStr(Value, 1, 2) + "." + SubStr(Value, 4, 2) + "." + SubStr(Value, 7, 4);
+          Return true;
+        elsif Length(Value) = 8 then
+          if Int(SubStr(Value,7,2)) > 40 then     FinValue = SubStr(Value, 1, 2) + "." + SubStr(Value, 4, 2) + ".19" + SubStr(Value, 7, 2);
+            Return true;
+          else                                    FinValue = SubStr(Value, 1, 2) + "." + SubStr(Value, 4, 2) + ".20" + SubStr(Value, 7, 2);
+            Return true;
+          fi;
+        elsif Length(Value) = 7 then              FinValue = SubStr(Value, 1, 2) + "." + SubStr(Value, 4, 2) + ".200" + SubStr(Value, 7, 1);
+          Return true;
+        fi;
+      fi;
+    except
+      Return false;
+    end;
+  end;
+
+end

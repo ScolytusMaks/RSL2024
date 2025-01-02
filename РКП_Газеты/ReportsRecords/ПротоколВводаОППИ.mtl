@@ -1,0 +1,13 @@
+record ПротоколВводаОППИ inherited РКП_СИС.AbstractRecord.StoredReport title "Сводная статистика ввода данных ОРГП";
+
+  struct Поступления array Integer title "Статистика ввода поступлений номеров газет";
+    field ОператорИмя                 :String  title "";
+    field Оператор                    :String  title "Оператор";
+    field СозданоЗаписей              :Integer;
+    field ПринятоЭкземпляров          :Integer;
+  end;
+  field ВсегоСозданоЗаписейПоступлений:Integer;
+  field ВсегоПринятоЭкземпляров       :Integer;
+
+  RecordDescription НомерОтчета;
+end;

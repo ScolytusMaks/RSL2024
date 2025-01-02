@@ -1,0 +1,35 @@
+class inherited РКП_Справочники.RI.Справочники.intBaseType1 'Интерфейс записи (справочник, тип 1)';
+
+inclass public
+
+  var ОбязательныеПоля     :String[] = ['Газета', 'Наим'];
+  var ХешируемыеПоля       :String[] = ['Газета', 'Наим'];
+
+  func СвязанныйКлассЗаписей: Class РКП_Справочники.BaseRefType1;
+    Result = спрСерияПриложений;
+  end;
+
+  func Create: RI.Справочники.СерияПриложений;
+    Result = inherited Create;
+    Result.Record = спрСерияПриложений.Create;
+  end;
+
+  func ОткрытьПоЗаписи synonym OpenRecord(locRecord: спрСерияПриложений): RI.Справочники.СерияПриложений;
+    Result = inherited Create;
+    Result.Record = locRecord;
+  end;
+
+  func БланкРедакторПоУмолчанию: Class РКП_Справочники.Справочники.editBaseType1;
+    Result = Справочники.редСерияПриложений;
+  end;
+
+  func КартотекаПоУмолчанию: Class РКП_Справочники.Справочники.CardBaseType1;
+    Result = Справочники.картСерияПриложений;
+  end;
+
+inobject public
+
+  Record: спрСерияПриложений;
+
+
+end

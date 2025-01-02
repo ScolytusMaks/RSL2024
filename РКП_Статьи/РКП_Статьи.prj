@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project Version="1">
+  <Options Caption="Газетные статьи" Comment="Аналитическая рспись газетных статей #3" Version="001" Author="Copyright © 2008-2023 ООО &quot;Арго&quot;, Самсоненко М.А." Code="0" SubCode="0" WebCode="0" WebSubCode="0" Frontal="True"/>
+  <Usage>
+    <Project Name="СИС2"/>
+    <Project Name="РКП_Газеты"/>
+    <Project Name="РКП_СИС"/>
+    <Project Name="РКП_Справочники"/>
+  </Usage>
+  <Groups>
+    <Group Name="AbstractRecords" Type="Documents" Disabled="False"/>
+    <Group Name="Records" Type="Documents" Disabled="False"/>
+    <Group Name="ClientClasses" Type="Classes" Disabled="False"/>
+    <Group Name="Cardfiles" Type="Cards" Disabled="False"/>
+    <Group Name="Blanks" Type="Blanks" Disabled="False"/>
+    <Group Name="Help" Type="Helps" Disabled="False"/>
+    <Group Name="OldDocs" Type="Other" Disabled="True"/>
+  </Groups>
+</Project>

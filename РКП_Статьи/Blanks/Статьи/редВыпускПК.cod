@@ -1,0 +1,149 @@
+class inherited РКП_Статьи.Статьи.редВыпускПК_03 "Подготовка выпуска ПК", editor ВыпускПК;
+
+inclass
+
+inobject
+секцПозицииПК           : TemplateSection;
+секцСортировкаКарточек  : TemplateSection;
+
+var ГодКарточек : integer = Year(ДатаВыпуска);
+var KolGK       : integer;
+var KolGK1      : integer;
+var ПерваяКарточка      : integer;
+var ПоследняяКарточка   : integer;
+var КомплектКарточек    : string;
+var Комментарий         : string;
+
+
+proc Мордочка;
+  var Q                 : Query;
+      Q                                 = Query.Create([РКП_Статьи.Роспись]);
+      Q.Filter                          = "Year(ДатаКарточек)="+Str(Year(ДатаВыпуска))+
+                                          " and ДатаКарточек="+Str(ДатаВыпуска);
+--                                          " and ВыпускКарточек="+Str(ВыпускКарточек);
+      Q.Select;
+      Q.Order   = "НомерЗаписиВВыпускеПК";
+      if not(Q.BOF=true and Q.EOF=true) then
+      Q.First;
+      ПерваяКарточка    = Q.Current.НомерЗаписиВВыпускеПК;
+      Q.Last;
+      ПоследняяКарточка = Q.Current.НомерЗаписиВВыпускеПК;
+      КомплектКарточек  = Str(ПерваяКарточка)+' - '+Str(ПоследняяКарточка);
+      KolGK1            = KolGK;
+      end;
+      Q.Close;
+end;
+
+--------------------------------------------------------------------------------
+--{ Обработчики событий бланка
+  func СоздатьВыпуск(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var kk              : integer;
+    kk = Нумерация;
+    if kk > 0           then
+    ФормированиеПК;
+    ФормированиеФайла;
+    Message("Количество статей, включенных в выпуск:"+
+            Chr(13)+
+            Chr(13)+
+            "           "+
+            Str(kk)+
+            ".");
+    ДатаЗаписиВФайл = today;
+    Мордочка;
+    end;
+    Result              = false;
+  end;
+
+  func ПросмотрКарточек(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    #NoWarning;
+    РКП_Статьи.Статьи.картРосписьСтатейПросмотр.ShowFormEx(nil, "isGroup = 0 and ДатаКарточек="+Str(ДатаВыпуска), Window.ChildWindow);
+    Result = True;
+  end;
+
+  func ОткрытьОригиналМакетIn(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    OpenEditor(ФайлКарточек);--отладка
+    Result = True; 
+  end;
+
+  func ОткрытьОригиналМакетOut(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    ExecuteProgram(ФайлКарточек);
+    Result = True; 
+  end;
+
+  func ОткрытьОригиналМакетFold(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    ExecuteProgram(ПапкаКарточек);
+    Result = True; 
+  end;
+
+  func ОткрытьЭкспортFold(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    ExecuteProgram(ПапкаФайлаЭкспорта);
+    Result = True; 
+  end;
+
+  func КопироватьНаДискету(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    try
+    CopyFile(ФайлКарточек,'A:\'+SubStr(ФайлКарточек,4,1000));
+    except
+    end;
+    try
+    CopyFile(ФайлЭкспорта,"A:\"+SubStr(ФайлЭкспорта,4,1000));
+    except
+    end;
+    Result = True; 
+  end;
+
+
+  proc ПолеВыпускСверстанПриВыходе(Cell :TemplateCell; Index :Integer);
+  var Q                 : Query;
+  var k                 : integer;
+  var Rec               : record;
+      Q                                 = Query.Create([РКП_Статьи.Роспись]);
+      Q.Filter                          = "Year(ДатаКарточек)="+Str(Year(ДатаВыпуска))+
+                                          " and ДатаКарточек="+Str(ДатаВыпуска);
+--                                          " and ВыпускКарточек="+Str(ВыпускКарточек);
+      Q.Select;
+      Q.First;
+        for k = 1..Q.Count                              do
+          Hint("Выполнение...",k,Q.Count);
+          Rec                           = Q.Current;
+          if  Rec.СтатусПК <> ВыпускСверстан            then
+            Rec.СтатусПК                = ВыпускСверстан;
+          end;
+          if ВыпускСверстан = false                     then
+            Rec.ДатаЗаписиВФайлПК       = nil;
+          else
+            Rec.ДатаЗаписиВФайлПК       = ДатаЗаписиВФайл;
+          end;
+          if Rec.State = Rec.Edited                      then
+            Rec.Post;
+          end;
+          Q.Next;
+        end;
+      Q.Close;
+  end;
+
+  func Ntcn(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+      секцСортировкаКарточек.SortBy("КодУдк_+");
+    Result = True; -- Разрешаем стандартную обработку
+  end;
+
+  proc шаблон_ПриСчитывании;
+    var Q       : Query;
+    Q                           = Query.Create([РКП_Статьи.Роспись]);
+    Q.Filter                    = "ГодЛетописи="+Str(ГодКарточек)+
+                                  " and ВыпускЛетописи="+Str(ВыпускЛетописи)+
+                                  " and ДатаКарточек="+Str(ДатаВыпуска);
+    Q.Select;
+    KolGK                       = Q.Count;
+    Q.Close;
+    Мордочка;
+  end;
+
+  func ОбновитьФайл(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    ФормированиеФайла;
+    Result = True; -- Разрешаем стандартную обработку
+  end;
+
+--}
+
+end

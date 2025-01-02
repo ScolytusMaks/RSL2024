@@ -1,0 +1,8 @@
+record спрТерриторияРаспространения inherited BaseRefType2 title "Территория распространения";
+
+  struct ПланКолНом array Integer title "Плановое кол-во поступающих номеров";
+    field НормГод :Integer  title "Год установления норматива";
+    field КолНом  :Integer  title "Плановое кол-во номеров";
+  end;
+
+end;

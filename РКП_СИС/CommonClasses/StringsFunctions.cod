@@ -1,0 +1,76 @@
+﻿class inherited СИС2.СтроковыеФункции;
+
+inclass public
+
+  -- С Заглавной буквы
+  func WithCapitalLetter(aOriginalString :String) :String;
+    Return СБольшойБуквы(aOriginalString);
+  end;
+
+  -- Возвращает символ "Возврат каретки"
+  func Br synonym CR, ВозвратКаретки :string;
+    Return Chr(13);
+  end;
+
+  -- Возвращает символ "Перевод строки"
+  func LF synonym ПереводСтроки :String;
+    Return Chr(10);
+  end;
+
+  -- Возвращает символ "табуляция", n - количество повторов
+  func TAB (n: integer = 1): string;
+    return RepStr(chr(09), n);
+  end;
+
+
+  -- На вход функции подяется массив строк.
+  -- Результат -  текст, составленный из элементов массива, где каждый элемент (кроме последнего)
+  -- заканчивается символовм разрыва строки.
+  -- Если параметр РазрывЭлементов = false, то разрыв не добавляется.
+  -- Однако можно разорвать абзацы сообщения, если в элементы locStr вводить символы перевода строки
+  -- Параметр АвтоПробел работает только при РазрывЭлементов = false
+  func ArrayToText synonym МассивСтрокВТекст (locStr: String[]; BreakElts, AutoSpace: Logical = true): String;
+    var i, ii, j: integer;
+    ii = LengthOfArray(locStr);
+    if BreakElts then
+      for i = 1 .. ii do
+        Result = if((i < ii), (Result + locStr[i] + Br), (Result + locStr[i]));
+      od;
+    else
+      if AutoSpace then
+        for i = 1 .. ii do
+          if (locStr[i] <> nil):
+            j = j + 1;
+            if (j = 1):
+              Result = Trim(locStr[i]);
+            else
+              Result = Result + ' ' + Trim(locStr[i]);
+            fi;
+          fi;
+        od;
+      else
+        for i = 1 .. ii do
+          Result = Result + locStr[i];
+        od;
+      fi;
+    fi;
+  end;
+
+  -- В дополнение к похожей функции класса СИС2 введен параметр "Разделитель",
+  -- позволяющий манипулировать символами - разделителями элементов перечня.
+  func МассивСтрокВСтрокуРасш (ArrayString: String[]; ВыделятьКавычками: Logical = false; Разделитель: String = '; '; РазрывСтрок: Logical = true): String;
+    var i: Integer;
+    var locDlm: String;
+    locDlm = if(РазрывСтрок, Разделитель + Chr(13), Разделитель) as String;
+    for i = 1 .. LengthOfArray(ArrayString) do
+      ArrayString[i] = trim(ArrayString[i]);
+      if (Result = '') and (ArrayString[i] <> ''):
+        Result = if(ВыделятьКавычками, '"', '') + ArrayString[i] + if(ВыделятьКавычками, '"', '');
+      elsif (Result <> '') and (ArrayString[i] <> ''):
+        Result = Result + locDlm + if(ВыделятьКавычками, '"', '') + ArrayString[i] + if(ВыделятьКавычками, '"', '');
+      fi;
+    od;
+  end;
+
+
+end

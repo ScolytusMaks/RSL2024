@@ -1,0 +1,63 @@
+class "Выпуск ЛГС";
+
+import СИС2 classes Константы;
+import РКП_СИС classes Recs, StringsFunctions, StdCode, Functions, FilterMaker;
+
+inclass public
+
+  -- Проверка наличия группы в картотеке "Выпуск ЛГС"
+  -- При отсутствии - добавление
+  func СоздатьЗаписьГод (ГодЛетописи :Integer) :Logical;
+    var R :РКП_Статьи.ВыпускЛГС;
+    if (ГодЛетописи > 1901) and (ГодЛетописи < 3000) then
+      R = FindRecord(РКП_Статьи.ВыпускЛГС, 'ГодЛетописи=' + Str(ГодЛетописи));
+      if (R = nil) then
+        R                = РКП_Статьи.ВыпускЛГС.Create;
+        R.ГодЛетописи    = ГодЛетописи;
+        R.ВыпускЛетописи = ГодЛетописи;
+        R.isGroup        = true;
+        R.Post;
+      fi;
+      Return true;
+    else
+      Message('Пожалуйста, проверьте правильность введенного значения!');
+    fi;
+  end;
+
+  -- Проверка наличия записи в картотеке "Выпуск ЛГС"
+  -- При отсутствии - добавление
+  func СоздатьЗаписьВыпуск (ГодЛетописи :Integer; ВыпускЛетописи :Integer) :Logical;
+    var aFlt :String[];
+    var R :РКП_Статьи.ВыпускЛГС;
+    if ((ГодЛетописи > 1901) and (ГодЛетописи < 3000)) and (ВыпускЛетописи <= 52) then
+      AddInArray( aFlt, 'ГодЛетописи=' + Str(ГодЛетописи) );
+      AddInArray( aFlt, 'ВыпускЛетописи=' + Str(ВыпускЛетописи) );
+      R = FindRecord(РКП_Статьи.ВыпускЛГС, MakeFilter(aFlt));
+      if (R = nil) then
+        R                = РКП_Статьи.ВыпускЛГС.Create;
+        R.ГодЛетописи    = ГодЛетописи;
+        R.ВыпускЛетописи = ВыпускЛетописи;
+        --
+        aFlt = nil;
+        AddInArray( aFlt, 'ГодЛетописи=' + Str(ГодЛетописи) );
+        AddInArray( aFlt, 'ВыпускЛетописи=' + Str(ГодЛетописи) );
+        AddInArray( aFlt, 'isGroup=-1' );
+        R.GroupDoc = FindRecord(РКП_Статьи.ВыпускЛГС, MakeFilter(aFlt));
+        R.Post;
+      fi;
+      Return true;
+    else
+      Message('Пожалуйста, проверьте правильность введенных значений года и номера выпуска летописи!');
+    fi;
+  end;
+
+  func КолСтрокСтатьиВЛГС (НомерЗаписиВВыпускеГЛ :Integer; Заголовок :String; ОписаниеСтатьи :String) :Integer;
+    Result = 12 + Length(Str(НомерЗаписиВВыпускеГЛ)) + Length(Заголовок) + Length(ОписаниеСтатьи);
+    if (Result - Trunc(Result / 70) > 0) then
+      Result = Int(Trunc(Result / 70)) + 1;
+    else
+      Result = Int(Trunc(Result / 70));
+    fi;
+  end;
+
+end

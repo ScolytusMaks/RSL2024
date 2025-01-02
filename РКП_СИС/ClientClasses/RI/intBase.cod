@@ -1,0 +1,337 @@
+﻿class inherited МашинаРеквизитов.Базовые.интЗапись "";
+
+import РКП_СИС Classes Functions, Recs, StdCode, StringsFunctions, FltMaker;
+
+inclass public
+
+  var ИмяПоляНеПрименяется :String = 'Завершен';
+  var ИмяПоляНаим          :String = 'Имя';
+
+  -- четные значения - изменения после перехода
+  type tWorkState = (wsIndifferently = -1,
+                     wsRecCreated = 0, wsRecUpdated   = 1,
+                     wsAccepted   = 2, wsAcpUpdated   = 3);
+
+inobject public
+
+  proc ИнициализироватьПоУмолчанию synonym InitByDefault;
+    Init;
+  end;
+
+  proc Инициализировать synonym Init;
+    Assert(Record.State = Kernel.Record.Created);
+  end;
+
+  -- Сохранение информации в WorkLog --
+
+  #Warning 'Заменить дату "Сегодня" на дату начала сессии?';
+
+  proc SetWorkLog(aWorkStateCreate, aWorkStateUpdate :tWorkState);
+    -- Запись в лог работ при добавлении или модификации записи.
+    -- В параметр aWorkState передается пара значений tWorkState,tWorkState
+    -- в контексте (состояние как создано, состояние как изменено)
+    var rWrkLog :РКП_СИС.ЛогРабот;
+    if RecordEdited(Self.Record) then
+      if ContentValidToWorkLog(aWorkStateCreate) then -- содержимое записи валидно для сохранения в лог по состоянию рабочего процесса aWorkStateCreate
+        if (Today = CreateDateForWorkLog(aWorkStateCreate, false)) then
+          rWrkLog = GetCurrentWorkLog(aWorkStateCreate, false);
+          if (rWrkLog = nil) then
+            rWrkLog = CreateWrkLogRecord(aWorkStateCreate);
+          else
+            if (rWrkLog.CreateUser <> SessionInfo.UserName) then
+              rWrkLog = GetCurrentWorkLog(aWorkStateUpdate, true);
+              if (rWrkLog = nil) then
+                rWrkLog = CreateWrkLogRecord(aWorkStateUpdate);
+              else
+                RecordModify(rWrkLog);
+                SaveStoredValI(rWrkLog, aWorkStateUpdate);
+                SaveStoredValL(rWrkLog, aWorkStateUpdate);
+                rWrkLog.Post;
+              fi;
+            fi;
+          fi;
+        else
+          rWrkLog = GetCurrentWorkLog(aWorkStateUpdate, true);
+          if (rWrkLog = nil) then
+            rWrkLog = CreateWrkLogRecord(aWorkStateUpdate);
+          else
+            RecordModify(rWrkLog);
+            SaveStoredValI(rWrkLog, aWorkStateUpdate);
+            SaveStoredValL(rWrkLog, aWorkStateUpdate);
+            rWrkLog.Post;
+          fi;
+        fi;
+      else
+        ClearWorkLog(aWorkStateCreate, false);
+      fi;
+    fi;
+  end;
+
+  func ContentValidToWorkLog(byWorkState :tWorkState) :Logical; -- Содержимое записи валидно для принятия к учету как единица рабочего процесса на стадии WorkState
+    Result = true;
+  end;
+
+  func CreateWrkLogRecord(byWorkState :tWorkState) :РКП_СИС.ЛогРабот;
+    Result = РКП_СИС.ЛогРабот.Create;
+    Result.RClass = РКП_СИС.Functions.FullClassName(Self.Record.ClassInfo.ClassRef);
+    Result.RID = Record.DocId;
+    Result.Competencies = Profile.МаскаКомпетенций;
+    Result.ActionType = byWorkState;
+    SaveStoredValI(Result, byWorkState);
+    SaveStoredValL(Result, byWorkState);
+    Result.Post;
+  end;
+
+  proc SaveStoredValI(rWrkLog :РКП_СИС.ЛогРабот; byWorkState :tWorkState);
+    -- сохранение показателя целочисленного типа
+  end;
+
+  proc SaveStoredValL(rWrkLog :РКП_СИС.ЛогРабот; byWorkState :tWorkState);
+    -- сохранение показателя логического типа
+  end;
+
+
+  proc ClearWorkLog(byWorkState :tWorkState; byCurrentUsers :Logical); -- Удаление из лога работ записей о модификации или создании в день их модификации (создания)
+    var aFlt :String[];
+    var Q :Query;
+    var AddCnd :String;
+    AddInArray( aFlt, 'CreateDate>=' + Str(Today) );
+    AddInArray( aFlt, 'CreateDate<' + Str(Today + 1) );
+    AddInArray( aFlt, 'RClass="' + РКП_СИС.Functions.FullClassName(Self.Record.ClassInfo.ClassRef) + '"' );
+    AddInArray( aFlt, 'RID=' + Str(Record.DocId) );
+    AddCnd = AddWorkLogClearCnd(byWorkState);
+    if (AddCnd <> nil) then
+      AddInArray( aFlt, AddCnd );
+    fi;
+    if byCurrentUsers then
+      AddInArray( aFlt, 'CreateUser="' + SessionInfo.UserName + '"');
+    fi;
+    Q = Query.Create([РКП_СИС.ЛогРабот]);
+    Q.Filter = MakeFilter(aFlt);
+    Q.Select;
+    DeleteAllRecords(Q);
+  end;
+
+  func GetCurrentWorkLog (WorkState :tWorkState; byCurrentUsers :Logical) :РКП_СИС.ЛогРабот;
+    var aFlt :String[];
+    var FltLog :String;
+    AddInArray( aFlt, 'CreateDate>=' + Str(Today) );
+    AddInArray( aFlt, 'CreateDate<' + Str(Today + 1) );
+    AddInArray( aFlt, 'RClass="' + РКП_СИС.Functions.FullClassName(Self.Record.ClassInfo.ClassRef) + '"' );
+    AddInArray( aFlt, 'RID=' + Str(Record.DocId) );
+    AddInArray( aFlt, 'ActionType=' + Str(WorkState) );
+    if byCurrentUsers then
+     AddInArray( aFlt, 'CreateUser="' + SessionInfo.UserName + '"' );
+    fi;
+    FltLog = MakeFilter(aFlt);
+    Result = FindRecord( РКП_СИС.ЛогРабот, FltLog );
+  end;
+
+  func CreateDateForWorkLog (WorkState :tWorkState; byCurrentUsers :Logical) :Date; -- Дата, когда запись считается созданной и принимается к учету как единица рабочего процесса
+    var dt :Date;
+    if byCurrentUsers then
+      if (Self.Record.CreateUser = SessionInfo.UserName) then
+        dt = Self.Record.CreateDate;
+        Result = CreateDate(Day(dt), Mon(dt), Year(dt));
+      fi;
+    else
+      dt = Self.Record.CreateDate; -- По умолчанию. Но не обязательно.
+      Result = CreateDate(Day(dt), Mon(dt), Year(dt));
+    fi;
+  end;
+
+  func UpdateDateForWorkLog (WorkState :tWorkState) :Date; -- Дата, когда запись считается обновленной и принимается к учету как единица рабочего процесса
+    var dt :Date;
+    if (CreateDateForWorkLog(WorkState, false) <> nil) then
+      if (CreateDateForWorkLog(WorkState, true) <> CreateDateForWorkLog(WorkState, false)) then
+        dt = Self.Record.UpdateDate;
+        Result = CreateDate(Day(dt), Mon(dt), Year(dt));
+      fi;
+    fi;
+  end;
+
+inclass public
+
+  proc ClearWorkLogExt(vRec :Record; byCurrentUsers :Logical; byWorkState :tWorkState); -- Удаление из лога работ записей о модификации или создании в день их модификации (создания) - для вызова inclass
+    var aFlt :String[];
+    var Q :Query;
+    var AddCnd :String;
+    AddInArray( aFlt, 'CreateDate>=' + Str(Today) );
+    AddInArray( aFlt, 'CreateDate<' + Str(Today + 1) );
+    AddInArray( aFlt, 'RClass="' + РКП_СИС.Functions.FullClassName(vRec.ClassInfo.ClassRef) + '"' );
+    AddInArray( aFlt, 'RID=' + Str(vRec.DocId) );
+    AddCnd = AddWorkLogClearCnd(byWorkState);
+    if (AddCnd <> nil) then
+      AddInArray( aFlt, AddCnd );
+    fi;
+    if byCurrentUsers then
+      AddInArray( aFlt, 'CreateUser="' + SessionInfo.UserName + '"' );
+    fi;
+    Q = Query.Create([РКП_СИС.ЛогРабот]); -- тип действия здесь не важен
+    Q.Filter = MakeFilter(aFlt);
+    Q.Select;
+    DeleteAllRecords(Q);
+  end;
+
+  func AddWorkLogClearCnd(WorkState :tWorkState) :String; -- дополнительное условие для удаления рабочего лога
+    Result = 'ActionType>=' + Str(WorkState); -- перекрывается в наследниках
+  end;
+
+
+
+
+
+
+
+
+
+
+
+
+  -----------------------------------
+inobject public
+
+--  proc Set_WorkLog;  -- Запись в лог работ при добавлении или модификации записи
+--    var rWrkLog :РКП_СИС.ЛогРабот;
+--    if RecordEdited(Self.Record) then
+--      if ContentValid_ToWorkLog then
+--        if (Today = CreateDate_ForWorkLog(false)) then
+--          rWrkLog = GetCurrentWorkLogType0(false);
+--          if (rWrkLog = nil) then
+--            rWrkLog = РКП_СИС.ЛогРабот.Create;
+--            rWrkLog.RClass = РКП_СИС.Functions.FullClassName(Self.Record.ClassInfo.ClassRef);
+--            rWrkLog.RID = Record.DocId;
+--            rWrkLog.Competencies = Profile.МаскаКомпетенций;
+--            rWrkLog.ActionType = 0;
+--            rWrkLog.Post;
+--          else
+--            if (rWrkLog.CreateUser <> SessionInfo.UserName) then
+--              rWrkLog = GetCurrentWorkLogType1(true);
+--              if (rWrkLog = nil) then
+--                rWrkLog = РКП_СИС.ЛогРабот.Create;
+--                rWrkLog.RClass = РКП_СИС.Functions.FullClassName(Self.Record.ClassInfo.ClassRef);
+--                rWrkLog.RID = Record.DocId;
+--                rWrkLog.Competencies = Profile.МаскаКомпетенций;
+--                rWrkLog.ActionType = 1;
+--                rWrkLog.Post;
+--              else
+--                RecordModify(rWrkLog);
+--                rWrkLog.Post;
+--              fi;
+--            fi;
+--          fi;
+--        else
+--          rWrkLog = GetCurrentWorkLogType1(true);
+--          if (rWrkLog = nil) then
+--            rWrkLog = РКП_СИС.ЛогРабот.Create;
+--            rWrkLog.RClass = РКП_СИС.Functions.FullClassName(Self.Record.ClassInfo.ClassRef);
+--            rWrkLog.RID = Record.DocId;
+--            rWrkLog.Competencies = Profile.МаскаКомпетенций;
+--            rWrkLog.ActionType = 1;
+--            rWrkLog.Post;
+--          else
+--            RecordModify(rWrkLog);
+--            rWrkLog.Post;
+--          fi;
+--        fi;
+--      else
+--        Clear_WorkLog(false);
+--      fi;
+--    fi;
+--  end;
+--
+--  proc Clear_WorkLog(byCurrentUsers :Logical); -- Удаление из лога работ записей о модификации или создании в день их модификации (создания)
+--    var aFlt :String[];
+--    var Q :Query;
+--    aFlt[1] = 'CreateDate>=' + Str(Today);
+--    aFlt[2] = 'CreateDate<' + Str(Today + 1);
+--    aFlt[3] = 'RClass="' + РКП_СИС.Functions.FullClassName(Self.Record.ClassInfo.ClassRef) + '"';
+--    aFlt[4] = 'RID=' + Str(Record.DocId);
+--    if byCurrentUsers then
+--      aFlt[5] = 'CreateUser="' + SessionInfo.UserName + '"';
+--    fi;
+--    Q = Query.Create([РКП_СИС.ЛогРабот]); -- тип действия здесь не важен
+--    Q.Filter = MakeFilter(aFlt);
+--    Q.Select;
+--    DeleteAllRecords(Q);
+--  end;
+
+inobject private
+
+--  func ЗаписьПринимается_КУчету synonym ContentValid_ToWorkLog :Logical; -- Содержимое записи валидно для принятия к учету как единица рабочего процесса
+--    Return true;
+--  end;
+--
+--  func ДатаПринятия_КУчету synonym CreateDate_ForWorkLog (byCurrentUsers :Logical) :Date; -- Дата, когда запись считается созданной и принимается к учету как единица рабочего процесса
+--    var dt :Date;
+--    if byCurrentUsers then
+--      if (Self.Record.CreateUser = SessionInfo.UserName) then
+--        dt = Self.Record.CreateDate;
+--        Result = CreateDate(Day(dt), Mon(dt), Year(dt));
+--      fi;
+--    else
+--      dt = Self.Record.CreateDate; -- По умолчанию. Но не обязательно.
+--      Result = CreateDate(Day(dt), Mon(dt), Year(dt));
+--    fi;
+--  end;
+
+--  func ДатаОбновления_ДляУчета synonym UpdateDate_ForWorkLog :Date; -- Дата, когда запись считается обновленной и принимается к учету как единица рабочего процесса
+--    var dt :Date;
+--    if (ДатаПринятия_КУчету(false) <> nil) then
+--      if (ДатаПринятия_КУчету(true) <> ДатаПринятия_КУчету(false)) then
+--        dt = Self.Record.UpdateDate;
+--        Result = CreateDate(Day(dt), Mon(dt), Year(dt));
+--      fi;
+--    fi;
+--  end;
+
+--  func ПолучитьЛогТип0 synonym GetCurrentWorkLogType0 (byCurrentUsers :Logical) :РКП_СИС.ЛогРабот;
+--    var aFlt :String[];
+--    var FltLog :String;
+--    aFlt[1] = 'CreateDate>=' + Str(Today);
+--    aFlt[2] = 'CreateDate<' + Str(Today + 1);
+--    aFlt[3] = 'RClass="' + РКП_СИС.Functions.FullClassName(Self.Record.ClassInfo.ClassRef) + '"';
+--    aFlt[4] = 'RID=' + Str(Record.DocId);
+--    aFlt[5] = 'ActionType=0';
+--    if byCurrentUsers then
+--     aFlt[6] = 'CreateUser="' + SessionInfo.UserName + '"';
+--    fi;
+--    FltLog = MakeFilter(aFlt);
+--    Result = FindRecord( РКП_СИС.ЛогРабот, FltLog );
+--  end;
+--
+--  func ПолучитьЛогТип1 synonym GetCurrentWorkLogType1 (byCurrentUsers :Logical) :РКП_СИС.ЛогРабот;
+--    var aFlt :String[];
+--    var FltLog :String;
+--    aFlt[1] = 'CreateDate>=' + Str(Today);
+--    aFlt[2] = 'CreateDate<' + Str(Today + 1);
+--    aFlt[3] = 'RClass="' + РКП_СИС.Functions.FullClassName(Self.Record.ClassInfo.ClassRef) + '"';
+--    aFlt[4] = 'RID=' + Str(Record.DocId);
+--    aFlt[5] = 'ActionType=1';
+--    if byCurrentUsers then
+--     aFlt[6] = 'CreateUser="' + SessionInfo.UserName + '"';
+--    fi;
+--    FltLog = MakeFilter(aFlt);
+--    Result = FindRecord( РКП_СИС.ЛогРабот, FltLog );
+--  end;
+
+
+inclass private
+
+--  proc Clear_WorkLogExt(vRec :Record; byCurrentUsers :Logical); -- Удаление из лога работ записей о модификации или создании в день их модификации (создания) - для вызова inclass
+--    var aFlt :String[];
+--    var Q :Query;
+--    aFlt[1] = 'CreateDate>=' + Str(Today);
+--    aFlt[2] = 'CreateDate<' + Str(Today + 1);
+--    aFlt[3] = 'RClass="' + РКП_СИС.Functions.FullClassName(vRec.ClassInfo.ClassRef) + '"';
+--    aFlt[4] = 'RID=' + Str(vRec.DocId);
+--    if byCurrentUsers then
+--      aFlt[5] = 'CreateUser="' + SessionInfo.UserName + '"';
+--    fi;
+--    Q = Query.Create([РКП_СИС.ЛогРабот]); -- тип действия здесь не важен
+--    Q.Filter = MakeFilter(aFlt);
+--    Q.Select;
+--    DeleteAllRecords(Q);
+--  end;
+
+end

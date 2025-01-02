@@ -1,0 +1,383 @@
+class inherited – ѕ_—»—.RI.intBase '»нтерфейс записи';
+
+import – ѕ_—»— Classes Functions, Recs, StdCode, StringsFunctions;
+
+inclass public
+
+  var »м€ѕол€Ќеѕримен€етс€ :String = 'ѕрекращено';
+  var »м€ѕол€Ќаим          :String = 'Ќазваниеќсн';
+
+  func —в€занный ласс«аписей: Class —»—2.Ѕазова€.Ѕазова€«апись;
+    Result = – ѕ_√азеты.√азета;
+  end;
+
+  func Create: – ѕ_√азеты.RI.√азета;
+    Result = inherited Create;
+    Result.Record = – ѕ_√азеты.√азета.Create;
+  end;
+
+  func ќткрытьѕо«аписи synonym OpenRecord(locRecord: – ѕ_√азеты.√азета): – ѕ_√азеты.RI.√азета;
+    Result = inherited Create;
+    Result.Record = locRecord;
+  end;
+
+  func Ѕланк–едакторѕо”молчанию: Class BlankForm;
+    Result = nil;
+  end;
+
+  func  артотекаѕо”молчанию: Class CardForm;
+    Result = nil;
+  end;
+
+inobject public
+
+  Record: – ѕ_√азеты.√азета;
+
+  proc »нициализироватьѕо”молчанию synonym InitByDefault;
+    Init;
+    with Record.языки.AddEx do
+      язык = FindRecord(– ѕ_—правочники.спрязык»здани€, '√осяз–‘');
+    end;
+  end;
+
+  proc »нициализировать synonym Init;
+    Assert(Record.State = Kernel.Record.Created);
+  end;
+
+  proc «аписать synonym Post( аƒиалоговый–ежим :Logical = False );
+    SetWorkLog(wsRecCreated, wsRecUpdated);
+    ќбновитьѕол€»нфо;
+    inherited Post(аƒиалоговый–ежим);
+    ќбновить—татјналитику;
+  end;
+
+  proc ќбновитьѕол€»нфо; -- ќбновление полей, ранее бывших вычислимыми
+    ќбновитьѕоле»нфо_ћеста»здани€;
+    ќбновитьѕоле»нфо_язык»здани€;
+    ќбновитьѕоле»нфо_„итательскийјдрес;
+    ќбновитьѕоле»нфо_“ематика;
+    ќбновитьѕоле»нфо_ѕоследнийѕолученныйЌомер;
+  end;
+
+  inobject private
+
+  proc ќбновитьѕоле»нфо_ћеста»здани€;
+    var vCount :Integer;
+    var locResult :String;
+    vCount = Self.Record.ћеста»здани€.Count;
+    if (vCount = 1) then
+      locResult = Self.Record.ћеста»здани€.Items[1].ћесто»здани€.Ќаим;
+    elsif (vCount = 2) then
+      locResult = Self.Record.ћеста»здани€.Items[1].ћесто»здани€.Ќаим + '; ' +
+                Self.Record.ћеста»здани€.Items[2].ћесто»здани€.Ќаим;
+    elsif (vCount >= 3) then
+      locResult = Self.Record.ћеста»здани€.Items[1].ћесто»здани€.Ќаим + '; ' +
+                  Self.Record.ћеста»здани€.Items[2].ћесто»здани€.Ќаим + '; ' +
+                  Self.Record.ћеста»здани€.Items[3].ћесто»здани€.Ќаим;
+    fi;
+    Self.Record.ћеста»здани€—тр = SubStr(Trim(locResult), 1, 250);
+  end;
+
+  proc ќбновитьѕоле»нфо_язык»здани€;
+    var vCount :Integer;
+    var locResult :String;
+    vCount = Self.Record.языки.Count;
+    if (vCount = 1) then
+      locResult = Self.Record.языки.Items[1].язык.Ќаим;
+    elsif (vCount = 2) then
+      locResult = Self.Record.языки.Items[1].язык.Ќаим + '; ' +
+                  Self.Record.языки.Items[2].язык.Ќаим;
+    elsif (vCount >= 3) then
+      locResult = Self.Record.языки.Items[1].язык.Ќаим + '; ' +
+                  Self.Record.языки.Items[2].язык.Ќаим + '; ' +
+                  Self.Record.языки.Items[3].язык.Ќаим;
+    fi;
+    Self.Record.языки—тр = SubStr(Trim(locResult), 1, 250);
+  end;
+
+  proc ќбновитьѕоле»нфо_„итательскийјдрес;
+    var vCount :Integer;
+    var locResult :String;
+    vCount = Self.Record.„ј÷Ќ.Count;
+    if (vCount = 1) then
+      locResult = Self.Record.„ј÷Ќ.Items[1].„ј÷Ќ.Ќаим;
+    elsif (vCount = 2) then
+      locResult = Self.Record.„ј÷Ќ.Items[1].„ј÷Ќ.Ќаим + '; ' +
+                  Self.Record.„ј÷Ќ.Items[2].„ј÷Ќ.Ќаим;
+    elsif (vCount >= 3) then
+      locResult = Self.Record.„ј÷Ќ.Items[1].„ј÷Ќ.Ќаим + '; ' +
+                  Self.Record.„ј÷Ќ.Items[2].„ј÷Ќ.Ќаим + '; ' +
+                  Self.Record.„ј÷Ќ.Items[3].„ј÷Ќ.Ќаим;
+    fi;
+    Self.Record.„ј÷Ќ—тр = SubStr(Trim(locResult), 1, 250);
+  end;
+
+  proc ќбновитьѕоле»нфо_“ематика;
+    var vCount :Integer;
+    var locResult :String;
+    vCount = Self.Record.“ематики.Count;
+    if (vCount = 1) then
+      locResult = Self.Record.“ематики.Items[1].“ематика.Ќаим;
+    elsif (vCount = 2) then
+      locResult = Self.Record.“ематики.Items[1].“ематика.Ќаим + '; ' +
+                  Self.Record.“ематики.Items[2].“ематика.Ќаим;
+    elsif (vCount >= 3) then
+      locResult = Self.Record.“ематики.Items[1].“ематика.Ќаим + '; ' +
+                  Self.Record.“ематики.Items[2].“ематика.Ќаим + '; ' +
+                  Self.Record.“ематики.Items[3].“ематика.Ќаим;
+    fi;
+    Self.Record.“ематики—тр = SubStr(Trim(locResult), 1, 250);
+  end;
+
+  proc ќбновитьѕоле»нфо_ѕоследнийѕолученныйЌомер;
+    var rNom :– ѕ_√азеты.Ќомер√азеты;
+    var locResult :String;
+    rNom = – ѕ_√азеты.—тат.ѕоследнийѕолученныйЌомер(Self.Record);
+    if (rNom <> nil) then
+      locResult = BiblioRecord.ќписаниеЌомера(rNom);
+    fi;
+    Self.Record.ѕоследнийѕолученныйЌомер = SubStr(Trim(locResult), 1, 250);
+  end;
+
+  proc ¬ыполнить”даление synonym DoDelete( const aCheckRefs :Logical );
+    ClearWorkLog(wsIndifferently, false);
+    inherited DoDelete(aCheckRefs);
+  end;
+
+  proc SaveStoredValL(rWrkLog :– ѕ_—»—.Ћог–абот; byWorkState :tWorkState);
+    rWrkLog.StoredValL = Self.Record.ѕризнакќтсылки; -- сохранение показател€ логического типа
+  end;
+
+
+  inobject public
+
+  proc ќбновить—татјналитику;
+    ќбновить—татјналитикуƒл€√азеты(Self.Record);
+  end;
+
+  -- ћетод вызываетс€ тогда, когда требуетс€ проверить возможность удалени€ газеты
+  func ”даление¬озможно :Logical;
+    var Q :Query;
+    var aTxt :String[];
+    -- 1. ѕроверка наличи€ номеров
+    with Query.Create([– ѕ_√азеты.Ќомер√азеты]) do
+      Filter = 'isGroup=0 and √азета=' + Self.Record.DocIDStr;
+      Result = (Count = 0);
+    end;
+    if (not Result) then
+      aTxt = nil;
+      AddInArray( aTxt, '”даление невозможно: в базе данных имеютс€ данные о номерах газеты.');
+      AddInArray( aTxt, 'ƒл€ удалени€ газеты следует предварительно удалить (если это возможно) записи о номерах и записи о статистике выпуска.');
+      Message( ArrayToText(aTxt) );
+      Return;
+    fi;
+    -- 1.1. ѕроверка наличи€ номеров, созданных Ћ√—
+    if Result then
+      with Query.Create([– ѕ_√азеты.Ќомер√азеты]) do
+        Filter = '—озданќЋ√— and √азета=' + Self.Record.DocIDStr;
+        Result = (Count = 0);
+      end;
+      if (not Result) then
+        aTxt = nil;
+        AddInArray( aTxt, '”даление невозможно: в базе данных имеютс€ данные о номерах газеты.');
+        AddInArray( aTxt, 'ќписание номеров внесено сотрудниками сектора (группы) Ћ√—.');
+        AddInArray( aTxt, 'ƒл€ разрешени€ конфликта обратитесь к системному администратору.');
+        Message( ArrayToText(aTxt) );
+        Return;
+      fi;
+    fi;
+    -- 1.2. ”даление групп номеров
+    if Result then
+      try
+        Q = Query.Create([– ѕ_√азеты.Ќомер√азеты]);
+        Q.Filter = 'isGroup=-1 and √азета=' + Self.Record.DocIDStr;
+        Q.Select;
+        DeleteAllRecords(Q);
+      except
+        Result = false;
+      end;
+      if (not Result) then
+        aTxt = nil;
+        AddInArray( aTxt, 'Ќе удалось выполнить удаление групповой записи номеров.');
+        AddInArray( aTxt, 'ƒл€ разрешени€ конфликта обратитесь к системному администратору.');
+        Message( ArrayToText(aTxt) );
+        Return;
+      fi;
+    fi;
+    -- 2. ѕроверка наличи€ статистики выпуска
+    if Result then
+      with Query.Create([– ѕ_√азеты.¬ыпуск√азеты]) do
+        Filter = '√азета=' + Self.Record.DocIDStr;
+        Result = (Count = 0);
+      end;
+      if (not Result) then
+        aTxt = nil;
+        AddInArray( aTxt, '”даление невозможно: в базе данных имеютс€ данные о статистике выпуска газеты.');
+        AddInArray( aTxt, 'ƒл€ удалени€ газеты следует предварительно удалить эти записи.');
+        Message( ArrayToText(aTxt) );
+        Return;
+      fi;
+    fi;
+    -- 3. ”даление статистики поступлений
+    if Result then
+      try
+        Q = Query.Create([– ѕ_√азеты.ѕоступление√азеты]);
+        Q.Filter = '√азета=' + Self.Record.DocIDStr;
+        Q.Select;
+        DeleteAllRecords(Q);
+      except
+        Result = false;
+      end;
+      if (not Result) then
+        aTxt = nil;
+        AddInArray( aTxt, 'Ќе удалось выполнить удаление записей статистики поступлений.');
+        AddInArray( aTxt, 'ƒл€ разрешени€ конфликта обратитесь к системному администратору.');
+        Message( ArrayToText(aTxt) );
+        Return;
+      fi;
+    fi;
+    -- 4. ”даление истории изменений
+    if Result then
+      try
+        Q = Query.Create([– ѕ_√азеты.»стори€√азеты]);
+        Q.Filter = '√азета=' + Self.Record.DocIDStr;
+        Q.Select;
+        DeleteAllRecords(Q);
+      except
+        Result = false;
+      end;
+      if (not Result) then
+        aTxt = nil;
+        AddInArray( aTxt, 'Ќе удалось выполнить удаление записей истории изменений.');
+        AddInArray( aTxt, 'ƒл€ разрешени€ конфликта обратитесь к системному администратору.');
+        Message( ArrayToText(aTxt) );
+        Return;
+      fi;
+    fi;
+  end;
+
+inclass public
+
+  type тип—татјналитика = (ан“ип»здани€ = 1,
+                           ан“ерритори€–аспространени€,
+                           ан атегори€ѕериодичности,
+                           ан оличество¬ѕериоде,
+                           анѕериодичность,
+                           ан∆анр,
+                           анћесто»здани€,
+                           ан“ематика,
+                           ан„ј÷Ќ,
+                           анязык
+                           );
+
+  type типќпци€ѕолучени€—татјн = (опќбновить эш—татјн = 1, оп„итать эш—татјн);
+
+  -- ќбновление аналитичесих стат показателей без пересчета количественных
+  proc ќбновить—татјналитикуƒл€√азеты (vNsp :– ѕ_√азеты.√азета);
+    var aAnlt :Variant[];
+    var rStatOut :– ѕ_√азеты.¬ыпуск√азеты;
+    var rStatIn :– ѕ_√азеты.ѕоступление√азеты;
+    aAnlt = ѕолучить—татјналитикуƒл€√азеты(vNsp, опќбновить эш—татјн);
+    -- выпуск
+    with Query.Create([– ѕ_√азеты.¬ыпуск√азеты]) do
+      Filter = 'not  омплектѕолучен and √азета=' + vNsp.DocIDStr;
+      Select;
+      while not Eof do
+        rStatOut = Current as – ѕ_√азеты.¬ыпуск√азеты;
+        rStatOut.“ематика                  = aAnlt[ан“ематика] as – ѕ_—правочники.спр“ематика;
+        rStatOut.ћесто»здани€              = aAnlt[анћесто»здани€] as – ѕ_—правочники.спр√еографи€;
+        rStatOut.“ерритори€–аспространени€ = aAnlt[ан“ерритори€–аспространени€] as – ѕ_—правочники.спр“ерритори€–аспространени€;
+        rStatOut.“ип»здани€                = aAnlt[ан“ип»здани€] as Integer;
+        rStatOut.язык                      = aAnlt[анязык] as – ѕ_—правочники.спрязык»здани€;
+        rStatOut.„ј÷Ќ                      = aAnlt[ан„ј÷Ќ] as – ѕ_—правочники.спр“ематика;
+        rStatOut.∆анр                      = aAnlt[ан∆анр] as – ѕ_—правочники.спр∆анр;
+        rStatOut. атегори€ѕериодичности    = aAnlt[ан атегори€ѕериодичности] as Integer;
+        rStatOut. оличество¬ѕериоде        = aAnlt[ан оличество¬ѕериоде] as Integer;
+        rStatOut.ѕериодичность             = aAnlt[анѕериодичность] as String;
+        RecordPostIfNeed(rStatOut);
+        Next;
+      od;
+    end;
+    -- поступление
+    with Query.Create([– ѕ_√азеты.ѕоступление√азеты]) do
+      Filter = 'not »зменени€«апрещены and √азета=' + vNsp.DocIDStr + ' and √одѕоступлени€=' + Str(Year(Today));
+      Select;
+      while not Eof do
+        rStatIn = Current as – ѕ_√азеты.ѕоступление√азеты;
+        rStatIn.“ематика                  = aAnlt[ан“ематика] as – ѕ_—правочники.спр“ематика;
+        rStatIn.ћесто»здани€              = aAnlt[анћесто»здани€] as – ѕ_—правочники.спр√еографи€;
+        rStatIn.“ерритори€–аспространени€ = aAnlt[ан“ерритори€–аспространени€] as – ѕ_—правочники.спр“ерритори€–аспространени€;
+        rStatIn.“ип»здани€                = aAnlt[ан“ип»здани€] as Integer;
+        rStatIn.язык                      = aAnlt[анязык] as – ѕ_—правочники.спрязык»здани€;
+        rStatIn.„ј÷Ќ                      = aAnlt[ан„ј÷Ќ] as – ѕ_—правочники.спр“ематика;
+        rStatIn.∆анр                      = aAnlt[ан∆анр] as – ѕ_—правочники.спр∆анр;
+        rStatIn. атегори€ѕериодичности    = aAnlt[ан атегори€ѕериодичности] as Integer;
+        rStatIn. оличество¬ѕериоде        = aAnlt[ан оличество¬ѕериоде] as Integer;
+        rStatIn.ѕериодичность             = aAnlt[анѕериодичность] as String;
+        RecordPostIfNeed(rStatIn);
+        Next;
+      od;
+    end;
+    ќчистить эш—татјн;
+  end;
+
+  func ѕолучить—татјналитикуƒл€√азеты (rNsp :– ѕ_√азеты.√азета; vOpt :типќпци€ѕолучени€—татјн) :Variant[];
+    --var eAnlt :Variant[];
+    --var јналитика :Subtable;
+    if (vOpt = опќбновить эш—татјн) then
+      ќчистить эш—татјн;
+    elsif (vOpt in [оп„итать эш—татјн]) then
+       if (LastNspStAn = rNsp) and (CashNspStAn <> nil) then
+         Result = CashNspStAn;
+       fi;
+    fi;
+    if (Result = nil) then
+      --== —кал€рные значени€ ==--
+      -- “ип издани€
+      Result[ан“ип»здани€] = rNsp.“ип»здани€;
+      -- “ерритори€ распространени€
+      Result[ан“ерритори€–аспространени€] = rNsp.“ерритори€–аспространени€;
+      -- ѕериодичность
+      Result[ан атегори€ѕериодичности] = rNsp. атегори€ѕериодичности;
+      Result[ан оличество¬ѕериоде] = rNsp. оличество¬ѕериоде;
+      Result[анѕериодичность] = rNsp.ѕериодичность;
+      -- ∆анр
+      Result[ан∆анр] = rNsp.∆анр;
+      --== ћассивы ==--
+      -- ћесто издани€
+      if (rNsp.ћеста»здани€.Count > 0) then
+        Result[анћесто»здани€] = rNsp.ћеста»здани€.Items[1].ћесто»здани€;
+      fi;
+      -- “ематика
+      if (rNsp.“ематики.Count > 0) then
+        Result[ан“ематика] = rNsp.“ематики.Items[1].“ематика;
+      fi;
+      -- „ј÷Ќ
+      if (rNsp.„ј÷Ќ.Count > 0) then
+        Result[ан„ј÷Ќ] = rNsp.„ј÷Ќ.Items[1].„ј÷Ќ;
+      fi;
+      -- язык
+      if (rNsp.языки.Count > 0) then
+        Result[анязык] = rNsp.языки.Items[1].язык;
+      fi;
+    fi;
+    if (vOpt = опќбновить эш—татјн) then
+      LastNspStAn = rNsp;
+      CashNspStAn = Result;
+    elsif (vOpt = оп„итать эш—татјн) then
+      ќчистить эш—татјн;
+    fi;
+  end;
+
+  proc ќчистить эш—татјн;
+    LastNspStAn = nil;
+    CashNspStAn = nil;
+  end;
+
+inclass private
+
+  var LastNspStAn :– ѕ_√азеты.√азета;
+  var CashNspStAn :Variant[];
+
+
+end

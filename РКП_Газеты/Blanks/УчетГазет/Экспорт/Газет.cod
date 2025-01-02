@@ -1,0 +1,178 @@
+class inherited СИС2.БазовыйБланк "Экспорт газет в банк данных РКП", editor ЭкспортВБанкДанныхГазет;
+Import РКП_СИС Classes StdCode;
+
+inclass
+
+inobject
+
+
+  proc ВычислитьИмяФайла;
+  var Q                         : Query;
+----Определение даты последнего экспорта газет-------------------------------------------------------------
+  Q                             = Query.Create([РКП_Газеты.ЭкспортВБанкДанныхГазет]);
+  Q.Filter                      = "ДатаЗаписиВФайл<"+Str(Dat(Day(Now(true)),Mon(Now(true)),Year(Now(true))))+
+                                  " and Year(ДатаЗаписиВФайл)="+Str(Year(Now(true)));
+  Q.Order                       = "ДатаЗаписиВФайл";
+  Q.Select;
+  if Q.Count = 0                                                then
+    НомерСеансаВГоду            = 1;
+  else
+    Q.Last;
+    НомерСеансаВГоду            = Q.Current.НомерСеансаВГоду+1;
+  end;
+----Определение имен файла и папки-------------------------------------------------------------------------
+  if ДатаЗаписиВФайл<>nil                                       then
+    ПапкаФайлаЭкспорта          = "C:\ЭКСПОРТ\ГАЗЕТЫ\"+Str(ГодСеанса);
+    if НомерСеансаВГоду < 2                                     then
+    ФайлЭкспорта                = "C:\ЭКСПОРТ\ГАЗЕТЫ\"+Str(ГодСеанса)+
+                                   "\gzt-"+SubStr(Str(ГодСеанса),3,2)+
+                                   ".rlg";
+    else
+    ФайлЭкспорта                = "C:\ЭКСПОРТ\ГАЗЕТЫ\"+Str(ГодСеанса)+
+                                   "\izm"+SubStr(Str(ГодСеанса),3,2)+
+                                   "-"+
+                                   FixStr(Str(НомерСеансаВГоду),"0",2)+
+                                   ".rlg";
+    end;
+  end;
+  end;--proc ВычислитьИмяФайла;
+
+
+--------------------------------------------------------------------------------
+--{ Обработчики событий бланка
+
+--\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+  func СоздатьФайлЭкспорта(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    var ГАЗ                     : TextFile;
+    var Q                       : Query;
+    var k,kk,z,zz               : integer;
+    var ДатаПоследнегоЭкспорта  : Date;
+    var РешениеПродолжить       : Logical;
+  if ГодСеанса>2007                                             then
+  if ИзмененияЗапрещены = false                                 then
+----Определение даты последнего экспорта газет-------------------------------------------------------------
+      Q                         = Query.Create([РКП_Газеты.ЭкспортВБанкДанныхГазет]);
+      Q.Filter                  = "ДатаЗаписиВФайл<"+Str(Dat(Day(Now(true)),Mon(Now(true)),Year(Now(true))));    --точка отсчета - системное время сервера
+      Q.Order                   = "ДатаЗаписиВФайл";
+      Q.Select;
+      if Q.Count > 0                                            then
+        Q.Last;
+        ДатаПоследнегоЭкспорта  = Q.Current.ДатаЗаписиВФайл;
+      else
+        ДатаПоследнегоЭкспорта  = nil;
+      end;
+      Q.Close;
+----Принятие решения об экспорте и определение момента экспорта (даты)-------------------------------------
+      Q                         = Query.Create([РКП_Газеты.Газета]);
+      if ДатаПоследнегоЭкспорта = nil                           then -- все газеты
+        Q.Filter                = "UpdateDate<"+Str(Dat(Day(Now(true)),Mon(Now(true)),Year(Now(true)))+1)+
+                                  " and ЭкспортРКП.Count>0";
+      else
+        Q.Filter                = "UpdateDate<"+Str(Dat(Day(Now(true)),Mon(Now(true)),Year(Now(true)))+1)+
+                                  " and UpdateDate>="+Str(ДатаПоследнегоЭкспорта)+
+                                  " and ЭкспортРКП.Count>0";
+      end;
+      Q.Select;
+      if Q.Count>0                                              then
+        РешениеПродолжить       = true;
+        ДатаЗаписиВФайл         = Now(true);
+      end;
+      Q.Close;
+----Создание файла-----------------------------------------------------------------------------------------
+    if РешениеПродолжить = true                                 then
+    ВычислитьИмяФайла;
+    if    ExistFolder(ПапкаФайлаЭкспорта) = false                then
+      CreateFolder(ПапкаФайлаЭкспорта);
+    end;
+    if  ExistFile(ФайлЭкспорта)= true                           then
+      RemoveFile(ФайлЭкспорта);
+    end;
+    ГАЗ         = TextFile.Create(ФайлЭкспорта,fmCreate,false);   --28.01.2009 - в кодировке DOS
+      Q                         = Query.Create([РКП_Газеты.Газета]);
+      if ДатаПоследнегоЭкспорта = nil                           then
+        Q.Filter                = "UpdateDate<"+Str(Dat(Day(Now(true)),Mon(Now(true)),Year(Now(true)))+1)+
+                                  " and ЭкспортРКП.Count>0 and ПризнакОтсылки = false";
+      else
+        Q.Filter                = "UpdateDate<"+Str(Dat(Day(Now(true)),Mon(Now(true)),Year(Now(true)))+1)+
+                                  " and UpdateDate>"+Str(ДатаПоследнегоЭкспорта-1)+
+                                  " and ЭкспортРКП.Count>0 and ПризнакОтсылки = false";
+
+      end;
+      Q.Order                   = "НазваниеОсн";
+      Q.Select;
+      kk                        = Q.Count;
+      if  kk > 0                                        then
+        Q.First;
+        for k = 1..kk                                   do --начало перебора газет
+          Hint("Создание файла ...",k,kk);
+          zz                   = Q.Current.ЭкспортРКП.Count;
+              ГАЗ.WriteLn("000 "+FixStr(Str(k),"0",6));
+          for z = 1..zz                                 do
+              ГАЗ.WriteLn(Q.Current.ЭкспортРКП.Items[z].Данные);
+          end;
+              ГАЗ.WriteLn("054 "+Str(Dat(Day(ДатаЗаписиВФайл),Mon(ДатаЗаписиВФайл),Year(ДатаЗаписиВФайл))));
+          if k < kk                                     then --вставка сепаратора
+                ГАЗ.WriteLn("___");
+          end;
+        Q.Current.ДатаЗаписиВФайлГЗ     = ДатаЗаписиВФайл;
+        Q.Next;
+        end;--цикл перебора газет
+      end;--условие на непустую выборку
+      Q.Close;--запрос по газетам
+      Message("Обработано записей:      "+Str(kk));
+    else
+      Message("Файл не создан: не найдены газеты, подготовленные для экспорта.");
+    end;--решение о выполнении экспорта
+  else
+    Message("Изменение файла запрещено!");
+  end;
+  else
+    Message("Пожалуйста, укажите год передачи данных!");
+  end;
+  Result = True;
+  end;--СоздатьФайлЭкспорта
+--\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+  func ОткрытьЭкспортFold(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    if ExistFolder(ПапкаФайлаЭкспорта) = true           then
+      ExecuteProgram(ПапкаФайлаЭкспорта);
+    end;
+    Result = True; 
+  end;
+
+  proc ОбработатьВсеГазеты(Sender :Button);
+    var Q                       : Query;
+    var k,kk                    : integer;
+    var ЭкспортРКПДанные_[]     : string;
+    var КолСтрок                : integer;
+      Q                         = Query.Create([РКП_Газеты.Газета]);
+      Q.Filter                  = "ПризнакОтсылки = false";
+      Q.Select;
+      kk                        = Q.Count;
+      Q.First;
+      for k = 1..kk             do
+        Hint("Обработка газет...",k,kk);
+        --if  Q.Current.ЭкспортРКП.Count=0                then
+        ЭкспортРКПДанные_       = nil;
+        РКП_Газеты.Экспорт.Газет.СоздатьЗаписьРКП(Q.Current,ЭкспортРКПДанные_,КолСтрок);
+        РКП_Газеты.Экспорт.Газет.Синхронизация(Q.Current,ЭкспортРКПДанные_);
+        if Q.Current.State = Q.Current.Edited           then
+          Q.Current.Post;
+        end;
+        --end;
+        Q.Next;
+      end;
+      Q.Close;
+      Beep;
+      Message("Ok!");
+      
+  end;
+
+  proc Шаблон_ПриСчит;
+      self.Template.Field       = "ГодСеанса";
+  end;
+
+
+--}
+
+end

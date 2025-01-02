@@ -1,0 +1,219 @@
+class inherited РКП_Газеты.УчетГазет.Отчеты.блОтчетСтатРГБазовый1 "Сводный отчет по вводу данных", editor ПротоколВводаОЛГС;
+
+inclass
+
+inobject
+секцНомера      : Section;
+секцГазеты      : Section;
+секцОператоры   : Section;
+Оператор_[]     : String;
+
+--------------------------------------------------------------------------------
+--{ Обработчики событий бланка
+
+  proc ПриСчит;
+  var Q        : query;
+    ДатаН       = ДатаНачалаПериода;
+    ДатаК       = ДатаКонцаПериода;
+    ЗаДату1     = false;
+    ЗаДату2     = false;
+    ЗаДату3     = false;
+    ЗаДату4     = false;
+    ЗаДату5     = false;
+    секцСПО.Row[1].Visible        = false;
+    секцСПО.Row[2].Visible        = false;
+    секцВарианты.CellByField["ЗаДату1"].Font.Bold = false;
+    секцВарианты.CellByField["ЗаДату2"].Font.Bold = false;
+    секцВарианты.CellByField["ЗаДату3"].Font.Bold = false;
+    секцВарианты.CellByField["ЗаДату4"].Font.Bold = false;
+    секцВарианты.CellByField["ЗаДату5"].Font.Bold = false;
+    if     СтандартныйПериод    = 0     then
+      ЗаДату1                   = true;
+      секцВарианты.CellByField["ЗаДату1"].Font.Bold = true;
+    elsif  СтандартныйПериод    = 1     then
+      ЗаДату2                   = true;
+      секцВарианты.CellByField["ЗаДату2"].Font.Bold = true;
+    elsif  СтандартныйПериод    = 2     then
+      ЗаДату3                   = true;
+      секцВарианты.CellByField["ЗаДату3"].Font.Bold = true;
+    elsif  СтандартныйПериод    = 3     then
+      ЗаДату4                   = true;
+      секцВарианты.CellByField["ЗаДату4"].Font.Bold = true;
+    elsif  СтандартныйПериод    = 4     then
+      ЗаДату5                   = true;
+      секцВарианты.CellByField["ЗаДату5"].Font.Bold = true;
+      секцСПО.Row[1].Visible    = true;
+      секцСПО.Row[2].Visible    = true;
+    end;
+    if Record.State = Record.Created    then
+      ГодПротокола      = Year(today);
+      Q                         = Query.Create([РКП_Статьи.ПротоколВводаОЛГС]);
+      Q.Filter                  = "ГодПротокола="+Str(Year(today))+" and DocID<>"+Str(Record.DocID);
+      Q.LoadingFields           = "НомерПротокола";
+      Q.Order                   = "НомерПротокола";
+      Q.Select;
+        if Q.Count > 0          then
+          Q.Last;
+          НомерПротокола        = Q.Current.НомерПротокола+1;
+        else
+          НомерПротокола        = 1;
+        end;
+      Q.Close;
+    end;
+  end;
+
+  proc ПолеВвода_ПриВыходе(Cell :TemplateCell; Index :Integer);
+    if ИзмененияЗапрещены             = false then
+      inherited ПолеВвода_ПриВыходе(Cell, Index);
+      ДатаНачалаПериода         = ДатаН;
+      ДатаКонцаПериода          = ДатаК;
+      СтандартныйПериод         = ЗаДату;
+    else
+      Message('Запись защищена от изменений!');
+    end;
+  end;
+
+  proc КнОК_ПриНажатии(Sender :Button);
+    if BlankOption[AutoPostOrCancel]    = True  then
+      if ИзмененияЗапрещены             = false then
+        EditorPost;
+      end;
+    end;
+    Close(cmOK);
+  end;
+
+  func СменаВариантаПериода(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    if ИзмененияЗапрещены       = false         then
+      Result = inherited СменаВариантаПериода(Cell, Action);
+      ДатаНачалаПериода         = ДатаН;
+      ДатаКонцаПериода          = ДатаК;
+      СтандартныйПериод         = ЗаДату;
+      Result = True; -- Разрешаем стандартную обработку
+    else
+      Message('Запись защищена от изменений!');
+    end;
+  end;
+
+  proc ПостроитьОтчет(Sender :Button);
+  var Q        : query;
+  var k,z      : integer;
+  var val_0,val_1 : string;
+  Hint("Построение отчета",1,9);
+  секцОператоры.Count = nil;
+    if ИзмененияЗапрещены = false then          --проверка защищенности
+    if    ДатаН<>nil              and           --проверка корректности условий
+          ДатаК<>nil              and
+          ДатаН<=ДатаК            then
+      --очистка предыдущих результатов
+      Record.Статьи.Clear;
+      ВсегоВведеноСтатей          = nil;
+      ВсегоРедактированоСтатей    = nil;
+      Оператор_                   = nil;
+      --анализ статей
+      --построение списка операторов, вводивших статьи
+      Q                         = Query.Create([РКП_Статьи.Роспись]);
+      Q.Filter                  = " CreateDate>="+Str(ДатаН)+
+                                  " and CreateDate<"+Str(ДатаК+1)+
+                                  " and CreateUser<>'Администратор'";
+      Q.LoadingFields           = "CreateUser";
+      Q.Order                   = "CreateUser";
+      Q.Select;
+      Q.First;
+      Hint("Построение отчета",2,9);
+      for k =  1..Q.Count        do
+        val_1           = Q.Current.CreateUser;
+          if val_1      <> val_0 or k=1 then
+            z      = z+1;
+            секцОператоры.InsertFrame(z);
+            InsertInArray(Оператор_,z,Q.Current.CreateUser);
+          end;
+        val_0           = Q.Current.CreateUser;
+        Q.Next;
+      end;
+      Q.Close;
+      --построение списка операторов, редактировавших статьи
+      val_1 = "";
+      val_0 = "";
+      Q                         = Query.Create([РКП_Статьи.Роспись]);
+      Q.Filter                  = "UpdateDate>="+Str(ДатаН)+
+                                  " and UpdateDate<"+Str(ДатаК+1)+
+                                  " and UpdateUser<>'Администратор'";
+      Q.LoadingFields           = "UpdateUser";
+      Q.Order                   = "UpdateUser";
+      Q.Select;
+      Q.First;
+      Hint("Построение отчета",3,9);
+      for k =  1..Q.Count       do
+        val_1           = Q.Current.UpdateUser;
+          if val_1      <> val_0 or k=1 then
+            z      = z+1;
+            секцОператоры.InsertFrame(z);
+            InsertInArray(Оператор_,z,Q.Current.UpdateUser);
+          end;
+        val_0           = Q.Current.UpdateUser;
+        Q.Next;
+      end;
+      Q.Close;
+      --сортировка
+      секцОператоры.SortBy("Оператор_");
+      --заполнение подтаблицы
+      val_1 = "";
+      val_0 = "";
+      Hint("Построение отчета",4,9);
+      for k =  1..секцОператоры.Count   do
+        val_1           = Оператор_[k];
+          if val_1      <> val_0 or k=1 then
+            z                               = Record.Статьи.Add;
+            Record.Статьи[z].Оператор       = Оператор_[k];
+          end;
+        val_0           = Оператор_[k];
+      end;
+      секцОператоры.Count = nil;
+      Оператор_           = nil;
+      --расчет подтаблицы
+      Hint("Построение отчета",5,9);
+      for k = 1..Record.Статьи.Count    do
+        Record.Статьи[k].Введено        = РКП_Статьи.Стат.ВведеноСтатейЗаПериод(Record.Статьи[k].Оператор,ДатаН,ДатаК);
+        Record.Статьи[k].Редактировано  = РКП_Статьи.Стат.РедактированоСтатейЗаПериод(Record.Статьи[k].Оператор,ДатаН,ДатаК);
+      end;
+      --------------------------------------------------------
+      ----------------------------
+      --Вычисление итогов
+      Hint("Построение отчета",6,9);
+      for k = 1..Record.Статьи.Count    do
+        ВсегоВведеноСтатей              = ВсегоВведеноСтатей        + Record.Статьи[k].Введено;
+        ВсегоРедактированоСтатей        = ВсегоРедактированоСтатей  + Record.Статьи[k].Редактировано;
+      end;
+      Hint("Построение отчета",7,9);
+      --Вычисление полных имен пользователей
+      Hint("Построение отчета",8,9);
+      for k = 1..Record.Статьи.Count    do
+        Q               = Query.Create([Kernel.Settings.User]);
+        Q.Filter        = "Name='"+Record.Статьи[k].Оператор+"'";
+        Q.Select;
+        if Q.Count>0    then
+          Q.First;
+          if Q.Current.FullName<>nil    then
+            Record.Статьи[k].Оператор   = Q.Current.FullName;
+          else
+            Record.Статьи[k].Оператор   = Record.Статьи[k].Оператор+" (?)";
+          end;
+        else
+          Record.Статьи[k].Оператор   = Record.Статьи[k].Оператор+" (?)";
+        end;
+        Q.Close;
+      end;
+      Hint("Построение отчета",9,9);
+      --завершение расчетов и принудительное сохранение результатов
+      EditorPost;
+    else
+      Message("Пожалуйста, проверьте правильность периода отбора!");
+    end;                                        --проверка корректности условий
+    else
+      Message("Отчет защищен от изменений!");
+    end;                                        --проверка защищенности
+  end;
+
+--}
+
+end

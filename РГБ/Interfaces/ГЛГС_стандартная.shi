@@ -1,0 +1,347 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Layout Version="7">
+  <Commands/>
+  <Menus>
+    <Menu Name="FMainMenu">
+      <Item Caption="&amp;Файл">
+        <Item Command="Kernel.File.Open" Caption="&amp;Открыть..."/>
+        <Item Command="Kernel.File.OpenInfobase" Caption="Открыть с&amp;ессию..."/>
+        <Item Command="Kernel.File.CloseAll" Caption="&amp;Закрыть все"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.File.Export" Caption="&amp;Экспорт..."/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Setup.PrintSetup" Caption="Н&amp;астройка печати..."/>
+        <Item Command="Kernel.File.PrintPreview" Caption="Предварительный прос&amp;мотр"/>
+        <Item Command="Kernel.File.Print" Caption="&amp;Печать..."/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.File.ClosedDocs"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Service.Quit" Caption="В&amp;ыход"/>
+      </Item>
+      <Item Caption="&amp;Правка">
+        <Item Command="Kernel.Edit.Undo" Caption="&amp;Отменить"/>
+        <Item Command="Kernel.Edit.Redo" Caption="В&amp;ернуть"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Edit.Cut" Caption="В&amp;ырезать"/>
+        <Item Command="Kernel.Edit.Copy" Caption="&amp;Копировать"/>
+        <Item Command="Kernel.Edit.Paste" Caption="&amp;Вставить"/>
+        <Item Command="Kernel.Edit.Delete" Caption="&amp;Удалить"/>
+        <Item Command="Kernel.Edit.Clipboard" Caption="К&amp;арман"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Find.Find" Caption="&amp;Поиск..."/>
+        <Item Command="Kernel.Find.FindNext" Caption="Пов&amp;тор"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Edit.Properties" Caption="&amp;Свойства..."/>
+      </Item>
+      <Item Caption="Вид">
+        <Item Command="Kernel.Setup.Toolbar"/>
+        <Item Command="Kernel.Setup.WindowBar"/>
+        <Item Command="Kernel.Setup.StatusBar"/>
+        <Item Caption="-"/>
+        <Item Caption="Интерфейс">
+          <Item Command="СервисРКП.ЗавСектЛГС"/>
+          <Item Command="СервисРКП.ИнтерфейсОператораЛГС"/>
+        </Item>
+      </Item>
+      <Item Caption="Справочники">
+        <Item Command="Infobase.РКП.ОРГП.РеестрГазет"/>
+        <Item Command="Infobase.РКП.Справочники.ТематикаСтатьи"/>
+        <Item Command="Infobase.РКП.Справочники.ББК"/>
+        <Item Command="Infobase.РКП.Справочники.ГеографияСтатьи"/>
+        <Item Command="Infobase.РКП.Справочники.Лица"/>
+        <Item Command="Infobase.РКП.Справочники.СерииПриложений"/>
+        <Item Caption="Коллективные авторы">
+          <Item Caption="Постоянные организации">
+            <Item Command="Infobase.РКП.Справочники.ПостОрг"/>
+            <Item Command="Infobase.РКП.Справочники.ПостОргКолл"/>
+            <Item Command="Infobase.РКП.Справочники.ПостОргСП"/>
+            <Item Command="Infobase.РКП.Справочники.ПостОргВП"/>
+          </Item>
+          <Item Caption="Временные организации">
+            <Item Command="Infobase.РКП.Справочники.ВремОрг"/>
+            <Item Command="Infobase.РКП.Справочники.ВремОргКолл"/>
+            <Item Command="Infobase.РКП.Справочники.ВремОргСП"/>
+            <Item Command="Infobase.РКП.Справочники.ВремОргВП"/>
+          </Item>
+        </Item>
+      </Item>
+      <Item Caption="Данные">
+        <Item Command="Infobase.РКП.ГЛГС.РеестрСтатей"/>
+        <Item Command="Infobase.РКП.ГЛГС.ФильтрРеестраСтатей"/>
+      </Item>
+      <Item Caption="Отчеты">
+        <Item Command="Infobase.РКП.ГЛГС.Отчеты.БибСправка01"/>
+      </Item>
+      <Item Caption="Экспорт">
+        <Item Command="Infobase.РКП.ГЛГС.Экспорт.ВыпускЛГС"/>
+        <Item Command="Infobase.РКП.ГЛГС.Экспорт.ВыпускЛГС"/>
+      </Item>
+      <Item Caption="&amp;Сервис">
+        <Item Command="Kernel.Service.Calculator"/>
+        <Item Command="Kernel.Service.Calendar"/>
+        <Item Command="Kernel.Service.Messages" Caption="Соо&amp;бщения"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Setup.ProgramSetup" Caption="Настройки &amp;программы..."/>
+      </Item>
+      <Item Caption="&amp;Окна">
+        <Item Command="Kernel.Window.Cascade" Caption="&amp;Каскад окон"/>
+        <Item Command="Kernel.Window.Tile" Caption="&amp;Разложить окна"/>
+        <Item Command="Kernel.Window.TileTwo" Caption="&amp;Сравнить окна"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Window.Next" Caption="С&amp;ледующее"/>
+        <Item Command="Kernel.Window.Prev" Caption="&amp;Предыдущее"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Window.Close" Caption="&amp;Закрыть"/>
+        <Item Command="Kernel.Window.CloseAll" Caption="Закрыть &amp;все"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Window.Select" Caption="В&amp;ыбор окна..."/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Window.List"/>
+      </Item>
+      <Item Caption="По&amp;мощь">
+        <Item Command="Kernel.Help.About" Caption="&amp;Информация производителя..."/>
+        <Item Command="Kernel.Account.Information"/>
+      </Item>
+    </Menu>
+    <Menu Name="AppWinTabMenu1">
+      <Item Command="Kernel.Window.New"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Window.Cascade"/>
+      <Item Command="Kernel.Window.Tile"/>
+      <Item Command="Kernel.Window.TileTwo"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Window.Toggle"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Window.CloseAll"/>
+      <Item Command="Kernel.Window.Close"/>
+    </Menu>
+    <Menu Name="MEdtEditPopup">
+      <Item Command="Kernel.Window.Close"/>
+      <Item Command="Kernel.File.Open"/>
+      <Item Command="Kernel.File.SaveAs"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Edit.Copy"/>
+      <Item Command="Kernel.Edit.Cut"/>
+      <Item Command="Kernel.Edit.Paste"/>
+      <Item Command="Kernel.Edit.Delete"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Text.Block.Read"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Edit.Undo"/>
+      <Item Command="Kernel.Edit.Redo"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Find.Find"/>
+      <Item Command="Kernel.Find.FindReplace"/>
+      <Item Command="Kernel.Find.Goto"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Setup.EditorSetup"/>
+    </Menu>
+    <Menu Name="MEdtBlockPopup">
+      <Item Command="Kernel.Window.Close"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Edit.Copy"/>
+      <Item Command="Kernel.Edit.Cut"/>
+      <Item Command="Kernel.Edit.Paste"/>
+      <Item Command="Kernel.Edit.Delete"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Text.Block.Write"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Edit.Undo"/>
+      <Item Command="Kernel.Edit.Redo"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Text.Block.Indent"/>
+      <Item Command="Kernel.Text.Block.Unindent"/>
+      <Item Command="Kernel.Text.Block.Upcase"/>
+      <Item Command="Kernel.Text.Block.Locase"/>
+      <Item Command="Kernel.Text.Block.ChangeFont"/>
+      <Item Command="Kernel.Text.Block.Comment"/>
+      <Item Command="Kernel.Text.Block.Format"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Service.CalcSum"/>
+    </Menu>
+    <Menu Name="MTplBlankPopup">
+      <Item Command="Kernel.Window.Close"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Edit.Copy"/>
+      <Item Command="Kernel.Edit.Cut"/>
+      <Item Command="Kernel.Edit.Paste"/>
+      <Item Command="Kernel.Edit.Delete"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.View.SetVisible"/>
+      <Item Command="Kernel.View.FreezeTable"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Form.DesignMode"/>
+    </Menu>
+    <Menu Name="MTplMultiPopup">
+      <Item Command="Kernel.Window.Close"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Edit.Copy"/>
+      <Item Command="Kernel.Edit.Cut"/>
+      <Item Command="Kernel.Edit.Paste"/>
+      <Item Command="Kernel.Edit.Delete"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Edit.InsertObj"/>
+      <Item Command="Kernel.Edit.DeleteObj"/>
+      <Item Command="Kernel.Form.Run.StrokeMoveUp"/>
+      <Item Command="Kernel.Form.Run.StrokeMoveDown"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.View.SetVisible"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Form.DesignMode"/>
+    </Menu>
+    <Menu Name="MCrvPopup">
+      <Item Command="Kernel.Window.Close"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Card.Run.Edit"/>
+      <Item Command="Kernel.Card.Run.AddRec"/>
+      <Item Command="Kernel.Card.Run.AddGroup"/>
+      <Item Command="Kernel.Card.Run.CloneRec"/>
+      <Item Command="Kernel.Card.Run.DeleteRec"/>
+      <Item Command="Kernel.Card.Run.UndeleteRec"/>
+      <Item Command="Kernel.Card.Run.CompareRecords" Caption="Сравнить"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Find.Find"/>
+      <Item Command="Kernel.Card.Run.Filter"/>
+      <Item Caption="Выделение">
+        <Item Command="Kernel.Edit.SelectAll"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Card.Run.Select"/>
+        <Item Command="Kernel.Card.Run.Deselect"/>
+        <Item Command="Kernel.Card.Run.InvertSelection"/>
+        <Item Command="Kernel.Card.Run.SaveSelection"/>
+        <Item Command="Kernel.Card.Run.RestoreSelection"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Card.Run.FilterSelection"/>
+      </Item>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Card.Run.ShowHierarchy"/>
+      <Item Command="Kernel.Card.Run.ShowDeleted"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Edit.Properties"/>
+      <Item Command="Kernel.Form.DesignMode"/>
+    </Menu>
+    <Menu Name="MCrvDesignPopup">
+      <Item Command="Kernel.Window.Close"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Edit.InsertObj"/>
+      <Item Command="Kernel.Card.Design.AddCalcColumn"/>
+      <Item Command="Kernel.Edit.DeleteObj"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Card.Design.AddTable"/>
+      <Item Command="Kernel.Card.Design.DelTable"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Card.Design.ColProps"/>
+      <Item Command="Kernel.Card.Design.CardProps"/>
+      <Item Command="Kernel.Form.Design.FormProps"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Form.DesignMode"/>
+    </Menu>
+    <Menu Name="MGraPopup">
+      <Item Command="Kernel.Window.Close"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Graph.Type"/>
+      <Item Command="Kernel.Graph.Legend"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Graph.Hints"/>
+      <Item Command="Kernel.Graph.Look3D"/>
+      <Item Command="Kernel.Graph.Hatched"/>
+      <Item Command="Kernel.Graph.Turn"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Graph.Data"/>
+      <Item Command="Kernel.Graph.PrevTab"/>
+      <Item Command="Kernel.Graph.NextTab"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Graph.GraphSetup"/>
+      <Item Command="Kernel.Form.DesignMode"/>
+    </Menu>
+    <Menu Name="MJurTabMainPopup">
+      <Item Command="Kernel.Window.Close"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Account.InputTrans"/>
+      <Item Command="Kernel.Account.InputOper"/>
+      <Item Command="Kernel.Account.Change"/>
+      <Item Command="Kernel.Account.Expand" Caption="Раскрыть..."/>
+      <Item Command="Kernel.Account.Comment"/>
+      <Item Command="Kernel.Card.Run.CloneRec"/>
+      <Item Command="Kernel.Card.Run.DeleteRec"/>
+      <Item Command="Kernel.Card.Run.UndeleteRec"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Find.Find"/>
+      <Item Command="Kernel.Card.Run.Filter"/>
+      <Item Caption="Выделение">
+        <Item Command="Kernel.Edit.SelectAll"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Card.Run.Select"/>
+        <Item Command="Kernel.Card.Run.Deselect"/>
+        <Item Command="Kernel.Card.Run.InvertSelection"/>
+        <Item Command="Kernel.Card.Run.SaveSelection"/>
+        <Item Command="Kernel.Card.Run.RestoreSelection"/>
+        <Item Caption="-"/>
+        <Item Command="Kernel.Card.Run.FilterSelection"/>
+      </Item>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Card.Run.ShowDeleted"/>
+      <Item Caption="-"/>
+      <Item Command="Kernel.Edit.Properties"/>
+      <Item Command="Kernel.Form.DesignMode"/>
+    </Menu>
+  </Menus>
+  <Toolbars>
+    <FixedToolbars>
+      <Toolbar>
+        <Button Command="Infobase.РКП.ГЛГС.РеестрСтатей"/>
+        <Button Command="Infobase.РКП.ГЛГС.ФильтрРеестраСтатей"/>
+        <Button Command="Kernel.Card.Run.PrevRec"/>
+        <Button Command="Kernel.Card.Run.NextRec"/>
+        <Divider/>
+        <Button Command="Kernel.Card.Run.Post"/>
+        <Divider/>
+        <Button Command="Kernel.Edit.Copy"/>
+        <Button Command="Kernel.Edit.Paste"/>
+        <Divider/>
+        <Button Command="Kernel.Edit.Undo"/>
+        <Divider/>
+        <Button Command="Kernel.File.PrintPreview"/>
+        <Divider/>
+        <Button Command="Kernel.View.Scale"/>
+        <Divider/>
+        <Button Command="Kernel.Service.Quit"/>
+      </Toolbar>
+      <Toolbar>
+        <Button Command="Kernel.Find.Find"/>
+        <Button Command="Kernel.Find.FindNext"/>
+        <Button Command="Kernel.Card.Run.FirstRec"/>
+        <Button Command="Kernel.Card.Run.LastRec"/>
+        <Divider/>
+        <Button Command="Kernel.Card.Run.Cancel"/>
+        <Divider/>
+        <Button Command="Kernel.Edit.Cut"/>
+        <Button Command="Kernel.Edit.Delete"/>
+        <Divider/>
+        <Button Command="Kernel.Edit.Redo"/>
+        <Divider/>
+        <Button Command="Kernel.File.Print"/>
+        <Divider/>
+        <Button Command="Kernel.Service.Calendar"/>
+        <Button Command="Kernel.Service.Calculator"/>
+      </Toolbar>
+    </FixedToolbars>
+    <ScrollToolbars>
+      <Toolbar Name="Справочники">
+        <Button Command="Infobase.РКП.ОРГП.РеестрГазет"/>
+        <Button Command="Infobase.РКП.Справочники.ТематикаСтатьи"/>
+        <Button Command="Infobase.РКП.Справочники.ББК"/>
+        <Button Command="Infobase.РКП.Справочники.ГеографияСтатьи"/>
+        <Button Command="Infobase.РКП.Справочники.Лица"/>
+      </Toolbar>
+      <Toolbar Name="Отчеты">
+        <Button Command="Infobase.РКП.ГЛГС.Отчеты.БибСправка01"/>
+      </Toolbar>
+      <Toolbar Name="Экспорт">
+        <Button Command="Infobase.РКП.ГЛГС.Экспорт.ВыпускЛГС"/>
+        <Button Command="Infobase.РКП.ГЛГС.Экспорт.ВыпускЛГС"/>
+      </Toolbar>
+    </ScrollToolbars>
+  </Toolbars>
+  <Keyboards/>
+</Layout>

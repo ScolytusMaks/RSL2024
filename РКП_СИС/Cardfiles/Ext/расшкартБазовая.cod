@@ -1,0 +1,144 @@
+﻿extends СИС2.картБазовая "";
+
+import classes Def, Functions;
+
+inclass public
+
+  var СимволСкрыто synonym SymbolCollapsed    :String = 'w';
+  var СимволРазвернуто synonym SymbolExpanded :String = 'q';
+
+inobject private
+
+  proc шаблон_ПриСоздании(Context :Variant);
+    extended шаблон_ПриСоздании(Context);
+  end;
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    extended шаблон_ПриОткрытии(Create);
+    МодифицироватьШаблон;
+    УстРазмерОкна;
+  end;
+
+  func шаблон_ПередЗакрытием(ModalResult :Integer) :Logical;
+    СИС2.Переменные.РежимТестПравДоступа = false;
+    Result = extended шаблон_ПередЗакрытием(ModalResult);
+  end;
+
+  -- Создает список в столбце картотеки перечислимого типа на основании константы - многомерного массива,
+  -- по умолчанию имеющего структуру [[Код:integer,Наименование:string]]
+  proc UpdateCardFieldList synonym ОбновитьСписокПоля, ОбновитьСписокПоляКартотеки (locColumn: CardFileColumn; locList: variant[2]; ИндексКода: integer=1; ИндексОписания: integer=2);
+    var i, ii: integer;
+    locColumn.List.Clear;
+    ii = LengthOfArray(locList);
+    for i = 1 .. ii do
+      locColumn.List.Add(locList[i,ИндексОписания] as String + '|' + Str(locList[i,ИндексКода]));
+    od;
+  end;
+
+  -- Создает список в клетке шаблона перечислимого типа на основании константы - многомерного массива,
+  -- по умолчанию имеющего структуру [[Код:integer,Наименование:string]]
+  proc UpdateTplFieldList synonym ОбновитьСписокПоляШаблона, ОбновитьСписокКлеткиШаблона (locCell: TemplateCell; locList: variant[2]; ИндексКода: integer = 1; ИндексОписания: integer = 2);
+    var i, ii: integer;
+    if (locCell <> nil):
+      locCell.List.Clear;
+      ii = LengthOfArray(locList);
+      for i = 1 .. ii do
+        locCell.List.Add(locList[i,ИндексОписания] as String + '|' + Str(locList[i,ИндексКода]));
+      od;
+    fi;
+  end;
+
+  proc МодифицироватьШаблон;
+    CanHideTemplate = true;
+  end;
+
+  proc РазрешитьСкрыватьШаблон;
+  end;
+
+  proc УстРазмерОкна;
+    var minHeight, minWidth :Integer;
+    if Self.Window.Modal then
+      minHeight = Int(ScreenHeight / 3);
+      minWidth  = Int(ScreenWidth / 3);
+      if (Self.Window.Height < minHeight) then
+        Self.Window.Height = minHeight;
+      fi;
+      if (Self.Window.Width < minWidth) then
+        Self.Window.Width = minWidth;
+      fi;
+    fi;
+  end;
+
+  proc НастроитьДоступностьИВидимостьКнопок;
+    var локОгрРед :Logical;
+    if Self.Cardfile.CanInsert and ЕстьОграничениеДоступа_НаЗапись then
+      Self.Cardfile.CanInsert = false;
+    fi;
+    локОгрРед = ЕстьОграничениеДоступа_НаРедактирование;
+    if Self.Cardfile.CanEdit and локОгрРед then
+      Self.Cardfile.CanEdit = false;
+    fi;
+    Запретить_Редактирование = локОгрРед;
+    if Self.Cardfile.CanDelete and ЕстьОграничениеДоступа_НаУдаление then
+      Self.Cardfile.CanDelete = false;
+    fi;
+    extended НастроитьДоступностьИВидимостьКнопок;
+  end;
+
+  func ЕстьОграничениеДоступа_НаЗапись :Logical;
+    var r, rr :Integer;
+    var j, jj :Integer;
+    var rClass :Class Record;
+    var cConstraint :Constraint;
+    rr = LengthOfArray(Self.Cardfile.Records);
+    for r = 1 ..  rr do
+      rClass = Self.Cardfile.Records[r];
+      jj = rClass.UserConstraintsCount;
+      for j = 1 .. jj do
+        cConstraint = rClass.UserConstraint[j];
+        if (cConstraint.OnPost) and (cConstraint.Constraint = 'False') then
+          Return true;
+        fi;
+      od;
+    od;
+  end;
+
+  func ЕстьОграничениеДоступа_НаРедактирование :Logical;
+    var r, rr :Integer;
+    var j, jj :Integer;
+    var rClass :Class Record;
+    var cConstraint :Constraint;
+    rr = LengthOfArray(Self.Cardfile.Records);
+    for r = 1 ..  rr do
+      rClass = Self.Cardfile.Records[r];
+      jj = rClass.UserConstraintsCount;
+      for j = 1 .. jj do
+        cConstraint = rClass.UserConstraint[j];
+        if (cConstraint.OnEdit) and (cConstraint.Constraint = 'False') then
+          Return true;
+        fi;
+      od;
+    od;
+  end;
+
+  func ЕстьОграничениеДоступа_НаУдаление :Logical;
+    var r, rr :Integer;
+    var j, jj :Integer;
+    var rClass :Class Record;
+    var cConstraint :Constraint;
+    rr = LengthOfArray(Self.Cardfile.Records);
+    for r = 1 ..  rr do
+      rClass = Self.Cardfile.Records[r];
+      jj = rClass.UserConstraintsCount;
+      for j = 1 .. jj do
+        cConstraint = rClass.UserConstraint[j];
+        if (cConstraint.OnDelete) and (cConstraint.Constraint = 'False') then
+          Return true;
+        fi;
+      od;
+    od;
+  end;
+
+
+
+end

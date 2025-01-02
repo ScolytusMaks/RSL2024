@@ -1,0 +1,41 @@
+Class inherited —правочники.CardBaseType1 "языки изданий";
+
+inclass private
+
+  var  ласс»нтерфейса :Class RI.—правочники.intBaseType1 = RI.—правочники.язык»здани€;
+
+inobject private
+
+
+-- 2_ќбработчики событий 0картотеки. --
+
+  proc —толбец_ѕри–исовании(Column :CardfileColumn; Rec :Record; Selected :Logical; var Color :Integer; Font :Font);
+    inherited —толбец_ѕри–исовании(Column, Rec, Selected, Color, Font);
+    if (Rec.√осяз–‘ as logical) then
+      Font.Bold = true;
+    fi;
+  end;
+
+  proc картотека_ѕриќформлении(Action :Cardfile.RearrangeActions; Column :CardfileColumn);
+    var vOrd :String;
+    inherited картотека_ѕриќформлении(Action, Column);
+    if (Action = Cardfile.SortByColumn) then
+      vOrd = Self.Cardfile.Order;
+      if (vOrd = nil) then
+        Self.Cardfile.Order = '√осяз–‘-;Ќаим';
+      else
+        Self.Cardfile.Order = '√осяз–‘-;' + vOrd;
+      fi;
+    fi;
+  end;
+
+
+-- 2_¬спомогательные методы0. --
+
+  proc ”становитьѕараметрыѕо”молчанию;
+    —трока—ортировки = '√осяз–‘-;Ќаим';
+    ¬осстановить—ортировку = true;
+  end;
+
+
+end

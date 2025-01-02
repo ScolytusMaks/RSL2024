@@ -1,0 +1,175 @@
+class inherited Справочники.FalseCardType3 "Тематики/целевое назначение/читательский адрес";
+
+import РКП_СИС Classes StringsFunctions, Functions, Recs, FilterMaker;
+import Classes Def;
+
+
+--{{ 2_Свойства
+
+inclass private
+
+  var КлассИнтерфейса :Class RI.Справочники.Тематика := RI.Справочники.Тематика;
+  stored var ПоказатьТематику   :Integer;
+  stored var ПоказатьЧАЦН       :Integer;
+
+inobject private
+
+  var SelectedRecord :спрТематика; -- Проброс выбранного значения
+  var РежимВыбораТематики :Logical;
+  var РежимВыбораЧАЦН     :Logical;
+--}}
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    inherited шаблон_ПриОткрытии(Create);
+    Template.CellByField['ПоказатьТематику'].Enabled = not true in [РежимВыбораТематики, РежимВыбораЧАЦН];
+    Template.CellByField['ПоказатьЧАЦН'].Enabled     = not true in [РежимВыбораТематики, РежимВыбораЧАЦН];
+    if РежимВыбораТематики and (not РежимВыбораЧАЦН) then
+      Window.Caption = 'Тематики';
+    elsif РежимВыбораЧАЦН and (not РежимВыбораТематики) then
+      Window.Caption = 'Целевое назначение (читательский адрес)';
+    fi;
+  end;
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func Поле_Фильтр_ПриНажатии (Cell: TemplateCell; Action: Template.ClickTypes): Logical;
+    if (Cell.Contents = 'ПоказатьТематику') then
+      if (ПоказатьТематику in [0,1]) then
+        ПоказатьТематику = -1;
+      else
+        ПоказатьТематику = 1;
+      fi;
+      if (ПоказатьЧАЦН in [-1]) then
+        ПоказатьЧАЦН = 1;
+      fi;
+    elsif (Cell.Contents = 'ПоказатьЧАЦН') then
+      if (ПоказатьЧАЦН in [0,1]) then
+        ПоказатьЧАЦН = -1;
+      else
+        ПоказатьЧАЦН = 1;
+      fi;
+      if (ПоказатьТематику in [-1]) then
+        ПоказатьТематику = 1;
+      fi;
+    else
+      Result = Inherited Поле_Фильтр_ПриНажатии(Cell, Action);
+      Return; -- чтобы не вызывать дважды "ОбновитьФильтр"
+    fi;
+    ОбновитьФильтр;
+  end;
+
+  func Поле_Фильтр_ПриВыводе (Cell: TemplateCell; Value: Variant; Action: Template.OutputTypes; var Format: String): Variant;
+    if (Cell.Contents = 'ПоказатьТематику') then
+      if РежимВыбораТематики and (not РежимВыбораЧАЦН) then
+        Result = true;
+      elsif РежимВыбораЧАЦН and (not РежимВыбораТематики) then
+        Result = false;
+      else
+        Result = ПоказатьТематику in [0,1];
+      fi;
+    elsif (Cell.Contents = 'ПоказатьЧАЦН') then
+      if РежимВыбораЧАЦН and (not РежимВыбораТематики) then
+        Result = true;
+      elsif РежимВыбораТематики and (not РежимВыбораЧАЦН) then
+        Result = false;
+      else
+        Result = ПоказатьЧАЦН in [0,1];
+      fi;
+    else
+      Result = Inherited Поле_Фильтр_ПриВыводе(Cell, Value, Action, Format);
+    fi;
+  end;
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+-- 2_Вспомогательные методы0. --
+
+  proc ИнициализироватьСтолбцыКартотеки;
+    var locColumn: CardFileColumn;
+    inherited ИнициализироватьСтолбцыКартотеки;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'Код';
+      Caption = 'Код';
+      FieldType = Template.StringField;
+      Alignment = Template.LeftAlign;
+      Font.Size = crdBuiltIn.Font.Size;
+      MinWidth = 180;
+      Width = 180;
+      Visible = true;
+      CanEdit = false;
+    end;
+    -- категория
+    locColumn = crdBuiltIn.AddColumn;
+    locColumn.FieldName = 'ЦельАнализа';
+    locColumn.Caption = 'Категория';
+    locColumn.FieldType = Template.EnumField;
+    locColumn.Alignment = Template.CenterAlign;
+    locColumn.Font.Size = crdBuiltIn.Font.Size;
+    locColumn.MinWidth = 200;
+    locColumn.Width = 200;
+    UpdateCardFieldList(locColumn, Def.ContentsCategory);
+    locColumn.CanEdit = false;
+    -- остальное
+    with crdBuiltIn.AddColumn do
+      FieldName = 'Наим';
+      Caption = 'Наименование';
+      FieldType = Template.StringField;
+      Alignment = Template.LeftAlign;
+      Font.Size = crdBuiltIn.Font.Size;
+      MinWidth = 100;
+      Width = 0;
+      CanEdit = false;
+    end;
+    with crdBuiltIn.AddColumn do
+      FieldName = 'НеПрименяется';
+      Caption = 'Не применяется';
+      Hint = 'Более не применяется';
+      FieldType = Template.LogicalField;
+      Alignment = Template.CenterAlign;
+      MinWidth = 160;
+      Width = 160;
+      Visible = false;
+      CanEdit = false;
+    end;
+  end;
+
+  func СоздатьФильтр :String;
+    var aFlt :String[];
+    AddInArray( aFlt, inherited СоздатьФильтр );
+    AddInArray( aFlt, ПолучитьФильтрПоКатегории );
+    Result = MakeFilter(aFlt);
+  end;
+
+  func ПолучитьФильтрПоКатегории :String;
+    var aFlt :String[];
+    var локПоказатьТематику, локПоказатьЧАЦН :Logical;
+    if РежимВыбораТематики then
+      AddInArray( aFlt, Фильтр_ТолькоТематика );
+    elsif РежимВыбораЧАЦН then
+      AddInArray( aFlt, Фильтр_ТолькоЧАЦН );
+    else
+      локПоказатьТематику = ПоказатьТематику in [0,1];
+      локПоказатьЧАЦН     = ПоказатьЧАЦН in [0,1];
+      if локПоказатьТематику and (not локПоказатьЧАЦН) then
+        AddInArray( aFlt, Фильтр_ТолькоТематика );
+      elsif локПоказатьЧАЦН and (not локПоказатьТематику) then
+        AddInArray( aFlt, Фильтр_ТолькоЧАЦН );
+      fi;
+    fi;
+    Result = MakeFilter(aFlt);
+  end;
+
+  func Фильтр_ТолькоТематика :String;
+    Return 'ЦельАнализа=' + Str(tcSubjects);
+  end;
+
+  func Фильтр_ТолькоЧАЦН :String;
+    Return 'ЦельАнализа in ' + ToStr([tcReadersAddress, tcPurpose]);
+  end;
+
+
+
+
+end

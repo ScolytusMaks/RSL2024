@@ -1,0 +1,31 @@
+class "";
+
+inclass public
+
+  --Проверка наличия группы в картотеке "Выпуск ЛППИ"
+  --При отсутствии - добавление
+  func Создание (vYearMemo :Integer) :logical;
+    var vMemoExists :Logical;
+    if (vYearMemo > 1901) and (vYearMemo < 3000) then
+      with Query.Create([РКП_Газеты.ВыпускЛППИ]) do
+        Filter = 'ГодЛетописи=' + Str(vYearMemo);
+        vMemoExists = RecordsExists;
+      end;
+      if (not vMemoExists) then
+        with РКП_Газеты.ВыпускЛППИ.Create do
+          ГодЛетописи = vYearMemo;
+          Post;
+        end;
+      fi;
+      Return true;
+    else
+      if (vYearMemo > 0) then
+        Message('Пожалуйста, проверьте правильность введенного значения!');
+      else
+        Return true;
+      fi;
+    fi;
+  end;
+
+
+end

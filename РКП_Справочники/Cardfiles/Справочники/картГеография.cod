@@ -1,0 +1,84 @@
+Class inherited Справочники.CardBaseType1 "Места изданий";
+
+import classes Def;
+
+inclass private
+
+  var КлассИнтерфейса :Class RI.Справочники.intBaseType1 = RI.Справочники.География;
+
+  stored var ТипФрагмента :Integer;
+
+inobject private
+
+-- 2_Обработчики событий 0шаблона. --
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    var locColumnTerrEntity: CardFileColumn;
+    Запретить_Дублирование = true;
+    inherited шаблон_ПриОткрытии(Create);
+    --кнПреобразовать.Enabled = false;
+    Self.CardFile.TreeRoot = 'Административная подчиненность';
+    locColumnTerrEntity = Self.Cardfile.ColumnByField['Категория'];
+    UpdateCardFieldList(locColumnTerrEntity, Def.TerrEntity);
+  end;
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func Поле_Фильтр_ПриНажатии (Cell: TemplateCell; Action: Template.ClickTypes): Logical;
+    var r: Integer;
+    if (Cell.Contents = 'ТипФрагмента') then
+      r = Cell.Row;
+      ТипФрагмента = (r - 1);
+    else
+      Result = Inherited Поле_Фильтр_ПриНажатии(Cell, Action);
+      Return; -- чтобы не вызывать дважды "ОбновитьФильтр"
+    fi;
+    ОбновитьФильтр;
+  end;
+
+  func Поле_Фильтр_ПриВыводе (Cell: TemplateCell; Value: Variant; Action: Template.OutputTypes; var Format: String): Variant;
+    var r: Integer;
+    if (Cell.Contents = 'ТипФрагмента') then
+      r = Cell.Row;
+      Cell.Caption = if( (r - 1) = ТипФрагмента, 'l', '');
+    else
+      Result = Inherited Поле_Фильтр_ПриВыводе(Cell, Value, Action, Format);
+    fi;
+  end;
+
+
+-- 2_Обработчики событий 0картотеки. --
+
+  proc Столбец_ПриРисовании (Column :CardfileColumn; Rec :Record; Selected :Logical; var Color :Integer; Font :Font);
+    var R, G, B :Integer;
+    inherited Столбец_ПриРисовании (Column, Rec, Selected, Color, Font);
+    if ( (Rec as спрГеография).Категория = ктрНеОпределено ) then
+      --Font.Bold = true;
+      R = 255; G = 0; B = 0;
+      Font.Color = (R + G * 256 + B * 256 * 256);
+      R = 255; G = 230;  B = 230;
+      Color = (R + G * 256 + B * 256 * 256);
+    fi;
+  end;
+
+
+-- _Прочие методы. --
+
+  func ПолучитьФильтрКартотеки (var locTreeFilter :String = nil) :String;
+    Result = Inherited ПолучитьФильтрКартотеки(locTreeFilter);
+    locTreeFilter = РКП_СИС.FilterMaker.CreateExt([Result]).GetFilterGroups( [РКП_Справочники.спрГеография] );
+  end;
+
+  func ПолучитьФильтрПоФрагменту :String;
+    if (ТипФрагмента = fltByBegin) then
+      Result = if((Фрагмент <> nil), 'Match(Наим,"' + Фрагмент +'*")', nil);
+    elsif (ТипФрагмента = fltBySubStr) then
+      Result = if((Фрагмент <> nil), 'Match(Наим,"*' + Фрагмент +'*")', nil);
+    elsif (ТипФрагмента = fltExactMatch) then
+      Result = if((Фрагмент <> nil), 'Наим="' + Фрагмент +'"', nil);
+    fi;
+  end;
+
+
+
+end

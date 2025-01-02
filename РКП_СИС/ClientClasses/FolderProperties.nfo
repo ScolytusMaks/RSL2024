@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Properties Version="1">
+  <Property Name="Title" Value="Клиентские классы"/>
+  <Property Name="Required" Value="True"/>
+</Properties>
+<Items>
+  <Item Name="Profile"/>
+  <Item Name="NameSplitter"/>
+  <Item Name="ClientFunctions"/>
+  <Item Name="RI"/>
+</Items>

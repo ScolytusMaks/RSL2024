@@ -1,0 +1,479 @@
+class "Делатель фильтров" synonym FltMaker;
+
+  --Примеры использования:
+  ------ A ----
+  --with Query.Create([AnyRecordClass]) do
+  --  with FltMaker.CreateExt do
+  --    AddCondition('FieldA<>nil');
+  --    AddCondition('FieldB<>nil');
+  --    AddConditionByDate(today);
+  --    Filter = GetFilter(byOr);
+  --  end;
+  --end;
+  ------ Б ----
+  --var aFlt: string[];
+  --aFlt[1] = 'FieldA<>nil';
+  --aFlt[2] = 'FieldB<>nil';
+  --with Query.Create([AnyRecordClass]) do
+  --  Filter = FltMaker.MakeFilter(aFlt);
+  --end;
+  ------ В ----
+  --Получение фильтра вида "(A or B) and C"
+  --with Query.Create([AnyRecordClass]) do
+  --  with FltMaker.CreateExt do
+  --    AddCondition('FieldA<>nil');
+  --    AddCondition('FieldB<>nil');
+  --    CompressConditionsToOne(byOr);
+  --    AddCondition('FieldC<>nil');
+  --    Filter = GetFilter;
+  --  end;
+  --end;
+
+  import  classes Functions, StringsFunctions;
+
+
+inclass public --------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  type tLogOperations = (byAnd = 0, byOr, byXor); -- правила сложения элементов фильтра
+
+  -- Вычисление фильтра как результата сложения элементов (aCnd) по правилу and/or/xor (tLogOperations).
+  -- Вызывается как библиотечный метод.
+  func MakeFilter (aCnd :string[]; MainRule :tLogOperations = byAnd) :string;
+    var locFltMaker :FilterMaker;
+    locFltMaker = CreateExt(aCnd);
+    Return locFltMaker.GetFilter(MainRule);
+  end;
+
+  -- Конструктор.
+  -- Параметры:
+  -- aCnd : массив элементов будущего фильтра.
+  func CreateExt (aCnd :string[] = nil) :FilterMaker;
+    var i :Integer;
+    Result = inherited Create;
+    for i = 1 .. LengthOfArray(aCnd) do
+      Result.AddCondition(aCnd[i]);
+    od;
+  end;
+
+inobject public -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  -- Добавление произвольного условия в будущий фильтр
+  proc AddCondition synonym Add, ДобавитьУсловие (locCnd :string);
+    locCnd = Trim(locCnd);
+    if (locCnd <> nil):
+      AddInArray(aCondition, locCnd);
+    fi;
+  end;
+
+  -- Добавление условия на актуальные на дату запроса записи.
+  -- Аргументы:
+  -- locDateBeg : дата запроса (обязательный)
+  -- locFieldBeg : имя поля даты начала
+  -- locFieldEnd : имя поля даты окончания
+  proc AddConditionByDate synonym AddByDate, ДобавитьУсловиеПоДате (locDateBeg :date; locFieldBeg :string = FieldDateB; locFieldEnd :string = FieldDateE);
+    var locCnd :string;
+    locCnd = SomeFieldsFilterByDates(locDateBeg, locDateBeg, locFieldBeg, locFieldEnd);
+    AddCondition(locCnd);
+  end;
+
+  -- Добавление условия на записи, актуальные позднее даты запроса.
+  -- Аргументы:
+  -- locDateEnd : дата запроса (обязательный)
+  -- locFieldEnd : имя поля даты окончания
+  proc AddConditionByDateLater synonym AddByDateLater, ДобавитьУсловиеПоДатеПозднее (locDateEnd :date; locFieldEnd :string = FieldDateE);
+    var locCnd :string;
+    if (locDateEnd <> nil):
+      locCnd = '(' + locFieldEnd + '>=' + Str(locDateEnd) + ') or (' + locFieldEnd + '=nil)'; -- дата окончания не раньше ограничения или не определена
+      AddCondition(locCnd);
+    fi;
+  end;
+
+  -- Добавление условия на записи, актуальные в диапазон дат запроса.
+  -- Под фильтр попадают не только записи, у которых период актуальности целиком ложится в диапазон дат запроса,
+  -- но и те, у которых период актуальности начинается или заканчивается между датами запроса.
+  -- Аргументы:
+  -- locDateBeg : дата начала периода запроса (обязательный, м.б. nil)
+  -- locDateEnd : дата окончания периода запроса (обязательный, м.б. nil)
+  -- locFieldBeg : имя поля даты начала
+  -- locFieldEnd : имя поля даты окончания
+  proc AddConditionByDates synonym AddByDates, ДобавитьУсловиеПоДатам  (locDateBeg, locDateEnd :date; locFieldBeg :string = FieldDateB; locFieldEnd :string = FieldDateE);
+    var locCnd :string;
+    locCnd = SomeFieldsFilterByDates(locDateBeg, locDateEnd, locFieldBeg, locFieldEnd);
+    AddCondition(locCnd);
+  end;
+
+  -- Добавление условия на записи, ключи (ID) которых входят в массив
+  -- Аргументы:
+  -- aId : массив значений ID, тип значений - любой; при пустом значении под результирующий фильтр не попадет ни одной записи
+  -- locFieldKey : имя ключевого поля (по умолчанию - "DocId").
+  proc AddConditionByIdArray synonym AddByIdArray, ДобавитьУсловиеПоМассивуКлючей (aId :variant[]; locFieldKey :string = 'DocId');
+    if LengthOfArray(aId) > 0:
+      AddCondition(locFieldKey + ' in ' + ToStr(aId));
+    else
+      AddCondition(locFieldKey + ' in [nil]');
+    fi;
+  end;
+
+  -- Добавление условия по классу записей.
+  -- Аргументы:
+  -- ClassRecord : класс записей
+  proc AddConditionByClassRecord synonym AddByClassRecord, ДобавитьУсловиеПоКлассуЗаписей (ClassRecord :Class Record);
+    if (ClassRecord <> nil):
+      AddCondition('ClassType=' + ClassRecord.ClassProject + '.' + ClassRecord.ClassName);
+    fi;
+  end;
+
+  proc AddConditionGroupOnly synonym AddGroupOnly, ДобавитьУсловиеТолькоГруппы;
+    AddCondition('isGroup=-1');
+  end;
+
+  proc AddConditionGroupExcept synonym AddGroupExcept, ДобавитьУсловиеКромеГрупп;
+    AddCondition('isGroup<>-1');
+  end;
+
+  -- Сжатие всех условий до одного элемента.
+  -- Все условия обрабатываются до результирующего фильтра по правилу and/or/xor,
+  -- полученный результат помещается в первый элемент набора условий,
+  -- остальные условия удаляются.
+  proc CompressConditionsToOne synonym Compress, СжатьУсловия (MainRule :tLogOperations = byAnd);
+    var locResult :string;
+    locResult = GetFilter(MainRule);
+    ClearConditions;
+    AddCondition(locResult);
+  end;
+
+  proc ClearConditions;
+    aCondition = nil;
+  end;
+
+  -- Получение итогового фильтра как результата сложения элементов по правилу and/or/xor`;
+  func GetFilter synonym ПолучитьФильтр (MainRule :tLogOperations = byAnd) :string;
+    if (LengthOfArray(aCondition) = 1):
+      Return aCondition[1];
+    elsif (LengthOfArray(aCondition) > 1):
+      if (MainRule = byAnd):
+        Return StringsFunctions.СложитьСтрокиРазделенныеСимволом(aCondition, ' and ', true, true);
+      elsif (MainRule = byOr):
+        Return StringsFunctions.СложитьСтрокиРазделенныеСимволом(aCondition, ' or ', true, true);
+      elsif (MainRule = byXor):
+        Return StringsFunctions.СложитьСтрокиРазделенныеСимволом(aCondition, ' xor ', true, true);
+      fi;
+    fi;
+  end;
+
+  -- Получение фильтра на группы по тем же условиям
+  -- Параметры:
+  -- RecordClasses : массив классов записей. Обязательный параметр.
+  -- MainRule : главное правило сложения условий фильтра.
+  --  для получения корректных результатов должно совпадать с правилом сложения, применяемому к записям.
+  -- IncludeEmptyGroups : включение в результат пустых групп (по умолчанию - нет).
+  func GetFilterGroups synonym ПолучитьФильтрГрупп (RecordClasses :Class[] Record; MainRule :tLogOperations = byAnd; IncludeEmptyGroups :logical = false) :string;
+    var aCnd :string[];
+    var locMaker :FilterMaker;
+    if IncludeEmptyGroups:
+      Return GetFilterTreeByFilter (RecordClasses, MainRule);
+    else
+      if RecordClasses <> nil:
+        aCnd[1] = GetFilter(MainRule);
+        aCnd[2] = 'GroupPath<>nil';
+        --aCnd[3] = 'IsGroup=0';
+        locMaker = CreateExt(aCnd);
+        locMaker.CompressConditionsToOne;
+        Return locMaker.GetFilterTreeByFilter(RecordClasses, MainRule);
+      fi;
+    fi;
+  end;
+
+  -- Имя поля записи (допускается синоним), хранящее сведения о дате начала актуальности записи
+  var FieldNameBegDate synonym FieldDateB, ПолеДатаНачала :string; -- get @GetFieldNameBegDate set @SetFieldNameBegDate;
+  -- Имя поля записи (допускается синоним), хранящее сведения о дате окончания актуальности записи
+  var FieldNameEndDate synonym FieldDateE, ПолеДатаОкончания :string; -- get @GetFieldNameEndDate set @SetFieldNameEndDate;
+
+inobject private ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  -- Имя поля записи (допускается синоним), хранящее сведения о дате начала актуальности записи - defaults
+  const fnDateBd: string = 'ДатаНачала';
+  -- Имя поля записи (допускается синоним), хранящее сведения о дате окончания актуальности записи - defaults
+  const fnDateEd: string = 'ДатаОкончания';
+  -- Имя поля записи (допускается синоним), хранящее сведения о дате начала актуальности записи - custom
+  var   fnDateBc: string;
+  -- Имя поля записи (допускается синоним), хранящее сведения о дате окончания актуальности записи - custom
+  var   fnDateEc: string;
+
+  proc SetFieldNameBegDate (locValue :string);
+    fnDateBc = locValue;
+  end;
+
+  func GetFieldNameBegDate :string;
+    Return if(fnDateBc = nil, fnDateBd, fnDateBc);
+  end;
+
+  proc SetFieldNameEndDate (locValue :string);
+    fnDateEc = locValue;
+  end;
+
+  func GetFieldNameEndDate :string;
+    Return if(fnDateEc = nil, fnDateEd, fnDateEc);
+  end;
+
+  -- Генерация фильтра на актуальность записей по паре полей дата начала / окончания.
+  -- Допускается отсутствие определния периода актуальности.
+  func SomeFieldsFilterByDates (locDateBeg :date; locDateEnd :date; locFieldBeg :string = FieldDateB; locFieldEnd :string = FieldDateE; locExtrFilter :string = nil) :string;
+    var локФильтрНачалоВПериоде, локФильтрКонецВПериоде :string;
+    if ((locDateBeg = nil) and (locDateEnd = nil)):
+      Return locExtrFilter;
+    elsif ((locDateBeg <> nil) and (locDateEnd = nil)): -- ограничение только на начало периода:
+      локФильтрНачалоВПериоде = '(' + locFieldBeg + '<=' + Str(locDateBeg) + ') or (' + locFieldBeg + '=nil)'; -- дата начала не позже ограничения или не определена
+      локФильтрКонецВПериоде  = '(' + locFieldEnd + '>=' + Str(locDateBeg) + ') or (' + locFieldEnd + '=nil)'; -- дата окончания не раньше ограничения или не определена
+      Result = '(' + локФильтрНачалоВПериоде + ') and (' + локФильтрКонецВПериоде + ')';
+      Return '(' + Result + ') ' + if((locExtrFilter <> nil), ' and (' + locExtrFilter + ')', '');
+    elsif ((locDateBeg = nil) and (locDateEnd <> nil)): -- ограничение только на конец периода:
+      локФильтрНачалоВПериоде = '(' + locFieldBeg + '<=' + Str(locDateEnd) + ') or (' + locFieldBeg + '=nil)'; -- дата начала не позже ограничения или не определена
+      локФильтрКонецВПериоде  = '(' + locFieldEnd + '>=' + Str(locDateEnd) + ') or (' + locFieldEnd + '=nil)'; -- дата окончания не раньше ограничения или не определена
+      Result = '(' + локФильтрНачалоВПериоде + ') and (' + локФильтрКонецВПериоде + ')';
+      Return '(' + Result + ') ' + if((locExtrFilter <> nil), ' and (' + locExtrFilter + ')', '');
+    elsif ((locDateBeg <> nil) and (locDateEnd <> nil)):
+      if (locDateBeg = locDateEnd):
+        Result = '(' + locFieldBeg + '<=' + Str(locDateBeg) + ' or ' + locFieldBeg + '=nil)' + ' and ' + '(' + locFieldEnd + '>=' + Str(locDateEnd) + ' or ' + locFieldEnd + '=nil)';
+        Return '(' + Result + ') ' + if((locExtrFilter <> nil), ' and (' + locExtrFilter + ')', '');
+       else
+        локФильтрНачалоВПериоде = '(' + locFieldBeg + '<=' + Str(locDateEnd) + ') or (' + locFieldBeg + '=nil)';
+        локФильтрКонецВПериоде  = '(' + locFieldEnd + '>=' + Str(locDateBeg) + ') or (' + locFieldEnd + '=nil)';
+        Result = '(' + локФильтрНачалоВПериоде + ') and (' + локФильтрКонецВПериоде + ')';
+        Return '(' + Result + ') ' + if((locExtrFilter <> nil), ' and (' + locExtrFilter + ')', '');
+      fi;
+    fi;
+  end;
+
+  -- Функция возвращает фильтр на дерево иерархической записи на основании фильтра на данные, выбирает в т.ч. пустые ветки.
+  -- При пустом фильре на данные выбирает все дерево, включая пустые ветки.
+  func GetFilterTreeByFilter (Records :Class[] Record; MainRule :tLogOperations = byAnd) :String;
+    var locTreeFltMaker, locFltMaker: FilterMaker;
+    var RecordsFilter: String;
+    var i, ii :Integer;
+    var IdArray :Integer[];
+
+
+    locTreeFltMaker = CreateExt;
+    if Records <> nil:
+      RecordsFilter = GetFilter(MainRule);
+      if RecordsFilter = nil:
+        locTreeFltMaker.AddCondition('IsGroup<>0'); -- восстанавливаем все дерево, включая пустые ветки
+      else
+        ii = LengthOfArray(Records);
+        for i = 1 .. ii do
+          locFltMaker = CreateExt;
+          IdArray = DocIdListByFilter(Records[i], RecordsFilter);
+          locFltMaker.AddConditionByIdArray(IdArray);
+          if (ii > 1): -- при гетерогенном варианте добавляем условие на текущий класс записи
+            locFltMaker.AddConditionByClassRecord(Records[i]);
+          fi;
+          locTreeFltMaker.AddCondition(locFltMaker.GetFilter);
+        od;
+      fi;
+      Return locTreeFltMaker.GetFilter(byOr);
+    fi;
+  end;
+
+  -- Массив DocId по фильтру
+  func DocIdListByFilter (RecordClass :Class Record; RecordsFilter :String; ListDocId :Integer[] = nil) :Integer[];
+    if ListDocId <> nil:
+      Result = ListDocId;
+    fi;
+    AddDocIdListByFilter(RecordClass, RecordsFilter, Result);
+  end;
+
+  -- Процедура, дополняющая целочисленный массив "ListDocId" значениями полей DocID записей,
+  -- являющимися иерархическими предками записей, отобранными входящим фильтром
+  -- Аргументы:
+  -- 1. RecordClass : Класс записи.
+  -- 2. RecordsFilter : фильтр на записи.
+  -- 3. ListDocId : массив DocID.
+  -- Важно:
+  -- Функция расчитана на использование в НЕ гетерогенных картотеках.
+  -- При использовании в гетерогенной картотеке DocID могут повторяться для разных классов записей, что приведет к показу "пустых" ветвей.
+  -- Поэтому входящий аргумент RecordClass - не массив
+  proc AddDocIdListByFilter (RecordClass :Class Record; RecordsFilter :String; var ListDocId :Integer[]);
+    var GroupPathS: string[];
+    var Q: Query;
+
+    proc ДополнитьМассивКлючей (R: Record);
+      if (R.isGroup):
+        InsertInSortedArray (ListDocId, R.DocId);
+      fi;
+      if (R.GroupDoc <> nil):
+        if (SearchInArray(ListDocId, R.GroupDoc, ,true) < 1): -- исключаем повторный подъем по ветке
+           ДополнитьМассивКлючей(R.GroupDoc);
+        fi;
+      fi;
+    end;
+
+    func ЕстьПолеВКлассеЗаписи (const aField: string; RecordClassInfo: ClassInfo): logical;
+      if (aField <> nil):
+        Result = RecordClassInfo.MemberByName(aField) is FieldInfo;
+      fi;
+    end;
+
+    if RecordsFilter = nil:
+      RecordsFilter = 'isGroup<>0';
+    fi;
+    if RecordClass.Hierarchical:
+      Q = Query.Create([RecordClass]);
+      if ЕстьПолеВКлассеЗаписи('GroupPath', RecordClass.ClassInfo):
+        FillGroupPathS(groupPathS, q, RecordsFilter, true); -- исключаем при отборе внутренние пересечения
+        GroupPathsAddToList(groupPathS, ListDocId);
+      else
+        Q.Filter = RecordsFilter;
+        Q.LoadingFieldsMode = 0; -- не загружать поля
+        Q.LoadingFields = 'DocId;GroupDoc';
+        if Q.RecordsExists:
+          Q.Select;
+          while not Q.Eof do
+            ДополнитьМассивКлючей(Q.Current);
+            Q.Next;
+          od;
+        fi;
+      fi;
+    fi;
+  end;
+
+  -- Заполнение пути групп.
+  -- Дополняет массив GroupPathS недостающими GroupPath из запроса с фильтром.
+  -- Запрос не пересчитывается, если его фильтр совпадает с входящим RecordsFilter,
+  -- а режим загрузки полей, загружаемые поля, поле сортировки равны соответственно 0, "GroupPath;IsGroup;DocID", "GroupPath".
+  -- Важно!
+  -- GroupPathS обязательно отсортирован в порядке возрастания или пустой!
+  -- Необязательный параметр NotIn не включает в результат цепочки, входящие в другие
+  -- 1.2.3 не попадет в результат, если есть 1.2.3.4
+  proc FillGroupPathS (var GroupPathS :String[]; Q :Query; RecordsFilter :String; NotIn :Logical = false);
+   var i, j :Integer;
+   var asAdd :Logical;
+   var GroupPathOld, GroupPathCurrent_ :String;
+
+    proc GroupPathOldADD;
+      i = i + 1; -- подсчет длины массива GroupPathS
+      if asAdd: -- добавляем внутри массива
+        j = GroupPathADD(GroupPathS, groupPathOld, NotIn);
+        if (i <= j) and (j > 0): -- начали добавлять за пределы входящего GroupPathS, можем просто добалять остальное в конец
+          asAdd = false;
+        else
+          if (j < 1): -- такой уже есть, т.е. ничего не добавили
+            i = i - 1;
+          fi;
+        fi;
+      else -- простой вариант добавления в конец массива
+        GroupPathS[i] = GroupPathOld;
+      fi;
+    end;
+
+    func GroupPathCurrent: string;
+      Result = Q.Current.GroupPath as string;
+      if Q.Current.IsGroup:
+        if (Result = nil) then
+          Result = Str(Q.Current.DocID) + '.';
+        else
+          if (SubStr(Result, Length(Result), 1) = '.') then
+            Result = Result + Str(Q.Current.DocID) + '.';
+          else
+            Result = Result + '.' + Str(Q.Current.DocID) + '.';
+          fi;
+        fi;
+        --Result = Result + '.' + Str(Q.Current.DocID);
+      fi;
+    end;
+
+    asAdd = (GroupPathS <> nil);
+    if Q.Filter <> RecordsFilter or Q.LoadingFieldsMode <> 0 or Q.LoadingFields <> "GroupPath;IsGroup;DocID" or Q.Order <> "GroupPath":
+    -- не открываем запрос лишний раз
+      if Q.Active :
+        Q.Close;
+      fi;
+      Q.Filter = RecordsFilter;
+      Q.LoadingFieldsMode = 0; -- не загружать поля
+      Q.LoadingFields = 'GroupPath;IsGroup;DocID';
+      Q.Order = 'GroupPath';
+    fi;
+    if Q.RecordsExists:
+      i = LengthOfArray(GroupPathS);
+      if (not Q.Active):
+        Q.Select;
+      else
+        Q.First;
+      fi;
+      --
+      GroupPathOld = GroupPathCurrent;
+      while not Q.EOF do
+        Q.Next;
+        if Q.EOF: -- добавляем последний элемент
+          GroupPathOldADD;
+        else
+          GroupPathCurrent_ = GroupPathCurrent;
+          if (NotIn and Pos(groupPathOld, GroupPathCurrent_) <> 1) or (not NotIn and groupPathOld <> GroupPathCurrent_):
+            -- сменили значение
+            GroupPathOldADD;
+          fi;
+          GroupPathOld = Q.Current.GroupPath as string;
+        fi;
+      od;
+      --
+      Q.First;
+      while not Q.EOF do
+        if (Q.Current.IsGroup) then
+          GroupPathOld = Q.Current.GroupPath as string;
+          GroupPathOld = GroupPathOld + Str(Q.Current.DocID) + '.';
+          if not (GroupPathOld in GroupPathS) then
+            AddInArray(GroupPathS, GroupPathOld);
+          fi;
+        fi;
+        Q.Next;
+      od;
+
+    fi;
+  end;
+
+  -- Добавить путь группы.
+  -- Добавляет GroupPath в отсортированный массив GroupPathS.
+  -- Необязательный параметр NotIn не включает в результат цепочки, входящие в другие
+  -- 1.2.3 не попадет в результат, если есть 1.2.3.4
+  func GroupPathAdd (var GroupPathS: String[]; GroupPath: String; NotIn: Logical = false): Integer;
+    var j: Integer;
+    if SearchNearestInArray(GroupPathS, GroupPath, j):
+      Return 0; -- уже есть такой GroupPath
+    fi;
+    if (not NotIn) or (j > LengthOfArray(GroupPathS)) or (Pos(GroupPath, GroupPathS[j]) <> 1):
+      InsertInArray(GroupPathS, j, GroupPath);
+      Return j;
+    fi;
+    Return 0;
+  end;
+
+  -- Функция, дополняющая массив locmDocId недостающими значениями DocID, взятыми из массива таких цепочек - GroupPathS
+  proc GroupPathsAddToList (var GroupPathS: String[]; var ListDocId: Integer[]);
+    var i, ii: Integer;
+    ii = LengthOfArray(GroupPathS);
+    for i = 1 .. ii do
+      GroupPathAddToList(ListDocId, GroupPathS[i]);
+    od;
+  end;
+
+  -- Процедура, дополняющая массив ListDocId недостающими значениями DocID, взятыми из GroupPath  - строковой цепочки DocID через точку
+  proc GroupPathAddToList (var ListDocId: Integer[]; GroupPath: String);
+    var i, wcount: Integer;
+    var wcurrent: Integer;
+    wcount = WordsCount(GroupPath, '.');
+    for i = wcount .. 1 step -1 do
+      wcurrent = int(ExtractWord(GroupPath, i, '.'));
+      if (SearchInArray(ListDocId, wcurrent, ,true) < 1):
+        InsertInSortedArray (ListDocId, wcurrent);
+      else
+        break; -- часть ветки была отработана ранее, не отрабатываем повторы
+      fi;
+    od;
+  end;
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  -- Элементы будущего фильтра
+  var aCondition :String[];
+
+end

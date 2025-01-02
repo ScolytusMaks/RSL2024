@@ -1,0 +1,218 @@
+class "Выпуски за год";
+
+import РКП_СИС classes StringsFunctions, StdCode, Functions, FilterMaker;
+
+inclass public
+
+  type типДопФлт = (допФлтНеРег = -1, допФлтВсе, допФлтРег, допФлтЛГС);
+
+
+  func ПолучитьДанные(локИздание :РКП_Газеты.Газета; ТолькоНеПолученные :Logical) :DR.Номера[];
+    var aFlt :String[];
+    var aData :DR.Номера[]; -- проект результата, индекс=год выпуска
+    var y :Integer;
+    var rNspStt :РКП_Газеты.ВыпускГазеты;
+    var rNspIss :РКП_Газеты.НомерГазеты;
+    -- запрос к записям статистики выпуска
+    with Query.Create([РКП_Газеты.ВыпускГазеты]) do
+      aFlt = nil;
+      AddInArray( aFlt, 'Газета=' + локИздание.DocIDStr );
+      if ТолькоНеПолученные then
+        AddInArray( aFlt, 'not КомплектПолучен' );
+      fi;
+      Filter = MakeFilter(aFlt);
+      Order = 'ГодВыпуска';
+      LoadingFieldsMode = СИС2.Константы.mdNone;
+      LoadingFields = 'ГодВыпуска';
+      Select;
+      while not Eof do
+        rNspStt = Current as РКП_Газеты.ВыпускГазеты;
+        if (aData[rNspStt.ГодВыпуска] = nil) then
+          aData[rNspStt.ГодВыпуска] = CreateByYear(локИздание, rNspStt.ГодВыпуска);
+        fi;
+        Next;
+      end;
+    end;
+    -- запрос к записям номеров
+    with Query.Create([РКП_Газеты.НомерГазеты]) do
+      Filter = 'isGroup=0 and Газета=' + локИздание.DocIDStr;
+      Order = 'ГодВыпуска;СерияНумерации;Номер';
+      LoadingFieldsMode = СИС2.Константы.mdNone;
+      LoadingFields = 'ГодВыпуска;СозданОЛГС;НеПолучен';
+      Select;
+      while not Eof do
+        rNspIss = Current as РКП_Газеты.НомерГазеты;
+        if (aData[rNspIss.ГодВыпуска] <> nil) then
+          if ( not(rNspIss.СозданОЛГС and rNspIss.НеПолучен) ) then
+            aData[rNspIss.ГодВыпуска].Добавить_НомерВыпущен(rNspIss);
+            if ( rNspIss.НеПолучен ) then
+              aData[rNspIss.ГодВыпуска].Добавить_НомерНеПолучен(rNspIss);
+            else
+              aData[rNspIss.ГодВыпуска].Добавить_НомерПолучен(rNspIss);
+            fi;
+            aData[rNspIss.ГодВыпуска].УстПоследнийНомер(rNspIss);
+          fi;
+          aData[rNspIss.ГодВыпуска].УстЕстьДанныеЛГС(rNspIss);
+        fi;
+        Next;
+      od;
+    end;
+    -- сжатие результатов
+    for y = 1 .. LengthOfArray(aData) do
+      if (aData[y] <> nil) then
+        AddInArray(Result, aData[y]);
+      fi;
+    od;
+  end;
+
+inclass private
+
+  func CreateByYear(rNsp :РКП_Газеты.Газета; vYear :Integer) :DR.Номера;
+    Result = DR.Номера.Create;
+    Result._ГодВыпуска   = vYear;
+    Result._Издание      = rNsp;
+    Result._ВыпускГазеты = RI.ВыпускГазеты.ПолучитьЗаписьСтат(rNsp, vYear, false);
+  end;
+
+inobject public
+
+  func Издание :РКП_Газеты.Газета;
+    Return _Издание;
+  end;
+
+  func IdRecArray synonym ИдентификаторыПоТипу (локТипДопФлт :ТипДопФлт) :Integer[];
+    if (локТипДопФлт = допФлтНеРег) then
+      Return _НомеровНеПолученоID;
+    elsif (локТипДопФлт = допФлтВсе) then
+      Return _НомеровВыпущеноID;
+    elsif (локТипДопФлт = допФлтРег) then
+      Return _НомеровПолученоID;
+    elsif (локТипДопФлт = допФлтЛГС) then
+      
+    fi;
+  end;
+
+  func ГодВыпуска :Integer;
+    Return _ГодВыпуска;
+  end;
+
+  func НомеровВыпущено :Integer;
+    Return _НомеровВыпущено;
+  end;
+
+  func НомеровПолучено :Integer;
+    Return _НомеровПолучено;
+  end;
+
+  func НомеровНеПолучено :Integer;
+    Return _НомеровНеПолучено;
+  end;
+
+  func ПоследнийПолученныйНомер :String;
+    if (_ПоследнийНомер <> nil) then
+      if (_ПоследнийНомерОписание = nil) then
+        _ПоследнийНомерОписание = BiblioRecord.ОписаниеНомера(_ПоследнийНомер);
+      fi;
+      Return _ПоследнийНомерОписание;
+    fi;
+  end;
+
+  func ЕстьДанныеЛГС :Logical;
+    Return _ЕстьДанныеЛГС;
+  end;
+
+  func КомплектПолучен :Logical;
+    if (_ВыпускГазеты <> nil) then
+      Return _ВыпускГазеты.КомплектПолучен;
+    fi;
+  end;
+
+  func ВыпускГазеты :РКП_Газеты.ВыпускГазеты;
+    Return _ВыпускГазеты;
+  end;
+
+
+  proc UpdateData synonym ОбновитьДанные;
+    var aFlt :String[];
+    var cRec :РКП_Газеты.НомерГазеты;
+    _НомеровВыпущено = nil;
+    _НомеровВыпущеноID = nil;
+    _НомеровПолучено = nil;
+    _НомеровПолученоID = nil;
+    _НомеровНеПолучено = nil;
+    _НомеровНеПолученоID = nil;
+    _ПоследнийНомер = nil;
+    _ПоследнийНомерОписание = nil;
+    _ЕстьДанныеЛГС = false;
+    with Query.Create([РКП_Газеты.НомерГазеты]) do
+      AddInArray( aFlt, 'isGroup=0' );
+      AddInArray( aFlt, 'Газета=' + _Издание.DocIDStr );
+      AddInArray( aFlt, 'ГодВыпуска=' + Str(_ГодВыпуска) );
+      Filter = MakeFilter(aFlt);
+      Order = 'ГодВыпуска;СерияНумерации;Номер';
+      LoadingFieldsMode = СИС2.Константы.mdNone;
+      LoadingFields = 'ГодВыпуска;СозданОЛГС;НеПолучен';
+      Select;
+      while not Eof do
+        cRec = Current as РКП_Газеты.НомерГазеты;
+        if ( not(cRec.СозданОЛГС and cRec.НеПолучен) ) then
+          Добавить_НомерВыпущен(cRec);
+          if ( cRec.НеПолучен ) then
+            Добавить_НомерНеПолучен(cRec);
+          else
+            Добавить_НомерПолучен(cRec);
+          fi;
+          УстПоследнийНомер(cRec);
+        fi;
+        УстЕстьДанныеЛГС(cRec);
+        Next;
+      od;
+    end;
+  end;
+
+inobject private
+
+  var _Издание :РКП_Газеты.Газета;
+  var _ГодВыпуска :Integer;
+  var _НомеровВыпущено :Integer;
+  var _НомеровВыпущеноID :Integer[];
+  var _НомеровПолучено :Integer;
+  var _НомеровПолученоID :Integer[];
+  var _НомеровНеПолучено :Integer;
+  var _НомеровНеПолученоID :Integer[];
+  var _ПоследнийНомер :РКП_Газеты.НомерГазеты;
+  var _ПоследнийНомерОписание :String;
+  var _ЕстьДанныеЛГС :Logical;
+  var _ВыпускГазеты :РКП_Газеты.ВыпускГазеты;
+
+  proc Добавить_НомерВыпущен(cRec :РКП_Газеты.НомерГазеты);
+    _НомеровВыпущено = _НомеровВыпущено + 1;
+    AddInArray(_НомеровВыпущеноID, cRec.DocId);
+  end;
+
+  proc Добавить_НомерПолучен(cRec :РКП_Газеты.НомерГазеты);
+    _НомеровПолучено = _НомеровПолучено + 1;
+    AddInArray(_НомеровПолученоID, cRec.DocId);
+  end;
+
+  proc Добавить_НомерНеПолучен(cRec :РКП_Газеты.НомерГазеты);
+    _НомеровНеПолучено = _НомеровНеПолучено + 1;
+    AddInArray(_НомеровНеПолученоID, cRec.DocId);
+  end;
+
+  proc УстПоследнийНомер(vRec :РКП_Газеты.НомерГазеты);
+    if ( not vRec.НеПолучен ) then
+      _ПоследнийНомер  = vRec;
+      _ПоследнийНомерОписание  = nil;
+    fi;
+  end;
+
+  proc УстЕстьДанныеЛГС(vRec :РКП_Газеты.НомерГазеты);
+    if (not _ЕстьДанныеЛГС) then
+      _ЕстьДанныеЛГС = (vRec.СозданОЛГС and vRec.НеПолучен);
+    fi;
+  end;
+
+
+
+end

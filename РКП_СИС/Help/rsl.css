@@ -1,0 +1,24 @@
+.std {background-color: #F0F8FF}
+
+/* Cтиль заголовка четвертого уровня: */
+H4       {font-family: Verdana, Arial, sans-serif; font-size:9pt; font-weight:bold; text-align:left; margin-top:10px; margin-bottom:10px; margin-left:10px}
+
+
+/* Код на ТБ.Скрипт. Пример использования: <p class="samplecode"> */
+.samplecode {font-family: Courier New, monospace}
+
+ dt{font-family: Verdana, Arial, sans-serif; color:blue; letter-spacing:2px; margin-top: 1em}
+
+ .asdt {font-family: Verdana, Arial, sans-serif; color:blue; letter-spacing:2px}
+
+ dd{font-family: Verdana, Arial, sans-serif; font-style: italic}
+
+
+/* Элемент списка, после которого увеличен отступ. Пример использования: <li class="txt-plus"> */
+li.txt-plus {margin-bottom:10px}
+
+/* Элемент списка, перед которым не стоит никакого символа, кроме отступа; увеличено расстояние после элемента. Пример использования: <li class="elm-block"> */
+li.elm-block {margin-bottom: 10px; list-style-type: none}
+
+/* Клавиша, правая/левая кнопка мыши */
+.keyb    {font-family: Verdana, Arial, sans-serif: monospace ; font-weight:bold; font-size: 10pt; text-decoration:none; letter-spacing: 1px;}

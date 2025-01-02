@@ -1,0 +1,600 @@
+class inherited МашинаРеквизитов.Базовые.блРедакторСИнтерфейсом "Учетный документ", editor УчетныйДокумент;
+import РКП_СИС Classes Constants, Functions, StringsFunctions, Recs, FilterMaker, StdCode;
+
+inclass public
+
+inobject private
+
+--{{ 2_Свойства
+
+  var Интерфейс :РКП_Газеты.RI.УчетныйДокумент;
+  var ТипУД_ :Integer;
+  var КоличествоПринято :Integer = Получить_КоличествоПринято;
+  var СуммаПринято :Numeric = Получить_СуммаПринято;
+  var КоличествоРасхождение :Integer = (КоличествоВсего - КоличествоПринято);
+  var СуммаРасхождение :Numeric = (СуммаВсего - СуммаПринято);
+  var фреймУД :TemplateFrame;
+  var секцЗаголовокТаблицы :TemplateSection;
+  var секцПозиции :TemplateSection;
+  var ОперФильтрИздание :String;
+  var ОперФильтрГодВыпуска :String;
+
+  func ПолеОтправитель_ПриВходе(Cell :TemplateCell; Index :Integer; Action :Template.EnterTypes) :Logical;
+     
+    Result = True; 
+  end;
+
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inclass public
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриСоздании(Context :Variant);
+    var locCell :TemplateCell;
+    inherited шаблон_ПриСоздании(Context);
+    locCell = Self.Template.CellByField['ТипУД_'];
+    UpdateFieldList(locCell, GetListTypeDoc);
+  end;
+
+  proc шаблон_ПриСчитывании;
+    inherited шаблон_ПриСчитывании;
+    ТипУД_ = GetIdTypeDoc;
+    ПрочитатьПозиции;
+  end;
+
+  func шаблон_ПриЗаписи :Logical;
+    УстДанныеПозицийВИнтерфейсе;
+    Result = inherited шаблон_ПриЗаписи;
+  end;
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  proc Поле_ПриРисовании(Cell :TemplateCell; Selected :Logical; var Color :Integer; var FieldColor :Integer; Font :Font);
+    if (Cell.Contents = 'КоличествоРасхождение') then
+      if (КоличествоРасхождение <> 0) then
+        inherited ПриРисовании_КакПолеСОшибкой(Cell, Selected, Color, FieldColor, Font);
+      fi;
+    elsif (Cell.Contents = 'СуммаРасхождение') then
+      if (СуммаРасхождение <> 0) then
+        inherited ПриРисовании_КакПолеСОшибкой(Cell, Selected, Color, FieldColor, Font);
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриВходе_Отправитель(Cell :TemplateCell; Index :Integer; Action :Template.EnterTypes) :Logical;
+    if (Action = Template.Clear) then
+      Отправитель = nil;
+      Return;
+    else
+      Return true;
+    fi;
+  end;
+
+  func Поле_ПриНаборе_Отправитель(Cell :TemplateCell; Key :String; Value :Variant; var NewValue :Variant) :Logical;
+    var aParam :Variant[2];
+    var vRefRec :Базовый.Данные.Субъект;
+    if (Cell.Contents = 'Отправитель') and (Cell.LookupField = 'Имя') then
+      aParam[1] = ['Фрагмент', Value];
+      if (cmOk = РКП_Газеты.УчетГазет.Справочники.картОтправители.ВыполнитьВыбор(vRefRec, aParam) ) then
+        NewValue = vRefRec;
+        Template.EndEdit(true);
+      fi;
+    elsif (Cell.Contents = 'Отправитель') and (Cell.LookupField = 'ИНН')  then
+      aParam[1] = ['ФрагментИНН', Value];
+      if (cmOk = РКП_Газеты.УчетГазет.Справочники.картОтправители.ВыполнитьВыбор(vRefRec, aParam) ) then
+        NewValue = vRefRec;
+        Template.EndEdit(true);
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриОбзоре_Отправитель(Cell :TemplateCell; Value :Variant; var NewValue :Variant) :Logical;
+    var aParam :Variant[2];
+    var vRefRec :Базовый.Данные.Субъект;
+    var altValue, smb :String;
+    var i :Integer;
+    if (Cell.Contents = 'Отправитель') and (Cell.LookupField = 'Имя') then
+      for i = 1 .. Length(Value)  do
+        smb = SubStr(Value, i, 1);
+        if (smb in ['"',"'", '*', '?', '&', '%', '$']) and (altValue <> nil) then    --
+          Break;
+        fi;
+        if (not smb in ['"',"'", '*', '?', '&', '%', '$']) then  --
+          altValue = altValue + smb;
+        fi;
+      od;
+      aParam[1] = ['Фрагмент', altValue];
+      if (cmOk = РКП_Газеты.УчетГазет.Справочники.картОтправители.ВыполнитьВыбор(vRefRec, aParam) ) then
+        NewValue = vRefRec;
+        Template.EndEdit(true);
+      fi;
+    elsif (Cell.Contents = 'Отправитель') and (Cell.LookupField = 'ИНН')  then
+      aParam[1] = ['ФрагментИНН', Value];
+      if (cmOk = РКП_Газеты.УчетГазет.Справочники.картОтправители.ВыполнитьВыбор(vRefRec, aParam) ) then
+        NewValue = vRefRec;
+        Template.EndEdit(true);
+      fi;
+    fi;
+  end;
+
+  proc Поле_ПриВыходе_ТипУД(Cell :TemplateCell; Index :Integer);
+    ТипУД = РКП_СИС.Recs.GetRecordByRef('{РКП_Справочники.спрТипУД:' + Str(ТипУД_) + '}');
+    РКП_СИС.Recs.RecordEdit(Self.Record);
+    фреймУД.CellByField['НомерУД'].SetFocus;
+  end;
+
+  proc Поле_ПриВыходе_РеквУД(Cell :TemplateCell; Index :Integer);
+    if (Cell.Contents = 'НомерУД') then   фреймУД.CellByField['ДатаУД'].SetFocus;
+    elsif (Cell.Contents = 'ДатаУД') then фреймУД.CellByField['Отправитель'].SetFocus;
+    fi;
+  end;
+
+
+  func Поле_ПриВыводе_ТипУД(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    if (Action = Template.Output) and (ТипУД <> nil) then
+      Return ТипУД.Наим;
+    else
+      Return Value;
+    fi;
+  end;
+
+  func Поле_ПриНажатии_ДобавитьПозицию(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var vNewTag :РКП_Газеты.RI.ЕдиницаХранения;
+    var vNearTag :РКП_Газеты.RI.ЕдиницаХранения;
+    var aRowTag :РКП_Газеты.RI.ЕдиницаХранения[];
+    var r, rr :Integer;
+    РКП_СИС.Recs.RecordModify(Record); -- перевод записи и формы в сост.модифицированности
+    -- сбор инф. о ранее созданных интерфейсах
+    if секцПозиции.Visible then
+      rr = секцПозиции.RowsCount;
+      for r = 1 .. rr do
+        AddInArray(aRowTag, секцПозиции.Row[r].Tag);
+      od;
+    fi;
+    -- поиск образца
+    if (Cell.Owner = секцЗаголовокТаблицы) then
+      if (aRowTag <> nil) then
+        vNearTag = aRowTag[LengthOfArray(aRowTag)];
+      fi;
+    elsif (Cell.Owner = секцПозиции) then
+      vNearTag = GetRowTag(Cell);
+    fi;
+    -- создание и добавление нового интерфейса в массив
+    vNewTag = РКП_Газеты.RI.ЕдиницаХранения.CreateNew(Record, vNearTag); -- создание нового интерфейса и записи без передачи на сервер
+    if (Cell.Owner = секцЗаголовокТаблицы) then
+      AddInArray(aRowTag, vNewTag);
+    elsif (Cell.Owner = секцПозиции) then
+      InsertInArray(aRowTag, Cell.Row, vNewTag);
+    fi;
+    -- перерисовка
+    Self.Template.BeginModify;
+    секцПозиции.RowsCount = 1;
+    rr = LengthOfArray(aRowTag);
+    CloneFirstRows(секцПозиции, rr);
+    for r = 1 .. rr do
+      aRowTag[r].Record.НомерПозиции = r;
+      секцПозиции.Row[r].Tag = aRowTag[r];
+    od;
+    секцПозиции.Visible = true;
+    Self.Template.EndModify;
+  end;
+
+  func Поле_ПриНажатии_УдалитьПозицию(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var locRowTag :RI.ЕдиницаХранения;
+    var aRowTag :РКП_Газеты.RI.ЕдиницаХранения[];
+    var r, rr :Integer;
+    РКП_СИС.Recs.RecordModify(Record); -- перевод записи и формы в сост.модифицированности
+    locRowTag = GetRowTag(Cell);
+    if (locRowTag <> nil) then
+      rr = секцПозиции.RowsCount;
+      for r = 1 .. rr do
+        AddInArray(aRowTag, секцПозиции.Row[r].Tag);
+      od;
+      if (aRowTag[Cell.Row].НомерНеВыбран) then
+        aRowTag[Cell.Row].Cancel;
+      else
+        aRowTag[Cell.Row].УстУчДокумент(nil);
+        aRowTag[Cell.Row].Post;
+      fi;
+      Cell.Owner.Row[Cell.Row].Tag = nil;
+      DeleteFromArray(aRowTag, Cell.Row);
+      -- перерисовка
+      Self.Template.BeginModify;
+      секцПозиции.Visible = false;
+      секцПозиции.RowsCount = 1;
+      rr = LengthOfArray(aRowTag);
+      CloneFirstRows(секцПозиции, rr);
+      for r = 1 .. rr do
+        aRowTag[r].Record.НомерПозиции = r;
+        секцПозиции.Row[r].Tag = aRowTag[r];
+      od;
+      секцПозиции.Visible = (LengthOfArray(aRowTag) > 0);
+      Self.Template.EndModify;
+    fi;
+  end;
+
+  proc Поле_ПриРисовании_Позиция(Cell :TemplateCell; Selected :Logical; var Color :Integer; var FieldColor :Integer; Font :Font);
+    var locRowTag :RI.ЕдиницаХранения;
+    locRowTag = GetRowTag(Cell);
+    if (locRowTag <> nil) then
+      if (Cell.Contents in ['Издание','ГодВыпуска','Номер']) then
+        if locRowTag.НомерНеВыбран then
+          Font.Color = СИС2.Константы.COLOR_GRAYTEXT;
+          Font.Italic = true;
+        fi;
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриНажатии_Позиция(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var locRowTag :RI.ЕдиницаХранения;
+    locRowTag = GetRowTag(Cell);
+    if (locRowTag <> nil) and (locRowTag.Record <> nil) and (locRowTag.Record.НомерГазеты <> nil) then
+      #NoWarning;
+      РКП_Газеты.УчетГазет.редНомерГазеты.ShowFormEx(locRowTag.Record.НомерГазеты, Window.ModalWindow);
+    else
+      Message('Просмотр номера возможен только после ввода количества.');
+    fi;
+  end;
+
+
+  func Поле_ПриВходе_Позиция(Cell :TemplateCell; Index :Integer; Action :Template.EnterTypes) :Logical;
+    var locRowTag, posTag :RI.ЕдиницаХранения;
+    var addParam :Variant[2];
+    var rUnitSave: РКП_Газеты.ЕдиницаХранения;
+    var j, jj, idDoc :Integer;
+    var IdInDoc :Integer[];
+    locRowTag = GetRowTag(Cell);
+    if (locRowTag <> nil) then
+      if (Cell.Contents = 'Издание') and (Action = Template.Clear) then
+        if locRowTag.НомерНеВыбран then
+          locRowTag.ОперФильтрИздание = nil;
+        fi;
+      elsif (Cell.Contents = 'Издание') and (Action <> Template.Clear) then
+        Return locRowTag.НомерНеВыбран;
+      elsif (Cell.Contents = 'ГодВыпуска') and (Action = Template.Clear) then
+        if locRowTag.НомерНеВыбран then
+          locRowTag.ОперФильтрГодВыпуска = nil;
+        fi;
+      elsif (Cell.Contents = 'ГодВыпуска') and (Action <> Template.Clear) then
+        Return locRowTag.НомерНеВыбран;
+      elsif (Cell.Contents = 'Номер') and (Action = Template.Clear) then
+        if locRowTag.НомерНеВыбран then
+          locRowTag.ОперФильтрНомер = nil;
+        fi;
+      elsif (Cell.Contents = 'Номер') and (Action <> Template.Clear) then
+        Return locRowTag.НомерНеВыбран;
+      elsif (Cell.Contents = 'Количество') then  -- выбор с учетом фильтра
+        if locRowTag.НомерНеВыбран then
+          if (locRowTag.ОперФильтрИздание <> nil) then
+            AddInArray( addParam, ['Фрагмент', locRowTag.ОперФильтрИздание] );
+          fi;
+          if (locRowTag.ОперФильтрГодВыпуска <> nil) then
+            AddInArray( addParam, ['ГодВыпуска', locRowTag.ОперФильтрГодВыпуска] );
+          fi;
+          if (locRowTag.ОперФильтрНомер <> nil) then
+            AddInArray( addParam, ['ФрагментНомера', locRowTag.ОперФильтрНомер] );
+          fi;
+          jj = секцПозиции.RowsCount;
+          for j = 1 .. jj do
+            if (секцПозиции.Row[j].Tag is RI.ЕдиницаХранения) then
+              posTag = (секцПозиции.Row[j].Tag as RI.ЕдиницаХранения);
+              if (posTag <> locRowTag) and (posTag.Record <> nil) then
+                idDoc = posTag.Record.DocId;
+                AddInArray( IdInDoc, idDoc );
+              fi;
+            fi;
+          od;
+          AddInArray( addParam, ['ТолькоНормСост', true] );
+          if (IdInDoc <> nil) then
+            AddInArray( addParam, ['ИсключитьЗаписи', IdInDoc] );
+          fi;
+          if (cmOk = УчетГазет.картЕдиницаХранения.ВыполнитьВыбор(rUnitSave, addParam, 'НомерГазеты<>nil and УчетныйДокумент=nil') ) then
+            locRowTag.Record = rUnitSave;
+            RecordModify(rUnitSave);
+            locRowTag.Record.УчетныйДокумент = Record;
+            locRowTag.Record.ДатаПодшивки = Today;
+          fi;
+        else
+          Message('Информация о поступлении номеров уже введена в документ.' + Br + 'Если данные введены ошибочно - необходимо удалить всю строку.');
+        fi;
+      elsif (Cell.Contents = 'Цена') and (Action = Template.Clear) then
+        if (locRowTag.НомерГазеты <> nil) then
+          locRowTag.НомерГазеты.Цена = nil;
+          RecordPostIfNeed(locRowTag.НомерГазеты);
+        fi;
+      elsif (Cell.Contents = 'Цена') and (Action <> Template.Clear) then
+        if (locRowTag.НомерГазеты <> nil) then
+          Return true;
+        else
+          Message('Пожалуйста, сначала введите данные в столбец "номер(выпуск)". Без этого ввод цены невозможен.');
+        fi;
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриОбзоре_Позиция(Cell :TemplateCell; Value :Variant; var NewValue :Variant) :Logical;
+    var locRowTag :RI.ЕдиницаХранения;
+    locRowTag = GetRowTag(Cell);
+    if (locRowTag <> nil) and (locRowTag.Record <> nil) and (locRowTag.Record.НомерГазеты <> nil) then
+      #NoWarning;
+      РКП_Газеты.УчетГазет.редНомерГазеты.ShowFormEx(locRowTag.Record.НомерГазеты, Window.ModalWindow);
+    else
+      Message('Просмотр номера возможен только после ввода количества.');
+    fi;
+  end;
+
+
+  func Поле_ПриПроверке_Позиция(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+    var locRowTag :RI.ЕдиницаХранения;
+    locRowTag = GetRowTag(Cell);
+    if (locRowTag <> nil) then
+      if (Cell.Contents = 'Цена') then
+        if ((Value as numeric) < 0) then
+          Message('Ввод отрицательного значения цены невозможен!');
+        else
+          Value = Round((Value as numeric), 4);
+          Return true;
+        fi;
+      fi;
+     fi;
+  end;
+
+
+  func Поле_ПриВводе_Позиция(Cell :TemplateCell; Value :Variant) :Logical;
+    var locRowTag :RI.ЕдиницаХранения;
+    locRowTag = GetRowTag(Cell);
+    if (locRowTag <> nil) then
+      if (Cell.Contents = 'Издание') then
+        locRowTag.ОперФильтрИздание = (Value as String);
+        Return true;
+      elsif (Cell.Contents = 'ГодВыпуска') and (Value is Integer) then
+        if ((Value as Integer) >= ГодВыпускаПервойГазеты) and ((Value as Integer) <= Year(today)) then
+          locRowTag.ОперФильтрГодВыпуска = (Value as Integer);
+          Return true;
+        else
+          Message('Недопустимое значение года!');
+        fi;
+      elsif (Cell.Contents = 'Номер') then
+        locRowTag.ОперФильтрНомер = (Value as String);
+        Return true;
+      elsif (Cell.Contents = 'Цена') and (Value is numeric) then
+        if (locRowTag.НомерГазеты <> nil) then
+          locRowTag.НомерГазеты.Цена = (Value as numeric);
+          RecordPostIfNeed(locRowTag.НомерГазеты);
+        fi;
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриВыводе_Позиция(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    var locRowTag :RI.ЕдиницаХранения;
+    locRowTag = GetRowTag(Cell);
+    if (locRowTag <> nil) then
+      if (Cell.Contents = 'Nom') then
+        Return Cell.Row;
+      elsif (Cell.Contents = 'ДатаПоступления') then
+        Return locRowTag.ДатаПоступления;
+      elsif (Cell.Contents = 'Издание') then
+        if (locRowTag.Издание = nil) then
+          Return locRowTag.ОперФильтрИздание;
+        else
+          Return locRowTag.Издание_НазваниеОсн;
+        fi;
+      elsif (Cell.Contents = 'ГодВыпуска') then
+        if (locRowTag.Издание = nil) then
+          Return locRowTag.ОперФильтрГодВыпуска;
+        else
+          Return locRowTag.ГодВыпуска;
+        fi;
+      elsif (Cell.Contents = 'Номер') then
+        if (locRowTag.Издание = nil) then
+          Return locRowTag.ОперФильтрНомер;
+        else
+          Return locRowTag.Номер;
+        fi;
+      elsif (Cell.Contents = 'ОписаниеНомера') then
+        Return nil;
+      elsif (Cell.Contents = 'Ненумерованный') then
+        Return locRowTag.Ненумерованный;
+      elsif (Cell.Contents = 'ДатаВыхода') then
+        Return locRowTag.ДатаВыхода;
+      elsif (Cell.Contents = 'Количество') then
+        Return locRowTag.Количество;
+      elsif (Cell.Contents = 'Цена') then
+        Return locRowTag.Цена;
+      elsif (Cell.Contents = 'СуммаПозиции') then
+        Return locRowTag.СуммаПозиции;
+      elsif (Cell.Contents = 'Test1') then
+        Return locRowTag.Record.DocIdStr;
+      elsif (Cell.Contents = 'Test2') then
+        Return locRowTag.Record.State;
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриПодсказке_Позиция(Cell :TemplateCell; var Text :String) :Logical;
+    var locRowTag :RI.ЕдиницаХранения;
+    var vTxt :String;
+    locRowTag = GetRowTag(Cell);
+    if (locRowTag <> nil) and (locRowTag.Record <> nil) and (locRowTag.Record.НомерГазеты <> nil) then
+      vTxt = BiblioRecord.ОписаниеНомера(locRowTag.Record.НомерГазеты);
+      if (locRowTag.Record.НомерГазеты.Комментарий <> nil) then
+        vTxt = vTxt + Br + locRowTag.Record.НомерГазеты.Комментарий;
+      fi;
+      Text = vTxt;
+    else
+      Text = 'Просмотр номера возможен только после ввода количества.';
+    fi;
+  end;
+
+
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+  proc кнОК_ПриНажатии(Sender :Button);
+    inherited кнОК_ПриНажатии(Sender);
+  end;
+
+  proc кнСохранить_ПриНажатии(Sender :Button);
+    УстДанныеПозицийВИнтерфейсе;
+    Интерфейс.Post;
+  end;
+
+  proc кнОтменить_ПриНажатии(Sender :Button);
+    inherited кнОтменить_ПриНажатии(Sender);
+  end;
+
+
+-- 2_Дополнительные команды0. --
+
+  func cmdInsertPos_OnExecute(Command :Command) :Logical;
+    if (Template.CurrentSection = секцПозиции) then
+      Template.CurrentCell = SectionCellByContents(секцЗаголовокТаблицы, '+');
+      Поле_ПриНажатии_ДобавитьПозицию(Template.CurrentCell, Template.SingleClick);
+    else
+      Return true;
+    fi;
+  end;
+
+  func cmdDeletePos_OnExecute(Command :Command) :Logical;
+    var cRow :Integer;
+    if (Template.CurrentSection = секцПозиции) then
+      cRow = Template.Row;
+      if (CmOk =  EnqOkCancel('Удалить текущую позицию?') ) then
+        Template.CurrentCell = SectionCellByContents(секцПозиции, 'x');
+        Template.Row = cRow;
+        Поле_ПриНажатии_УдалитьПозицию(Template.CurrentCell, Template.SingleClick);
+      fi;
+    else
+      Return true;
+    fi;
+  end;
+
+
+-- 2_Вспомогательные методы0. --
+
+inclass private
+
+  func GetListTypeDoc :Variant[2];
+    var aElm :Variant[];
+    РКП_СИС.Functions.AddInArray(Result, [0, '<cf:red>Не указан']);
+    with Query.Create([РКП_Справочники.спрТипУД]) do
+      Order = 'Номер';
+      Filter = 'not НеПрименяется';
+      LoadingFieldsMode = СИС2.Константы.mdNone;
+      LoadingFields = 'Наим';
+      Select;
+      while not Eof do
+        aElm[1] = Current.DocId;
+        aElm[2] = Current.Наим;
+        РКП_СИС.Functions.AddInArray(Result, aElm);
+        Next;
+      od;
+    end;
+  end;
+
+inobject private
+
+  func GetRowTag synonym ПолучитьТегСтроки (Cell :TemplateCell) :RI.ЕдиницаХранения;
+    var locRow :TemplateRow;
+    locRow = Cell.Owner.Row[Cell.Row];
+    if (locRow.Tag is RI.ЕдиницаХранения) then
+      Return (locRow.Tag as RI.ЕдиницаХранения);
+    fi;
+  end;
+
+  func GetIdTypeDoc :Integer;
+    if (ТипУД <> nil) then
+      Return ТипУД.DocID;
+    fi;
+  end;
+
+  proc ПрочитатьПозиции;
+    var i, ii :Integer;
+    Self.Template.BeginModify;
+    секцПозиции.RowsCount = 1;
+    секцПозиции.Visible = false;
+    секцПозиции.Row[1].Tag = nil;
+    with Query.Create([РКП_Газеты.ЕдиницаХранения]) do
+      Filter = 'УчетныйДокумент=' + Record.DocIDStr;
+      Order = 'НомерПозиции';
+      Select;
+      ii = Count;
+      if (ii > 0) then
+        CloneFirstRows(секцПозиции, ii);
+        while not Eof do
+          i = i + 1;
+          секцПозиции.Row[i].Tag = РКП_Газеты.RI.ЕдиницаХранения.OpenRecord(Current);
+          Next;
+        od;
+        секцПозиции.Visible = true;
+      fi;
+    end;
+    Self.Template.EndModify;
+    --ПолучитьПринятоВсего;
+  end;
+
+  proc SetPositionsDataInInterface synonym УстДанныеПозицийВИнтерфейсе;
+    var i, ii :Integer;
+    var aRowTag :RI.ЕдиницаХранения[];
+    ii = секцПозиции.RowsCount;
+    if (ii > 1) or (секцПозиции.Visible) then
+      for i = 1 .. ii do
+        if (секцПозиции.Row[i].Tag is RI.ЕдиницаХранения) then
+          AddInArray(aRowTag, (секцПозиции.Row[i].Tag as RI.ЕдиницаХранения));
+        fi;
+      od;
+      Интерфейс.SetPositionsData(aRowTag);
+    fi;
+  end;
+
+--  proc CancelPositionsDataInInterface synonym ОтмДанныеПозицийВИнтерфейсе;
+--    var i, ii :Integer;
+--    var aRowTag :RI.ЕдиницаХранения[];
+--    ii = секцПозиции.RowsCount;
+--    if (ii > 1) or (секцПозиции.Visible) then
+--      for i = 1 .. ii do
+--        if (секцПозиции.Row[i].Tag is RI.ЕдиницаХранения) then
+--          AddInArray(aRowTag, (секцПозиции.Row[i].Tag as RI.ЕдиницаХранения));
+--        fi;
+--      od;
+--      Интерфейс.SetPositionsData(aRowTag);
+--    fi;
+--  end;
+
+  func Получить_КоличествоПринято :Integer;
+    var i, ii :Integer;
+    var cTag :RI.ЕдиницаХранения;
+    if секцПозиции.Visible then
+      ii = секцПозиции.RowsCount;
+      for i = 1 .. ii do
+        if (секцПозиции.Row[i].Tag is RI.ЕдиницаХранения) then
+          cTag = секцПозиции.Row[i].Tag as RI.ЕдиницаХранения;
+          Result = Result + cTag.Количество;
+        fi;
+      od;
+    fi;
+  end;
+
+  func Получить_СуммаПринято :Numeric;
+    var i, ii :Integer;
+    var cTag :RI.ЕдиницаХранения;
+    if секцПозиции.Visible then
+      ii = секцПозиции.RowsCount;
+      for i = 1 .. ii do
+        if (секцПозиции.Row[i].Tag is RI.ЕдиницаХранения) then
+          cTag = секцПозиции.Row[i].Tag as RI.ЕдиницаХранения;
+          Result = Result + cTag.СуммаПозиции;
+        fi;
+      od;
+    fi;
+  end;
+
+
+end

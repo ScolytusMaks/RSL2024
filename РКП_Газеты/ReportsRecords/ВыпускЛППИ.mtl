@@ -1,0 +1,5 @@
+record ВыпускЛППИ inherited СИС2.Базовая.БазоваяЗапись title "Выпуски ЛППИ";
+  field ГодЛетописи       :Integer title "Год летописи";
+  field ЛетописьСверстана :Logical title "Выпуск сверстан";
+  RecordDescription  ГодЛетописи;
+end;

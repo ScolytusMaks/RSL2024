@@ -1,0 +1,94 @@
+class inherited СИС2.БазовыйБланк "Выбор месяца";
+
+inclass public
+
+  func ВыполнитьВыбор(var локГод, локМес :Integer) :Integer;
+    var vObj :Сервис.блВыборМесяца;
+    vObj = Сервис.блВыборМесяца.Create;
+    if (локГод = nil) then -- год не передан
+      локГод = ВыбранныйРанееГод;
+    fi;
+    if (локГод = nil) then -- год ранее не выбирался или сброшен
+      локГод = Year(today);
+    fi;
+    if (локМес = nil) then -- месяц не передан
+      локМес = ВыбранныйРанееМес;
+    fi;
+    if (локМес = nil) then -- месяц ранее не выбирался или сброшен
+      локМес = Mon(today);
+    fi;
+    vObj.ВыбранныйГод = локГод;
+    vObj.ВыбранныйМес = локМес;
+    if cmOk = vObj.ShowEx(, Kernel.Window.ModalWindow) then
+      ВыбранныйРанееГод = vObj.ВыбранныйГод;
+      ВыбранныйРанееМес = vObj.ВыбранныйМес;
+      локГод = vObj.ВыбранныйГод;
+      локМес = vObj.ВыбранныйМес;
+      Result = cmOk;
+    fi;
+  end;
+
+inclass private
+
+  stored var ВыбранныйРанееГод :Integer;
+  stored var ВыбранныйРанееМес :Integer;
+
+inobject private
+
+  var ВыбранныйГод :Integer;
+  var ВыбранныйМес :Integer;
+
+  var НадписьГод :Label;
+  var Кнопка1    :Button;
+  var Кнопка2    :Button;
+  var Кнопка3    :Button;
+  var Кнопка4    :Button;
+  var Кнопка5    :Button;
+  var Кнопка6    :Button;
+  var Кнопка7    :Button;
+  var Кнопка8    :Button;
+  var Кнопка9    :Button;
+  var Кнопка10   :Button;
+  var Кнопка11   :Button;
+  var Кнопка12   :Button;
+
+  Proc ПриОткр(Create: Logical);
+    if ВыбранныйГод = nil then
+      ВыбранныйГод = Year(Today);
+    fi;
+    НадписьГод.Caption = Str(ВыбранныйГод) + ' год';
+  end;
+
+  Proc ГодДо(Sender :Button);
+    ВыбранныйГод = ВыбранныйГод - 1;
+    НадписьГод.Caption = Str(ВыбранныйГод) + ' год';
+  end;
+
+  Proc ГодПосле(Sender :Button);
+    ВыбранныйГод = ВыбранныйГод + 1;
+    НадписьГод.Caption = Str(ВыбранныйГод) + ' год';
+  end;
+
+  Proc Выбор(Sender :Button);
+    if    (Sender = Кнопка1)  then ВыбранныйМес =  1;
+    elsif (Sender = Кнопка2)  then ВыбранныйМес =  2;
+    elsif (Sender = Кнопка3)  then ВыбранныйМес =  3;
+    elsif (Sender = Кнопка4)  then ВыбранныйМес =  4;
+    elsif (Sender = Кнопка5)  then ВыбранныйМес =  5;
+    elsif (Sender = Кнопка6)  then ВыбранныйМес =  6;
+    elsif (Sender = Кнопка7)  then ВыбранныйМес =  7;
+    elsif (Sender = Кнопка8)  then ВыбранныйМес =  8;
+    elsif (Sender = Кнопка9)  then ВыбранныйМес =  9;
+    elsif (Sender = Кнопка10) then ВыбранныйМес = 10;
+    elsif (Sender = Кнопка11) then ВыбранныйМес = 11;
+    elsif (Sender = Кнопка12) then ВыбранныйМес = 12;
+    fi;
+    Close(CmOk);
+  end;
+
+  Proc Отм(Sender :Button);
+    Close(cmCancel);
+  end;
+
+
+end
