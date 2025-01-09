@@ -243,6 +243,24 @@ inobject private
     fi;
   end;
 
+  proc кнИспр250109_ПриНажатии(Sender :Button);
+    var i :Integer;
+    Hint('Выполнение...');
+    with Query.Create([РКП_Газеты.НомерГазеты]) do
+      Filter = 'CreateDate>=09.01.2025 and CreateDate<10.01.2025';
+      Select;
+      while not Eof do
+        if (Current.ДатаПринятияНаХранение <> nil) and (Current.ПринялНаХранение = nil) then
+          Current.ПринялНаХранение = Current.CreateUser;
+          РКП_СИС.Recs.RecordPostIfNeed(Current);
+          i = i + 1;
+        fi;
+        Next;
+      od;
+    end;
+    Hint('');
+    Message('Завершено. Изменено записей : ' + Str(i));
+  end;
 
 
 -- 2_Обработчики событий картотеки0. --

@@ -35,7 +35,7 @@ inclass public
     end;
     -- запрос к записям номеров
     with Query.Create([РКП_Газеты.НомерГазеты]) do
-      Filter = 'isGroup=0 and Газета=' + локИздание.DocIDStr;
+      Filter = 'ГодВыпуска>0 and isGroup=0 and Газета=' + локИздание.DocIDStr;
       Order = 'ГодВыпуска;СерияНумерации;Номер';
       LoadingFieldsMode = СИС2.Константы.mdNone;
       LoadingFields = 'ГодВыпуска;СозданОЛГС;НеПолучен';

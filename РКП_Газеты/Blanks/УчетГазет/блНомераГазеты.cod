@@ -39,7 +39,7 @@ inobject private
   var Издание :РКП_Газеты.Газета;
   var ГодВыпуска :Integer;
   var ТипДопФильтра :DR.Номера.типДопФлт;
-  var UserName :String; -- имя пользователя
+  var UserName :String := SessionInfo.UserName; -- имя пользователя
   var DataReflection :DR.Номера;
   var фреймТаблица :TemplateFrame;
   var фреймУправление :TemplateFrame;
