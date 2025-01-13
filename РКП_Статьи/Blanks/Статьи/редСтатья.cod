@@ -1668,6 +1668,7 @@ inobject private
     var Решение1 :Integer;
     var Инициалы_               : string;
     var NameSplitter :РКП_СИС.NameSplitterSrv;
+    var RI :RI.Справочники.Лица;
     NameSplitter = РКП_СИС.NameSplitterSrv.CreateExt(Value as String);
     if NameSplitter.Make then
       Фамилия_  = NameSplitter.Фамилия;
@@ -1729,12 +1730,13 @@ inobject private
           Return False;
         elsif (Решение1 = 1) then
         -- добавление в справочник -----------------------------------------------
-          R          = РКП_Справочники.СпрЛица.Create;
-          R.Наим     = Фамилия_;
-          R.Инициалы = Инициалы_;
-          R.Имя      = Имя_;
-          R.Отчество = Отчество_;
-          R.Post;
+          RI = РКП_Справочники.RI.Справочники.Лица.Create;
+          RI.Record.Наим     = Фамилия_;
+          RI.Record.Инициалы = Инициалы_;
+          RI.Record.Имя      = Имя_;
+          RI.Record.Отчество = Отчество_;
+          RI.Record.Hash     = RI.GetHashByRecord(RI.Record);
+          RI.Post;
           Value      = Фамилия_;
           Cell.Owner.Cell[Cell.Column + 3, Cell.Row].Value = Инициалы_;
           Result = true;
@@ -1775,6 +1777,7 @@ inobject private
     var Решение1 :Integer;
     var Инициалы_               : string;
     var NameSplitter :РКП_СИС.NameSplitterSrv;
+    var RI :RI.Справочники.Лица;
     if (Cell.Owner.Cell[Cell.Column - 3, Cell.Row].Value <> nil) then
       Value_ = Cell.Owner.Cell[Cell.Column - 3, Cell.Row].Value + ' ' + Value;
       NameSplitter = РКП_СИС.NameSplitterSrv.CreateExt(Value_);
@@ -1824,12 +1827,13 @@ inobject private
             Return false;
           elsif (Решение1 = 1) then
           -- добавление в справочник -----------------------------------------------
-            R          = РКП_Справочники.СпрЛица.Create;
-            R.Наим     = Фамилия_;
-            R.Инициалы = Инициалы_;
-            R.Имя      = Имя_;
-            R.Отчество = Отчество_;
-            R.Post;
+            RI = РКП_Справочники.RI.Справочники.Лица.Create;
+            RI.Record.Наим     = Фамилия_;
+            RI.Record.Инициалы = Инициалы_;
+            RI.Record.Имя      = Имя_;
+            RI.Record.Отчество = Отчество_;
+            RI.Record.Hash     = RI.GetHashByRecord(RI.Record);
+            RI.Post;
             Value      = Инициалы_;
             Cell.Owner.Cell[Cell.Column - 3, Cell.Row].Value = Фамилия_;
             Result = true;
