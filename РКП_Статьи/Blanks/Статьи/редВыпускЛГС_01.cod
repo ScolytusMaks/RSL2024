@@ -63,11 +63,11 @@ inobject
             Статья_[k]          = Q.Current;
             Заголовок_[k]       = Q.Current.Заголовок;
             if Q.Current.ИндексУДК.Count>0      then
-              КодУдк_[k]        = Q.Current.ИндексУДК.Items[1].РубрикаУДК.КодУДК;
+              КодУдк_[k]        = Q.Current.ИндексУДК.Items[1].РубрикаУДК.Код;
               КодУдк_[k]        = FixCode14(Str(Q.Current.ИндексУДК.Items[1].РубрикаУДК.Номер)); --26.12.2008
             end;
             if Q.Current.ИндексВТР<>nil         then
-              КодУдк_[k]        = Q.Current.ИндексВТР.КодУДК;
+              КодУдк_[k]        = Q.Current.ИндексВТР.Код;
               КодУдк_[k]        = FixCode14(Str(Q.Current.ИндексВТР.Номер));--26.12.2008
             end;
           Q.Next;
