@@ -16,7 +16,7 @@ inclass public
     -- запрос к записям статистики выпуска
     with Query.Create([РКП_Газеты.ВыпускГазеты]) do
       aFlt = nil;
-      AddInArray( aFlt, 'Газета=' + локИздание.DocIDStr );
+      AddInArray( aFlt, 'ГодВыпуска>0 and Газета=' + локИздание.DocIDStr );
       if ТолькоНеПолученные then
         AddInArray( aFlt, 'not КомплектПолучен' );
       fi;

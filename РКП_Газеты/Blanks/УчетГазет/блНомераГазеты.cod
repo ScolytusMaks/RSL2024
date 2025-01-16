@@ -11,6 +11,7 @@ inclass private
   stored var Прямое_Редактирование :Logical;
   -- Сохранение пользовательской настройки картотеки между периодами жизни объектов
   var DefaultLayout  :Variant[2] :=       [['DocId',                 10, false, 'ID',                         'ID'],
+                                           ['UpdateUser',            28, false, 'Изменил пользователь',       'Изменил' + Br + 'пользователь'],
                                            ['UpdateDate',            20, false, 'Дата изменения',             'Дата' + Br + 'изменения'],
                                            ['ГодВыпуска',            16, false, 'Годвыпуска',                 'Год' + Br + 'выпуска'],
                                            ['СерияНумерации',        20, true,  'Серия нумерации',            'Серия' + Br + 'нумерации'],
@@ -761,14 +762,25 @@ inobject private
 
   proc УстРазмерОкна;
     var minHeight, minWidth :Integer;
-    minHeight = Int(ScreenHeight / 3);
-    minWidth  = Int(ScreenWidth / 4);
+    var maxHeight, maxWidth :Integer;
+    -- не меньше
+    minHeight = Int(ScreenHeight / 3);   -- 728     768
+    minWidth  = Int(ScreenWidth / 4);    -- 1366   1024
     if (Self.Window.Height < minHeight) then
       Self.Window.Height = minHeight;
     fi;
     if (Self.Window.Width < minWidth) then
       Self.Window.Width = minWidth;
     fi;
+    -- не больше
+    --maxHeight = Int(Self.Window.Height * 0.9);
+    --maxWidth  = Int(Self.Window.Width * 0.9);
+    --if (Self.Window.Height > maxHeight) then
+    --  Self.Window.Height = maxHeight;
+    --fi;
+    --if (Self.Window.Width > maxWidth) then
+    --  Self.Window.Width = maxWidth;
+    --fi;
   end;
 
   func ПолучитьФильтр :String;
