@@ -339,6 +339,7 @@ inobject private
         --    Message("Номер не выбран. Соответствующие поля в карточке описания статьи заполнены не будут!");
         --  end;
       elsif (Qn.Count = 1) then
+        Qn.Select;
         Rn = Qn.Current;
       fi;
     end;
