@@ -1,71 +1,71 @@
-Class inherited СИС2.БазовыйБланк "Номера (выпуски) газет и МП" ;
+п»їClass inherited РЎРРЎ2.Р‘Р°Р·РѕРІС‹Р№Р‘Р»Р°РЅРє "РќРѕРјРµСЂР° (РІС‹РїСѓСЃРєРё) РіР°Р·РµС‚ Рё РњРџ" ;
 
-import СИС2 classes Константы, Исключения;
-import РКП_СИС classes Profile, StdCode, Recs, Functions, FilterMaker, Def, StringsFunctions;
-import classes Константы;
+import РЎРРЎ2 classes РљРѕРЅСЃС‚Р°РЅС‚С‹, РСЃРєР»СЋС‡РµРЅРёСЏ;
+import Р РљРџ_РЎРРЎ classes Profile, StdCode, Recs, Functions, FilterMaker, Def, StringsFunctions;
+import classes РљРѕРЅСЃС‚Р°РЅС‚С‹;
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 
 inclass private
 
-  stored var Прямое_Редактирование :Logical;
-  -- Сохранение пользовательской настройки картотеки между периодами жизни объектов
+  stored var РџСЂСЏРјРѕРµ_Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ :Logical;
+  -- РЎРѕС…СЂР°РЅРµРЅРёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕР№ РЅР°СЃС‚СЂРѕР№РєРё РєР°СЂС‚РѕС‚РµРєРё РјРµР¶РґСѓ РїРµСЂРёРѕРґР°РјРё Р¶РёР·РЅРё РѕР±СЉРµРєС‚РѕРІ
   var DefaultLayout  :Variant[2] :=       [['DocId',                 10, false, 'ID',                         'ID'],
-                                           ['UpdateUser',            28, false, 'Изменил пользователь',       'Изменил' + Br + 'пользователь'],
-                                           ['UpdateDate',            20, false, 'Дата изменения',             'Дата' + Br + 'изменения'],
-                                           ['ГодВыпуска',            16, false, 'Годвыпуска',                 'Год' + Br + 'выпуска'],
-                                           ['СерияНумерации',        20, true,  'Серия нумерации',            'Серия' + Br + 'нумерации'],
-                                           ['Номер',                 16, true,  'Номер',                      'Номер'],
-                                           ['ВаловыйНомер',          16, true,  'Валовый номер',              'Вал.' + Br + 'номер'],
-                                           ['ДатаВыхода',            16, true,  'Дата выхода',                'Дата' + Br + 'выхода'],
-                                           ['ЛожныйНомер',           14, true,  'Ложный номер',               'Ложный' + Br + 'номер'],
-                                           ['НеПолучен',             10, true,  'Не получен ОРГП',            'Не' + Br + 'получ.'],
-                                           ['ДатаПринятияНаХранение',14, true,  'Дата регистрации номера',    'Дата' + Br + 'рег.'],
-                                           ['Тираж',                 14, true,  'Тираж выпуска',              'Тираж'],
-                                           ['Комментарий',           22, true,  'Комментарий библиографа',    'Комментарий'],
-                                           ['ПринялНаХранение',      28, true,  'Зарегистрировал библиограф', 'Зарегистрировал'],
-                                           ['ПринятоЭкземпляров',    16, true,  'Принято экземпляров всего',  'Принято' + Br + 'экз.']
+                                           ['UpdateUser',            28, false, 'РР·РјРµРЅРёР» РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ',       'РР·РјРµРЅРёР»' + Br + 'РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ'],
+                                           ['UpdateDate',            20, false, 'Р”Р°С‚Р° РёР·РјРµРЅРµРЅРёСЏ',             'Р”Р°С‚Р°' + Br + 'РёР·РјРµРЅРµРЅРёСЏ'],
+                                           ['Р“РѕРґР’С‹РїСѓСЃРєР°',            16, false, 'Р“РѕРґРІС‹РїСѓСЃРєР°',                 'Р“РѕРґ' + Br + 'РІС‹РїСѓСЃРєР°'],
+                                           ['РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё',        20, true,  'РЎРµСЂРёСЏ РЅСѓРјРµСЂР°С†РёРё',            'РЎРµСЂРёСЏ' + Br + 'РЅСѓРјРµСЂР°С†РёРё'],
+                                           ['РќРѕРјРµСЂ',                 16, true,  'РќРѕРјРµСЂ',                      'РќРѕРјРµСЂ'],
+                                           ['Р’Р°Р»РѕРІС‹Р№РќРѕРјРµСЂ',          16, true,  'Р’Р°Р»РѕРІС‹Р№ РЅРѕРјРµСЂ',              'Р’Р°Р».' + Br + 'РЅРѕРјРµСЂ'],
+                                           ['Р”Р°С‚Р°Р’С‹С…РѕРґР°',            16, true,  'Р”Р°С‚Р° РІС‹С…РѕРґР°',                'Р”Р°С‚Р°' + Br + 'РІС‹С…РѕРґР°'],
+                                           ['Р›РѕР¶РЅС‹Р№РќРѕРјРµСЂ',           14, true,  'Р›РѕР¶РЅС‹Р№ РЅРѕРјРµСЂ',               'Р›РѕР¶РЅС‹Р№' + Br + 'РЅРѕРјРµСЂ'],
+                                           ['РќРµРџРѕР»СѓС‡РµРЅ',             10, true,  'РќРµ РїРѕР»СѓС‡РµРЅ РћР Р“Рџ',            'РќРµ' + Br + 'РїРѕР»СѓС‡.'],
+                                           ['Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ',14, true,  'Р”Р°С‚Р° СЂРµРіРёСЃС‚СЂР°С†РёРё РЅРѕРјРµСЂР°',    'Р”Р°С‚Р°' + Br + 'СЂРµРі.'],
+                                           ['РўРёСЂР°Р¶',                 14, true,  'РўРёСЂР°Р¶ РІС‹РїСѓСЃРєР°',              'РўРёСЂР°Р¶'],
+                                           ['РљРѕРјРјРµРЅС‚Р°СЂРёР№',           22, true,  'РљРѕРјРјРµРЅС‚Р°СЂРёР№ Р±РёР±Р»РёРѕРіСЂР°С„Р°',    'РљРѕРјРјРµРЅС‚Р°СЂРёР№'],
+                                           ['РџСЂРёРЅСЏР»РќР°РҐСЂР°РЅРµРЅРёРµ',      28, true,  'Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°Р» Р±РёР±Р»РёРѕРіСЂР°С„', 'Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°Р»'],
+                                           ['РџСЂРёРЅСЏС‚РѕР­РєР·РµРјРїР»СЏСЂРѕРІ',    16, true,  'РџСЂРёРЅСЏС‚Рѕ СЌРєР·РµРјРїР»СЏСЂРѕРІ РІСЃРµРіРѕ',  'РџСЂРёРЅСЏС‚Рѕ' + Br + 'СЌРєР·.']
                                           ];
 
   stored var tabUserColLayout :String[];
   stored var tabUserColVisible :Logical[];
   stored var tabUserColWidth :Numeric[];
   stored var tabUserOrder :String;
-  stored var frameInfoState :Integer; -- Состояние фрейма фреймИнфо: -1 : скрыт | 0 : по умолчанию (развернут)  | 1 : развернут
+  stored var frameInfoState :Integer; -- РЎРѕСЃС‚РѕСЏРЅРёРµ С„СЂРµР№РјР° С„СЂРµР№РјРРЅС„Рѕ: -1 : СЃРєСЂС‹С‚ | 0 : РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ (СЂР°Р·РІРµСЂРЅСѓС‚)  | 1 : СЂР°Р·РІРµСЂРЅСѓС‚
 
 
 
 inobject private
 
-  var Издание :РКП_Газеты.Газета;
-  var ГодВыпуска :Integer;
-  var ТипДопФильтра :DR.Номера.типДопФлт;
-  var UserName :String := SessionInfo.UserName; -- имя пользователя
-  var DataReflection :DR.Номера;
-  var фреймТаблица :TemplateFrame;
-  var фреймУправление :TemplateFrame;
-  var фреймИнфо :TemplateFrame;
-  var фреймНомераНаХранении :TemplateFrame;
-  var секцНомерВыпуска :TemplateSection;
-  var секцНомераЗаголовки :TemplateSection;
-  var секцНомераДанные :TemplateSection;
-  var секцПоступления :TemplateSection;
-  var секцУправлениеИнфо :TemplateSection;
-  var секцПоступленияЗаголовок :TemplateSection;
-  var секцПоступленияВсего :TemplateSection;
-  var секцияСтатистика :TemplateSection;
-  var клУправлениеИнфо :TemplateCell := if(секцУправлениеИнфо <> nil, секцУправлениеИнфо.Cell[1,1], nil);
+  var РР·РґР°РЅРёРµ :Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°;
+  var Р“РѕРґР’С‹РїСѓСЃРєР° :Integer;
+  var РўРёРїР”РѕРїР¤РёР»СЊС‚СЂР° :DR.РќРѕРјРµСЂР°.С‚РёРїР”РѕРїР¤Р»С‚;
+  var UserName :String := SessionInfo.UserName; -- РёРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
+  var DataReflection :DR.РќРѕРјРµСЂР°;
+  var С„СЂРµР№РјРўР°Р±Р»РёС†Р° :TemplateFrame;
+  var С„СЂРµР№РјРЈРїСЂР°РІР»РµРЅРёРµ :TemplateFrame;
+  var С„СЂРµР№РјРРЅС„Рѕ :TemplateFrame;
+  var С„СЂРµР№РјРќРѕРјРµСЂР°РќР°РҐСЂР°РЅРµРЅРёРё :TemplateFrame;
+  var СЃРµРєС†РќРѕРјРµСЂР’С‹РїСѓСЃРєР° :TemplateSection;
+  var СЃРµРєС†РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё :TemplateSection;
+  var СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ :TemplateSection;
+  var СЃРµРєС†РџРѕСЃС‚СѓРїР»РµРЅРёСЏ :TemplateSection;
+  var СЃРµРєС†РЈРїСЂР°РІР»РµРЅРёРµРРЅС„Рѕ :TemplateSection;
+  var СЃРµРєС†РџРѕСЃС‚СѓРїР»РµРЅРёСЏР—Р°РіРѕР»РѕРІРѕРє :TemplateSection;
+  var СЃРµРєС†РџРѕСЃС‚СѓРїР»РµРЅРёСЏР’СЃРµРіРѕ :TemplateSection;
+  var СЃРµРєС†РёСЏРЎС‚Р°С‚РёСЃС‚РёРєР° :TemplateSection;
+  var РєР»РЈРїСЂР°РІР»РµРЅРёРµРРЅС„Рѕ :TemplateCell := if(СЃРµРєС†РЈРїСЂР°РІР»РµРЅРёРµРРЅС„Рѕ <> nil, СЃРµРєС†РЈРїСЂР°РІР»РµРЅРёРµРРЅС„Рѕ.Cell[1,1], nil);
 
 
-  var КолЭкзВсего :Integer;
-  var КолЭкзОб :Integer;
-  var ПрямРед :Logical = УчетГазет.блНомераГазеты.Прямое_Редактирование;
-  var ПоказатьСтандартноеМеню :Logical;
-  var ВсегоЗаписей :Integer;
-  var ВсегоТираж :Integer;
+  var РљРѕР»Р­РєР·Р’СЃРµРіРѕ :Integer;
+  var РљРѕР»Р­РєР·РћР± :Integer;
+  var РџСЂСЏРјР РµРґ :Logical = РЈС‡РµС‚Р“Р°Р·РµС‚.Р±Р»РќРѕРјРµСЂР°Р“Р°Р·РµС‚С‹.РџСЂСЏРјРѕРµ_Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ;
+  var РџРѕРєР°Р·Р°С‚СЊРЎС‚Р°РЅРґР°СЂС‚РЅРѕРµРњРµРЅСЋ :Logical;
+  var Р’СЃРµРіРѕР—Р°РїРёСЃРµР№ :Integer;
+  var Р’СЃРµРіРѕРўРёСЂР°Р¶ :Integer;
 
-  var DefaultFldNames :String[] = ПолучитьВсеИменаПолей;
-  var strgDefaultFldNames :String[]; -- кэш
+  var DefaultFldNames :String[] = РџРѕР»СѓС‡РёС‚СЊР’СЃРµРРјРµРЅР°РџРѕР»РµР№;
+  var strgDefaultFldNames :String[]; -- РєСЌС€
 
   proc Button1_OnClick(Sender :Button);
     ClearTrace;
@@ -74,17 +74,17 @@ inobject private
 
 --}}
 
--- 2_Конструкторы, визуализаторы0. --
+-- 2_РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹, РІРёР·СѓР°Р»РёР·Р°С‚РѕСЂС‹0. --
 
 inclass public
 
-  func OpenExt synonym ОткрытьРасш(locDataReflection :DR.Номера; локТипДопФильтра :DR.Номера.типДопФлт) :Integer;
-    var vFrm :РКП_Газеты.УчетГазет.блНомераГазеты;
-    vFrm = РКП_Газеты.УчетГазет.блНомераГазеты.Create;
+  func OpenExt synonym РћС‚РєСЂС‹С‚СЊР Р°СЃС€(locDataReflection :DR.РќРѕРјРµСЂР°; Р»РѕРєРўРёРїР”РѕРїР¤РёР»СЊС‚СЂР° :DR.РќРѕРјРµСЂР°.С‚РёРїР”РѕРїР¤Р»С‚) :Integer;
+    var vFrm :Р РљРџ_Р“Р°Р·РµС‚С‹.РЈС‡РµС‚Р“Р°Р·РµС‚.Р±Р»РќРѕРјРµСЂР°Р“Р°Р·РµС‚С‹;
+    vFrm = Р РљРџ_Р“Р°Р·РµС‚С‹.РЈС‡РµС‚Р“Р°Р·РµС‚.Р±Р»РќРѕРјРµСЂР°Р“Р°Р·РµС‚С‹.Create;
     vFrm.DataReflection = locDataReflection;
-    vFrm.Издание = locDataReflection.Издание;
-    vFrm.ГодВыпуска = locDataReflection.ГодВыпуска;
-    vFrm.ТипДопФильтра = локТипДопФильтра;
+    vFrm.РР·РґР°РЅРёРµ = locDataReflection.РР·РґР°РЅРёРµ;
+    vFrm.Р“РѕРґР’С‹РїСѓСЃРєР° = locDataReflection.Р“РѕРґР’С‹РїСѓСЃРєР°;
+    vFrm.РўРёРїР”РѕРїР¤РёР»СЊС‚СЂР° = Р»РѕРєРўРёРїР”РѕРїР¤РёР»СЊС‚СЂР°;
     #NoWarning;
     if (CmOk = vFrm.ShowEx(nil, Kernel.Window.ModalWindow)) then
       Return cmOk;
@@ -94,118 +94,118 @@ inclass public
 
 inobject private
 
--- 2_Обработчики событий шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ С€Р°Р±Р»РѕРЅР°0. --
 
-  proc шаблон_ПриСоздании(Context :Variant);
-    inherited шаблон_ПриСоздании(Context);
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёРЎРѕР·РґР°РЅРёРё(Context :Variant);
+    inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРЎРѕР·РґР°РЅРёРё(Context);
     if OPPIAccess then
-      Template.HelpContext =  'РКП_Газеты.РГБ.УчетФактическихПоступлений.РеестрНомеров.htm';
+      Template.HelpContext =  'Р РљРџ_Р“Р°Р·РµС‚С‹.Р Р“Р‘.РЈС‡РµС‚Р¤Р°РєС‚РёС‡РµСЃРєРёС…РџРѕСЃС‚СѓРїР»РµРЅРёР№.Р РµРµСЃС‚СЂРќРѕРјРµСЂРѕРІ.htm';
     else
-      Template.HelpContext =  'РКП_Газеты.РГБ.Регистрация.РеестрНомеров.htm';
+      Template.HelpContext =  'Р РљРџ_Р“Р°Р·РµС‚С‹.Р Р“Р‘.Р РµРіРёСЃС‚СЂР°С†РёСЏ.Р РµРµСЃС‚СЂРќРѕРјРµСЂРѕРІ.htm';
     fi;
   end;
 
-  proc шаблон_ПриОткрытии(Create :Logical);
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(Create :Logical);
     var aCnd :Logical[];
-    AddInArray( aCnd, (Self.Издание <> nil) );
-    AddInArray( aCnd, (Self.ГодВыпуска > 0) );
+    AddInArray( aCnd, (Self.РР·РґР°РЅРёРµ <> nil) );
+    AddInArray( aCnd, (Self.Р“РѕРґР’С‹РїСѓСЃРєР° > 0) );
     AddInArray( aCnd, (Self.DataReflection <> nil) );
     if (false in aCnd) then
-      Message('Недопустимый способ открытия формы!');
+      Message('РќРµРґРѕРїСѓСЃС‚РёРјС‹Р№ СЃРїРѕСЃРѕР± РѕС‚РєСЂС‹С‚РёСЏ С„РѕСЂРјС‹!');
       Close;
     else
       if OPPIAccess then
-        Прямое_Редактирование = false;
+        РџСЂСЏРјРѕРµ_Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ = false;
       fi;
-      --inherited шаблон_ПриОткрытии(Create);
-      КолЭкзОб = РКП_Справочники.Справочники.КОЭ.КоличествоДляГазеты(Self.Издание, Self.ГодВыпуска);
+      --inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(Create);
+      РљРѕР»Р­РєР·РћР± = Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РљРћР­.РљРѕР»РёС‡РµСЃС‚РІРѕР”Р»СЏР“Р°Р·РµС‚С‹(Self.РР·РґР°РЅРёРµ, Self.Р“РѕРґР’С‹РїСѓСЃРєР°);
       --crdBuiltIn.SetFocus;
     fi;
     if (frameInfoState = -1) then
-      if (клУправлениеИнфо <> nil) then
+      if (РєР»РЈРїСЂР°РІР»РµРЅРёРµРРЅС„Рѕ <> nil) then
         if (frameInfoState = -1) then
-          клУправлениеИнфо.Contents = SymbolCollapsed;
+          РєР»РЈРїСЂР°РІР»РµРЅРёРµРРЅС„Рѕ.Contents = SymbolCollapsed;
         else
-          клУправлениеИнфо.Contents = SymbolExpanded;
+          РєР»РЈРїСЂР°РІР»РµРЅРёРµРРЅС„Рѕ.Contents = SymbolExpanded;
         fi;
       fi;
     else
-      клУправлениеИнфо.Contents = SymbolCollapsed;
+      РєР»РЈРїСЂР°РІР»РµРЅРёРµРРЅС„Рѕ.Contents = SymbolCollapsed;
     fi;
-    Модифицировать_ИнфоПанель;
-    inherited шаблон_ПриОткрытии(Create);
-    УстановитьРаскладкуТаблицы;
-    Модифицировать_Таблицу;
-    ФокусНаПоследнийВыпуск;
+    РњРѕРґРёС„РёС†РёСЂРѕРІР°С‚СЊ_РРЅС„РѕРџР°РЅРµР»СЊ;
+    inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(Create);
+    РЈСЃС‚Р°РЅРѕРІРёС‚СЊР Р°СЃРєР»Р°РґРєСѓРўР°Р±Р»РёС†С‹;
+    РњРѕРґРёС„РёС†РёСЂРѕРІР°С‚СЊ_РўР°Р±Р»РёС†Сѓ;
+    Р¤РѕРєСѓСЃРќР°РџРѕСЃР»РµРґРЅРёР№Р’С‹РїСѓСЃРє;
   end;
 
-  proc шаблон_ПриПеремещении;
-    var rIssue :РКП_Газеты.НомерГазеты;
-    var cInt :РКП_Газеты.RI.НомерГазеты;
-    var aRec :РКП_Газеты.ЕдиницаХранения[];
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёРџРµСЂРµРјРµС‰РµРЅРёРё;
+    var rIssue :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+    var cInt :Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+    var aRec :Р РљРџ_Р“Р°Р·РµС‚С‹.Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ[];
     var r, rr :Integer;
-    inherited шаблон_ПриПеремещении;
-    фреймТаблица.Update;
+    inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРџРµСЂРµРјРµС‰РµРЅРёРё;
+    С„СЂРµР№РјРўР°Р±Р»РёС†Р°.Update;
     --
-    if (клУправлениеИнфо <> nil) and (клУправлениеИнфо.Contents = SymbolExpanded) then
-      секцНомерВыпуска.Tag = nil;
-      секцПоступления.Visible = false;
-      секцПоступления.RowsCount = 1;
-      КолЭкзВсего = 0;
-      if (Template.CurrentCell <> nil) and (Template.CurrentCell.Owner = секцНомераДанные) then
-        if (CellRow(Template.CurrentCell).Tag is РКП_Газеты.НомерГазеты) then
-          rIssue = (CellRow(Template.CurrentCell).Tag as РКП_Газеты.НомерГазеты);
-        elsif (CellRow(Template.CurrentCell).Tag is РКП_Газеты.RI.НомерГазеты) then
-          rIssue = (CellRow(Template.CurrentCell).Tag as РКП_Газеты.RI.НомерГазеты).Record;
+    if (РєР»РЈРїСЂР°РІР»РµРЅРёРµРРЅС„Рѕ <> nil) and (РєР»РЈРїСЂР°РІР»РµРЅРёРµРРЅС„Рѕ.Contents = SymbolExpanded) then
+      СЃРµРєС†РќРѕРјРµСЂР’С‹РїСѓСЃРєР°.Tag = nil;
+      СЃРµРєС†РџРѕСЃС‚СѓРїР»РµРЅРёСЏ.Visible = false;
+      СЃРµРєС†РџРѕСЃС‚СѓРїР»РµРЅРёСЏ.RowsCount = 1;
+      РљРѕР»Р­РєР·Р’СЃРµРіРѕ = 0;
+      if (Template.CurrentCell <> nil) and (Template.CurrentCell.Owner = СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ) then
+        if (CellRow(Template.CurrentCell).Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+          rIssue = (CellRow(Template.CurrentCell).Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹);
+        elsif (CellRow(Template.CurrentCell).Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+          rIssue = (CellRow(Template.CurrentCell).Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹).Record;
         fi;
         if (rIssue <> nil) then
-          секцНомерВыпуска.Tag = rIssue;
-          cInt = РКП_Газеты.RI.НомерГазеты.OpenRecord(rIssue);
-          aRec = cInt.ПолучитьЕдХран(КолЭкзВсего);
+          СЃРµРєС†РќРѕРјРµСЂР’С‹РїСѓСЃРєР°.Tag = rIssue;
+          cInt = Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹.OpenRecord(rIssue);
+          aRec = cInt.РџРѕР»СѓС‡РёС‚СЊР•РґРҐСЂР°РЅ(РљРѕР»Р­РєР·Р’СЃРµРіРѕ);
           if (aRec <> nil) then
-            секцПоступления.Visible = true;
+            СЃРµРєС†РџРѕСЃС‚СѓРїР»РµРЅРёСЏ.Visible = true;
             rr = LengthOfArray(aRec);
             if ( rr > 1 ) then
-              CloneFirstRows(секцПоступления, rr);
+              CloneFirstRows(СЃРµРєС†РџРѕСЃС‚СѓРїР»РµРЅРёСЏ, rr);
             fi;
             for r = 1 .. rr do
-              секцПоступления.Row[r].Tag = aRec[r];
+              СЃРµРєС†РџРѕСЃС‚СѓРїР»РµРЅРёСЏ.Row[r].Tag = aRec[r];
             od;
           fi;
         fi;
       fi;
-      фреймНомераНаХранении.Update;
+      С„СЂРµР№РјРќРѕРјРµСЂР°РќР°РҐСЂР°РЅРµРЅРёРё.Update;
     fi;
   end;
 
-  func шаблон_ПриПоказеМеню(Object :Object; ByMouse :Logical) :Logical;
+  func С€Р°Р±Р»РѕРЅ_РџСЂРёРџРѕРєР°Р·РµРњРµРЅСЋ(Object :Object; ByMouse :Logical) :Logical;
     var locValuePosition :Variant[];
     var Position :Variant;
     var p :Integer;
     if (Object is TemplateCell) then
-      if ((Object as TemplateCell).Owner = секцНомераЗаголовки) then
-        if not ПоказатьСтандартноеМеню then
-          locValuePosition[1] = 'Скрыть столбец';
-          locValuePosition[2] = 'Столбец влево';
-          locValuePosition[3] = 'Столбец вправо';
-          --locValuePosition[4] = 'Настроить видимость';
-          locValuePosition[4] = 'Восстановить раскладку';
-          --locValuePosition[6] = 'Восстановить сортировку';
-          locValuePosition[5] = 'Стандартное меню';
+      if ((Object as TemplateCell).Owner = СЃРµРєС†РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё) then
+        if not РџРѕРєР°Р·Р°С‚СЊРЎС‚Р°РЅРґР°СЂС‚РЅРѕРµРњРµРЅСЋ then
+          locValuePosition[1] = 'РЎРєСЂС‹С‚СЊ СЃС‚РѕР»Р±РµС†';
+          locValuePosition[2] = 'РЎС‚РѕР»Р±РµС† РІР»РµРІРѕ';
+          locValuePosition[3] = 'РЎС‚РѕР»Р±РµС† РІРїСЂР°РІРѕ';
+          --locValuePosition[4] = 'РќР°СЃС‚СЂРѕРёС‚СЊ РІРёРґРёРјРѕСЃС‚СЊ';
+          locValuePosition[4] = 'Р’РѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊ СЂР°СЃРєР»Р°РґРєСѓ';
+          --locValuePosition[6] = 'Р’РѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊ СЃРѕСЂС‚РёСЂРѕРІРєСѓ';
+          locValuePosition[5] = 'РЎС‚Р°РЅРґР°СЂС‚РЅРѕРµ РјРµРЅСЋ';
           p = PopupMenu(locValuePosition, Position);
-          if (p = 1) then    СкрытьСтолбецТаблицы(Object);
-          elsif (p = 2) then СтолбецТаблицыВлево(Object);
-          elsif (p = 3) then СтолбецТаблицыВправо(Object);
+          if (p = 1) then    РЎРєСЂС‹С‚СЊРЎС‚РѕР»Р±РµС†РўР°Р±Р»РёС†С‹(Object);
+          elsif (p = 2) then РЎС‚РѕР»Р±РµС†РўР°Р±Р»РёС†С‹Р’Р»РµРІРѕ(Object);
+          elsif (p = 3) then РЎС‚РѕР»Р±РµС†РўР°Р±Р»РёС†С‹Р’РїСЂР°РІРѕ(Object);
           --elsif (p = 6) then
-          elsif (p = 4) then ВосстановитьРаскладкуТаблицы;
+          elsif (p = 4) then Р’РѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊР Р°СЃРєР»Р°РґРєСѓРўР°Р±Р»РёС†С‹;
           elsif (p = 5) then
-            ПоказатьСтандартноеМеню = false;
+            РџРѕРєР°Р·Р°С‚СЊРЎС‚Р°РЅРґР°СЂС‚РЅРѕРµРњРµРЅСЋ = false;
             Return true;
-            шаблон_ПриПоказеМеню(Object, ByMouse);
+            С€Р°Р±Р»РѕРЅ_РџСЂРёРџРѕРєР°Р·РµРњРµРЅСЋ(Object, ByMouse);
           fi;
         else
           Return true;
-          шаблон_ПриПоказеМеню(Object, ByMouse);
+          С€Р°Р±Р»РѕРЅ_РџСЂРёРџРѕРєР°Р·РµРњРµРЅСЋ(Object, ByMouse);
         fi;
       else
         Return true;
@@ -215,19 +215,19 @@ inobject private
     fi;
   end;
 
-  proc СкрытьСтолбецТаблицы(Object :Object);
+  proc РЎРєСЂС‹С‚СЊРЎС‚РѕР»Р±РµС†РўР°Р±Р»РёС†С‹(Object :Object);
     var locColumn :TemplateColumn;
     locColumn = CellColumn(Object as TemplateCell);
     locColumn.Visible = false;
-    секц_ПриОформлении_НомераЗаголовки(секцНомераЗаголовки, Template.VisibilityColumn, locColumn);
+    СЃРµРєС†_РџСЂРёРћС„РѕСЂРјР»РµРЅРёРё_РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё(СЃРµРєС†РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё, Template.VisibilityColumn, locColumn);
   end;
 
-  proc СтолбецТаблицыВлево(Object :Object);
+  proc РЎС‚РѕР»Р±РµС†РўР°Р±Р»РёС†С‹Р’Р»РµРІРѕ(Object :Object);
     var curColNumber, prvColNumber, k :Integer;
     var curColName, prvColName :String;
     var curColVisible, prvColVisible :Logical;
     var curColWidth, prvColWidth :Numeric;
-    СохранитьРаскладкуТаблицы;
+    РЎРѕС…СЂР°РЅРёС‚СЊР Р°СЃРєР»Р°РґРєСѓРўР°Р±Р»РёС†С‹;
     curColNumber = (Object as TemplateCell).Column;
     for k = (curColNumber - 1) .. 1 step - 1 do
       if tabUserColVisible[k] then
@@ -249,16 +249,16 @@ inobject private
       tabUserColLayout[prvColNumber]  = curColName;
       tabUserColVisible[prvColNumber] = curColVisible;
       tabUserColWidth[prvColNumber]   = curColWidth;
-      УстановитьРаскладкуТаблицы;
+      РЈСЃС‚Р°РЅРѕРІРёС‚СЊР Р°СЃРєР»Р°РґРєСѓРўР°Р±Р»РёС†С‹;
     fi;
   end;
 
-  proc СтолбецТаблицыВправо(Object :Object);
+  proc РЎС‚РѕР»Р±РµС†РўР°Р±Р»РёС†С‹Р’РїСЂР°РІРѕ(Object :Object);
     var curColNumber, nxtColNumber, k :Integer;
     var curColName, nxtColName :String;
     var curColVisible, nxtColVisible :Logical;
     var curColWidth, nxtColWidth :Numeric;
-    СохранитьРаскладкуТаблицы;
+    РЎРѕС…СЂР°РЅРёС‚СЊР Р°СЃРєР»Р°РґРєСѓРўР°Р±Р»РёС†С‹;
     curColNumber = (Object as TemplateCell).Column;
     for k = (curColNumber + 1) .. LengthOfArray(tabUserColLayout) do
       if tabUserColVisible[k] then
@@ -280,32 +280,36 @@ inobject private
       tabUserColLayout[nxtColNumber]  = curColName;
       tabUserColVisible[nxtColNumber] = curColVisible;
       tabUserColWidth[nxtColNumber]   = curColWidth;
-      УстановитьРаскладкуТаблицы;
+      РЈСЃС‚Р°РЅРѕРІРёС‚СЊР Р°СЃРєР»Р°РґРєСѓРўР°Р±Р»РёС†С‹;
     fi;
   end;
 
-  proc НастроитьВидимостьТаблицы;
+  proc РќР°СЃС‚СЂРѕРёС‚СЊР’РёРґРёРјРѕСЃС‚СЊРўР°Р±Р»РёС†С‹;
   end;
 
-  proc шаблон_ПриЗакрытии(Destroy :Logical);
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёР—Р°РєСЂС‹С‚РёРё(Destroy :Logical);
     var k :Integer;
-    var rIssue :РКП_Газеты.НомерГазеты;
-    var RI :РКП_Газеты.RI.НомерГазеты;
-    var ST :СИС2.SmartTransaction;
-    if секцНомераДанные.Visible then
-      ST = СИС2.SmartTransaction.CreateEx([РКП_Газеты.НомерГазеты,ВыпускГазеты,ПоступлениеГазеты], 1000);
-      for k = 1 .. секцНомераДанные.RowsCount do
+    var rIssue :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+    var RI :Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+    var ST :РЎРРЎ2.SmartTransaction;
+    var aYearIn :Integer[];
+    if СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Visible then
+      ST = РЎРРЎ2.SmartTransaction.CreateEx([Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹,Р’С‹РїСѓСЃРєР“Р°Р·РµС‚С‹,РџРѕСЃС‚СѓРїР»РµРЅРёРµР“Р°Р·РµС‚С‹], 1000);
+      for k = 1 .. СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.RowsCount do
         rIssue = nil;
         RI = nil;
-        if (секцНомераДанные.Row[k].Tag is РКП_Газеты.НомерГазеты) then
-          rIssue = (секцНомераДанные.Row[k].Tag as РКП_Газеты.НомерГазеты);
+        if (СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Row[k].Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+          rIssue = (СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Row[k].Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹);
+          if (rIssue <> nil) and (rIssue.Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ <> nil) then
+            AddInArray(aYearIn, Year(rIssue.Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ), true);
+          fi;
           if RecordEdited(rIssue) then
-            RI = РКП_Газеты.RI.НомерГазеты.OpenRecord(rIssue);
+            RI = Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹.OpenRecord(rIssue);
           else
             RI = nil;
           fi;
-        elsif (секцНомераДанные.Row[k].Tag is РКП_Газеты.RI.НомерГазеты) then
-          RI = (секцНомераДанные.Row[k].Tag as РКП_Газеты.RI.НомерГазеты);
+        elsif (СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Row[k].Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+          RI = (СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Row[k].Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹);
         fi;
         if (RI <> nil) then
           RI.Post;
@@ -314,52 +318,58 @@ inobject private
       od;
       ST.Apply;
     fi;
-    inherited шаблон_ПриЗакрытии(Destroy);
+    inherited С€Р°Р±Р»РѕРЅ_РџСЂРёР—Р°РєСЂС‹С‚РёРё(Destroy);
+    Р РљРџ_Р“Р°Р·РµС‚С‹.RI.Р’С‹РїСѓСЃРєР“Р°Р·РµС‚С‹.РћР±РЅРѕРІРёС‚СЊРЎС‚Р°С‚РёСЃС‚РёРєСѓ(Self.РР·РґР°РЅРёРµ, Self.Р“РѕРґР’С‹РїСѓСЃРєР°, Р РљРџ_Р“Р°Р·РµС‚С‹.RI.Р“Р°Р·РµС‚Р°.РѕРїРћР±РЅРѕРІРёС‚СЊРљСЌС€РЎС‚Р°С‚РђРЅ );
+    SortArray(aYearIn);
+    for k = 1 .. LengthOfArray(aYearIn) do
+      if (aYearIn[k] = Year(Today) ) then
+        Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РџРѕСЃС‚СѓРїР»РµРЅРёРµР“Р°Р·РµС‚С‹.РћР±РЅРѕРІРёС‚СЊРЎС‚Р°С‚РёСЃС‚РёРєСѓ(Self.РР·РґР°РЅРёРµ, aYearIn[k], Р РљРџ_Р“Р°Р·РµС‚С‹.RI.Р“Р°Р·РµС‚Р°.РѕРїРћР±РЅРѕРІРёС‚СЊРљСЌС€РЎС‚Р°С‚РђРЅ );
+        Break;
+      fi;
+    od;
   end;
 
-
-
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
 
 
 
 
-  func Поле_ПриВыводе_ЗаголовокОкнаФормы(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+  func РџРѕР»Рµ_РџСЂРёР’С‹РІРѕРґРµ_Р—Р°РіРѕР»РѕРІРѕРєРћРєРЅР°Р¤РѕСЂРјС‹(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
     var vNspName, vIssYear, vIssContent :String;
-    if (Self.Издание <> nil) and (Self.ГодВыпуска > 0) then
-      vNspName = Self.Издание.НазваниеОсн;
-      vIssYear = Str(Self.ГодВыпуска);
-      if (Self.ТипДопФильтра = DR.Номера.допФлтНеРег) then
-        vIssContent = 'не полученные номера';
-      elsif (Self.ТипДопФильтра = DR.Номера.допФлтВсе) then
-        vIssContent = 'все номера';
-      elsif (Self.ТипДопФильтра = DR.Номера.допФлтРег) then
-        vIssContent = 'полученные номера';
-      elsif (Self.ТипДопФильтра = DR.Номера.допФлтЛГС) then
-        vIssContent = 'номера, обработанные сектором ЛГС';
+    if (Self.РР·РґР°РЅРёРµ <> nil) and (Self.Р“РѕРґР’С‹РїСѓСЃРєР° > 0) then
+      vNspName = Self.РР·РґР°РЅРёРµ.РќР°Р·РІР°РЅРёРµРћСЃРЅ;
+      vIssYear = Str(Self.Р“РѕРґР’С‹РїСѓСЃРєР°);
+      if (Self.РўРёРїР”РѕРїР¤РёР»СЊС‚СЂР° = DR.РќРѕРјРµСЂР°.РґРѕРїР¤Р»С‚РќРµР РµРі) then
+        vIssContent = 'РЅРµ РїРѕР»СѓС‡РµРЅРЅС‹Рµ РЅРѕРјРµСЂР°';
+      elsif (Self.РўРёРїР”РѕРїР¤РёР»СЊС‚СЂР° = DR.РќРѕРјРµСЂР°.РґРѕРїР¤Р»С‚Р’СЃРµ) then
+        vIssContent = 'РІСЃРµ РЅРѕРјРµСЂР°';
+      elsif (Self.РўРёРїР”РѕРїР¤РёР»СЊС‚СЂР° = DR.РќРѕРјРµСЂР°.РґРѕРїР¤Р»С‚Р РµРі) then
+        vIssContent = 'РїРѕР»СѓС‡РµРЅРЅС‹Рµ РЅРѕРјРµСЂР°';
+      elsif (Self.РўРёРїР”РѕРїР¤РёР»СЊС‚СЂР° = DR.РќРѕРјРµСЂР°.РґРѕРїР¤Р»С‚Р›Р“РЎ) then
+        vIssContent = 'РЅРѕРјРµСЂР°, РѕР±СЂР°Р±РѕС‚Р°РЅРЅС‹Рµ СЃРµРєС‚РѕСЂРѕРј Р›Р“РЎ';
       fi;
       Return vNspName + Br + vIssYear + Br + '<s-><s->' + vIssContent;
     fi;
   end;
 
 
-  func Поле_ПриВыводе_ПрямРед(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
-    Return ПрямРед;
+  func РџРѕР»Рµ_РџСЂРёР’С‹РІРѕРґРµ_РџСЂСЏРјР РµРґ(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    Return РџСЂСЏРјР РµРґ;
   end;
 
-  func Поле_ПриВыводе_НомерГазеты(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+  func РџРѕР»Рµ_РџСЂРёР’С‹РІРѕРґРµ_РќРѕРјРµСЂР“Р°Р·РµС‚С‹(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
      
     Result = Value; 
   end;
 
-  func Поле_ПриВыводе_Данные(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+  func РџРѕР»Рµ_РџСЂРёР’С‹РІРѕРґРµ_Р”Р°РЅРЅС‹Рµ(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
     var vFldName :String;
-    var rIssue :РКП_Газеты.НомерГазеты;
-    if (CellRow(Cell).Tag is РКП_Газеты.НомерГазеты) then
-      rIssue = (CellRow(Cell).Tag as РКП_Газеты.НомерГазеты);
-    elsif (CellRow(Cell).Tag is РКП_Газеты.RI.НомерГазеты) then
-      rIssue = (CellRow(Cell).Tag as РКП_Газеты.RI.НомерГазеты).Record;
+    var rIssue :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+    if (CellRow(Cell).Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+      rIssue = (CellRow(Cell).Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹);
+    elsif (CellRow(Cell).Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+      rIssue = (CellRow(Cell).Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹).Record;
     fi;
     if (rIssue <> nil) then
       vFldName = CellColumn(Cell).Name;
@@ -372,85 +382,85 @@ inobject private
     fi;
   end;
 
-  func Поле_ПриВыводе_Поступление(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
-    var locRowTag :РКП_Газеты.ЕдиницаХранения;
+  func РџРѕР»Рµ_РџСЂРёР’С‹РІРѕРґРµ_РџРѕСЃС‚СѓРїР»РµРЅРёРµ(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    var locRowTag :Р РљРџ_Р“Р°Р·РµС‚С‹.Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ;
 
-    func GetRowTag (Cell :TemplateCell) :РКП_Газеты.ЕдиницаХранения;
+    func GetRowTag (Cell :TemplateCell) :Р РљРџ_Р“Р°Р·РµС‚С‹.Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ;
       var locRow :TemplateRow;
       locRow = Cell.Owner.Row[Cell.Row];
-      if (locRow.Tag is РКП_Газеты.ЕдиницаХранения) then
-        Return (locRow.Tag as РКП_Газеты.ЕдиницаХранения);
+      if (locRow.Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ) then
+        Return (locRow.Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ);
       fi;
     end;
 
     locRowTag = GetRowTag(Cell);
     if (locRowTag <> nil) then
-      if (Cell.Contents = 'КолЭкз') then
-        Return locRowTag.Количество as Integer;
-      elsif (Cell.Contents = 'ДатаПоступления') then
-        Return locRowTag.ДатаПоступления as Date;
+      if (Cell.Contents = 'РљРѕР»Р­РєР·') then
+        Return locRowTag.РљРѕР»РёС‡РµСЃС‚РІРѕ as Integer;
+      elsif (Cell.Contents = 'Р”Р°С‚Р°РџРѕСЃС‚СѓРїР»РµРЅРёСЏ') then
+        Return locRowTag.Р”Р°С‚Р°РџРѕСЃС‚СѓРїР»РµРЅРёСЏ as Date;
       fi;
     fi;
   end;
 
-  func Поле_ВсегоЗаписей_ПриВыводе(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+  func РџРѕР»Рµ_Р’СЃРµРіРѕР—Р°РїРёСЃРµР№_РџСЂРёР’С‹РІРѕРґРµ(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
     --with crdBuiltIn.Query do
     --  Result = Count;
     --end;
   end;
 
-  func Поле_ВсегоТираж_ПриВыводе(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+  func РџРѕР»Рµ_Р’СЃРµРіРѕРўРёСЂР°Р¶_РџСЂРёР’С‹РІРѕРґРµ(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
     --if (crdBuiltIn.Query.Filter <> nil) then
     --  with crdBuiltIn.Query do
-    --    Result = CalcAggregates('Sum(Тираж)');
+    --    Result = CalcAggregates('Sum(РўРёСЂР°Р¶)');
     --  end;
     --fi;
   end;
 
 
 
-  func Поле_ПриНажатии_ПрямРед(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
-    Прямое_Редактирование = not Прямое_Редактирование;
-    Модифицировать_Таблицу;
+  func РџРѕР»Рµ_РџСЂРёРќР°Р¶Р°С‚РёРё_РџСЂСЏРјР РµРґ(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    РџСЂСЏРјРѕРµ_Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ = not РџСЂСЏРјРѕРµ_Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ;
+    РњРѕРґРёС„РёС†РёСЂРѕРІР°С‚СЊ_РўР°Р±Р»РёС†Сѓ;
   end;
 
-  func Поле_ПриНажатии_ДопИнфо(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
-    if (Cell in [клУправлениеИнфо]) then
+  func РџРѕР»Рµ_РџСЂРёРќР°Р¶Р°С‚РёРё_Р”РѕРїРРЅС„Рѕ(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    if (Cell in [РєР»РЈРїСЂР°РІР»РµРЅРёРµРРЅС„Рѕ]) then
       if Cell.Contents = SymbolCollapsed then
         Cell.Contents = SymbolExpanded;
-        шаблон_ПриПеремещении;
+        С€Р°Р±Р»РѕРЅ_РџСЂРёРџРµСЂРµРјРµС‰РµРЅРёРё;
       elsif Cell.Contents = SymbolExpanded then
         Cell.Contents = SymbolCollapsed;
       fi;
-      Модифицировать_ИнфоПанель;
+      РњРѕРґРёС„РёС†РёСЂРѕРІР°С‚СЊ_РРЅС„РѕРџР°РЅРµР»СЊ;
       --if Cell.Contents = SymbolExpanded then
       --fi;
     fi;
   end;
 
-  func Поле_ПриНажатии_Данные(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
-    var rIssue :РКП_Газеты.НомерГазеты;
-    --var RI :РКП_Газеты.RI.НомерГазеты;
-    if (CellRow(Cell).Tag is РКП_Газеты.НомерГазеты) then
-      rIssue = (CellRow(Cell).Tag as РКП_Газеты.НомерГазеты);
-    elsif (CellRow(Cell).Tag is РКП_Газеты.RI.НомерГазеты) then
-      rIssue = (CellRow(Cell).Tag as РКП_Газеты.RI.НомерГазеты).Record;
+  func РџРѕР»Рµ_РџСЂРёРќР°Р¶Р°С‚РёРё_Р”Р°РЅРЅС‹Рµ(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var rIssue :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+    --var RI :Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+    if (CellRow(Cell).Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+      rIssue = (CellRow(Cell).Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹);
+    elsif (CellRow(Cell).Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+      rIssue = (CellRow(Cell).Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹).Record;
     fi;
-    if (not Прямое_Редактирование) then
+    if (not РџСЂСЏРјРѕРµ_Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ) then
       if (rIssue <> nil) and (Action in [Template.DoubleClick,Template.EnterPressed]) then
-        if cmOk = РКП_Газеты.УчетГазет.редНомерГазеты.OpenRecordExt(rIssue) then
+        if cmOk = Р РљРџ_Р“Р°Р·РµС‚С‹.РЈС‡РµС‚Р“Р°Р·РµС‚.СЂРµРґРќРѕРјРµСЂР“Р°Р·РµС‚С‹.OpenRecordExt(rIssue) then
           Template.BeginModify;
-          фреймТаблица.Update;
+          С„СЂРµР№РјРўР°Р±Р»РёС†Р°.Update;
           Template.EndModify;
-          #Warning 'Здесь должен выполняться пересчет статистики для вывода';
+          #Warning 'Р—РґРµСЃСЊ РґРѕР»Р¶РµРЅ РІС‹РїРѕР»РЅСЏС‚СЊСЃСЏ РїРµСЂРµСЃС‡РµС‚ СЃС‚Р°С‚РёСЃС‚РёРєРё РґР»СЏ РІС‹РІРѕРґР°';
         fi;
       fi;
     else
       if (rIssue <> nil) then
-        if (CellColumn(Cell).Name = 'ЛожныйНомер') then
-          Изменить_ЛожныйНомер(rIssue);
-        elsif (CellColumn(Cell).Name = 'НеПолучен') then
-          Изменить_НеПолучен(rIssue);
+        if (CellColumn(Cell).Name = 'Р›РѕР¶РЅС‹Р№РќРѕРјРµСЂ') then
+          РР·РјРµРЅРёС‚СЊ_Р›РѕР¶РЅС‹Р№РќРѕРјРµСЂ(rIssue);
+        elsif (CellColumn(Cell).Name = 'РќРµРџРѕР»СѓС‡РµРЅ') then
+          РР·РјРµРЅРёС‚СЊ_РќРµРџРѕР»СѓС‡РµРЅ(rIssue);
         else
           Return true;
         fi;
@@ -458,59 +468,59 @@ inobject private
     fi;
   end;
 
-  proc Изменить_ЛожныйНомер(rIssue :РКП_Газеты.НомерГазеты);
+  proc РР·РјРµРЅРёС‚СЊ_Р›РѕР¶РЅС‹Р№РќРѕРјРµСЂ(rIssue :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹);
     var newValue :Logical;
-    newValue = not rIssue.ЛожныйНомер;
-    if (not РКП_Газеты.RI.НомерГазеты.ПроверитьУникальностьВыпуска(rIssue, 'ЛожныйНомер', newValue)) then
-      Message('Вводимое значение недопустимо!');
+    newValue = not rIssue.Р›РѕР¶РЅС‹Р№РќРѕРјРµСЂ;
+    if (not Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹.РџСЂРѕРІРµСЂРёС‚СЊРЈРЅРёРєР°Р»СЊРЅРѕСЃС‚СЊР’С‹РїСѓСЃРєР°(rIssue, 'Р›РѕР¶РЅС‹Р№РќРѕРјРµСЂ', newValue)) then
+      Message('Р’РІРѕРґРёРјРѕРµ Р·РЅР°С‡РµРЅРёРµ РЅРµРґРѕРїСѓСЃС‚РёРјРѕ!');
     else
-      РКП_СИС.Recs.RecordModify(rIssue);
-      rIssue.ЛожныйНомер = newValue;
+      Р РљРџ_РЎРРЎ.Recs.RecordModify(rIssue);
+      rIssue.Р›РѕР¶РЅС‹Р№РќРѕРјРµСЂ = newValue;
     fi;
   end;
 
-  proc Изменить_НеПолучен(rIssue :РКП_Газеты.НомерГазеты);
+  proc РР·РјРµРЅРёС‚СЊ_РќРµРџРѕР»СѓС‡РµРЅ(rIssue :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹);
     var newValue :Logical;
-    var Тираж_ :Integer;
-    newValue = not rIssue.НеПолучен;
+    var РўРёСЂР°Р¶_ :Integer;
+    newValue = not rIssue.РќРµРџРѕР»СѓС‡РµРЅ;
     if newValue then
       Recs.RecordModify(rIssue);
-      rIssue.НеПолучен = newValue;
+      rIssue.РќРµРџРѕР»СѓС‡РµРЅ = newValue;
     else
-      if РКП_Газеты.RI.НомерГазеты.ПроверитьУникальностьВыпуска(rIssue, 'НеПолучен', newValue) then
-        if (rIssue.Тираж = 0) then
-          if cmOk = Input(Тираж_, 'Введите тираж выпуска') then
-            if (Тираж_ > 0) then
+      if Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹.РџСЂРѕРІРµСЂРёС‚СЊРЈРЅРёРєР°Р»СЊРЅРѕСЃС‚СЊР’С‹РїСѓСЃРєР°(rIssue, 'РќРµРџРѕР»СѓС‡РµРЅ', newValue) then
+        if (rIssue.РўРёСЂР°Р¶ = 0) then
+          if cmOk = Input(РўРёСЂР°Р¶_, 'Р’РІРµРґРёС‚Рµ С‚РёСЂР°Р¶ РІС‹РїСѓСЃРєР°') then
+            if (РўРёСЂР°Р¶_ > 0) then
               RecordModify(rIssue);
-              rIssue.НеПолучен              = newValue;
-              rIssue.Тираж                  = Тираж_;
-              rIssue.ДатаПринятияНаХранение = Today;
-              rIssue.ПринялНаХранение       = Self.UserName;
+              rIssue.РќРµРџРѕР»СѓС‡РµРЅ              = newValue;
+              rIssue.РўРёСЂР°Р¶                  = РўРёСЂР°Р¶_;
+              rIssue.Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ = Today;
+              rIssue.РџСЂРёРЅСЏР»РќР°РҐСЂР°РЅРµРЅРёРµ       = Self.UserName;
             else
-              Message('Нулевой тираж возможен только у не поступивших номеров!');
+              Message('РќСѓР»РµРІРѕР№ С‚РёСЂР°Р¶ РІРѕР·РјРѕР¶РµРЅ С‚РѕР»СЊРєРѕ Сѓ РЅРµ РїРѕСЃС‚СѓРїРёРІС€РёС… РЅРѕРјРµСЂРѕРІ!');
             fi;
           else
-            Message('Нулевой тираж возможен только у не поступивших номеров!');
+            Message('РќСѓР»РµРІРѕР№ С‚РёСЂР°Р¶ РІРѕР·РјРѕР¶РµРЅ С‚РѕР»СЊРєРѕ Сѓ РЅРµ РїРѕСЃС‚СѓРїРёРІС€РёС… РЅРѕРјРµСЂРѕРІ!');
           fi;
         else
           RecordModify(rIssue);
-          rIssue.НеПолучен              = newValue;
-          rIssue.ДатаПринятияНаХранение = Today;
-          rIssue.ПринялНаХранение       = Self.UserName;
+          rIssue.РќРµРџРѕР»СѓС‡РµРЅ              = newValue;
+          rIssue.Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ = Today;
+          rIssue.РџСЂРёРЅСЏР»РќР°РҐСЂР°РЅРµРЅРёРµ       = Self.UserName;
         fi;
       else
-        Message('Вводимое значение недопустимо!');
+        Message('Р’РІРѕРґРёРјРѕРµ Р·РЅР°С‡РµРЅРёРµ РЅРµРґРѕРїСѓСЃС‚РёРјРѕ!');
       fi;
     fi;
   end;
 
-  func Поле_ПриВходе_Данные(Cell :TemplateCell; Index :Integer; Action :Template.EnterTypes) :Logical;
+  func РџРѕР»Рµ_РџСЂРёР’С…РѕРґРµ_Р”Р°РЅРЅС‹Рµ(Cell :TemplateCell; Index :Integer; Action :Template.EnterTypes) :Logical;
     var vFldName :String;
-    var rIssue :РКП_Газеты.НомерГазеты;
-    if (CellRow(Cell).Tag is РКП_Газеты.НомерГазеты) then
-      rIssue = (CellRow(Cell).Tag as РКП_Газеты.НомерГазеты);
-    elsif (CellRow(Cell).Tag is РКП_Газеты.RI.НомерГазеты) then
-      rIssue = (CellRow(Cell).Tag as РКП_Газеты.RI.НомерГазеты).Record;
+    var rIssue :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+    if (CellRow(Cell).Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+      rIssue = (CellRow(Cell).Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹);
+    elsif (CellRow(Cell).Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+      rIssue = (CellRow(Cell).Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹).Record;
     fi;
     if (rIssue <> nil) then
       vFldName = CellColumn(Cell).Name;
@@ -528,143 +538,143 @@ inobject private
   end;
 
 
-  func Поле_ПриПроверке_Данные(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+  func РџРѕР»Рµ_РџСЂРёРџСЂРѕРІРµСЂРєРµ_Р”Р°РЅРЅС‹Рµ(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
     var vFldName :String;
-    var rIssue :РКП_Газеты.НомерГазеты;
-    if Прямое_Редактирование and (not Cell.ReadOnly) then
-      if (CellRow(Cell).Tag is РКП_Газеты.НомерГазеты) then
-        rIssue = (CellRow(Cell).Tag as РКП_Газеты.НомерГазеты);
-      elsif (CellRow(Cell).Tag is РКП_Газеты.RI.НомерГазеты) then
-        rIssue = (CellRow(Cell).Tag as РКП_Газеты.RI.НомерГазеты).Record;
+    var rIssue :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+    if РџСЂСЏРјРѕРµ_Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ and (not Cell.ReadOnly) then
+      if (CellRow(Cell).Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+        rIssue = (CellRow(Cell).Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹);
+      elsif (CellRow(Cell).Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+        rIssue = (CellRow(Cell).Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹).Record;
       fi;
       if (rIssue <> nil) then
         vFldName = CellColumn(Cell).Name;
-        if (vFldName = 'СерияНумерации') then   Return Проверить_СериюНумерации(rIssue, Value as Integer);
-        elsif (vFldName = 'Номер') then         Return Проверить_Номер(rIssue, Value as String);
-        elsif (vFldName = 'ВаловыйНомер') then  Return Проверить_ВаловыйНомер(rIssue, Value as String);
-        elsif (vFldName = 'ДатаВыхода') then    Return Проверить_ДатуВыхода(rIssue, Value as Date);
-        elsif (vFldName = 'Тираж') then         Return Проверить_Тираж(rIssue, Value as Integer);
-        elsif (vFldName = 'Комментарий') then   Return Проверить_Комментарий(rIssue, Value as String);
+        if (vFldName = 'РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё') then   Return РџСЂРѕРІРµСЂРёС‚СЊ_РЎРµСЂРёСЋРќСѓРјРµСЂР°С†РёРё(rIssue, Value as Integer);
+        elsif (vFldName = 'РќРѕРјРµСЂ') then         Return РџСЂРѕРІРµСЂРёС‚СЊ_РќРѕРјРµСЂ(rIssue, Value as String);
+        elsif (vFldName = 'Р’Р°Р»РѕРІС‹Р№РќРѕРјРµСЂ') then  Return РџСЂРѕРІРµСЂРёС‚СЊ_Р’Р°Р»РѕРІС‹Р№РќРѕРјРµСЂ(rIssue, Value as String);
+        elsif (vFldName = 'Р”Р°С‚Р°Р’С‹С…РѕРґР°') then    Return РџСЂРѕРІРµСЂРёС‚СЊ_Р”Р°С‚СѓР’С‹С…РѕРґР°(rIssue, Value as Date);
+        elsif (vFldName = 'РўРёСЂР°Р¶') then         Return РџСЂРѕРІРµСЂРёС‚СЊ_РўРёСЂР°Р¶(rIssue, Value as Integer);
+        elsif (vFldName = 'РљРѕРјРјРµРЅС‚Р°СЂРёР№') then   Return РџСЂРѕРІРµСЂРёС‚СЊ_РљРѕРјРјРµРЅС‚Р°СЂРёР№(rIssue, Value as String);
         fi;
       fi;
     fi;
   end;
 
-  func Проверить_СериюНумерации(rIssue :РКП_Газеты.НомерГазеты; Value :Integer) :Logical;
-    if (rIssue.Номер = UnnumberedIssue) then
+  func РџСЂРѕРІРµСЂРёС‚СЊ_РЎРµСЂРёСЋРќСѓРјРµСЂР°С†РёРё(rIssue :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹; Value :Integer) :Logical;
+    if (rIssue.РќРѕРјРµСЂ = UnnumberedIssue) then
       RecordModify(rIssue);
-      rIssue.СерияНумерации = Value;
+      rIssue.РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё = Value;
       Return true;
     else
-      Result = РКП_Газеты.RI.НомерГазеты.ПроверитьУникальностьВыпуска(rIssue, 'СерияНумерации', Value);
+      Result = Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹.РџСЂРѕРІРµСЂРёС‚СЊРЈРЅРёРєР°Р»СЊРЅРѕСЃС‚СЊР’С‹РїСѓСЃРєР°(rIssue, 'РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё', Value);
       if (not Result) then
-        Message('Вводимое значение недопустимо!');
+        Message('Р’РІРѕРґРёРјРѕРµ Р·РЅР°С‡РµРЅРёРµ РЅРµРґРѕРїСѓСЃС‚РёРјРѕ!');
       else
         RecordModify(rIssue);
-        rIssue.СерияНумерации = Value;
+        rIssue.РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё = Value;
         Return true;
       fi;
     fi;
   end;
 
-  func Проверить_Номер(rIssue :РКП_Газеты.НомерГазеты; Value :String) :Logical;
+  func РџСЂРѕРІРµСЂРёС‚СЊ_РќРѕРјРµСЂ(rIssue :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹; Value :String) :Logical;
     var sValue :String;
     Value = Trim(Value);
     if (Value = nil) then
       RecordModify(rIssue);
-      rIssue.Номер = nil;
+      rIssue.РќРѕРјРµСЂ = nil;
       Return true;
     else
       sValue = FixCode10(Value);
-      Result = РКП_Газеты.RI.НомерГазеты.ПроверитьУникальностьВыпуска(rIssue, 'Номер', sValue);
-      if (РКП_Газеты.RI.НомерГазеты.ПроверитьУникальностьВыпуска(rIssue, 'Номер', sValue)) then
+      Result = Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹.РџСЂРѕРІРµСЂРёС‚СЊРЈРЅРёРєР°Р»СЊРЅРѕСЃС‚СЊР’С‹РїСѓСЃРєР°(rIssue, 'РќРѕРјРµСЂ', sValue);
+      if (Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹.РџСЂРѕРІРµСЂРёС‚СЊРЈРЅРёРєР°Р»СЊРЅРѕСЃС‚СЊР’С‹РїСѓСЃРєР°(rIssue, 'РќРѕРјРµСЂ', sValue)) then
         RecordModify(rIssue);
-        rIssue.Номер = sValue;
+        rIssue.РќРѕРјРµСЂ = sValue;
         Return true;
       else
-        Message('Вводимое значение недопустимо!');
+        Message('Р’РІРѕРґРёРјРѕРµ Р·РЅР°С‡РµРЅРёРµ РЅРµРґРѕРїСѓСЃС‚РёРјРѕ!');
       fi;
     fi;
   end;
 
-  func Проверить_ВаловыйНомер(rIssue :РКП_Газеты.НомерГазеты; Value :String) :Logical;
+  func РџСЂРѕРІРµСЂРёС‚СЊ_Р’Р°Р»РѕРІС‹Р№РќРѕРјРµСЂ(rIssue :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹; Value :String) :Logical;
     var sValue :String;
     Value = Trim(Value);
     if (Value <> nil) then
       sValue = FixCode10(Value);
     fi;
-    if (rIssue.ВаловыйНомер <> sValue) then
+    if (rIssue.Р’Р°Р»РѕРІС‹Р№РќРѕРјРµСЂ <> sValue) then
       RecordModify(rIssue);
-      rIssue.ВаловыйНомер = sValue;
+      rIssue.Р’Р°Р»РѕРІС‹Р№РќРѕРјРµСЂ = sValue;
       Return true;
     fi;
   end;
 
-  func Проверить_ДатуВыхода(rIssue :РКП_Газеты.НомерГазеты; Value :Date) :Logical;
+  func РџСЂРѕРІРµСЂРёС‚СЊ_Р”Р°С‚СѓР’С‹С…РѕРґР°(rIssue :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹; Value :Date) :Logical;
     var vChoice :Integer;
     if (Value = nil) then
       RecordModify(rIssue);
-      rIssue.ДатаВыхода = Value;
+      rIssue.Р”Р°С‚Р°Р’С‹С…РѕРґР° = Value;
       Return true;
     else
-      if (Year(Value) <> Self.ГодВыпуска) then
-        vChoice = Enquiry('Подтверждение',
-                          'Дата выхода номера не лежит в пределах ' + Str(ГодВыпуска) + ' года!' + Br +
-                          'Пожалуйста, подтвердите или измените значение.',
-                          ['Да, всё верно', 'Отмена']);
+      if (Year(Value) <> Self.Р“РѕРґР’С‹РїСѓСЃРєР°) then
+        vChoice = Enquiry('РџРѕРґС‚РІРµСЂР¶РґРµРЅРёРµ',
+                          'Р”Р°С‚Р° РІС‹С…РѕРґР° РЅРѕРјРµСЂР° РЅРµ Р»РµР¶РёС‚ РІ РїСЂРµРґРµР»Р°С… ' + Str(Р“РѕРґР’С‹РїСѓСЃРєР°) + ' РіРѕРґР°!' + Br +
+                          'РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РїРѕРґС‚РІРµСЂРґРёС‚Рµ РёР»Рё РёР·РјРµРЅРёС‚Рµ Р·РЅР°С‡РµРЅРёРµ.',
+                          ['Р”Р°, РІСЃС‘ РІРµСЂРЅРѕ', 'РћС‚РјРµРЅР°']);
         if (vChoice = 1) then
           RecordModify(rIssue);
-          rIssue.ДатаВыхода = Value;
+          rIssue.Р”Р°С‚Р°Р’С‹С…РѕРґР° = Value;
           Return true;
         fi;
       else
         RecordModify(rIssue);
-        rIssue.ДатаВыхода = Value;
+        rIssue.Р”Р°С‚Р°Р’С‹С…РѕРґР° = Value;
         Return true;
       fi;
     fi;
   end;
 
-  func Проверить_Тираж(rIssue :РКП_Газеты.НомерГазеты; Value :Integer) :Logical;
+  func РџСЂРѕРІРµСЂРёС‚СЊ_РўРёСЂР°Р¶(rIssue :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹; Value :Integer) :Logical;
     if (Value < 1) then
-      if (not rIssue.НеПолучен) then
-        Message('Нулевой тираж возможен только у не поступивших номеров!');
+      if (not rIssue.РќРµРџРѕР»СѓС‡РµРЅ) then
+        Message('РќСѓР»РµРІРѕР№ С‚РёСЂР°Р¶ РІРѕР·РјРѕР¶РµРЅ С‚РѕР»СЊРєРѕ Сѓ РЅРµ РїРѕСЃС‚СѓРїРёРІС€РёС… РЅРѕРјРµСЂРѕРІ!');
       else
         RecordModify(rIssue);
-        rIssue.Тираж = Value;
+        rIssue.РўРёСЂР°Р¶ = Value;
         Return true;
       fi;
     else
       RecordModify(rIssue);
-      rIssue.Тираж = Value;
+      rIssue.РўРёСЂР°Р¶ = Value;
       Return true;
     fi;
   end;
 
-  func Проверить_Комментарий(rIssue :РКП_Газеты.НомерГазеты; Value :String) :Logical;
+  func РџСЂРѕРІРµСЂРёС‚СЊ_РљРѕРјРјРµРЅС‚Р°СЂРёР№(rIssue :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹; Value :String) :Logical;
     RecordModify(rIssue);
-    rIssue.Комментарий = Value;
+    rIssue.РљРѕРјРјРµРЅС‚Р°СЂРёР№ = Value;
     Return true;
   end;
 
 
 
-  proc Поле_ПриРисовании_Данные(Cell :TemplateCell; Selected :Logical; var Color :Integer; var FieldColor :Integer; Font :Font);
+  proc РџРѕР»Рµ_РџСЂРёР РёСЃРѕРІР°РЅРёРё_Р”Р°РЅРЅС‹Рµ(Cell :TemplateCell; Selected :Logical; var Color :Integer; var FieldColor :Integer; Font :Font);
     if Cell.ReadOnly then
-      inherited ПриРисовании_КакПолеВывода(Cell, Selected, Color, FieldColor, Font);
+      inherited РџСЂРёР РёСЃРѕРІР°РЅРёРё_РљР°РєРџРѕР»РµР’С‹РІРѕРґР°(Cell, Selected, Color, FieldColor, Font);
     else
       if Cell.Button then
-        inherited ПриРисовании_КакПолеВыбора(Cell, Selected, Color, FieldColor, Font);
+        inherited РџСЂРёР РёСЃРѕРІР°РЅРёРё_РљР°РєРџРѕР»РµР’С‹Р±РѕСЂР°(Cell, Selected, Color, FieldColor, Font);
       else
         if Cell.CellFormat = Template.LogicalField then
-          inherited ПриРисовании_КакПолеВывода(Cell, Selected, Color, FieldColor, Font);
+          inherited РџСЂРёР РёСЃРѕРІР°РЅРёРё_РљР°РєРџРѕР»РµР’С‹РІРѕРґР°(Cell, Selected, Color, FieldColor, Font);
         else
-          inherited ПриРисовании_КакПолеВвода(Cell, Selected, Color, FieldColor, Font);
+          inherited РџСЂРёР РёСЃРѕРІР°РЅРёРё_РљР°РєРџРѕР»РµР’РІРѕРґР°(Cell, Selected, Color, FieldColor, Font);
         fi;
       fi;
     fi;
     try
-      if (CellRow(Template.CurrentCell).Owner = секцНомераДанные) then
+      if (CellRow(Template.CurrentCell).Owner = СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ) then
         Font.Bold = (Template.CurrentCell.Row = Cell.Row);
         if Font.Bold then
           Font.Size = 9;
@@ -677,67 +687,67 @@ inobject private
   end;
 
 
--- 2_Обработчики событий прочих объектов шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РїСЂРѕС‡РёС… РѕР±СЉРµРєС‚РѕРІ С€Р°Р±Р»РѕРЅР°0. --
 
-  proc секц_ПриОформлении_НомераЗаголовки(Section :TemplateSection; Action :Template.RearrangeActions; SectionObject :Object);
+  proc СЃРµРєС†_РџСЂРёРћС„РѕСЂРјР»РµРЅРёРё_РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё(Section :TemplateSection; Action :Template.RearrangeActions; SectionObject :Object);
     var iCol :Integer;
     Self.Template.BeginModify;
     if (Action = Template.ResizeColumn) then
       if (SectionObject is TemplateColumn) then
         iCol = (SectionObject as TemplateColumn).Number;
-        секцНомераДанные.Column[iCol].Width = (SectionObject as TemplateColumn).Width;
+        СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Column[iCol].Width = (SectionObject as TemplateColumn).Width;
       fi;
     elsif (Action = Template.VisibilityColumn ) then
       if (SectionObject is TemplateColumn) then
         iCol = (SectionObject as TemplateColumn).Number;
-        секцНомераДанные.Column[iCol].Visible = (SectionObject as TemplateColumn).Visible;
+        СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Column[iCol].Visible = (SectionObject as TemplateColumn).Visible;
       fi;
     fi;
-    фреймТаблица.Update;
-    СохранитьРаскладкуТаблицы;
+    С„СЂРµР№РјРўР°Р±Р»РёС†Р°.Update;
+    РЎРѕС…СЂР°РЅРёС‚СЊР Р°СЃРєР»Р°РґРєСѓРўР°Р±Р»РёС†С‹;
     Self.Template.EndModify;
   end;
 
-  proc кнДобавить_ПриНажатии(Sender :Button);
-    ДобавлениеЗаписей;
+  proc РєРЅР”РѕР±Р°РІРёС‚СЊ_РџСЂРёРќР°Р¶Р°С‚РёРё(Sender :Button);
+    Р”РѕР±Р°РІР»РµРЅРёРµР—Р°РїРёСЃРµР№;
   end;
 
-  proc кнРедактировать_ПриНажатии(Sender :Button);
-    var rIssue :РКП_Газеты.НомерГазеты;
+  proc РєРЅР РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ_РџСЂРёРќР°Р¶Р°С‚РёРё(Sender :Button);
+    var rIssue :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
     if (Template.CurrentCell <> nil) then
-      if (Template.CurrentCell.Owner = секцНомераДанные) then
-        if (CellRow(Template.CurrentCell).Tag is РКП_Газеты.НомерГазеты) then
-          rIssue = (CellRow(Template.CurrentCell).Tag as РКП_Газеты.НомерГазеты);
-        elsif (CellRow(Template.CurrentCell).Tag is РКП_Газеты.RI.НомерГазеты) then
-          rIssue = (CellRow(Template.CurrentCell).Tag as РКП_Газеты.RI.НомерГазеты).Record;
+      if (Template.CurrentCell.Owner = СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ) then
+        if (CellRow(Template.CurrentCell).Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+          rIssue = (CellRow(Template.CurrentCell).Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹);
+        elsif (CellRow(Template.CurrentCell).Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+          rIssue = (CellRow(Template.CurrentCell).Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹).Record;
         fi;
         if (rIssue <> nil) then
-          if cmOk = РКП_Газеты.УчетГазет.редНомерГазеты.OpenRecordExt(rIssue) then
-            #Warning 'Возможно, здесь что-то должно выполняться...';
+          if cmOk = Р РљРџ_Р“Р°Р·РµС‚С‹.РЈС‡РµС‚Р“Р°Р·РµС‚.СЂРµРґРќРѕРјРµСЂР“Р°Р·РµС‚С‹.OpenRecordExt(rIssue) then
+            #Warning 'Р’РѕР·РјРѕР¶РЅРѕ, Р·РґРµСЃСЊ С‡С‚Рѕ-С‚Рѕ РґРѕР»Р¶РЅРѕ РІС‹РїРѕР»РЅСЏС‚СЊСЃСЏ...';
           fi;
         fi;
       fi;
     fi;
   end;
 
-  proc кнУдалить_ПриНажатии(Sender :Button);
-    УдалениеЗаписей;
+  proc РєРЅРЈРґР°Р»РёС‚СЊ_РџСЂРёРќР°Р¶Р°С‚РёРё(Sender :Button);
+    РЈРґР°Р»РµРЅРёРµР—Р°РїРёСЃРµР№;
   end;
 
--- 2_Дополнительные команды0. --
+-- 2_Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ РєРѕРјР°РЅРґС‹0. --
 
   func cmdCreateRecords_OnExecute(Command :Command) :Logical;
-    if (CellRow(Template.CurrentCell).Owner = секцНомераДанные) then
-      ДобавлениеЗаписей;
+    if (CellRow(Template.CurrentCell).Owner = СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ) then
+      Р”РѕР±Р°РІР»РµРЅРёРµР—Р°РїРёСЃРµР№;
     else
-      Message('Для того, чтобы добавлять записи, установите селектор в таблицу с данными.');
+      Message('Р”Р»СЏ С‚РѕРіРѕ, С‡С‚РѕР±С‹ РґРѕР±Р°РІР»СЏС‚СЊ Р·Р°РїРёСЃРё, СѓСЃС‚Р°РЅРѕРІРёС‚Рµ СЃРµР»РµРєС‚РѕСЂ РІ С‚Р°Р±Р»РёС†Сѓ СЃ РґР°РЅРЅС‹РјРё.');
     fi;
   end;
 
   func cmdDeleteRecord_OnExecute(Command :Command) :Logical;
-    if (CellRow(Template.CurrentCell).Owner = секцНомераДанные) then
+    if (CellRow(Template.CurrentCell).Owner = СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ) then
       if Template.CurrentCell.ReadOnly then
-        УдалениеЗаписей;
+        РЈРґР°Р»РµРЅРёРµР—Р°РїРёСЃРµР№;
       fi;
     fi;
   end;
@@ -745,67 +755,62 @@ inobject private
 
 
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
-  proc СохранитьРаскладкуТаблицы;
+  proc РЎРѕС…СЂР°РЅРёС‚СЊР Р°СЃРєР»Р°РґРєСѓРўР°Р±Р»РёС†С‹;
     var k :Integer;
     tabUserColLayout  = nil;
     tabUserColVisible = nil;
     tabUserColWidth   = nil;
-    for k = 1 .. секцНомераЗаголовки.ColumnsCount do
-      tabUserColLayout[k]  = SubStr(секцНомераЗаголовки.Column[k].Name, 2);
-      tabUserColVisible[k] = секцНомераЗаголовки.Column[k].Visible;
-      tabUserColWidth[k]   = секцНомераЗаголовки.Column[k].Width;
+    for k = 1 .. СЃРµРєС†РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё.ColumnsCount do
+      tabUserColLayout[k]  = SubStr(СЃРµРєС†РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё.Column[k].Name, 2);
+      tabUserColVisible[k] = СЃРµРєС†РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё.Column[k].Visible;
+      tabUserColWidth[k]   = СЃРµРєС†РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё.Column[k].Width;
     od;
   end;
 
 
-  proc УстРазмерОкна;
+  proc РЈСЃС‚Р Р°Р·РјРµСЂРћРєРЅР°;
     var minHeight, minWidth :Integer;
-    var maxHeight, maxWidth :Integer;
-    -- не меньше
-    minHeight = Int(ScreenHeight / 3);   -- 728     768
-    minWidth  = Int(ScreenWidth / 4);    -- 1366   1024
+    -- РЅРµ РјРµРЅСЊС€Рµ
+    if (ScreenHeight <= 960) or (ScreenWidth <= 1280) then
+      minHeight = Int(ScreenHeight * 0.8);
+      minWidth  = Int(ScreenWidth * 0.8);
+    else
+      minHeight = Int(ScreenHeight / 2);   -- 728     768
+      minWidth  = Int(ScreenWidth / 2);    -- 1366   1024
+    fi;
+    -- РЅРµ РјРµРЅСЊС€Рµ
     if (Self.Window.Height < minHeight) then
       Self.Window.Height = minHeight;
     fi;
     if (Self.Window.Width < minWidth) then
       Self.Window.Width = minWidth;
     fi;
-    -- не больше
-    --maxHeight = Int(Self.Window.Height * 0.9);
-    --maxWidth  = Int(Self.Window.Width * 0.9);
-    --if (Self.Window.Height > maxHeight) then
-    --  Self.Window.Height = maxHeight;
-    --fi;
-    --if (Self.Window.Width > maxWidth) then
-    --  Self.Window.Width = maxWidth;
-    --fi;
   end;
 
-  func ПолучитьФильтр :String;
-    --var aFlt :String[];
-    if (Self.Издание <> nil) and (Self.ГодВыпуска > 0) then
+  func РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂ :String;
+    if (Self.РР·РґР°РЅРёРµ <> nil) and (Self.Р“РѕРґР’С‹РїСѓСЃРєР° > 0) then
       with FltMaker.CreateExt do
-        AddCondition( 'Газета=' + Self.Издание.DocIDStr );
-        AddCondition( 'ГодВыпуска=' + Str(Self.ГодВыпуска) );
+        AddCondition( 'Р“Р°Р·РµС‚Р°=' + Self.РР·РґР°РЅРёРµ.DocIDStr );
+        AddCondition( 'Р“РѕРґР’С‹РїСѓСЃРєР°=' + Str(Self.Р“РѕРґР’С‹РїСѓСЃРєР°) );
         AddCondition( 'isGroup=0' );
-        if (Self.ТипДопФильтра = DR.Номера.допФлтНеРег) then
-          AddCondition( 'НеПолучен' );
-        elsif (Self.ТипДопФильтра = DR.Номера.допФлтРег) then
-          AddCondition( 'not НеПолучен' );
+        if (Self.РўРёРїР”РѕРїР¤РёР»СЊС‚СЂР° = DR.РќРѕРјРµСЂР°.РґРѕРїР¤Р»С‚РќРµР РµРі) then
+          AddCondition( 'РќРµРџРѕР»СѓС‡РµРЅ' );
+        elsif (Self.РўРёРїР”РѕРїР¤РёР»СЊС‚СЂР° = DR.РќРѕРјРµСЂР°.РґРѕРїР¤Р»С‚Р РµРі) then
+          AddCondition( 'not РќРµРџРѕР»СѓС‡РµРЅ' );
         fi;
-        if (Self.ТипДопФильтра = DR.Номера.допФлтЛГС) then
-          AddCondition( 'СозданОЛГС' );  --AddCondition( '(СозданОЛГС and НеПолучен)' );
+        if (Self.РўРёРїР”РѕРїР¤РёР»СЊС‚СЂР° = DR.РќРѕРјРµСЂР°.РґРѕРїР¤Р»С‚Р›Р“РЎ) then
+          AddCondition( 'РЎРѕР·РґР°РЅРћР›Р“РЎ' );  --AddCondition( '(РЎРѕР·РґР°РЅРћР›Р“РЎ and РќРµРџРѕР»СѓС‡РµРЅ)' );
         else
           CompressConditionsToOne;
-          AddCondition( 'not(СозданОЛГС and НеПолучен)' );
+          AddCondition( 'not(РЎРѕР·РґР°РЅРћР›Р“РЎ and РќРµРџРѕР»СѓС‡РµРЅ)' );
         fi;
         Result = GetFilter;
-        -- дополнительный фильтр для того, чтобы измененные записи оставались видимыми после того,
-        -- как перестанут удовлетворять основному фильтру
+        -- РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Р№ С„РёР»СЊС‚СЂ РґР»СЏ С‚РѕРіРѕ, С‡С‚РѕР±С‹ РёР·РјРµРЅРµРЅРЅС‹Рµ Р·Р°РїРёСЃРё РѕСЃС‚Р°РІР°Р»РёСЃСЊ РІРёРґРёРјС‹РјРё РїРѕСЃР»Рµ С‚РѕРіРѕ,
+        -- РєР°Рє РїРµСЂРµСЃС‚Р°РЅСѓС‚ СѓРґРѕРІР»РµС‚РІРѕСЂСЏС‚СЊ РѕСЃРЅРѕРІРЅРѕРјСѓ С„РёР»СЊС‚СЂСѓ
         --CompressConditionsToOne;
-        --AddCondition( 'DocId in ' + ToStr(Self.DataReflection.IdRecArray(Self.ТипДопФильтра)) );
+        --AddCondition( 'DocId in ' + ToStr(Self.DataReflection.IdRecArray(Self.РўРёРїР”РѕРїР¤РёР»СЊС‚СЂР°)) );
         --Result = GetFilter(byOr);
       end;
     else
@@ -814,12 +819,12 @@ inobject private
   end;
 
 
-  proc МодифицироватьШаблон;
-    var aRec :РКП_Газеты.НомерГазеты[];
+  proc РњРѕРґРёС„РёС†РёСЂРѕРІР°С‚СЊРЁР°Р±Р»РѕРЅ;
+    var aRec :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹[];
     var k :Integer;
-    with Query.Create([РКП_Газеты.НомерГазеты]) do
-      Filter = ПолучитьФильтр;
-      Order = 'ГодВыпуска;СерияНумерации;Номер';
+    with Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹]) do
+      Filter = РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂ;
+      Order = 'Р“РѕРґР’С‹РїСѓСЃРєР°;РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё;РќРѕРјРµСЂ';
       Select;
       while not Eof do
         AddInArray(aRec, Current);
@@ -828,49 +833,49 @@ inobject private
     end;
     Template.BeginModify;
       if (aRec = nil) then
-        секцНомераДанные.RowsCount = 1;
-        секцНомераДанные.Visible = false;
+        СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.RowsCount = 1;
+        СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Visible = false;
       else
-        секцНомераДанные.RowsCount = 1;
-        секцНомераДанные.Visible = true;
-        Модифицировать_Таблицу;
-        CloneFirstRows(секцНомераДанные, LengthOfArray(aRec) );
+        СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.RowsCount = 1;
+        СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Visible = true;
+        РњРѕРґРёС„РёС†РёСЂРѕРІР°С‚СЊ_РўР°Р±Р»РёС†Сѓ;
+        CloneFirstRows(СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ, LengthOfArray(aRec) );
         for k = 1 .. LengthOfArray(aRec) do
-          секцНомераДанные.Row[k].Tag = aRec[k];
+          СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Row[k].Tag = aRec[k];
         od;
       fi;
-      фреймТаблица.FreezeArea(0, 0, 0, секцНомераЗаголовки.Row[1].Height);
+      С„СЂРµР№РјРўР°Р±Р»РёС†Р°.FreezeArea(0, 0, 0, СЃРµРєС†РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё.Row[1].Height);
     Template.EndModify;
   end;
 
-  proc Модифицировать_ИнфоПанель;
+  proc РњРѕРґРёС„РёС†РёСЂРѕРІР°С‚СЊ_РРЅС„РѕРџР°РЅРµР»СЊ;
     var ww, wh :Integer;
-    if (клУправлениеИнфо <> nil) then
+    if (РєР»РЈРїСЂР°РІР»РµРЅРёРµРРЅС„Рѕ <> nil) then
       ww = Self.Window.Width;
       wh = Self.Window.Height;
       Self.Template.BeginModify;
-      секцНомерВыпуска.Visible         = (клУправлениеИнфо.Contents = SymbolExpanded);
-      секцПоступленияЗаголовок.Visible = (клУправлениеИнфо.Contents = SymbolExpanded);
-      секцПоступления.Visible          = (клУправлениеИнфо.Contents = SymbolExpanded);
-      секцПоступленияВсего.Visible     = (клУправлениеИнфо.Contents = SymbolExpanded);
+      СЃРµРєС†РќРѕРјРµСЂР’С‹РїСѓСЃРєР°.Visible         = (РєР»РЈРїСЂР°РІР»РµРЅРёРµРРЅС„Рѕ.Contents = SymbolExpanded);
+      СЃРµРєС†РџРѕСЃС‚СѓРїР»РµРЅРёСЏР—Р°РіРѕР»РѕРІРѕРє.Visible = (РєР»РЈРїСЂР°РІР»РµРЅРёРµРРЅС„Рѕ.Contents = SymbolExpanded);
+      СЃРµРєС†РџРѕСЃС‚СѓРїР»РµРЅРёСЏ.Visible          = (РєР»РЈРїСЂР°РІР»РµРЅРёРµРРЅС„Рѕ.Contents = SymbolExpanded);
+      СЃРµРєС†РџРѕСЃС‚СѓРїР»РµРЅРёСЏР’СЃРµРіРѕ.Visible     = (РєР»РЈРїСЂР°РІР»РµРЅРёРµРРЅС„Рѕ.Contents = SymbolExpanded);
       Self.Window.Width  = ww + 2;
       Self.Window.Height = wh + 2;
       Self.Template.EndModify;
     fi;
   end;
 
-  proc Модифицировать_Таблицу;
+  proc РњРѕРґРёС„РёС†РёСЂРѕРІР°С‚СЊ_РўР°Р±Р»РёС†Сѓ;
     var c, cc, r, rr  :Integer;
     var vFldName :String;
-    cc = секцНомераДанные.ColumnsCount;
-    rr = секцНомераДанные.RowsCount;
+    cc = СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.ColumnsCount;
+    rr = СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.RowsCount;
     for c = 1 .. cc do
-      vFldName = секцНомераДанные.Column[c].Name;
+      vFldName = СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Column[c].Name;
       if (vFldName in DefaultFldNames) then
         for r = 1 .. rr do
-          --секцНомераДанные.Cell[c,r].FieldType = Template.LogicalField;
-          --секцНомераДанные.Cell[c,r].FieldType = Template.CommonField;
-          with секцНомераДанные.Cell[c,r] do  --секцНомераДанные.Cell[c,r].ReFieldTypes = Template.LogicalField
+          --СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Cell[c,r].FieldType = Template.LogicalField;
+          --СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Cell[c,r].FieldType = Template.CommonField;
+          with СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Cell[c,r] do  --СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Cell[c,r].ReFieldTypes = Template.LogicalField
             Button = false;
             Enabled = false;
             ReadOnly = true;
@@ -881,12 +886,12 @@ inobject private
               CellFormat = Template.DateFormat;
               FieldFormat = 'dd.mm.yyyy hh:mm:ss';
               Alignment  = Template.CenterAlign;
-            elsif (vFldName in ['ГодВыпуска']) then
+            elsif (vFldName in ['Р“РѕРґР’С‹РїСѓСЃРєР°']) then
               CellFormat = Template.NumericFormat;
               FieldFormat = '0000;; ';
               Alignment  = Template.CenterAlign;
               Alignment  = Template.CenterAlign;
-            elsif (vFldName in ['СерияНумерации']) then
+            elsif (vFldName in ['РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё']) then
               CellFormat = Template.EnumFormat;
               List.Clear;
               List.Add('0');
@@ -901,51 +906,51 @@ inobject private
               List.Add('9');
               Button = true;
               Alignment  = Template.CenterAlign;
-              Enabled = Прямое_Редактирование;
-              ReadOnly = not Прямое_Редактирование;
-            elsif (vFldName in ['Номер']) then
+              Enabled = РџСЂСЏРјРѕРµ_Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ;
+              ReadOnly = not РџСЂСЏРјРѕРµ_Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ;
+            elsif (vFldName in ['РќРѕРјРµСЂ']) then
               CellFormat = Template.StringFormat;
               Alignment  = Template.LeftAlign;
-              Enabled = Прямое_Редактирование;
-              ReadOnly = not Прямое_Редактирование;
-            elsif (vFldName in ['ВаловыйНомер']) then
+              Enabled = РџСЂСЏРјРѕРµ_Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ;
+              ReadOnly = not РџСЂСЏРјРѕРµ_Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ;
+            elsif (vFldName in ['Р’Р°Р»РѕРІС‹Р№РќРѕРјРµСЂ']) then
               CellFormat = Template.StringFormat;
               Alignment  = Template.LeftAlign;
-              Enabled = Прямое_Редактирование;
-              ReadOnly = not Прямое_Редактирование;
-            elsif (vFldName in ['ДатаВыхода']) then
+              Enabled = РџСЂСЏРјРѕРµ_Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ;
+              ReadOnly = not РџСЂСЏРјРѕРµ_Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ;
+            elsif (vFldName in ['Р”Р°С‚Р°Р’С‹С…РѕРґР°']) then
               CellFormat = Template.DateFormat;
               FieldFormat = 'dd.mm.yy';
               Alignment  = Template.CenterAlign;
-              Enabled = Прямое_Редактирование;
-              ReadOnly = not Прямое_Редактирование;
-            elsif (vFldName in ['ЛожныйНомер']) then
+              Enabled = РџСЂСЏРјРѕРµ_Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ;
+              ReadOnly = not РџСЂСЏРјРѕРµ_Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ;
+            elsif (vFldName in ['Р›РѕР¶РЅС‹Р№РќРѕРјРµСЂ']) then
               CellFormat = Template.LogicalFormat;
               Alignment  = Template.CenterAlign;
-              Enabled = Прямое_Редактирование;
-            elsif (vFldName in ['НеПолучен']) then
+              Enabled = РџСЂСЏРјРѕРµ_Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ;
+            elsif (vFldName in ['РќРµРџРѕР»СѓС‡РµРЅ']) then
               CellFormat = Template.LogicalFormat;
               Alignment  = Template.CenterAlign;
-              Enabled = Прямое_Редактирование;
-            elsif (vFldName in ['ДатаПринятияНаХранение']) then
+              Enabled = РџСЂСЏРјРѕРµ_Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ;
+            elsif (vFldName in ['Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ']) then
               CellFormat = Template.DateFormat;
               FieldFormat = 'dd.mm.yy';
               Alignment  = Template.CenterAlign;
-            elsif (vFldName in ['Тираж']) then
+            elsif (vFldName in ['РўРёСЂР°Р¶']) then
               CellFormat = Template.NumericFormat;
               FieldFormat = ' ##0;;-';
               Alignment  = Template.RightAlign;
-              Enabled = Прямое_Редактирование;
-              ReadOnly = not Прямое_Редактирование;
-            elsif (vFldName in ['Комментарий']) then
+              Enabled = РџСЂСЏРјРѕРµ_Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ;
+              ReadOnly = not РџСЂСЏРјРѕРµ_Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ;
+            elsif (vFldName in ['РљРѕРјРјРµРЅС‚Р°СЂРёР№']) then
               CellFormat = Template.StringFormat;
               Alignment  = Template.LeftAlign;
-              Enabled = Прямое_Редактирование;
-              ReadOnly = not Прямое_Редактирование;
-            elsif (vFldName in ['ПринялНаХранение']) then
+              Enabled = РџСЂСЏРјРѕРµ_Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ;
+              ReadOnly = not РџСЂСЏРјРѕРµ_Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ;
+            elsif (vFldName in ['РџСЂРёРЅСЏР»РќР°РҐСЂР°РЅРµРЅРёРµ']) then
               CellFormat = Template.StringFormat;
               Alignment  = Template.LeftAlign;
-            elsif (vFldName in ['ПринятоЭкземпляров']) then
+            elsif (vFldName in ['РџСЂРёРЅСЏС‚РѕР­РєР·РµРјРїР»СЏСЂРѕРІ']) then
               CellFormat = Template.NumericFormat;
               FieldFormat = ' ##0;;-';
               Alignment  = Template.RightAlign;
@@ -959,40 +964,40 @@ inobject private
     od;
   end;
 
-  proc ФокусНаПоследнийВыпуск(НаПоследнийВведенный :Logical = false);
+  proc Р¤РѕРєСѓСЃРќР°РџРѕСЃР»РµРґРЅРёР№Р’С‹РїСѓСЃРє(РќР°РџРѕСЃР»РµРґРЅРёР№Р’РІРµРґРµРЅРЅС‹Р№ :Logical = false);
     var vFlt :String;
-    var foundRec :РКП_Газеты.НомерГазеты;
+    var foundRec :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
     var c, r :Integer;
-    var rIssue :РКП_Газеты.НомерГазеты;
-    vFlt  = ПолучитьФильтр;
+    var rIssue :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+    vFlt  = РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂ;
     if (vFlt <> nil) then
-      if НаПоследнийВведенный then
-        foundRec = РКП_СИС.Recs.FindRecord(РКП_Газеты.НомерГазеты, vFlt, 'DocId-');
+      if РќР°РџРѕСЃР»РµРґРЅРёР№Р’РІРµРґРµРЅРЅС‹Р№ then
+        foundRec = Р РљРџ_РЎРРЎ.Recs.FindRecord(Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹, vFlt, 'DocId-');
       else
-        foundRec = РКП_СИС.Recs.FindRecord(РКП_Газеты.НомерГазеты, vFlt, 'ГодВыпуска-;СерияНумерации-;Номер-');
+        foundRec = Р РљРџ_РЎРРЎ.Recs.FindRecord(Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹, vFlt, 'Р“РѕРґР’С‹РїСѓСЃРєР°-;РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё-;РќРѕРјРµСЂ-');
       fi;
-      if (foundRec <> nil) and (секцНомераДанные.Visible) then
-        for c = 1 .. секцНомераДанные.ColumnsCount do
-          if секцНомераДанные.Column[c].Name = 'Номер' then
+      if (foundRec <> nil) and (СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Visible) then
+        for c = 1 .. СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.ColumnsCount do
+          if СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Column[c].Name = 'РќРѕРјРµСЂ' then
             Break;
           fi;
         od;
         if (c = 0) then
-          for c = 1 .. секцНомераДанные.ColumnsCount do
-            if секцНомераДанные.Column[c].Visible then
+          for c = 1 .. СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.ColumnsCount do
+            if СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Column[c].Visible then
               Break;
             fi;
           od;
         fi;
         if (c > 0) then
-          for r = 1 .. секцНомераДанные.RowsCount do
-            if (секцНомераДанные.Row[r].Tag is РКП_Газеты.НомерГазеты) then
-              rIssue = (секцНомераДанные.Row[r].Tag as РКП_Газеты.НомерГазеты);
-            elsif (секцНомераДанные.Row[r].Tag is РКП_Газеты.RI.НомерГазеты) then
-              rIssue = (секцНомераДанные.Row[r].Tag as РКП_Газеты.RI.НомерГазеты).Record;
+          for r = 1 .. СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.RowsCount do
+            if (СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Row[r].Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+              rIssue = (СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Row[r].Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹);
+            elsif (СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Row[r].Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+              rIssue = (СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Row[r].Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹).Record;
             fi;
             if (rIssue = foundRec) then
-              секцНомераДанные.Cell[c,r].SetFocus;
+              СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Cell[c,r].SetFocus;
             fi;
           od;
         fi;
@@ -1002,50 +1007,50 @@ inobject private
 
 
 
-  proc УстановитьРаскладкуТаблицы;
+  proc РЈСЃС‚Р°РЅРѕРІРёС‚СЊР Р°СЃРєР»Р°РґРєСѓРўР°Р±Р»РёС†С‹;
     var k, i :Integer;
     if (tabUserColLayout  = nil) then
-      ВосстановитьРаскладкуТаблицы;
+      Р’РѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊР Р°СЃРєР»Р°РґРєСѓРўР°Р±Р»РёС†С‹;
     else
-      for k = 1 .. секцНомераЗаголовки.ColumnsCount do -- для предотвращения конфликтов имен
-        секцНомераЗаголовки.Column[k].Name = СИС2.SysUtils.GetGUID(false);
-        секцНомераДанные.Column[k].Name    = СИС2.SysUtils.GetGUID(false);
+      for k = 1 .. СЃРµРєС†РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё.ColumnsCount do -- РґР»СЏ РїСЂРµРґРѕС‚РІСЂР°С‰РµРЅРёСЏ РєРѕРЅС„Р»РёРєС‚РѕРІ РёРјРµРЅ
+        СЃРµРєС†РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё.Column[k].Name = РЎРРЎ2.SysUtils.GetGUID(false);
+        СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Column[k].Name    = РЎРРЎ2.SysUtils.GetGUID(false);
       od;
       for k = 1 .. LengthOfArray(tabUserColLayout) do
-        секцНомераЗаголовки.Column[k].Name     = 'h' + tabUserColLayout[k];
+        СЃРµРєС†РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё.Column[k].Name     = 'h' + tabUserColLayout[k];
         i = SearchInArray(DefaultLayout, tabUserColLayout[k], [1]);
-        секцНомераЗаголовки.Column[k].Caption   = if( (i > 0), DefaultLayout[i,4] as String, '?');
-        секцНомераЗаголовки.Column[k].Width     = tabUserColWidth[k];
-        секцНомераЗаголовки.Column[k].Visible   = tabUserColVisible[k];
-        секцНомераЗаголовки.Cell[k, 1].Contents =  if( (i > 0), DefaultLayout[i,5] as String, '?');
-        секцНомераДанные.Column[k].Name         = tabUserColLayout[k];
-        секцНомераДанные.Column[k].Width        = tabUserColWidth[k];
-        секцНомераДанные.Column[k].Visible      = tabUserColVisible[k];
+        СЃРµРєС†РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё.Column[k].Caption   = if( (i > 0), DefaultLayout[i,4] as String, '?');
+        СЃРµРєС†РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё.Column[k].Width     = tabUserColWidth[k];
+        СЃРµРєС†РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё.Column[k].Visible   = tabUserColVisible[k];
+        СЃРµРєС†РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё.Cell[k, 1].Contents =  if( (i > 0), DefaultLayout[i,5] as String, '?');
+        СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Column[k].Name         = tabUserColLayout[k];
+        СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Column[k].Width        = tabUserColWidth[k];
+        СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Column[k].Visible      = tabUserColVisible[k];
       od;
-      Модифицировать_Таблицу;
+      РњРѕРґРёС„РёС†РёСЂРѕРІР°С‚СЊ_РўР°Р±Р»РёС†Сѓ;
     fi;
   end;
 
-  proc ВосстановитьРаскладкуТаблицы;
+  proc Р’РѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊР Р°СЃРєР»Р°РґРєСѓРўР°Р±Р»РёС†С‹;
     var k :Integer;
-    --УдалитьВсеСтолбцыКартотеки;
+    --РЈРґР°Р»РёС‚СЊР’СЃРµРЎС‚РѕР»Р±С†С‹РљР°СЂС‚РѕС‚РµРєРё;
     tabUserColLayout  = nil;
     tabUserColVisible = nil;
     tabUserColWidth   = nil;
-    --ИнициализироватьСтолбцыКартотеки;
+    --РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊРЎС‚РѕР»Р±С†С‹РљР°СЂС‚РѕС‚РµРєРё;
     for k = 1 .. LengthOfArray(DefaultLayout) do
-      секцНомераЗаголовки.Column[k].Name      = 'h' + DefaultLayout[k,1] as String;
-      секцНомераЗаголовки.Column[k].Caption   = DefaultLayout[k,4] as String;
-      секцНомераЗаголовки.Column[k].Width     = DefaultLayout[k,2] as Numeric;
-      секцНомераЗаголовки.Column[k].Visible   = DefaultLayout[k,3] as Logical;
-      секцНомераЗаголовки.Cell[k, 1].Contents = DefaultLayout[k,5] as String;
-      секцНомераДанные.Column[k].Name         = DefaultLayout[k,1] as String;
-      секцНомераДанные.Column[k].Width        = DefaultLayout[k,2] as Numeric;
-      секцНомераДанные.Column[k].Visible      = DefaultLayout[k,3] as Logical;
+      СЃРµРєС†РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё.Column[k].Name      = 'h' + DefaultLayout[k,1] as String;
+      СЃРµРєС†РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё.Column[k].Caption   = DefaultLayout[k,4] as String;
+      СЃРµРєС†РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё.Column[k].Width     = DefaultLayout[k,2] as Numeric;
+      СЃРµРєС†РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё.Column[k].Visible   = DefaultLayout[k,3] as Logical;
+      СЃРµРєС†РќРѕРјРµСЂР°Р—Р°РіРѕР»РѕРІРєРё.Cell[k, 1].Contents = DefaultLayout[k,5] as String;
+      СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Column[k].Name         = DefaultLayout[k,1] as String;
+      СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Column[k].Width        = DefaultLayout[k,2] as Numeric;
+      СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Column[k].Visible      = DefaultLayout[k,3] as Logical;
     od;
   end;
 
-  func ПолучитьВсеИменаПолей :String[];
+  func РџРѕР»СѓС‡РёС‚СЊР’СЃРµРРјРµРЅР°РџРѕР»РµР№ :String[];
     var i :Integer;
     if (strgDefaultFldNames = nil) then
       for i = 1 .. LengthOfArray(DefaultLayout) do
@@ -1056,149 +1061,149 @@ inobject private
   end;
 
 
-  proc ДобавлениеЗаписей;
+  proc Р”РѕР±Р°РІР»РµРЅРёРµР—Р°РїРёСЃРµР№;
     var vChoice :Integer;
     var vTitle, vRequest: String;
     var aBtnFace :String[];
-    var newRec :РКП_Газеты.НомерГазеты;
-    if (Self.Издание <> nil) and (Self.ГодВыпуска > 0) then
+    var newRec :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+    if (Self.РР·РґР°РЅРёРµ <> nil) and (Self.Р“РѕРґР’С‹РїСѓСЃРєР° > 0) then
       if OPPIAccess then
         vChoice = 2;
       else
-        vTitle   = 'Подтверждение';
-        vRequest = 'Выберите способ ввода номеров';
-        aBtnFace[1] = 'Списком';
-        aBtnFace[2] = 'По одному';
-        aBtnFace[3] = 'Отмена';
+        vTitle   = 'РџРѕРґС‚РІРµСЂР¶РґРµРЅРёРµ';
+        vRequest = 'Р’С‹Р±РµСЂРёС‚Рµ СЃРїРѕСЃРѕР± РІРІРѕРґР° РЅРѕРјРµСЂРѕРІ';
+        aBtnFace[1] = 'РЎРїРёСЃРєРѕРј';
+        aBtnFace[2] = 'РџРѕ РѕРґРЅРѕРјСѓ';
+        aBtnFace[3] = 'РћС‚РјРµРЅР°';
         vChoice = Enquiry(vTitle, vRequest, aBtnFace, 1);
       fi;
       if (vChoice = 1) then
-        with РКП_Газеты.УчетГазет.блВводНомеровСписком.Create do
-          ЗаписьИздания    = Self.Издание;
-          Издание          = Self.Издание.НазваниеОсн;
-          ГодВыпуска       = Self.ГодВыпуска;
-          ПринялНаХранение = Self.UserName;
+        with Р РљРџ_Р“Р°Р·РµС‚С‹.РЈС‡РµС‚Р“Р°Р·РµС‚.Р±Р»Р’РІРѕРґРќРѕРјРµСЂРѕРІРЎРїРёСЃРєРѕРј.Create do
+          Р—Р°РїРёСЃСЊРР·РґР°РЅРёСЏ    = Self.РР·РґР°РЅРёРµ;
+          РР·РґР°РЅРёРµ          = Self.РР·РґР°РЅРёРµ.РќР°Р·РІР°РЅРёРµРћСЃРЅ;
+          Р“РѕРґР’С‹РїСѓСЃРєР°       = Self.Р“РѕРґР’С‹РїСѓСЃРєР°;
+          РџСЂРёРЅСЏР»РќР°РҐСЂР°РЅРµРЅРёРµ = Self.UserName;
           #NoWarning;
           if cmOk = ShowEx(nil, Window.ModalWindow)then
-            МодифицироватьШаблон;
-            ФокусНаПоследнийВыпуск(true);
+            РњРѕРґРёС„РёС†РёСЂРѕРІР°С‚СЊРЁР°Р±Р»РѕРЅ;
+            Р¤РѕРєСѓСЃРќР°РџРѕСЃР»РµРґРЅРёР№Р’С‹РїСѓСЃРє(true);
           fi;
         end;
       elsif (vChoice = 2) then
-        newRec = РКП_Газеты.НомерГазеты.Create;
-        newRec.Газета                 = Издание;
-        newRec.ГодВыпуска             = ГодВыпуска;
-        if (Self.ТипДопФильтра = DR.Номера.допФлтНеРег) then
-          newRec.НеПолучен = true;
-        elsif (Self.ТипДопФильтра = DR.Номера.допФлтВсе) then
+        newRec = Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹.Create;
+        newRec.Р“Р°Р·РµС‚Р°                 = РР·РґР°РЅРёРµ;
+        newRec.Р“РѕРґР’С‹РїСѓСЃРєР°             = Р“РѕРґР’С‹РїСѓСЃРєР°;
+        if (Self.РўРёРїР”РѕРїР¤РёР»СЊС‚СЂР° = DR.РќРѕРјРµСЂР°.РґРѕРїР¤Р»С‚РќРµР РµРі) then
+          newRec.РќРµРџРѕР»СѓС‡РµРЅ = true;
+        elsif (Self.РўРёРїР”РѕРїР¤РёР»СЊС‚СЂР° = DR.РќРѕРјРµСЂР°.РґРѕРїР¤Р»С‚Р’СЃРµ) then
           if OPPIAccess then
-            newRec.НеПолучен = true;
+            newRec.РќРµРџРѕР»СѓС‡РµРЅ = true;
           else
-            newRec.ДатаПринятияНаХранение = Today;
-            newRec.ПринялНаХранение       = Self.UserName;
+            newRec.Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ = Today;
+            newRec.РџСЂРёРЅСЏР»РќР°РҐСЂР°РЅРµРЅРёРµ       = Self.UserName;
           fi;
-        elsif (Self.ТипДопФильтра = DR.Номера.допФлтРег) then
-          newRec.ДатаПринятияНаХранение = Today;
-          newRec.ПринялНаХранение       = Self.UserName;
-        elsif (Self.ТипДопФильтра = DR.Номера.допФлтЛГС) then
-          newRec.НеПолучен = true;
-          newRec.СозданОЛГС = true;
+        elsif (Self.РўРёРїР”РѕРїР¤РёР»СЊС‚СЂР° = DR.РќРѕРјРµСЂР°.РґРѕРїР¤Р»С‚Р РµРі) then
+          newRec.Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ = Today;
+          newRec.РџСЂРёРЅСЏР»РќР°РҐСЂР°РЅРµРЅРёРµ       = Self.UserName;
+        elsif (Self.РўРёРїР”РѕРїР¤РёР»СЊС‚СЂР° = DR.РќРѕРјРµСЂР°.РґРѕРїР¤Р»С‚Р›Р“РЎ) then
+          newRec.РќРµРџРѕР»СѓС‡РµРЅ = true;
+          newRec.РЎРѕР·РґР°РЅРћР›Р“РЎ = true;
         fi;
-        if cmOk = РКП_Газеты.УчетГазет.редНомерГазеты.ShowFormEx(newRec, Kernel.Window.ModalWindow) then
-          МодифицироватьШаблон;
-          ФокусНаПоследнийВыпуск(true);
+        if cmOk = Р РљРџ_Р“Р°Р·РµС‚С‹.РЈС‡РµС‚Р“Р°Р·РµС‚.СЂРµРґРќРѕРјРµСЂР“Р°Р·РµС‚С‹.ShowFormEx(newRec, Kernel.Window.ModalWindow) then
+          РњРѕРґРёС„РёС†РёСЂРѕРІР°С‚СЊРЁР°Р±Р»РѕРЅ;
+          Р¤РѕРєСѓСЃРќР°РџРѕСЃР»РµРґРЅРёР№Р’С‹РїСѓСЃРє(true);
         fi;
       fi;
     fi;
   end;
 
-  proc УдалениеЗаписей;
-    var vRI :РКП_Газеты.RI.НомерГазеты;
+  proc РЈРґР°Р»РµРЅРёРµР—Р°РїРёСЃРµР№;
+    var vRI :Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
     var vTplRng :TemplateRange;
     var rS, rF, r, j, jj :Integer;
-    var rIssueS, rIssueF :РКП_Газеты.НомерГазеты;
+    var rIssueS, rIssueF :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
     var vTxt :String;
-    var ST :СИС2.SmartTransaction;
-    var rYear :РКП_Газеты.ВыпускГазеты;
+    var ST :РЎРРЎ2.SmartTransaction;
+    var rYear :Р РљРџ_Р“Р°Р·РµС‚С‹.Р’С‹РїСѓСЃРєР“Р°Р·РµС‚С‹;
     ---
     try
-      rYear = FindRecord(РКП_Газеты.ВыпускГазеты, 'Газета=' + Str(Издание) + ' and ГодВыпуска=' + Str(ГодВыпуска));
-      if (rYear <> nil) and (rYear.КомплектПолучен) then
-        Message('Удаление номера (номеров) для года, за который получен весь комплект, невозможно!');
+      rYear = FindRecord(Р РљРџ_Р“Р°Р·РµС‚С‹.Р’С‹РїСѓСЃРєР“Р°Р·РµС‚С‹, 'Р“Р°Р·РµС‚Р°=' + Str(РР·РґР°РЅРёРµ) + ' and Р“РѕРґР’С‹РїСѓСЃРєР°=' + Str(Р“РѕРґР’С‹РїСѓСЃРєР°));
+      if (rYear <> nil) and (rYear.РљРѕРјРїР»РµРєС‚РџРѕР»СѓС‡РµРЅ) then
+        Message('РЈРґР°Р»РµРЅРёРµ РЅРѕРјРµСЂР° (РЅРѕРјРµСЂРѕРІ) РґР»СЏ РіРѕРґР°, Р·Р° РєРѕС‚РѕСЂС‹Р№ РїРѕР»СѓС‡РµРЅ РІРµСЃСЊ РєРѕРјРїР»РµРєС‚, РЅРµРІРѕР·РјРѕР¶РЅРѕ!');
         Return;
       fi;
     except
     end;
     ---
     if (Template.CurrentCell <> nil) then
-      if (Template.CurrentCell.Owner = секцНомераДанные) then
+      if (Template.CurrentCell.Owner = СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ) then
         if (Self.Template.Selection = nil) then
           vRI = GetIssueWrapByCell(Template.CurrentCell);
           if (vRI <> nil) then
             try
-              ST = СИС2.SmartTransaction.CreateEx([РКП_Газеты.ИсторияГазеты,РКП_Газеты.НомерГазеты], 1000);
+              ST = РЎРРЎ2.SmartTransaction.CreateEx([Р РљРџ_Р“Р°Р·РµС‚С‹.РСЃС‚РѕСЂРёСЏР“Р°Р·РµС‚С‹,Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹], 1000);
               vRI.Delete(false);
             except
               ST.Cancel;
             end;
             ST.Apply;
-            МодифицироватьШаблон;
-            ФокусНаПоследнийВыпуск(true);
+            РњРѕРґРёС„РёС†РёСЂРѕРІР°С‚СЊРЁР°Р±Р»РѕРЅ;
+            Р¤РѕРєСѓСЃРќР°РџРѕСЃР»РµРґРЅРёР№Р’С‹РїСѓСЃРє(true);
           fi;
         else
           vTplRng = Self.Template.Selection;
           if (vTplRng.BeginRow = vTplRng.EndRow) then
             rIssueS = GetIssueByRow(vTplRng.BeginRow);
 
-            vTxt = 'Номер ' + Trim(rIssueS.Номер);
-            vTxt = vTxt + ' будет удален.' + Br + Br;
-            vTxt = vTxt + 'Продолжить?';
+            vTxt = 'РќРѕРјРµСЂ ' + Trim(rIssueS.РќРѕРјРµСЂ);
+            vTxt = vTxt + ' Р±СѓРґРµС‚ СѓРґР°Р»РµРЅ.' + Br + Br;
+            vTxt = vTxt + 'РџСЂРѕРґРѕР»Р¶РёС‚СЊ?';
             if (cmOk = EnqOkCancel(vTxt)) then
               vRI = GetIssueWrapByRow(vTplRng.EndRow);
               try
-                ST = СИС2.SmartTransaction.CreateEx([РКП_Газеты.ИсторияГазеты,РКП_Газеты.НомерГазеты], 1000);
+                ST = РЎРРЎ2.SmartTransaction.CreateEx([Р РљРџ_Р“Р°Р·РµС‚С‹.РСЃС‚РѕСЂРёСЏР“Р°Р·РµС‚С‹,Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹], 1000);
                 vRI.Delete(false);
               except
                 ST.Cancel;
               end;
               ST.Apply;
-              МодифицироватьШаблон;
-              ФокусНаПоследнийВыпуск(true);
+              РњРѕРґРёС„РёС†РёСЂРѕРІР°С‚СЊРЁР°Р±Р»РѕРЅ;
+              Р¤РѕРєСѓСЃРќР°РџРѕСЃР»РµРґРЅРёР№Р’С‹РїСѓСЃРє(true);
             fi;
           else
             if (vTplRng.Style in [Template.LineBlock, Template.BoxBlock]) then
               rS = Min([vTplRng.BeginRow.Number,vTplRng.EndRow.Number]);
-              rIssueS = GetIssueByRow(секцНомераДанные.Row[rS]);
+              rIssueS = GetIssueByRow(СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Row[rS]);
               rF = Max([vTplRng.BeginRow.Number,vTplRng.EndRow.Number]);
-              rIssueF = GetIssueByRow(секцНомераДанные.Row[rF]);
-              vTxt = 'Номера в выделенной области с № ';
-              vTxt = vTxt + Trim(rIssueS.Номер) + ' по ';
-              vTxt = vTxt + Trim(rIssueF.Номер) + Br;
-              vTxt = vTxt + 'будут удалены.' + Br + Br;
-              vTxt = vTxt + 'Продолжить?';
+              rIssueF = GetIssueByRow(СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Row[rF]);
+              vTxt = 'РќРѕРјРµСЂР° РІ РІС‹РґРµР»РµРЅРЅРѕР№ РѕР±Р»Р°СЃС‚Рё СЃ в„– ';
+              vTxt = vTxt + Trim(rIssueS.РќРѕРјРµСЂ) + ' РїРѕ ';
+              vTxt = vTxt + Trim(rIssueF.РќРѕРјРµСЂ) + Br;
+              vTxt = vTxt + 'Р±СѓРґСѓС‚ СѓРґР°Р»РµРЅС‹.' + Br + Br;
+              vTxt = vTxt + 'РџСЂРѕРґРѕР»Р¶РёС‚СЊ?';
               if (cmOk = EnqOkCancel(vTxt)) then
                 try
-                  ST = СИС2.SmartTransaction.CreateEx([РКП_Газеты.ИсторияГазеты,РКП_Газеты.НомерГазеты], 1000);
+                  ST = РЎРРЎ2.SmartTransaction.CreateEx([Р РљРџ_Р“Р°Р·РµС‚С‹.РСЃС‚РѕСЂРёСЏР“Р°Р·РµС‚С‹,Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹], 1000);
                   jj = (rS - rF + 1);
                   for r = rF .. rS step -1 do
                     j = j + 1;
-                    Hint('Удаление...', j, jj);
-                    vRI = GetIssueWrapByRow(секцНомераДанные.Row[r]);
+                    Hint('РЈРґР°Р»РµРЅРёРµ...', j, jj);
+                    vRI = GetIssueWrapByRow(СЃРµРєС†РќРѕРјРµСЂР°Р”Р°РЅРЅС‹Рµ.Row[r]);
                     vRI.Delete(false);
                   od;
                 except
                   ST.Cancel;
                 end;
                 ST.Apply;
-                МодифицироватьШаблон;
-                ФокусНаПоследнийВыпуск(true);
+                РњРѕРґРёС„РёС†РёСЂРѕРІР°С‚СЊРЁР°Р±Р»РѕРЅ;
+                Р¤РѕРєСѓСЃРќР°РџРѕСЃР»РµРґРЅРёР№Р’С‹РїСѓСЃРє(true);
               fi;
             else
-              vTxt = 'Для удаления нескольких номеров необходимо выделить строковый или прямоугольный блок.';
+              vTxt = 'Р”Р»СЏ СѓРґР°Р»РµРЅРёСЏ РЅРµСЃРєРѕР»СЊРєРёС… РЅРѕРјРµСЂРѕРІ РЅРµРѕР±С…РѕРґРёРјРѕ РІС‹РґРµР»РёС‚СЊ СЃС‚СЂРѕРєРѕРІС‹Р№ РёР»Рё РїСЂСЏРјРѕСѓРіРѕР»СЊРЅС‹Р№ Р±Р»РѕРє.';
               vTxt = vTxt + Br;
-              vTxt = vTxt + 'Для выделения строкового блока используйте левую кнопку "мыши" с удержанной клавишей "Ctrl".';
+              vTxt = vTxt + 'Р”Р»СЏ РІС‹РґРµР»РµРЅРёСЏ СЃС‚СЂРѕРєРѕРІРѕРіРѕ Р±Р»РѕРєР° РёСЃРїРѕР»СЊР·СѓР№С‚Рµ Р»РµРІСѓСЋ РєРЅРѕРїРєСѓ "РјС‹С€Рё" СЃ СѓРґРµСЂР¶Р°РЅРЅРѕР№ РєР»Р°РІРёС€РµР№ "Ctrl".';
               vTxt = vTxt + Br;
-              vTxt = vTxt + 'Для выделения прямоугольного блока используйте клавиши "стрелки" с удержанной клавишей "Shift".';
+              vTxt = vTxt + 'Р”Р»СЏ РІС‹РґРµР»РµРЅРёСЏ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРѕРіРѕ Р±Р»РѕРєР° РёСЃРїРѕР»СЊР·СѓР№С‚Рµ РєР»Р°РІРёС€Рё "СЃС‚СЂРµР»РєРё" СЃ СѓРґРµСЂР¶Р°РЅРЅРѕР№ РєР»Р°РІРёС€РµР№ "Shift".';
               Message(vTxt);
             fi;
           fi;
@@ -1207,31 +1212,31 @@ inobject private
     fi;
   end;
 
-  func GetIssueWrapByCell(vCell :TemplateCell) :РКП_Газеты.RI.НомерГазеты;
-    var rIssue :РКП_Газеты.НомерГазеты;
-    if (CellRow(vCell).Tag is РКП_Газеты.НомерГазеты) then
-      rIssue = CellRow(vCell).Tag as РКП_Газеты.НомерГазеты;
-      Result = РКП_Газеты.RI.НомерГазеты.OpenRecord(rIssue);
-    elsif (CellRow(vCell).Tag is РКП_Газеты.RI.НомерГазеты) then
-      Result = CellRow(vCell).Tag as РКП_Газеты.RI.НомерГазеты;
+  func GetIssueWrapByCell(vCell :TemplateCell) :Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+    var rIssue :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+    if (CellRow(vCell).Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+      rIssue = CellRow(vCell).Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+      Result = Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹.OpenRecord(rIssue);
+    elsif (CellRow(vCell).Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+      Result = CellRow(vCell).Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
     fi;
   end;
 
-  func GetIssueWrapByRow(vRow :TemplateRow) :РКП_Газеты.RI.НомерГазеты;
-    var rIssue :РКП_Газеты.НомерГазеты;
-    if (vRow.Tag is РКП_Газеты.НомерГазеты) then
-      rIssue = vRow.Tag as РКП_Газеты.НомерГазеты;
-      Result = РКП_Газеты.RI.НомерГазеты.OpenRecord(rIssue);
-    elsif (vRow.Tag is РКП_Газеты.RI.НомерГазеты) then
-      Result = vRow.Tag as РКП_Газеты.RI.НомерГазеты;
+  func GetIssueWrapByRow(vRow :TemplateRow) :Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+    var rIssue :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+    if (vRow.Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+      rIssue = vRow.Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+      Result = Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹.OpenRecord(rIssue);
+    elsif (vRow.Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+      Result = vRow.Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
     fi;
   end;
 
-  func GetIssueByRow(vRow :TemplateRow) :РКП_Газеты.НомерГазеты;
-    if (vRow.Tag is РКП_Газеты.НомерГазеты) then
-      Result = vRow.Tag as РКП_Газеты.НомерГазеты;
-    elsif (vRow.Tag is РКП_Газеты.RI.НомерГазеты) then
-      Result = (vRow.Tag as РКП_Газеты.RI.НомерГазеты).Record;
+  func GetIssueByRow(vRow :TemplateRow) :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+    if (vRow.Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+      Result = vRow.Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+    elsif (vRow.Tag is Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) then
+      Result = (vRow.Tag as Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹).Record;
     fi;
   end;
 

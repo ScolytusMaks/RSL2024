@@ -56,7 +56,7 @@ inclass public
     var ГодовойТиражП, СреднийРазовыйТиражП :Numeric;
     var aAnlt :Variant[];
     rStat = ПолучитьЗаписьСтат(vNsp, vYear);
-    if not rStat.ИзмененияЗапрещены then -- Обработка происходит, если изменения не запрещены
+    if (not rStat.ИзмененияЗапрещены) and (vYear>=0) then -- Обработка происходит, если изменения не запрещены
       with Query.Create([РКП_Газеты.НомерГазеты]) do
         with FltMaker.CreateExt do
           AddCondition( 'isGroup=0' );
@@ -71,6 +71,9 @@ inclass public
           ГодовойТиражП        = CalcAggregates("Sum(Тираж)") / 1000;
           СреднийРазовыйТиражП = Round(ГодовойТиражП/НомеровПолученоП, 1);
           ГодовойТиражП        = Round(ГодовойТиражП, 1);
+        else
+          ГодовойТиражП        = 0;
+          СреднийРазовыйТиражП = 0.0;
         fi;
       end;
       -- Аналитика

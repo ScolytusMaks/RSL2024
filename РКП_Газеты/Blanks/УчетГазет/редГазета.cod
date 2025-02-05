@@ -138,7 +138,6 @@ inobject private
   end;
 
   func ѕоле_ѕри¬ыводе_ћеста»здани€ќѕѕ»(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
---  func картѕоле_ѕри¬ыводе_ћесто»здани€(Column :CardfileColumn; Rec :– ѕ_√азеты.√азета; Action :Template.OutputTypes; var Format :String) :Variant;
     var vCount :Integer;
     if (Action = Template.Output) then
       vCount = Self.Record.ћеста»здани€.Count;
@@ -153,7 +152,6 @@ inobject private
                Self.Record.ћеста»здани€.Items[3].ћесто»здани€.Ќаим;
       fi;
     fi;
---  end;
   end;
 
   func ѕоле_ѕри¬ыводе_Ќомерѕозиции(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
@@ -682,39 +680,37 @@ inobject private
         Return (locRow.Tag as DR.Ќомера);
       fi;
     end;
-    if RecordEdited(Self.Record) then
-      EditorPost;
-    fi;
+    EditorPost; -- запись переходит в состо€ние редактировани€, как только начинаетс€ редактирование клетки
     – ѕ_√азеты.ќбработка»стории.—оздатьћассивы—тарых«начений(Record);
     vRowTag = GetRowTag;
     if (Cell.Contents = '√од¬ыпуска') then
       #NoWarning;
-      --– ѕ_√азеты.”чет√азет.ред√одова€—татистика¬ыпуска.ShowFormEx(vRowTag.¬ыпуск√азеты, Kernel.Window.ModalWindow);
       – ѕ_√азеты.”чет√азет.ред¬ыпуск√азеты.ShowFormEx(vRowTag.¬ыпуск√азеты, Kernel.Window.ModalWindow);
       vRowTag.ќбновитьƒанные;
       фрейм¬ыход»«акрытие.Update;
     else
-      --with ”чет√азет.блкартЌомера√азеты do
       if (Cell.Contents = 'Ќомеров¬сего') then
-        --– ѕ_√азеты.”чет√азет.блкартЌомера√азеты.OpenExt(vRowTag, DR.Ќомера.доп‘лт¬се);
         – ѕ_√азеты.”чет√азет.блЌомера√азеты.OpenExt(vRowTag, DR.Ќомера.доп‘лт¬се);
         vRowTag.ќбновитьƒанные;
         ќбновить—ведени€ќѕрекращении;
+        ѕрочитать¬ыпускЌомеров;
+        ѕрочитатьѕоступлениеЌомеров;
         фрейм¬ыход»«акрытие.Update;
       elsif (Cell.Contents = 'Ќомеровѕолучено') then
-        --– ѕ_√азеты.”чет√азет.блкартЌомера√азеты.OpenExt(vRowTag, DR.Ќомера.доп‘лт–ег);
         – ѕ_√азеты.”чет√азет.блЌомера√азеты.OpenExt(vRowTag, DR.Ќомера.доп‘лт–ег);
         vRowTag.ќбновитьƒанные;
         ќбновить—ведени€ќѕрекращении;
+        ѕрочитать¬ыпускЌомеров;
+        ѕрочитатьѕоступлениеЌомеров;
         фрейм¬ыход»«акрытие.Update;
       elsif (Cell.Contents = 'ЌомеровЌеѕолучено') then
-        --– ѕ_√азеты.”чет√азет.блкартЌомера√азеты.OpenExt(vRowTag, DR.Ќомера.доп‘лтЌе–ег);
         – ѕ_√азеты.”чет√азет.блЌомера√азеты.OpenExt(vRowTag, DR.Ќомера.доп‘лтЌе–ег);
         vRowTag.ќбновитьƒанные;
         ќбновить—ведени€ќѕрекращении;
+        ѕрочитать¬ыпускЌомеров;
+        ѕрочитатьѕоступлениеЌомеров;
         фрейм¬ыход»«акрытие.Update;
       fi;
-      --end;
     fi;
     – ѕ_√азеты.ќбработка»стории.—оздатьћассивыЌовых«начений(Record);
     – ѕ_√азеты.ќбработка»стории.—оздатьЌачало»стории(Record);
@@ -744,6 +740,9 @@ inobject private
     if (Cell.Contents = 'ћесто»здани€.Ќаим') then
       aParam[1] = ['“ип‘рагмента', 0];
       aParam[2] = ['‘рагмент', Value];
+      if (ћеста»здани€[index].ћесто»здани€ <> nil) then
+        aParam[3] = ['CurrentExternal', ћеста»здани€[index].ћесто»здани€];
+      fi;
       if (cmOk = – ѕ_—правочники.—правочники.карт√еографи€.¬ыполнить¬ыбор(vRefRec, aParam)) then
         ћеста»здани€[index].ћесто»здани€ = vRefRec;
         NewValue = vRefRec;
@@ -915,6 +914,7 @@ inobject private
   end;
 
   func ѕоле_ѕриЌаборе(Cell :TemplateCell; Key :String; Value :Variant; var NewValue :Variant) :Logical;
+    var Index :Integer;
     var aParam :Variant[2];
     var vExtMethod :– ѕ_—правочники.ExtendedMethod.Cell.OnTypeRef;
     var vEndEditSave :Logical;
@@ -925,6 +925,13 @@ inobject private
       vExtMethod = – ѕ_—правочники.ExtendedMethod.Cell.OnTypeRef.CreateExt(Value);
       vExtMethod.SetClassRecord(– ѕ_—правочники.спр√еографи€);
       vExtMethod.SetClassCardfile(– ѕ_—правочники.—правочники.карт√еографи€);
+      aParam[1] = ['“ип‘рагмента', 0];
+      aParam[2] = ['‘рагмент', Value];
+      Index = Cell.Frame;
+      if (ћеста»здани€[index].ћесто»здани€ <> nil) and (ћеста»здани€[index].ћесто»здани€.Ќаим = Template.CurrentEdit.Text) then
+        aParam[3] = ['CurrentExternal', ћеста»здани€[index].ћесто»здани€];
+      fi;
+      vExtMethod.SetSearchFormParam(aParam);
       Result = vExtMethod.ReturnResult(NewValue, vEndEditSave);
       if (not Result) and vEndEditSave then
         Template.EndEdit(true);
@@ -1098,6 +1105,22 @@ inobject private
       fi;
     fi;
   end;
+
+  func ѕоле_ѕриѕодсказке_ћесто»здани€(Cell :TemplateCell; var Text :String) :Logical;
+    var Index :Integer;
+    var локЌаим, локЌаимЅибл :String;
+    Index = Cell.Frame;
+    if (ћеста»здани€[Index].ћесто»здани€ <> nil) then
+      локЌаим     = ћеста»здани€[Index].ћесто»здани€.Ќаим;
+      локЌаимЅибл = ћеста»здани€[Index].ћесто»здани€.ЌаимЅибл;
+      if (локЌаим <> nil) and (локЌаимЅибл <> nil) and (локЌаим <> локЌаимЅибл) then
+        Text = локЌаимЅибл;
+        Return;
+      fi;
+    fi;
+    Return true;
+  end;
+
 
 -- 2_ќбработчики событий прочих объектов шаблона0. --
 

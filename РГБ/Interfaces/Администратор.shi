@@ -110,7 +110,7 @@
         <Item Command="Infobase.РКП.ОРГП.Экспорт.Номеров"/>
         <Item Command="Infobase.РКП.ОРГП.Экспорт.ЛППИ"/>
         <Item Command="Infobase.РКП.ГЛГС.Экспорт.ВыпускЛГС"/>
-        <Item Command="Infobase.РКП.ГЛГС.Экспорт.ВыпускЛГС"/>
+        <Item Command="Infobase.РКП.ГЛГС.Экспорт.ВыпускПК"/>
       </Item>
       <Item Caption="&amp;Сервис">
         <Item Command="Kernel.Service.Administration"/>
@@ -122,6 +122,7 @@
         <Item Command="Kernel.Service.InfobaseExplorer" Caption="Проcмотр записей"/>
         <Item Caption="-"/>
         <Item Command="Infobase.РКП.ОРГП.Сервис.УдалениеНулевыхПоступлений"/>
+        <Item Command="Infobase.РКП.ОРГП.Сервис.ПересчетСтатистикаЗаГод"/>
         <Item Caption="-"/>
         <Item Command="Kernel.File.Import"/>
         <Item Command="Kernel.File.Export"/>

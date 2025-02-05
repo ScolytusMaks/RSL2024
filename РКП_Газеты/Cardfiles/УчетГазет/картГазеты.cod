@@ -17,6 +17,7 @@ inclass private
 inobject public
 
   var »гнорировать’ранимые—войства   :Logical;
+  var –ежим—ложного‘ильтра           :Logical;
 
 inobject private
 
@@ -283,9 +284,11 @@ inobject private
 
   func картотека_ѕриќткрытииЅланка(Action :Integer; Record :Record) :Logical;
     Result = inherited картотека_ѕриќткрытииЅланка(Action, Record);
-    ‘рагментЌазвани€ = nil;
-    ‘рагментѕодзаголовка = nil;
-    ќбновить‘ильтр;
+    if (not –ежим—ложного‘ильтра) then
+      ‘рагментЌазвани€ = nil;
+      ‘рагментѕодзаголовка = nil;
+      ќбновить‘ильтр;
+    fi;
   end;
 
   func картотека_ѕеред»зменением(Action :Cardfile.ModifyActions; Rec :Record; Group :Record; var AskConfirm :Logical) :Logical;

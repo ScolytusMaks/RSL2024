@@ -10,6 +10,8 @@ inclass private
 
 inobject private
 
+  var aNewID :Integer[]; -- Массив ID новых записей, созданных/измененных во время жизни экземпляра класса
+
 -- 2_Обработчики событий 0шаблона. --
 
   proc шаблон_ПриОткрытии(Create :Logical);
@@ -46,8 +48,30 @@ inobject private
     fi;
   end;
 
+  proc Поле_Фильтр_ПриВыходе(Cell :TemplateCell; Index :Integer);
+    ОбновитьФильтр;
+    УстановитьЗаписьПриОткрытии;
+  end;
+
 
 -- 2_Обработчики событий 0картотеки. --
+
+  func картотека_ПриОткрытииБланка(Action :Integer; newRec :Record) :Logical;
+    var aRes :Integer[];
+    var i :Integer;
+    Result = inherited картотека_ПриОткрытииБланка(Action, newRec);
+    ПолучитьПутьГруппы(newRec, aRes);
+    for i = 1 .. LengthOfArray(aRes) do
+      СИС2.Функции.AddInArray(aNewID, aRes[i], true);
+    od;
+  end;
+
+  proc ПолучитьПутьГруппы(newRec :Record; var aRes :Integer[]);
+    СИС2.Функции.AddInArray(aRes, newRec.DocId, true);
+    if (newRec.GroupDoc <> nil) then
+      ПолучитьПутьГруппы(newRec.GroupDoc, aRes);
+    fi;
+  end;
 
   proc Столбец_ПриРисовании (Column :CardfileColumn; Rec :Record; Selected :Logical; var Color :Integer; Font :Font);
     var R, G, B :Integer;
@@ -66,7 +90,11 @@ inobject private
 
   func ПолучитьФильтрКартотеки (var locTreeFilter :String = nil) :String;
     Result = Inherited ПолучитьФильтрКартотеки(locTreeFilter);
+    if (Result <> nil) and (aNewID <> nil) then
+      Result = РКП_СИС.FilterMaker.MakeFilter([ Result, 'DocId in ' + ToStr(aNewID) ], РКП_СИС.FilterMaker.byOr);
+    fi;
     locTreeFilter = РКП_СИС.FilterMaker.CreateExt([Result]).GetFilterGroups( [РКП_Справочники.спрГеография] );
+    Result = РКП_СИС.FilterMaker.MakeFilter([Result, locTreeFilter], РКП_СИС.FilterMaker.byOr);
   end;
 
   func ПолучитьФильтрПоФрагменту :String;
@@ -78,7 +106,6 @@ inobject private
       Result = if((Фрагмент <> nil), 'Наим="' + Фрагмент +'"', nil);
     fi;
   end;
-
 
 
 end

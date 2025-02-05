@@ -75,7 +75,7 @@
       </Item>
       <Item Caption="Экспорт">
         <Item Command="Infobase.РКП.ГЛГС.Экспорт.ВыпускЛГС"/>
-        <Item Command="Infobase.РКП.ГЛГС.Экспорт.ВыпускЛГС"/>
+        <Item Command="Infobase.РКП.ГЛГС.Экспорт.ВыпускПК"/>
       </Item>
       <Item Caption="&amp;Сервис">
         <Item Command="Kernel.Service.Calculator"/>
@@ -341,7 +341,7 @@
       </Toolbar>
       <Toolbar Name="Экспорт">
         <Button Command="Infobase.РКП.ГЛГС.Экспорт.ВыпускЛГС"/>
-        <Button Command="Infobase.РКП.ГЛГС.Экспорт.ВыпускЛГС"/>
+        <Button Command="Infobase.РКП.ГЛГС.Экспорт.ВыпускПК"/>
       </Toolbar>
     </ScrollToolbars>
   </Toolbars>
