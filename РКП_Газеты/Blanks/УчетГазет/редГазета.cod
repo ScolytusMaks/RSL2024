@@ -720,7 +720,7 @@ inobject private
   func Поле_ПриВходе_ГодПоступления(Cell :TemplateCell; Index :Integer; Action :Template.EnterTypes) :Logical;
     if (ПоступлениеНомеров[Index] <> nil) then
       #NoWarning;
-      РКП_Газеты.УчетГазет.редГодоваяСтатистикаПоступлений.ShowFormEx(ПоступлениеНомеров[Index], Kernel.Window.ModalWindow);
+      РКП_Газеты.УчетГазет.редПоступлениеГазеты.ShowFormEx(ПоступлениеНомеров[Index], Kernel.Window.ModalWindow);
     fi;
   end;
 
