@@ -627,45 +627,76 @@ inobject private
 2    0  2--======== Место издания =============--
 2    0  2--====================================--
       vRefClass = РКП_Справочники.СпрГеография;
-      vFindFlt  = 'Match(Наим,"*' + Value + '*")';
+      vFindFlt  = 'Match(Наим,"' + Value + '*")';
       vRefRec = РКП_СИС.Recs.FindRecordExt(vRefClass, vFindFlt, , vCountRec);
       if (vCountRec = 0) then
         vAnswer = Enquiry('', 'Наименования места издания, похожего на "' + Value +
                               '", не найдено в справочнике. ' +
                               'Пожалуйста, выберите действие:',
-                              ['Добавить в справочник','Искать в полном списке','Повторить ввод']);
-        if (vAnswer in [0,3]) then
+                              ['Искать в полном списке','Повторить ввод']);
+        if (vAnswer in [0,2]) then
           Return;
         elsif (vAnswer = 1) then
-          vRefRec = РКП_Справочники.СпрГеография.Create;
-          vRefRec.Наим = Value as String;
-          vRefRec.Post;
-          РКП_Справочники.Справочники.редГеография.ShowFormEx(vRefRec, Window.ModalWindow);
-          NewValue = vRefRec;
-          Template.EndEdit(true);
-          Return;
-        elsif (vAnswer = 2) then
           if (cmOk = РКП_Справочники.Справочники.картГеография.ВыполнитьВыбор(vRefRec)) then
             Справ[index] = vRefRec;
             NewValue     = vRefRec.Наим;
             Template.EndEdit(true);
-            Return false;
           fi;
           Return;
         fi;
       elsif (vCountRec = 1) then
         Return true;
       elsif (vCountRec > 1) then
-        aParam[1] = ['ТипФрагмента', 1];
+        aParam[1] = ['ТипФрагмента', 0];
         aParam[2] = ['Фрагмент', Value];
+        aParam[3] = ['CurrentExternal', vRefRec];
         if (cmOk = РКП_Справочники.Справочники.картГеография.ВыполнитьВыбор(vRefRec, aParam)) then
           Справ[index] = vRefRec;
-          NewValue     = vRefRec.Наим;
+          NewValue = vRefRec;
           Template.EndEdit(true);
-          Return false;
         fi;
         Return;
       fi;
+--      vRefClass = РКП_Справочники.СпрГеография;
+--      vFindFlt  = 'Match(Наим,"*' + Value + '*")';
+--      vRefRec = РКП_СИС.Recs.FindRecordExt(vRefClass, vFindFlt, , vCountRec);
+--      if (vCountRec = 0) then
+--        vAnswer = Enquiry('', 'Наименования места издания, похожего на "' + Value +
+--                              '", не найдено в справочнике. ' +
+--                              'Пожалуйста, выберите действие:',
+--                              ['Добавить в справочник','Искать в полном списке','Повторить ввод']);
+--        if (vAnswer in [0,3]) then
+--          Return;
+--        elsif (vAnswer = 1) then
+--          vRefRec = РКП_Справочники.СпрГеография.Create;
+--          vRefRec.Наим = Value as String;
+--          vRefRec.Post;
+--          РКП_Справочники.Справочники.редГеография.ShowFormEx(vRefRec, Window.ModalWindow);
+--          NewValue = vRefRec;
+--          Template.EndEdit(true);
+--          Return;
+--        elsif (vAnswer = 2) then
+--          if (cmOk = РКП_Справочники.Справочники.картГеография.ВыполнитьВыбор(vRefRec)) then
+--            Справ[index] = vRefRec;
+--            NewValue     = vRefRec.Наим;
+--            Template.EndEdit(true);
+--            Return false;
+--          fi;
+--          Return;
+--        fi;
+--      elsif (vCountRec = 1) then
+--        Return true;
+--      elsif (vCountRec > 1) then
+--        aParam[1] = ['ТипФрагмента', 1];
+--        aParam[2] = ['Фрагмент', Value];
+--        if (cmOk = РКП_Справочники.Справочники.картГеография.ВыполнитьВыбор(vRefRec, aParam)) then
+--          Справ[index] = vRefRec;
+--          NewValue     = vRefRec.Наим;
+--          Template.EndEdit(true);
+--          Return false;
+--        fi;
+--        Return;
+--      fi;
     elsif (НомерРежима = 6) then
 2    0  2--=================================================--
 2    0  2--======== Адрес           редакции  ==============--

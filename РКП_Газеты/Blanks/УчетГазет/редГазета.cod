@@ -733,15 +733,22 @@ inobject private
   end;
 
   func Поле_ПриОбзоре(Cell :TemplateCell; Value :Variant; var NewValue :Variant) :Logical;
-    var Index :Integer;
+    var Index, vCountRec :Integer;
     var aParam :Variant[2];
     var vRefRec :РКП_Справочники.BaseRefType1;
+    var vFindFlt :String;
     Index = Cell.Frame;
     if (Cell.Contents = 'МестоИздания.Наим') then
       aParam[1] = ['ТипФрагмента', 0];
       aParam[2] = ['Фрагмент', Value];
-      if (МестаИздания[index].МестоИздания <> nil) then
+      if (МестаИздания[index].МестоИздания = nil) then
         aParam[3] = ['CurrentExternal', МестаИздания[index].МестоИздания];
+      else
+        vFindFlt  = 'Match(Наим,"' + Value + '*")';
+        vRefRec = РКП_СИС.Recs.FindRecordExt(РКП_Справочники.СпрГеография, vFindFlt, , vCountRec);
+        if (vCountRec > 0) then
+          aParam[3] = ['CurrentExternal', vRefRec];
+        fi;
       fi;
       if (cmOk = РКП_Справочники.Справочники.картГеография.ВыполнитьВыбор(vRefRec, aParam)) then
         МестаИздания[index].МестоИздания = vRefRec;

@@ -75,11 +75,48 @@ inobject private
   end;
 
   func Поле_ПриОбзоре(Cell :TemplateCell; Value :Variant; var NewValue :Variant) :Logical;
+    var vRefClass: class Record;
+    var vFindFlt :String;
     var vRefRec :РКП_Справочники.BaseRefType1;
     var aParam :Variant[2];
-    var vYear :Integer;
+    var vYear, vAnswer, vCountRec :Integer;
+    if (Cell.Contents = 'МестоИздания.Наим') then
+      vRefClass = РКП_Справочники.СпрГеография;
+      vFindFlt  = 'Match(Наим,"*' + Value + '*")';
+      vRefRec = РКП_СИС.Recs.FindRecordExt(vRefClass, vFindFlt, , vCountRec);
+      if (vCountRec = 0) then
+        vAnswer = Enquiry('', 'Наименования места издания, похожего на "' + Value +
+                              '", не найдено в справочнике. ' +
+                              'Пожалуйста, выберите действие:',
+                              ['Искать в полном списке','Повторить ввод']);
+        if (vAnswer in [0,2]) then
+          Return;
+        elsif (vAnswer = 1) then
+          if (cmOk = РКП_Справочники.Справочники.картГеография.ВыполнитьВыбор(vRefRec)) then
+            МестоИздания = vRefRec;
+            NewValue = vRefRec;
+            Template.EndEdit(true);
+          fi;
+          Return;
+        fi;
+--      elsif (vCountRec = 1) then
+--        МестоИздания = vRefRec;
+--        NewValue = vRefRec;
+--        Template.EndEdit(true);
+--        Return;
+      elsif (vCountRec > 0) then
+        aParam[1] = ['ТипФрагмента', 0];
+        aParam[2] = ['Фрагмент', Value];
+        aParam[3] = ['CurrentExternal', vRefRec];
+        if (cmOk = РКП_Справочники.Справочники.картГеография.ВыполнитьВыбор(vRefRec, aParam)) then
+          МестоИздания = vRefRec;
+          NewValue = vRefRec;
+          Template.EndEdit(true);
+        fi;
+        Return;
+      fi;
     -- Тематика --
-    if (Cell.Contents = 'Тематика.Наим') then
+    elsif (Cell.Contents = 'Тематика.Наим') then
       aParam[1] = ['РежимВыбораТематики', true];
       aParam[2] = ['РежимВыбораЧАЦН', false];
       aParam[3] = ['Фрагмент', Value];
@@ -138,7 +175,7 @@ inobject private
 2    --====================================--
     if (Cell.Contents = 'МестоИздания.Наим') then
       vRefClass = РКП_Справочники.СпрГеография;
-      vFindFlt  = 'Match(Наим,"*' + Value + '*")';
+      vFindFlt  = 'Match(Наим,"' + Value + '*")';
       vRefRec = РКП_СИС.Recs.FindRecordExt(vRefClass, vFindFlt, , vCountRec);
       if (vCountRec = 0) then
         vAnswer = Enquiry('', 'Наименования места издания, похожего на "' + Value +
@@ -156,10 +193,14 @@ inobject private
           Return;
         fi;
       elsif (vCountRec = 1) then
-        Return true;
+        МестоИздания = vRefRec;
+        NewValue = vRefRec;
+        Template.EndEdit(true);
+        Return;
       elsif (vCountRec > 1) then
-        aParam[1] = ['ТипФрагмента', 1];
+        aParam[1] = ['ТипФрагмента', 0];
         aParam[2] = ['Фрагмент', Value];
+        aParam[3] = ['CurrentExternal', vRefRec];
         if (cmOk = РКП_Справочники.Справочники.картГеография.ВыполнитьВыбор(vRefRec, aParam)) then
           МестоИздания = vRefRec;
           NewValue = vRefRec;
@@ -350,11 +391,23 @@ inobject private
 
 -- 2_Обработчики событий прочих объектов шаблона0. --
 
+  proc кнПриВходе_Отменить(Sender :Button);
+    if (Template.CurrentEdit <> nil) then
+      Template.EndEdit(true);
+    fi;
+  end;
+
   proc кнПриНажатии_ОчиститьВсе(Sender :Button);
   end;
 
   proc кнПриНажатии_ОК(Sender :Button);
     var Frm :УчетГазет.картГазеты;
+    if (Template.CurrentEdit <> nil) then
+      Template.EndEdit(true);
+      Template.Update;
+      Message ('Пожалуйста, завершите ввод условий отбора!');
+      Return;
+    fi;
     inherited КнОК_ПриНажатии(Sender);
     Frm = УчетГазет.картГазеты.Create;
     Frm.ИгнорироватьХранимыеСвойства = true;
@@ -369,6 +422,12 @@ inobject private
   end;
 
   proc кнПриНажатии_Отменить(Sender :Button);
+    if (Template.CurrentEdit <> nil) then
+      Template.EndEdit(true);
+      Template.Update;
+      Message ('Пожалуйста, завершите ввод условий отбора!');
+      Return;
+    fi;
     inherited кнОтменить_ПриНажатии(Sender);
   end;
 
