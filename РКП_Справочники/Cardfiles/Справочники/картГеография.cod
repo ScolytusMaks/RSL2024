@@ -1,96 +1,96 @@
-Class inherited Справочники.CardBaseType1 "Места изданий";
+п»їClass inherited РЎРїСЂР°РІРѕС‡РЅРёРєРё.CardBaseType1 "РњРµСЃС‚Р° РёР·РґР°РЅРёР№";
 
 import classes Def;
 
 inclass private
 
-  var КлассИнтерфейса :Class RI.Справочники.intBaseType1 = RI.Справочники.География;
+  var РљР»Р°СЃСЃРРЅС‚РµСЂС„РµР№СЃР° :Class RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.intBaseType1 = RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.Р“РµРѕРіСЂР°С„РёСЏ;
 
-  stored var ТипФрагмента :Integer;
+  stored var РўРёРїР¤СЂР°РіРјРµРЅС‚Р° :Integer;
 
 inobject private
 
-  var aNewID :Integer[]; -- Массив ID новых записей, созданных/измененных во время жизни экземпляра класса
+  var aNewID :Integer[]; -- РњР°СЃСЃРёРІ ID РЅРѕРІС‹С… Р·Р°РїРёСЃРµР№, СЃРѕР·РґР°РЅРЅС‹С…/РёР·РјРµРЅРµРЅРЅС‹С… РІРѕ РІСЂРµРјСЏ Р¶РёР·РЅРё СЌРєР·РµРјРїР»СЏСЂР° РєР»Р°СЃСЃР°
 
--- 2_Обработчики событий 0шаблона. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ 0С€Р°Р±Р»РѕРЅР°. --
 
-  proc шаблон_ПриОткрытии(Create :Logical);
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(Create :Logical);
     var locColumnTerrEntity: CardFileColumn;
-    Запретить_Дублирование = true;
-    inherited шаблон_ПриОткрытии(Create);
-    --кнПреобразовать.Enabled = false;
-    Self.CardFile.TreeRoot = 'Административная подчиненность';
-    locColumnTerrEntity = Self.Cardfile.ColumnByField['Категория'];
+    Р—Р°РїСЂРµС‚РёС‚СЊ_Р”СѓР±Р»РёСЂРѕРІР°РЅРёРµ = true;
+    inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(Create);
+    --РєРЅРџСЂРµРѕР±СЂР°Р·РѕРІР°С‚СЊ.Enabled = false;
+    Self.CardFile.TreeRoot = 'РђРґРјРёРЅРёСЃС‚СЂР°С‚РёРІРЅР°СЏ РїРѕРґС‡РёРЅРµРЅРЅРѕСЃС‚СЊ';
+    locColumnTerrEntity = Self.Cardfile.ColumnByField['РљР°С‚РµРіРѕСЂРёСЏ'];
     UpdateCardFieldList(locColumnTerrEntity, Def.TerrEntity);
   end;
 
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
-  func Поле_Фильтр_ПриНажатии (Cell: TemplateCell; Action: Template.ClickTypes): Logical;
+  func РџРѕР»Рµ_Р¤РёР»СЊС‚СЂ_РџСЂРёРќР°Р¶Р°С‚РёРё (Cell: TemplateCell; Action: Template.ClickTypes): Logical;
     var r: Integer;
-    if (Cell.Contents = 'ТипФрагмента') then
+    if (Cell.Contents = 'РўРёРїР¤СЂР°РіРјРµРЅС‚Р°') then
       r = Cell.Row;
-      ТипФрагмента = (r - 1);
+      РўРёРїР¤СЂР°РіРјРµРЅС‚Р° = (r - 1);
     else
-      Result = Inherited Поле_Фильтр_ПриНажатии(Cell, Action);
-      Return; -- чтобы не вызывать дважды "ОбновитьФильтр"
+      Result = Inherited РџРѕР»Рµ_Р¤РёР»СЊС‚СЂ_РџСЂРёРќР°Р¶Р°С‚РёРё(Cell, Action);
+      Return; -- С‡С‚РѕР±С‹ РЅРµ РІС‹Р·С‹РІР°С‚СЊ РґРІР°Р¶РґС‹ "РћР±РЅРѕРІРёС‚СЊР¤РёР»СЊС‚СЂ"
     fi;
-    ОбновитьФильтр;
+    РћР±РЅРѕРІРёС‚СЊР¤РёР»СЊС‚СЂ;
   end;
 
-  func Поле_Фильтр_ПриВыводе (Cell: TemplateCell; Value: Variant; Action: Template.OutputTypes; var Format: String): Variant;
+  func РџРѕР»Рµ_Р¤РёР»СЊС‚СЂ_РџСЂРёР’С‹РІРѕРґРµ (Cell: TemplateCell; Value: Variant; Action: Template.OutputTypes; var Format: String): Variant;
     var r: Integer;
-    if (Cell.Contents = 'ТипФрагмента') then
+    if (Cell.Contents = 'РўРёРїР¤СЂР°РіРјРµРЅС‚Р°') then
       r = Cell.Row;
-      Cell.Caption = if( (r - 1) = ТипФрагмента, 'l', '');
+      Cell.Caption = if( (r - 1) = РўРёРїР¤СЂР°РіРјРµРЅС‚Р°, 'l', '');
     else
-      Result = Inherited Поле_Фильтр_ПриВыводе(Cell, Value, Action, Format);
+      Result = Inherited РџРѕР»Рµ_Р¤РёР»СЊС‚СЂ_РџСЂРёР’С‹РІРѕРґРµ(Cell, Value, Action, Format);
     fi;
   end;
 
-  proc Поле_Фильтр_ПриВыходе(Cell :TemplateCell; Index :Integer);
-    ОбновитьФильтр;
-    УстановитьЗаписьПриОткрытии;
+  proc РџРѕР»Рµ_Р¤РёР»СЊС‚СЂ_РџСЂРёР’С‹С…РѕРґРµ(Cell :TemplateCell; Index :Integer);
+    РћР±РЅРѕРІРёС‚СЊР¤РёР»СЊС‚СЂ;
+    РЈСЃС‚Р°РЅРѕРІРёС‚СЊР—Р°РїРёСЃСЊРџСЂРёРћС‚РєСЂС‹С‚РёРё;
   end;
 
 
--- 2_Обработчики событий 0картотеки. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ 0РєР°СЂС‚РѕС‚РµРєРё. --
 
-  func картотека_ПриИзменении(Action :Cardfile.ModifyActions; cRecord :Record; Group :Record) :Logical;
+  func РєР°СЂС‚РѕС‚РµРєР°_РџСЂРёРР·РјРµРЅРµРЅРёРё(Action :Cardfile.ModifyActions; cRecord :Record; Group :Record) :Logical;
     var aRes :Integer[];
     var i :Integer;
-    Result = inherited картотека_ПриИзменении(Action, cRecord, Group);
+    Result = inherited РєР°СЂС‚РѕС‚РµРєР°_РџСЂРёРР·РјРµРЅРµРЅРёРё(Action, cRecord, Group);
     if (Action = Cardfile.RecordGroupOn) then
-      ПолучитьПутьГруппы(cRecord, aRes);
+      РџРѕР»СѓС‡РёС‚СЊРџСѓС‚СЊР“СЂСѓРїРїС‹(cRecord, aRes);
       for i = 1 .. LengthOfArray(aRes) do
-        СИС2.Функции.AddInArray(aNewID, aRes[i], true);
+        РЎРРЎ2.Р¤СѓРЅРєС†РёРё.AddInArray(aNewID, aRes[i], true);
       od;
-      ОбновитьФильтр;
+      РћР±РЅРѕРІРёС‚СЊР¤РёР»СЊС‚СЂ;
     fi;
   end;
 
 
-  func картотека_ПриОткрытииБланка(Action :Integer; newRec :Record) :Logical;
+  func РєР°СЂС‚РѕС‚РµРєР°_РџСЂРёРћС‚РєСЂС‹С‚РёРёР‘Р»Р°РЅРєР°(Action :Integer; newRec :Record) :Logical;
     var aRes :Integer[];
     var i :Integer;
-    Result = inherited картотека_ПриОткрытииБланка(Action, newRec);
-    ПолучитьПутьГруппы(newRec, aRes);
+    Result = inherited РєР°СЂС‚РѕС‚РµРєР°_РџСЂРёРћС‚РєСЂС‹С‚РёРёР‘Р»Р°РЅРєР°(Action, newRec);
+    РџРѕР»СѓС‡РёС‚СЊРџСѓС‚СЊР“СЂСѓРїРїС‹(newRec, aRes);
     for i = 1 .. LengthOfArray(aRes) do
-      СИС2.Функции.AddInArray(aNewID, aRes[i], true);
+      РЎРРЎ2.Р¤СѓРЅРєС†РёРё.AddInArray(aNewID, aRes[i], true);
     od;
   end;
 
-  proc ПолучитьПутьГруппы(newRec :Record; var aRes :Integer[]);
-    СИС2.Функции.AddInArray(aRes, newRec.DocId, true);
+  proc РџРѕР»СѓС‡РёС‚СЊРџСѓС‚СЊР“СЂСѓРїРїС‹(newRec :Record; var aRes :Integer[]);
+    РЎРРЎ2.Р¤СѓРЅРєС†РёРё.AddInArray(aRes, newRec.DocId, true);
     if (newRec.GroupDoc <> nil) then
-      ПолучитьПутьГруппы(newRec.GroupDoc, aRes);
+      РџРѕР»СѓС‡РёС‚СЊРџСѓС‚СЊР“СЂСѓРїРїС‹(newRec.GroupDoc, aRes);
     fi;
   end;
 
-  proc Столбец_ПриРисовании (Column :CardfileColumn; Rec :Record; Selected :Logical; var Color :Integer; Font :Font);
+  proc РЎС‚РѕР»Р±РµС†_РџСЂРёР РёСЃРѕРІР°РЅРёРё (Column :CardfileColumn; Rec :Record; Selected :Logical; var Color :Integer; Font :Font);
     var R, G, B :Integer;
-    inherited Столбец_ПриРисовании (Column, Rec, Selected, Color, Font);
-    if ( (Rec as спрГеография).Категория = ктрНеОпределено ) then
+    inherited РЎС‚РѕР»Р±РµС†_РџСЂРёР РёСЃРѕРІР°РЅРёРё (Column, Rec, Selected, Color, Font);
+    if ( (Rec as СЃРїСЂР“РµРѕРіСЂР°С„РёСЏ).РљР°С‚РµРіРѕСЂРёСЏ = РєС‚СЂРќРµРћРїСЂРµРґРµР»РµРЅРѕ ) then
       --Font.Bold = true;
       R = 255; G = 0; B = 0;
       Font.Color = (R + G * 256 + B * 256 * 256);
@@ -100,26 +100,26 @@ inobject private
   end;
 
 
--- _Прочие методы. --
+-- _РџСЂРѕС‡РёРµ РјРµС‚РѕРґС‹. --
 
-  func ПолучитьФильтрКартотеки (var locTreeFilter :String = nil) :String;
-    Result = Inherited ПолучитьФильтрКартотеки(locTreeFilter);
+  func РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРљР°СЂС‚РѕС‚РµРєРё (var locTreeFilter :String = nil) :String;
+    Result = Inherited РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРљР°СЂС‚РѕС‚РµРєРё(locTreeFilter);
     if (Result <> nil) and (aNewID <> nil) then
-      Result = РКП_СИС.FilterMaker.MakeFilter([ Result, 'DocId in ' + ToStr(aNewID) ], РКП_СИС.FilterMaker.byOr);
+      Result = Р РљРџ_РЎРРЎ.FilterMaker.MakeFilter([ Result, 'DocId in ' + ToStr(aNewID) ], Р РљРџ_РЎРРЎ.FilterMaker.byOr);
     fi;
     if Result <> nil then
-      locTreeFilter = РКП_СИС.FilterMaker.CreateExt([Result]).GetFilterGroups( [РКП_Справочники.спрГеография] );
-      Result = РКП_СИС.FilterMaker.MakeFilter([Result, locTreeFilter], РКП_СИС.FilterMaker.byOr);
+      locTreeFilter = Р РљРџ_РЎРРЎ.FilterMaker.CreateExt([Result]).GetFilterGroups( [Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЃРїСЂР“РµРѕРіСЂР°С„РёСЏ] );
+      Result = Р РљРџ_РЎРРЎ.FilterMaker.MakeFilter([Result, locTreeFilter], Р РљРџ_РЎРРЎ.FilterMaker.byOr);
     fi;
   end;
 
-  func ПолучитьФильтрПоФрагменту :String;
-    if (ТипФрагмента = fltByBegin) then
-      Result = if((Фрагмент <> nil), 'Match(Наим,"' + Фрагмент +'*")', nil);
-    elsif (ТипФрагмента = fltBySubStr) then
-      Result = if((Фрагмент <> nil), 'Match(Наим,"*' + Фрагмент +'*")', nil);
-    elsif (ТипФрагмента = fltExactMatch) then
-      Result = if((Фрагмент <> nil), 'Наим="' + Фрагмент +'"', nil);
+  func РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРџРѕР¤СЂР°РіРјРµРЅС‚Сѓ :String;
+    if (РўРёРїР¤СЂР°РіРјРµРЅС‚Р° = fltByBegin) then
+      Result = if((Р¤СЂР°РіРјРµРЅС‚ <> nil), 'Match(РќР°РёРј,"' + Р¤СЂР°РіРјРµРЅС‚ +'*")', nil);
+    elsif (РўРёРїР¤СЂР°РіРјРµРЅС‚Р° = fltBySubStr) then
+      Result = if((Р¤СЂР°РіРјРµРЅС‚ <> nil), 'Match(РќР°РёРј,"*' + Р¤СЂР°РіРјРµРЅС‚ +'*")', nil);
+    elsif (РўРёРїР¤СЂР°РіРјРµРЅС‚Р° = fltExactMatch) then
+      Result = if((Р¤СЂР°РіРјРµРЅС‚ <> nil), 'РќР°РёРј="' + Р¤СЂР°РіРјРµРЅС‚ +'"', nil);
     fi;
   end;
 
