@@ -1,13 +1,13 @@
-record ПротоколВводаОППИ inherited РКП_СИС.AbstractRecord.StoredReport title "Сводная статистика ввода данных ОРГП";
+п»їrecord РџСЂРѕС‚РѕРєРѕР»Р’РІРѕРґР°РћРџРџР inherited Р РљРџ_РЎРРЎ.AbstractRecord.StoredReport title "РЎРІРѕРґРЅР°СЏ СЃС‚Р°С‚РёСЃС‚РёРєР° РІРІРѕРґР° РґР°РЅРЅС‹С… РћР Р“Рџ";
 
-  struct Поступления array Integer title "Статистика ввода поступлений номеров газет";
-    field ОператорИмя                 :String  title "";
-    field Оператор                    :String  title "Оператор";
-    field СозданоЗаписей              :Integer;
-    field ПринятоЭкземпляров          :Integer;
+  struct РџРѕСЃС‚СѓРїР»РµРЅРёСЏ array Integer title "РЎС‚Р°С‚РёСЃС‚РёРєР° РІРІРѕРґР° РїРѕСЃС‚СѓРїР»РµРЅРёР№ РЅРѕРјРµСЂРѕРІ РіР°Р·РµС‚";
+    field РћРїРµСЂР°С‚РѕСЂРРјСЏ                 :String  title "";
+    field РћРїРµСЂР°С‚РѕСЂ                    :String  title "РћРїРµСЂР°С‚РѕСЂ";
+    field РЎРѕР·РґР°РЅРѕР—Р°РїРёСЃРµР№              :Integer;
+    field РџСЂРёРЅСЏС‚РѕР­РєР·РµРјРїР»СЏСЂРѕРІ          :Integer;
   end;
-  field ВсегоСозданоЗаписейПоступлений:Integer;
-  field ВсегоПринятоЭкземпляров       :Integer;
+  field Р’СЃРµРіРѕРЎРѕР·РґР°РЅРѕР—Р°РїРёСЃРµР№РџРѕСЃС‚СѓРїР»РµРЅРёР№:Integer;
+  field Р’СЃРµРіРѕРџСЂРёРЅСЏС‚РѕР­РєР·РµРјРїР»СЏСЂРѕРІ       :Integer;
 
-  RecordDescription НомерОтчета;
+  RecordDescription РќРѕРјРµСЂРћС‚С‡РµС‚Р°;
 end;
