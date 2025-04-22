@@ -1,0 +1,15 @@
+﻿extends РКП_Газеты.УчетГазет.редГазета "";
+
+import РКП_СИС Classes Profile;
+
+inobject private
+
+  proc МодифицироватьСекцию_РосписьСтатей;
+    extended МодифицироватьСекцию_РосписьСтатей;
+    if GLGSAccess then
+      секцРосписьСтатей.CellByField['КодИздания'].CellType = Template.FieldCell;
+      секцРосписьСтатей.CellByField['НазваниеЛГС'].CellType = Template.FieldCell;
+    fi;
+  end;
+
+end

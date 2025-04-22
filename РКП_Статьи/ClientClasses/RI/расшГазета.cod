@@ -1,0 +1,43 @@
+﻿extends РКП_Газеты.RI.Газета;
+
+  inobject private
+
+  proc ОбновитьПолеИнфо_НазваниеЛГС;
+    var newRec :РКП_Статьи.Роспись;
+    if (Self.Record <> nil) and (Self.Record.РосписьСтатей) then
+      -- создание группы статей
+      with Query.Create([РКП_Статьи.Роспись]) do
+        Filter = 'IsGroup=-1 and Газета=' + Str(Self.Record);
+        if (Count = 0) then
+          newRec = РКП_Статьи.Роспись.Create;
+          newRec.IsGroup = true;
+          newRec.Газета = Self.Record;
+          if    ((Self.Record.НазваниеОсн = Self.Record.НазваниеЛГС) or (Self.Record.НазваниеЛГС = nil)) then
+            newRec.НазваниеОсн = Self.Record.НазваниеОсн;
+          elsif ((Self.Record.НазваниеОсн <> Self.Record.НазваниеЛГС) or (Self.Record.НазваниеЛГС <> nil)) then
+            newRec.НазваниеОсн = Self.Record.НазваниеЛГС;
+          fi;
+          newRec.Post;
+        fi;
+      end;
+      -- обновление наименования группы
+      with Query.Create([РКП_Статьи.Роспись]) do
+        Filter = 'Газета=' + Str(Self.Record);
+        Select;
+        while not Eof do
+          if (Current.Газета<>nil):
+            if    ((Current.Газета.НазваниеОсн=Current.Газета.НазваниеЛГС) or (Current.Газета.НазваниеЛГС=nil)):
+              Current.НазваниеОсн = Current.Газета.НазваниеОсн;
+            elsif ((Current.Газета.НазваниеОсн<>Current.Газета.НазваниеЛГС) or (Current.Газета.НазваниеЛГС<>nil)):
+              Current.НазваниеОсн = Current.Газета.НазваниеЛГС;
+            fi;
+            СИС2.ФункцииДокумента.RecordPostIfNeed(Current);
+          fi;
+          Next;
+        end;
+      end;
+    fi;
+  end;
+
+
+end

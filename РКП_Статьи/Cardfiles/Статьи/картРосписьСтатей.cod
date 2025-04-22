@@ -51,6 +51,7 @@ inobject private
   var стлбГаз                :CardfileColumn := Self.CardFile.ColumnByField['НазваниеОсн'];
   var стлбСт                 :CardfileColumn := Self.CardFile.ColumnByField['НазваниеСтатьи'];
 
+
 --}}
 
 -- 2_Конструкторы, визуализаторы0. --
@@ -64,10 +65,14 @@ inobject private
 
   proc шаблон_ПриСоздании(Context :Variant);
     ВключитьИерархию;
+    Запретить_Удаление = not (FullAccess or GLGSAccess);
+    Запретить_Добавление = not (FullAccess or GLGSAccess);
+    Запретить_ДобавлениеГрупп = true;
+    Запретить_Дублирование = true;
     inherited шаблон_ПриСоздании(Context);
-    Self.Cardfile.CanInsert = (FullAccess or GLGSAccess);
-    Self.Cardfile.CanDelete = (FullAccess or GLGSAccess);
-    Self.Cardfile.CanCopy = false;
+    --Self.Cardfile.CanInsert = (FullAccess or GLGSAccess);
+    --Self.Cardfile.CanDelete = (FullAccess or GLGSAccess);
+    --Self.Cardfile.CanCopy = false;
     фреймФильтрПК.Visible = false;
     фреймФильтрПК.UseSplitter = false;
   end;
@@ -393,6 +398,22 @@ inobject private
   end;
 
 -- 2_Обработчики событий картотеки0. --
+
+  func картотека_ПриСозданииЗаписи(var Record :Record) :Logical;
+    Result = inherited картотека_ПриСозданииЗаписи(Record);
+  end;
+
+  func картотека_ПриОткрытииБланка(Action :Integer; Record :Record) :Logical;
+    if (Record.IsGroup) and (Record.State = Record.Created) then
+      Message('В этой картотеке запрещено создавать групповые записи вручную.');
+      Return;
+    elsif (Record.State = Record.Normal) then
+      Return true;
+    else
+      Record = nil;
+      кнДобавить_ПриНажатии(nil);
+    fi;
+  end;
 
   proc картотека_ПриПеремещении(Record :Record);
     var cArticle :РКП_Статьи.Роспись;

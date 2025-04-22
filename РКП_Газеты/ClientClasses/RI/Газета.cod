@@ -57,6 +57,7 @@ inobject public
     ОбновитьПолеИнфо_ЧитательскийАдрес;
     ОбновитьПолеИнфо_Тематика;
     ОбновитьПолеИнфо_ПоследнийПолученныйНомер;
+    ОбновитьПолеИнфо_НазваниеЛГС;
   end;
 
   inobject private
@@ -137,6 +138,9 @@ inobject public
       locResult = BiblioRecord.ОписаниеНомера(rNom);
     fi;
     Self.Record.ПоследнийПолученныйНомер = SubStr(Trim(locResult), 1, 250);
+  end;
+
+  proc ОбновитьПолеИнфо_НазваниеЛГС;
   end;
 
   proc ВыполнитьУдаление synonym DoDelete( const aCheckRefs :Logical );

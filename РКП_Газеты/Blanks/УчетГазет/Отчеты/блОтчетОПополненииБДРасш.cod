@@ -178,7 +178,7 @@ Nom[]               : Integer;
                                   " and ДатаПринятияНаХранение<"+Str(ДатаК+1)+
                                   " and ПринялНаХранение<>'Администратор'";
       Q.LoadingFields           = "Газета";
-      Q.Order                   = "Газета.НазваниеОсн;Газета.DocId";
+      Q.Order                   = "Газета;Газета.НазваниеОсн;Газета.DocId";
       Q.Select;
       Q.First;
       for k =  1..Q.Count               do

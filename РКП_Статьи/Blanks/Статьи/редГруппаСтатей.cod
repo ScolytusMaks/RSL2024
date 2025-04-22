@@ -1,36 +1,30 @@
 class inherited СИС2.БазовыйБланкРедактор "Газета", editor Роспись;
 
-inclass
+  inobject private
 
-inobject
-
---------------------------------------------------------------------------------
---{ Обработчики событий бланка
-
-  func СсылочноеПоле_ПриОбзоре(Cell :TemplateCell; Value :Variant;var NewValue :record) :Logical;
-  var CardForSelect     : CardForm;
-  var Решение           : integer;
-    if record<>nil              then     --При условии, что оператор - внутри группы звписей
-      CardForSelect                     = РКП_Статьи.Статьи2.0картГазетыВыбор.Create;
-      CardForSelect.ФрагментНазвания    = record.НазваниеОсн;
-      Решение                           = CardForSelect.ShowEx(NewValue,"",Window.ModalWindow);
-        if Решение=CmOk         then
-          Газета                        = NewValue;
-          Газета.НазваниеЛГС            = НазваниеОсн;
-          Газета.РосписьСтатей          = true;
-        end;
-    end;
-    Result = false;
+  func СсылочноеПоле_ПриОбзоре(Cell :TemplateCell; Value :Variant; var NewValue :Record) :Logical;
+    var CardForSelect :CardForm;
+    var Решение :Integer;
+    if (Self.Record <> nil) then     --При условии, что оператор - внутри группы записей
+      CardForSelect  = РКП_Статьи.Статьи2.0картГазетыВыбор.Create;
+      CardForSelect.Cardfile.UseUserFilter = true;
+      CardForSelect.Cardfile.UserFilter = 'РосписьСтатей';
+      CardForSelect.ФрагментНазвания = Self.Record.НазваниеОсн;
+      Решение = CardForSelect.ShowEx(NewValue, '', Window.ModalWindow);
+      if (Решение = CmOk) then
+        Газета = NewValue;
+        Газета.НазваниеЛГС = НазваниеОсн;
+        Газета.РосписьСтатей = true;
+      fi;
+    fi;
   end;
-
 
   proc Шаблон_ПриСчит;
-    if Газета=nil       then
+    if (Газета = nil) then
       #NoWarning;
       СсылочноеПоле_ПриОбзоре(nil, nil, nil);
-    end;
+    fi;
   end;
 
---}
 
 end

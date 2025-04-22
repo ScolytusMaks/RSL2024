@@ -1,7 +1,7 @@
 ﻿[Options]
 Version=7
 Query=РКП_Газеты.Газета
-MBlank=.Статьи.редГазета
+MBlank=РКП_Газеты.УчетГазет.редГазета
 ActionOnType=2
 CanHGroupModify=0
 OnMove=картотека_ПриПеремещении

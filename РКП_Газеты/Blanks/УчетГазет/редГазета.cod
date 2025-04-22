@@ -66,6 +66,7 @@ inobject private
   var ОбТаймер                    :Timer;
   var секцТочностьДаты            :TemplateSection;
   var фреймЭкспорт                :TemplateFrame;
+  var секцРосписьСтатей           :TemplateSection;
 
 --}}
 
@@ -1235,6 +1236,10 @@ inobject private
     МодифицироватьШаблон;
   end;
 
+  proc флРосписьСтатей_ПриИзменении(Sender :CheckBox);
+    РКП_СИС.Recs.RecordModify(Self.Record);
+  end;
+
   proc РазблокировкаЗаписи(Sender :Button);
     Record.UnLock;
   end;
@@ -1410,7 +1415,7 @@ inobject private
   end;
 
   proc МодифицироватьШаблон;
-    флРосписьСтатей.Visible = (AdmAccess or DevAccess);
+    флРосписьСтатей.Visible = (AdmAccess or DevAccess or GLGSAccess);
     флКомплектРГБ.Visible = (AdmAccess or DevAccess);
     флСтатус.Enabled = false; -- флаг "Прекращено" недоступен
     кнОтмена.Visible = (FullAccess or ORGPAccess); -- для ОППИ не имеет смысла
@@ -1421,10 +1426,16 @@ inobject private
     секцВыпускНомеров.CellByField['КомплектПолучен'].Enabled = false;
     секцПрекращение.Visible = (НомерПоследнегоНомера <> nil);
     ---
-    фреймРегистрация.CellByField['РегНомер'].Enabled = not OPPIAccess;
-    фреймРегистрация.CellByField['ISSN'].Enabled = not OPPIAccess;
+    фреймРегистрация.CellByField['РегНомер'].Enabled = not (OPPIAccess or GLGSAccess);
+    фреймРегистрация.CellByField['ISSN'].Enabled = not (OPPIAccess or GLGSAccess);
     CellRow(фреймРегистрация.CellByField['ГодЛетописи']).Visible = not OPPIAccess;
-    флОтсылка.Enabled = not OPPIAccess;
+    фреймРегистрация.CellByField['ГодЛетописи'].Enabled = not (OPPIAccess or GLGSAccess);
+    флОтсылка.Enabled = (not OPPIAccess) and (not GLGSAccess);
+    фреймНазвания.CellByField['НазваниеОсн'].Enabled = not GLGSAccess;
+    фреймНазвания.CellByField['НазваниеИнЯз'].Enabled = not GLGSAccess;
+    фреймНазвания.CellByField['НазваниеНацЯз'].Enabled = not GLGSAccess;
+    фреймНазвания.CellByField['Подзаголовок'].Enabled = not GLGSAccess;
+    МодифицироватьСекцию_РосписьСтатей;
     ---
     секцМестаИзданияОППИ.Visible = OPPIAccess;
     секцТипИзданияОППИ.Visible   = OPPIAccess;
@@ -1516,6 +1527,10 @@ inobject private
         Self.Record.Периодичность = локПериодичность;
       fi;
     fi;
+  end;
+
+  proc МодифицироватьСекцию_РосписьСтатей;
+    секцРосписьСтатей.Visible = GLGSAccess or FullAccess;
   end;
 
 end
