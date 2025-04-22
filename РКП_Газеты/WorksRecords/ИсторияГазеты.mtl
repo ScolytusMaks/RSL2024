@@ -1,11 +1,11 @@
-record ИсторияГазеты inherited AbstractRecord.БазоваяКИзданию title "История издания";
-  field НомерПоля         :Integer        title "Условный номер поля";
-  field НомерИзменений    :Integer        title "Номер изменений";
-  field СНомера           :НомерГазеты    title "С номера"; -- (с номера газеты)
-  field Значение          :String(MaxStr) title "Значение";
-  field Справ :inherited Record           title "Справочник";
-  field ГруппаУчредителей :Boolean        title "Группа учредителей";
-  field ТипИздания        :Integer        title "Тип издания";
-  Indexed indNewspaper By Газета;
-  Indexed indNewspaperFieldNumber By Газета,НомерПоля;
+п»їrecord РСЃС‚РѕСЂРёСЏР“Р°Р·РµС‚С‹ inherited AbstractRecord.Р‘Р°Р·РѕРІР°СЏРљРР·РґР°РЅРёСЋ title "РСЃС‚РѕСЂРёСЏ РёР·РґР°РЅРёСЏ";
+  field РќРѕРјРµСЂРџРѕР»СЏ         :Integer        title "РЈСЃР»РѕРІРЅС‹Р№ РЅРѕРјРµСЂ РїРѕР»СЏ";
+  field РќРѕРјРµСЂРР·РјРµРЅРµРЅРёР№    :Integer        title "РќРѕРјРµСЂ РёР·РјРµРЅРµРЅРёР№";
+  field РЎРќРѕРјРµСЂР°           :РќРѕРјРµСЂР“Р°Р·РµС‚С‹    title "РЎ РЅРѕРјРµСЂР°"; -- (СЃ РЅРѕРјРµСЂР° РіР°Р·РµС‚С‹)
+  field Р—РЅР°С‡РµРЅРёРµ          :String(MaxStr) title "Р—РЅР°С‡РµРЅРёРµ";
+  field РЎРїСЂР°РІ :inherited Record           title "РЎРїСЂР°РІРѕС‡РЅРёРє";
+  field Р“СЂСѓРїРїР°РЈС‡СЂРµРґРёС‚РµР»РµР№ :Boolean        title "Р“СЂСѓРїРїР° СѓС‡СЂРµРґРёС‚РµР»РµР№";
+  field РўРёРїРР·РґР°РЅРёСЏ        :Integer        title "РўРёРї РёР·РґР°РЅРёСЏ";
+  Indexed indNewspaper By Р“Р°Р·РµС‚Р°;
+  Indexed indNewspaperFieldNumber By Р“Р°Р·РµС‚Р°,РќРѕРјРµСЂРџРѕР»СЏ;
 end;
