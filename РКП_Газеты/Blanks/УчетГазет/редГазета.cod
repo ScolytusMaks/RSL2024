@@ -67,6 +67,8 @@ inobject private
   var секцТочностьДаты            :TemplateSection;
   var фреймЭкспорт                :TemplateFrame;
   var секцРосписьСтатей           :TemplateSection;
+  var рмРежимВвода                :Bevel;
+  var флТолькоНеПолученныеКомплекты :CheckBox;
 
 --}}
 
@@ -1238,6 +1240,13 @@ inobject private
 
   proc флРосписьСтатей_ПриИзменении(Sender :CheckBox);
     РКП_СИС.Recs.RecordModify(Self.Record);
+    if РКП_СИС.Profile.GLGSAccess then
+      if (Self.Record.GetField('РосписьСтатей') = true) then
+        if (Self.Record.GetField('НазваниеЛГС') = nil) then
+          Self.Record.SetField('НазваниеЛГС', НазваниеОсн);
+        fi;
+      fi;
+    fi;
   end;
 
   proc РазблокировкаЗаписи(Sender :Button);
@@ -1415,6 +1424,8 @@ inobject private
   end;
 
   proc МодифицироватьШаблон;
+    рмРежимВвода.Visible = not GLGSAccess;
+    флТолькоНеПолученныеКомплекты.Visible = not GLGSAccess;
     флРосписьСтатей.Visible = (AdmAccess or DevAccess or GLGSAccess);
     флКомплектРГБ.Visible = (AdmAccess or DevAccess);
     флСтатус.Enabled = false; -- флаг "Прекращено" недоступен
