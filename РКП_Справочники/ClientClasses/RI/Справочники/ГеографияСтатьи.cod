@@ -1,34 +1,34 @@
-class inherited RI.Справочники.intBaseType1 'Интерфейс записи (справочник, тип 1)';
+п»їclass inherited RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.intBaseType1 'РРЅС‚РµСЂС„РµР№СЃ Р·Р°РїРёСЃРё (СЃРїСЂР°РІРѕС‡РЅРёРє, С‚РёРї 1)';
 
-import РКП_СИС Classes Functions, Recs;
+import Р РљРџ_РЎРРЎ Classes Functions, Recs;
 
 inclass public
 
-  func СвязанныйКлассЗаписей: Class BaseRefType1;
-    Result = спрГеографияСтатьи;
+  func РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№: Class BaseRefType1;
+    Result = СЃРїСЂР“РµРѕРіСЂР°С„РёСЏРЎС‚Р°С‚СЊРё;
   end;
 
-  func Create: RI.Справочники.ГеографияСтатьи;
+  func Create: RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.Р“РµРѕРіСЂР°С„РёСЏРЎС‚Р°С‚СЊРё;
     Result = inherited Create;
-    Result.Record = спрГеографияСтатьи.Create;
+    Result.Record = СЃРїСЂР“РµРѕРіСЂР°С„РёСЏРЎС‚Р°С‚СЊРё.Create;
   end;
 
-  func ОткрытьПоЗаписи synonym OpenRecord(locRecord: спрГеографияСтатьи): RI.Справочники.ГеографияСтатьи;
+  func РћС‚РєСЂС‹С‚СЊРџРѕР—Р°РїРёСЃРё synonym OpenRecord(locRecord: СЃРїСЂР“РµРѕРіСЂР°С„РёСЏРЎС‚Р°С‚СЊРё): RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.Р“РµРѕРіСЂР°С„РёСЏРЎС‚Р°С‚СЊРё;
     Result = inherited Create;
     Result.Record = locRecord;
   end;
 
-  func БланкРедакторПоУмолчанию: Class Справочники.editBaseType1;
-    Result = Справочники.редГеографияСтатьи;
+  func Р‘Р»Р°РЅРєР РµРґР°РєС‚РѕСЂРџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class РЎРїСЂР°РІРѕС‡РЅРёРєРё.editBaseType1;
+    Result = РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЂРµРґР“РµРѕРіСЂР°С„РёСЏРЎС‚Р°С‚СЊРё;
   end;
 
-  func КартотекаПоУмолчанию: Class Справочники.CardBaseType1;
-    Result = Справочники.картГеографияСтатьи;
+  func РљР°СЂС‚РѕС‚РµРєР°РџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class РЎРїСЂР°РІРѕС‡РЅРёРєРё.CardBaseType1;
+    Result = РЎРїСЂР°РІРѕС‡РЅРёРєРё.РєР°СЂС‚Р“РµРѕРіСЂР°С„РёСЏРЎС‚Р°С‚СЊРё;
   end;
 
 inobject public
 
-  Record: спрГеографияСтатьи;
+  Record: СЃРїСЂР“РµРѕРіСЂР°С„РёСЏРЎС‚Р°С‚СЊРё;
 
 
 end

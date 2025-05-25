@@ -1,205 +1,205 @@
-class inherited РКП_СИС.BiblioRecord;
+п»їclass inherited Р РљРџ_РЎРРЎ.BiblioRecord;
 
 import classes Def;
 
 inclass public
 
 
-  -- Формирование текста, описывающего периодичность выхода (РКП_СИС.БибЗапись.Период->РКП_Справочники.BiblioRecord.ПериодичностьВыхода)
-  func ReleaseFrequency synonym ПериодичностьВыхода (aQuantityPer :Integer; aPerCategory :tPeriodicityCategory) :String;
+  -- Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ С‚РµРєСЃС‚Р°, РѕРїРёСЃС‹РІР°СЋС‰РµРіРѕ РїРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ РІС‹С…РѕРґР° (Р РљРџ_РЎРРЎ.Р‘РёР±Р—Р°РїРёСЃСЊ.РџРµСЂРёРѕРґ->Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.BiblioRecord.РџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊР’С‹С…РѕРґР°)
+  func ReleaseFrequency synonym РџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊР’С‹С…РѕРґР° (aQuantityPer :Integer; aPerCategory :tPeriodicityCategory) :String;
     if (aPerCategory = pcUnDef) then
-      Result = 'Неопределенно';
+      Result = 'РќРµРѕРїСЂРµРґРµР»РµРЅРЅРѕ';
     elsif (aPerCategory = pcInYear) then
-      if    aQuantityPer = -1 then Result = 'В течение года ';
-      elsif aQuantityPer =  0 then Result = 'В течение года';
-      elsif aQuantityPer =  1 then Result = 'Ежегодн.';
-      elsif aQuantityPer =  2 then Result = '2 раза в год';
-      elsif aQuantityPer =  3 then Result = '3 раза в год';
-      elsif aQuantityPer =  4 then Result = 'Ежекв.';
-      elsif aQuantityPer =  5 then Result = '5 раз в год';
-      elsif aQuantityPer =  6 then Result = 'Двухмес.';
-      elsif aQuantityPer =  7 then Result = '7 раз в год';
-      elsif aQuantityPer =  8 then Result = '8 раз в год';
-      elsif aQuantityPer =  9 then Result = '9 раз в год';
-      elsif aQuantityPer = 10 then Result = '10 раз в год';
-      elsif aQuantityPer = 11 then Result = '11 раз в год';
-      elsif aQuantityPer = 12 then Result = '12 раз в год';
+      if    aQuantityPer = -1 then Result = 'Р’ С‚РµС‡РµРЅРёРµ РіРѕРґР° ';
+      elsif aQuantityPer =  0 then Result = 'Р’ С‚РµС‡РµРЅРёРµ РіРѕРґР°';
+      elsif aQuantityPer =  1 then Result = 'Р•Р¶РµРіРѕРґРЅ.';
+      elsif aQuantityPer =  2 then Result = '2 СЂР°Р·Р° РІ РіРѕРґ';
+      elsif aQuantityPer =  3 then Result = '3 СЂР°Р·Р° РІ РіРѕРґ';
+      elsif aQuantityPer =  4 then Result = 'Р•Р¶РµРєРІ.';
+      elsif aQuantityPer =  5 then Result = '5 СЂР°Р· РІ РіРѕРґ';
+      elsif aQuantityPer =  6 then Result = 'Р”РІСѓС…РјРµСЃ.';
+      elsif aQuantityPer =  7 then Result = '7 СЂР°Р· РІ РіРѕРґ';
+      elsif aQuantityPer =  8 then Result = '8 СЂР°Р· РІ РіРѕРґ';
+      elsif aQuantityPer =  9 then Result = '9 СЂР°Р· РІ РіРѕРґ';
+      elsif aQuantityPer = 10 then Result = '10 СЂР°Р· РІ РіРѕРґ';
+      elsif aQuantityPer = 11 then Result = '11 СЂР°Р· РІ РіРѕРґ';
+      elsif aQuantityPer = 12 then Result = '12 СЂР°Р· РІ РіРѕРґ';
       fi;
     elsif (aPerCategory = pcInMonth) then
-      if    aQuantityPer = -1 then Result = 'В течение месяца ';
-      elsif aQuantityPer =  0 then Result = 'В течение месяца';
-      elsif aQuantityPer =  1 then Result = '12 раз в год';
-      elsif aQuantityPer =  2 then Result = '2 раза в мес.';
-      elsif aQuantityPer =  3 then Result = '3 раза в мес.';
-      elsif aQuantityPer =  4 then Result = 'Еженед.';
-      elsif aQuantityPer =  5 then Result = '5 раз в мес.';
-      elsif aQuantityPer =  6 then Result = '6 раз в мес.';
-      elsif aQuantityPer =  7 then Result = '7 раз в мес.';
-      elsif aQuantityPer =  8 then Result = '2 раза в неделю';
+      if    aQuantityPer = -1 then Result = 'Р’ С‚РµС‡РµРЅРёРµ РјРµСЃСЏС†Р° ';
+      elsif aQuantityPer =  0 then Result = 'Р’ С‚РµС‡РµРЅРёРµ РјРµСЃСЏС†Р°';
+      elsif aQuantityPer =  1 then Result = '12 СЂР°Р· РІ РіРѕРґ';
+      elsif aQuantityPer =  2 then Result = '2 СЂР°Р·Р° РІ РјРµСЃ.';
+      elsif aQuantityPer =  3 then Result = '3 СЂР°Р·Р° РІ РјРµСЃ.';
+      elsif aQuantityPer =  4 then Result = 'Р•Р¶РµРЅРµРґ.';
+      elsif aQuantityPer =  5 then Result = '5 СЂР°Р· РІ РјРµСЃ.';
+      elsif aQuantityPer =  6 then Result = '6 СЂР°Р· РІ РјРµСЃ.';
+      elsif aQuantityPer =  7 then Result = '7 СЂР°Р· РІ РјРµСЃ.';
+      elsif aQuantityPer =  8 then Result = '2 СЂР°Р·Р° РІ РЅРµРґРµР»СЋ';
       fi;
     elsif (aPerCategory = pcInWeek) then
-      if    aQuantityPer = -1 then Result = 'В течение недели ';
-      elsif aQuantityPer =  0 then Result = 'В течение недели';
-      elsif aQuantityPer =  1 then Result = 'Еженед.';
-      elsif aQuantityPer =  2 then Result = '2 раза в неделю';
-      elsif aQuantityPer =  3 then Result = '3 раза в неделю';
-      elsif aQuantityPer =  4 then Result = '4 раза в неделю';
-      elsif aQuantityPer =  5 then Result = '5 раз в неделю';
-      elsif aQuantityPer =  6 then Result = '6 раз в неделю';
-      elsif aQuantityPer =  7 then Result = 'Ежедн.';
+      if    aQuantityPer = -1 then Result = 'Р’ С‚РµС‡РµРЅРёРµ РЅРµРґРµР»Рё ';
+      elsif aQuantityPer =  0 then Result = 'Р’ С‚РµС‡РµРЅРёРµ РЅРµРґРµР»Рё';
+      elsif aQuantityPer =  1 then Result = 'Р•Р¶РµРЅРµРґ.';
+      elsif aQuantityPer =  2 then Result = '2 СЂР°Р·Р° РІ РЅРµРґРµР»СЋ';
+      elsif aQuantityPer =  3 then Result = '3 СЂР°Р·Р° РІ РЅРµРґРµР»СЋ';
+      elsif aQuantityPer =  4 then Result = '4 СЂР°Р·Р° РІ РЅРµРґРµР»СЋ';
+      elsif aQuantityPer =  5 then Result = '5 СЂР°Р· РІ РЅРµРґРµР»СЋ';
+      elsif aQuantityPer =  6 then Result = '6 СЂР°Р· РІ РЅРµРґРµР»СЋ';
+      elsif aQuantityPer =  7 then Result = 'Р•Р¶РµРґРЅ.';
       fi;
     elsif (aPerCategory = pcInDay) then
-      if    aQuantityPer = -1 then Result = 'В течение дня ';
-      elsif aQuantityPer =  0 then Result = 'В течение дня';
-      elsif aQuantityPer =  1 then Result = 'Ежедн.';
-      elsif aQuantityPer =  2 then Result = '2 раза в день';
+      if    aQuantityPer = -1 then Result = 'Р’ С‚РµС‡РµРЅРёРµ РґРЅСЏ ';
+      elsif aQuantityPer =  0 then Result = 'Р’ С‚РµС‡РµРЅРёРµ РґРЅСЏ';
+      elsif aQuantityPer =  1 then Result = 'Р•Р¶РµРґРЅ.';
+      elsif aQuantityPer =  2 then Result = '2 СЂР°Р·Р° РІ РґРµРЅСЊ';
       fi;
     elsif (aPerCategory = pcTotal) then
-      if    aQuantityPer=1  then Result = '1 раз';
-      elsif aQuantityPer=2  then Result = '2 раза';
-      elsif aQuantityPer=3  then Result = '3 раза';
-      elsif aQuantityPer=4  then Result = '4 раза';
-      elsif aQuantityPer=5  then Result = '5 раз';
-      elsif aQuantityPer=6  then Result = '6 раз';
-      elsif aQuantityPer=7  then Result = '7 раз';
-      elsif aQuantityPer=8  then Result = '8 раз';
-      elsif aQuantityPer=9  then Result = '9 раз';
-      elsif aQuantityPer=10 then Result = '10 раз';
-      elsif aQuantityPer=11 then Result = '11 раз';
-      elsif aQuantityPer=12 then Result = '12 раз';
-      elsif aQuantityPer=13 then Result = '13 раз';
-      elsif aQuantityPer=14 then Result = '14 раз';
-      elsif aQuantityPer=15 then Result = '15 раз';
-      elsif aQuantityPer=16 then Result = '16 раз';
+      if    aQuantityPer=1  then Result = '1 СЂР°Р·';
+      elsif aQuantityPer=2  then Result = '2 СЂР°Р·Р°';
+      elsif aQuantityPer=3  then Result = '3 СЂР°Р·Р°';
+      elsif aQuantityPer=4  then Result = '4 СЂР°Р·Р°';
+      elsif aQuantityPer=5  then Result = '5 СЂР°Р·';
+      elsif aQuantityPer=6  then Result = '6 СЂР°Р·';
+      elsif aQuantityPer=7  then Result = '7 СЂР°Р·';
+      elsif aQuantityPer=8  then Result = '8 СЂР°Р·';
+      elsif aQuantityPer=9  then Result = '9 СЂР°Р·';
+      elsif aQuantityPer=10 then Result = '10 СЂР°Р·';
+      elsif aQuantityPer=11 then Result = '11 СЂР°Р·';
+      elsif aQuantityPer=12 then Result = '12 СЂР°Р·';
+      elsif aQuantityPer=13 then Result = '13 СЂР°Р·';
+      elsif aQuantityPer=14 then Result = '14 СЂР°Р·';
+      elsif aQuantityPer=15 then Result = '15 СЂР°Р·';
+      elsif aQuantityPer=16 then Result = '16 СЂР°Р·';
       fi;
     fi;
     if Result = nil then
-      Result = 'Ошибка';
+      Result = 'РћС€РёР±РєР°';
     fi;
   end;
 
-  -- Возвращает количество выпусков по описанию (метод, обратный ReleaseFrequency)
-  func QuantityInPeriod synonym КоличествоВПериоде(aQuantitySig :String) :Integer;
-    if    aQuantitySig = 'Ежегодн.'        then Return  1;
-    elsif aQuantitySig = '2 раза в год'    then Return  2;
-    elsif aQuantitySig = '3 раза в год'    then Return  3;
-    elsif aQuantitySig = 'Ежекв.'          then Return  4;
-    elsif aQuantitySig = '5 раз в год'     then Return  5;
-    elsif aQuantitySig = 'Двухмес.'        then Return  6;
-    elsif aQuantitySig = '7 раз в год'     then Return  7;
-    elsif aQuantitySig = '8 раз в год'     then Return  8;
-    elsif aQuantitySig = '9 раз в год'     then Return  9;
-    elsif aQuantitySig = '10 раз в год'    then Return 10;
-    elsif aQuantitySig = '11 раз в год'    then Return 11;
-    elsif aQuantitySig = 'Ежемес.'         then Return 12;
-    elsif aQuantitySig = '2 раза в мес.'   then Return  2;
-    elsif aQuantitySig = '3 раза в мес.'   then Return  3;
-    elsif aQuantitySig = '5 раз в мес.'    then Return  5;
-    elsif aQuantitySig = '6 раз в мес.'    then Return  6;
-    elsif aQuantitySig = '7 раз в мес.'    then Return  7;
-    elsif aQuantitySig = '2 раза в неделю' then Return  2;
-    elsif aQuantitySig = 'Еженед.'         then Return  1;
-    elsif aQuantitySig = '2 раза в неделю' then Return  2;
-    elsif aQuantitySig = '3 раза в неделю' then Return  3;
-    elsif aQuantitySig = '4 раза в неделю' then Return  4;
-    elsif aQuantitySig = '5 раз в неделю'  then Return  5;
-    elsif aQuantitySig = '6 раз в неделю'  then Return  6;
-    elsif aQuantitySig = 'Ежедн.'          then Return  1;
-    elsif aQuantitySig = '2 раза в день'   then Return  2;
-    elsif aQuantitySig = 'Неопределенно'   then Return  0;
+  -- Р’РѕР·РІСЂР°С‰Р°РµС‚ РєРѕР»РёС‡РµСЃС‚РІРѕ РІС‹РїСѓСЃРєРѕРІ РїРѕ РѕРїРёСЃР°РЅРёСЋ (РјРµС‚РѕРґ, РѕР±СЂР°С‚РЅС‹Р№ ReleaseFrequency)
+  func QuantityInPeriod synonym РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ(aQuantitySig :String) :Integer;
+    if    aQuantitySig = 'Р•Р¶РµРіРѕРґРЅ.'        then Return  1;
+    elsif aQuantitySig = '2 СЂР°Р·Р° РІ РіРѕРґ'    then Return  2;
+    elsif aQuantitySig = '3 СЂР°Р·Р° РІ РіРѕРґ'    then Return  3;
+    elsif aQuantitySig = 'Р•Р¶РµРєРІ.'          then Return  4;
+    elsif aQuantitySig = '5 СЂР°Р· РІ РіРѕРґ'     then Return  5;
+    elsif aQuantitySig = 'Р”РІСѓС…РјРµСЃ.'        then Return  6;
+    elsif aQuantitySig = '7 СЂР°Р· РІ РіРѕРґ'     then Return  7;
+    elsif aQuantitySig = '8 СЂР°Р· РІ РіРѕРґ'     then Return  8;
+    elsif aQuantitySig = '9 СЂР°Р· РІ РіРѕРґ'     then Return  9;
+    elsif aQuantitySig = '10 СЂР°Р· РІ РіРѕРґ'    then Return 10;
+    elsif aQuantitySig = '11 СЂР°Р· РІ РіРѕРґ'    then Return 11;
+    elsif aQuantitySig = 'Р•Р¶РµРјРµСЃ.'         then Return 12;
+    elsif aQuantitySig = '2 СЂР°Р·Р° РІ РјРµСЃ.'   then Return  2;
+    elsif aQuantitySig = '3 СЂР°Р·Р° РІ РјРµСЃ.'   then Return  3;
+    elsif aQuantitySig = '5 СЂР°Р· РІ РјРµСЃ.'    then Return  5;
+    elsif aQuantitySig = '6 СЂР°Р· РІ РјРµСЃ.'    then Return  6;
+    elsif aQuantitySig = '7 СЂР°Р· РІ РјРµСЃ.'    then Return  7;
+    elsif aQuantitySig = '2 СЂР°Р·Р° РІ РЅРµРґРµР»СЋ' then Return  2;
+    elsif aQuantitySig = 'Р•Р¶РµРЅРµРґ.'         then Return  1;
+    elsif aQuantitySig = '2 СЂР°Р·Р° РІ РЅРµРґРµР»СЋ' then Return  2;
+    elsif aQuantitySig = '3 СЂР°Р·Р° РІ РЅРµРґРµР»СЋ' then Return  3;
+    elsif aQuantitySig = '4 СЂР°Р·Р° РІ РЅРµРґРµР»СЋ' then Return  4;
+    elsif aQuantitySig = '5 СЂР°Р· РІ РЅРµРґРµР»СЋ'  then Return  5;
+    elsif aQuantitySig = '6 СЂР°Р· РІ РЅРµРґРµР»СЋ'  then Return  6;
+    elsif aQuantitySig = 'Р•Р¶РµРґРЅ.'          then Return  1;
+    elsif aQuantitySig = '2 СЂР°Р·Р° РІ РґРµРЅСЊ'   then Return  2;
+    elsif aQuantitySig = 'РќРµРѕРїСЂРµРґРµР»РµРЅРЅРѕ'   then Return  0;
     fi;
   end;
 
-  -- Возвращает категорию периодичности по описанию (метод, обратный ReleaseFrequency)
-  func PeriodicityCategory synonym КатегорияПериодичности(aPerCategorySig :String) :tPeriodicityCategory;
-    if    aPerCategorySig = 'Ежегодн.'        then Return pcInYear;
-    elsif aPerCategorySig = '2 раза в год'    then Return pcInYear;
-    elsif aPerCategorySig = '3 раза в год'    then Return pcInYear;
-    elsif aPerCategorySig = 'Ежекв.'          then Return pcInYear;
-    elsif aPerCategorySig = '5 раз в год'     then Return pcInYear;
-    elsif aPerCategorySig = 'Двухмес.'        then Return pcInYear;
-    elsif aPerCategorySig = '7 раз в год'     then Return pcInYear;
-    elsif aPerCategorySig = '8 раз в год'     then Return pcInYear;
-    elsif aPerCategorySig = '9 раз в год'     then Return pcInYear;
-    elsif aPerCategorySig = '10 раз в год'    then Return pcInYear;
-    elsif aPerCategorySig = '11 раз в год'    then Return pcInYear;
-    elsif aPerCategorySig = '12 раз в год'    then Return pcInYear;
-    elsif aPerCategorySig = 'Ежемес.'         then Return pcInYear;
-    elsif aPerCategorySig = '2 раза в мес.'   then Return pcInMonth;
-    elsif aPerCategorySig = '3 раза в мес.'   then Return pcInMonth;
-    elsif aPerCategorySig = '4 раза в мес.'   then Return pcInWeek; --=1 р.в НЕДЕЛЮ
-    elsif aPerCategorySig = '5 раз в мес.'    then Return pcInMonth;
-    elsif aPerCategorySig = '6 раз в мес.'    then Return pcInMonth;
-    elsif aPerCategorySig = '7 раз в мес.'    then Return pcInMonth;
-    elsif aPerCategorySig = '2 раза в неделю' then Return pcInWeek;
-    elsif aPerCategorySig = 'Еженед.'         then Return pcInWeek;
-    elsif aPerCategorySig = '2 раза в неделю' then Return pcInWeek;
-    elsif aPerCategorySig = '3 раза в неделю' then Return pcInWeek;
-    elsif aPerCategorySig = '4 раза в неделю' then Return pcInWeek;
-    elsif aPerCategorySig = '5 раз в неделю'  then Return pcInWeek;
-    elsif aPerCategorySig = '6 раз в неделю'  then Return pcInWeek;
-    elsif aPerCategorySig = 'Ежедн.'          then Return pcInDay;
-    elsif aPerCategorySig = '2 раза в день'   then Return pcInDay;
-    elsif aPerCategorySig = 'Неопределенно'   then Return pcUnDef;
+  -- Р’РѕР·РІСЂР°С‰Р°РµС‚ РєР°С‚РµРіРѕСЂРёСЋ РїРµСЂРёРѕРґРёС‡РЅРѕСЃС‚Рё РїРѕ РѕРїРёСЃР°РЅРёСЋ (РјРµС‚РѕРґ, РѕР±СЂР°С‚РЅС‹Р№ ReleaseFrequency)
+  func PeriodicityCategory synonym РљР°С‚РµРіРѕСЂРёСЏРџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚Рё(aPerCategorySig :String) :tPeriodicityCategory;
+    if    aPerCategorySig = 'Р•Р¶РµРіРѕРґРЅ.'        then Return pcInYear;
+    elsif aPerCategorySig = '2 СЂР°Р·Р° РІ РіРѕРґ'    then Return pcInYear;
+    elsif aPerCategorySig = '3 СЂР°Р·Р° РІ РіРѕРґ'    then Return pcInYear;
+    elsif aPerCategorySig = 'Р•Р¶РµРєРІ.'          then Return pcInYear;
+    elsif aPerCategorySig = '5 СЂР°Р· РІ РіРѕРґ'     then Return pcInYear;
+    elsif aPerCategorySig = 'Р”РІСѓС…РјРµСЃ.'        then Return pcInYear;
+    elsif aPerCategorySig = '7 СЂР°Р· РІ РіРѕРґ'     then Return pcInYear;
+    elsif aPerCategorySig = '8 СЂР°Р· РІ РіРѕРґ'     then Return pcInYear;
+    elsif aPerCategorySig = '9 СЂР°Р· РІ РіРѕРґ'     then Return pcInYear;
+    elsif aPerCategorySig = '10 СЂР°Р· РІ РіРѕРґ'    then Return pcInYear;
+    elsif aPerCategorySig = '11 СЂР°Р· РІ РіРѕРґ'    then Return pcInYear;
+    elsif aPerCategorySig = '12 СЂР°Р· РІ РіРѕРґ'    then Return pcInYear;
+    elsif aPerCategorySig = 'Р•Р¶РµРјРµСЃ.'         then Return pcInYear;
+    elsif aPerCategorySig = '2 СЂР°Р·Р° РІ РјРµСЃ.'   then Return pcInMonth;
+    elsif aPerCategorySig = '3 СЂР°Р·Р° РІ РјРµСЃ.'   then Return pcInMonth;
+    elsif aPerCategorySig = '4 СЂР°Р·Р° РІ РјРµСЃ.'   then Return pcInWeek; --=1 СЂ.РІ РќР•Р”Р•Р›Р®
+    elsif aPerCategorySig = '5 СЂР°Р· РІ РјРµСЃ.'    then Return pcInMonth;
+    elsif aPerCategorySig = '6 СЂР°Р· РІ РјРµСЃ.'    then Return pcInMonth;
+    elsif aPerCategorySig = '7 СЂР°Р· РІ РјРµСЃ.'    then Return pcInMonth;
+    elsif aPerCategorySig = '2 СЂР°Р·Р° РІ РЅРµРґРµР»СЋ' then Return pcInWeek;
+    elsif aPerCategorySig = 'Р•Р¶РµРЅРµРґ.'         then Return pcInWeek;
+    elsif aPerCategorySig = '2 СЂР°Р·Р° РІ РЅРµРґРµР»СЋ' then Return pcInWeek;
+    elsif aPerCategorySig = '3 СЂР°Р·Р° РІ РЅРµРґРµР»СЋ' then Return pcInWeek;
+    elsif aPerCategorySig = '4 СЂР°Р·Р° РІ РЅРµРґРµР»СЋ' then Return pcInWeek;
+    elsif aPerCategorySig = '5 СЂР°Р· РІ РЅРµРґРµР»СЋ'  then Return pcInWeek;
+    elsif aPerCategorySig = '6 СЂР°Р· РІ РЅРµРґРµР»СЋ'  then Return pcInWeek;
+    elsif aPerCategorySig = 'Р•Р¶РµРґРЅ.'          then Return pcInDay;
+    elsif aPerCategorySig = '2 СЂР°Р·Р° РІ РґРµРЅСЊ'   then Return pcInDay;
+    elsif aPerCategorySig = 'РќРµРѕРїСЂРµРґРµР»РµРЅРЅРѕ'   then Return pcUnDef;
     fi;
   end;
 
-  -- Возвращант библиографическую форму наименования населенного пункта (для ЛППИ и проч.)
-  -- аргумент - запись справочника геогр. объектов РФ
-  func НаимГео (R :РКП_Справочники.спрГеография) :String;
-    var vLevel :Integer; -- уровень вложенности
-    if R.Обл_Центр then
-      Result = R.НаимСокр;
+  -- Р’РѕР·РІСЂР°С‰Р°РЅС‚ Р±РёР±Р»РёРѕРіСЂР°С„РёС‡РµСЃРєСѓСЋ С„РѕСЂРјСѓ РЅР°РёРјРµРЅРѕРІР°РЅРёСЏ РЅР°СЃРµР»РµРЅРЅРѕРіРѕ РїСѓРЅРєС‚Р° (РґР»СЏ Р›РџРџР Рё РїСЂРѕС‡.)
+  -- Р°СЂРіСѓРјРµРЅС‚ - Р·Р°РїРёСЃСЊ СЃРїСЂР°РІРѕС‡РЅРёРєР° РіРµРѕРіСЂ. РѕР±СЉРµРєС‚РѕРІ Р Р¤
+  func РќР°РёРјР“РµРѕ (R :Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЃРїСЂР“РµРѕРіСЂР°С„РёСЏ) :String;
+    var vLevel :Integer; -- СѓСЂРѕРІРµРЅСЊ РІР»РѕР¶РµРЅРЅРѕСЃС‚Рё
+    if R.РћР±Р»_Р¦РµРЅС‚СЂ then
+      Result = R.РќР°РёРјРЎРѕРєСЂ;
     else
-      vLevel = РКП_СИС.Recs.RecordsLevel(R);
-      if (vLevel in [ктрНеОпределено,
-                     ктрФедеральныйОкруг,
-                     ктрРеспублика,
-                     ктрКрай,
-                     ктрАвтономныйОкруг]) then
-        if (R.GroupDoc.НаимСокр <> nil) then
-          Result  = R.НаимСокр + ' (' + R.GroupDoc.НаимСокр + ')';
+      vLevel = Р РљРџ_РЎРРЎ.Recs.RecordsLevel(R);
+      if (vLevel in [РєС‚СЂРќРµРћРїСЂРµРґРµР»РµРЅРѕ,
+                     РєС‚СЂР¤РµРґРµСЂР°Р»СЊРЅС‹Р№РћРєСЂСѓРі,
+                     РєС‚СЂР РµСЃРїСѓР±Р»РёРєР°,
+                     РєС‚СЂРљСЂР°Р№,
+                     РєС‚СЂРђРІС‚РѕРЅРѕРјРЅС‹Р№РћРєСЂСѓРі]) then
+        if (R.GroupDoc.РќР°РёРјРЎРѕРєСЂ <> nil) then
+          Result  = R.РќР°РёРјРЎРѕРєСЂ + ' (' + R.GroupDoc.РќР°РёРјРЎРѕРєСЂ + ')';
         else
-          Result  = R.НаимСокр;
+          Result  = R.РќР°РёРјРЎРѕРєСЂ;
         fi;
-      elsif (vLevel in [ктрОбласть,
-                        ктрОбластнойЦентрСубъектРф,
-                        ктрАвтономнаяОбласть,
-                        ктрРайон,
-                        ктрОбластнойЦентр,
-                        ктрРеспубликанскийЦентр,
-                        ктрРайонАвтономнойОбласти,
-                        ктрНаселенныйПунктОбластногоЦентра,
-                        ктрНаселенныйПункт]) then
-        if (R.GroupDoc.GroupDoc.НаимСокр <> nil) then
-          Result = R.НаимСокр + ' (' + R.GroupDoc.GroupDoc.НаимСокр + ')';
+      elsif (vLevel in [РєС‚СЂРћР±Р»Р°СЃС‚СЊ,
+                        РєС‚СЂРћР±Р»Р°СЃС‚РЅРѕР№Р¦РµРЅС‚СЂРЎСѓР±СЉРµРєС‚Р С„,
+                        РєС‚СЂРђРІС‚РѕРЅРѕРјРЅР°СЏРћР±Р»Р°СЃС‚СЊ,
+                        РєС‚СЂР Р°Р№РѕРЅ,
+                        РєС‚СЂРћР±Р»Р°СЃС‚РЅРѕР№Р¦РµРЅС‚СЂ,
+                        РєС‚СЂР РµСЃРїСѓР±Р»РёРєР°РЅСЃРєРёР№Р¦РµРЅС‚СЂ,
+                        РєС‚СЂР Р°Р№РѕРЅРђРІС‚РѕРЅРѕРјРЅРѕР№РћР±Р»Р°СЃС‚Рё,
+                        РєС‚СЂРќР°СЃРµР»РµРЅРЅС‹Р№РџСѓРЅРєС‚РћР±Р»Р°СЃС‚РЅРѕРіРѕР¦РµРЅС‚СЂР°,
+                        РєС‚СЂРќР°СЃРµР»РµРЅРЅС‹Р№РџСѓРЅРєС‚]) then
+        if (R.GroupDoc.GroupDoc.РќР°РёРјРЎРѕРєСЂ <> nil) then
+          Result = R.РќР°РёРјРЎРѕРєСЂ + ' (' + R.GroupDoc.GroupDoc.РќР°РёРјРЎРѕРєСЂ + ')';
         else
-          Result  = R.НаимСокр;
+          Result  = R.РќР°РёРјРЎРѕРєСЂ;
         fi;
       fi;
     fi;
   end;
 
-  func ПодчинениеГео (rGeo :РКП_Справочники.СпрГеография) :String; --аргумент - запись справочника геогр. объектов РФ
-    var Level :Integer; -- уровень вложенности
-    -- 1.вычисление уровня вложенности
-    Level= РКП_СИС.Recs.RecordsLevel(rGeo);
-    -- 2.формирование строки
+  func РџРѕРґС‡РёРЅРµРЅРёРµР“РµРѕ (rGeo :Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.РЎРїСЂР“РµРѕРіСЂР°С„РёСЏ) :String; --Р°СЂРіСѓРјРµРЅС‚ - Р·Р°РїРёСЃСЊ СЃРїСЂР°РІРѕС‡РЅРёРєР° РіРµРѕРіСЂ. РѕР±СЉРµРєС‚РѕРІ Р Р¤
+    var Level :Integer; -- СѓСЂРѕРІРµРЅСЊ РІР»РѕР¶РµРЅРЅРѕСЃС‚Рё
+    -- 1.РІС‹С‡РёСЃР»РµРЅРёРµ СѓСЂРѕРІРЅСЏ РІР»РѕР¶РµРЅРЅРѕСЃС‚Рё
+    Level= Р РљРџ_РЎРРЎ.Recs.RecordsLevel(rGeo);
+    -- 2.С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ СЃС‚СЂРѕРєРё
     if (Level < 4) then
-      if not rGeo.Субъект_РФ then
-        if (rGeo.GroupDoc.Наим <> nil) then
-          Return rGeo.GroupDoc.Наим;
+      if not rGeo.РЎСѓР±СЉРµРєС‚_Р Р¤ then
+        if (rGeo.GroupDoc.РќР°РёРј <> nil) then
+          Return rGeo.GroupDoc.РќР°РёРј;
         fi;
       else
-        Return rGeo.Наим;
+        Return rGeo.РќР°РёРј;
       fi;
     else
-      if not rGeo.Субъект_РФ then
-        if (rGeo.GroupDoc.GroupDoc.Наим <> nil) then
-          Return rGeo.GroupDoc.GroupDoc.Наим;
+      if not rGeo.РЎСѓР±СЉРµРєС‚_Р Р¤ then
+        if (rGeo.GroupDoc.GroupDoc.РќР°РёРј <> nil) then
+          Return rGeo.GroupDoc.GroupDoc.РќР°РёРј;
         fi;
       else
-        Return rGeo.Наим;
+        Return rGeo.РќР°РёРј;
       fi;
     fi;
   end;

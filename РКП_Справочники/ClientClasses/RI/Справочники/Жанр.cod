@@ -1,29 +1,29 @@
-class inherited RI.Справочники.intBaseType2 'Интерфейс записи (справочник, тип 2)';
+п»їclass inherited RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.intBaseType2 'РРЅС‚РµСЂС„РµР№СЃ Р·Р°РїРёСЃРё (СЃРїСЂР°РІРѕС‡РЅРёРє, С‚РёРї 2)';
 
-import РКП_СИС Classes Functions, Recs;
+import Р РљРџ_РЎРРЎ Classes Functions, Recs;
 
 inclass public
 
-  func СвязанныйКлассЗаписей: Class BaseRefType2;
-    Result = РКП_Справочники.спрЖанр;
+  func РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№: Class BaseRefType2;
+    Result = Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЃРїСЂР–Р°РЅСЂ;
   end;
 
-  func Create: RI.Справочники.Жанр;
+  func Create: RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.Р–Р°РЅСЂ;
     Result = inherited Create;
-    Result.Record = РКП_Справочники.спрЖанр.Create;
+    Result.Record = Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЃРїСЂР–Р°РЅСЂ.Create;
   end;
 
-  func ОткрытьПоЗаписи synonym OpenRecord(locRecord: спрЖанр): RI.Справочники.Жанр;
+  func РћС‚РєСЂС‹С‚СЊРџРѕР—Р°РїРёСЃРё synonym OpenRecord(locRecord: СЃРїСЂР–Р°РЅСЂ): RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.Р–Р°РЅСЂ;
     Result = inherited Create;
     Result.Record = locRecord;
   end;
 
-  func БланкРедакторПоУмолчанию: Class РКП_Справочники.Справочники.editBaseType2;
-    Result = РКП_Справочники.Справочники.редЖанр;
+  func Р‘Р»Р°РЅРєР РµРґР°РєС‚РѕСЂРџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.РЎРїСЂР°РІРѕС‡РЅРёРєРё.editBaseType2;
+    Result = Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЂРµРґР–Р°РЅСЂ;
   end;
 
 inobject public
 
-  Record: РКП_Справочники.спрЖанр;
+  Record: Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЃРїСЂР–Р°РЅСЂ;
 
 end

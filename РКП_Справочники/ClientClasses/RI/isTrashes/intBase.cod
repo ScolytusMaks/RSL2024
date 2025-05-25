@@ -1,22 +1,22 @@
-class inherited МашинаРеквизитов.Базовые.интЗаписьКодИмя "";
+п»їclass inherited РњР°С€РёРЅР°Р РµРєРІРёР·РёС‚РѕРІ.Р‘Р°Р·РѕРІС‹Рµ.РёРЅС‚Р—Р°РїРёСЃСЊРљРѕРґРРјСЏ "";
 
-import РКП_СИС Classes Functions, Recs;
+import Р РљРџ_РЎРРЎ Classes Functions, Recs;
 
 inclass public
 
-  var ТекстРодительный :String = 'записи справочника';
+  var РўРµРєСЃС‚Р РѕРґРёС‚РµР»СЊРЅС‹Р№ :String = 'Р·Р°РїРёСЃРё СЃРїСЂР°РІРѕС‡РЅРёРєР°';
 
-  var ИмяПоляКодСортировки :String = 'КодСортировки';
-  var ИмяПоляНеПрименяется :String = 'НеПрименяется';
-  var ОбязательныеПоля     :String[] = ['Код','КодСортировки','Имя'];
+  var РРјСЏРџРѕР»СЏРљРѕРґРЎРѕСЂС‚РёСЂРѕРІРєРё :String = 'РљРѕРґРЎРѕСЂС‚РёСЂРѕРІРєРё';
+  var РРјСЏРџРѕР»СЏРќРµРџСЂРёРјРµРЅСЏРµС‚СЃСЏ :String = 'РќРµРџСЂРёРјРµРЅСЏРµС‚СЃСЏ';
+  var РћР±СЏР·Р°С‚РµР»СЊРЅС‹РµРџРѕР»СЏ     :String[] = ['РљРѕРґ','РљРѕРґРЎРѕСЂС‚РёСЂРѕРІРєРё','РРјСЏ'];
 
 inobject public
 
   func TestCodeValue(SourceValue :String; var CorrectCode, CorrectValue :String) :Logical;
-    var vRec :спрТематика;
+    var vRec :СЃРїСЂРўРµРјР°С‚РёРєР°;
     var aFlt :String[];
     var vFilter :String;
-    if (Self.Record.GetField(ИмяПоляНеПрименяется) as logical):
+    if (Self.Record.GetField(РРјСЏРџРѕР»СЏРќРµРџСЂРёРјРµРЅСЏРµС‚СЃСЏ) as logical):
       CorrectCode = StdCode.NoSpace(SourceValue) + '-';
     else
       if ( Pos('-', SourceValue) = Length(SourceValue) ) then
@@ -24,56 +24,56 @@ inobject public
       fi;
       CorrectCode = StdCode.NoSpace(SourceValue);
     fi;
-    AddInArray( aFlt, 'Код="' + CorrectCode + '"');
+    AddInArray( aFlt, 'РљРѕРґ="' + CorrectCode + '"');
     AddInArray( aFlt, 'DocId<>' + Str(Record.DocID));
-    vFilter = РКП_СИС.FilterMaker.MakeFilter(aFlt);
+    vFilter = Р РљРџ_РЎРРЎ.FilterMaker.MakeFilter(aFlt);
     vRec = FindRecord( Self.Record.ClassInfo.ClassRef, vFilter );
     if (vRec = nil) then
       CorrectValue = DefaultFixCode(SourceValue);
       Result = true;
     else
-      Message('Введенный код уже используется.');
+      Message('Р’РІРµРґРµРЅРЅС‹Р№ РєРѕРґ СѓР¶Рµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ.');
     fi;
   end;
 
 inclass public
 
-  func СвязанныйКлассЗаписей: Class СИС2.Базовая.БазоваяЗапись;
+  func РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№: Class РЎРРЎ2.Р‘Р°Р·РѕРІР°СЏ.Р‘Р°Р·РѕРІР°СЏР—Р°РїРёСЃСЊ;
     Result = BaseRef;
   end;
 
-  func КартотекаДляВыбора (addParam :Variant = nil) :Class CardForm;
-    Result = КартотекаПоУмолчанию;
+  func РљР°СЂС‚РѕС‚РµРєР°Р”Р»СЏР’С‹Р±РѕСЂР° (addParam :Variant = nil) :Class CardForm;
+    Result = РљР°СЂС‚РѕС‚РµРєР°РџРѕРЈРјРѕР»С‡Р°РЅРёСЋ;
   end;
 
   func DefaultFixCode (SourceValue :String) :String;
     Result = StdCode.FixCode10(SourceValue);
   end;
 
-  -- Последний номер (поле сортировки) записи
+  -- РџРѕСЃР»РµРґРЅРёР№ РЅРѕРјРµСЂ (РїРѕР»Рµ СЃРѕСЂС‚РёСЂРѕРІРєРё) Р·Р°РїРёСЃРё
   func GetLastRecNumber :Integer;
-    with Query.Create([СвязанныйКлассЗаписей]) do
-      LoadingFieldsMode = СИС2.Константы.mdNone;
-      LoadingFields = 'Номер';
-      Order = 'Номер-';
+    with Query.Create([РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№]) do
+      LoadingFieldsMode = РЎРРЎ2.РљРѕРЅСЃС‚Р°РЅС‚С‹.mdNone;
+      LoadingFields = 'РќРѕРјРµСЂ';
+      Order = 'РќРѕРјРµСЂ-';
       PacketSize = 2;
       Select;
       if (Current <> nil):
-        Result = Current.Номер;
+        Result = Current.РќРѕРјРµСЂ;
       fi;
     end;
   end;
 
-  -- Последний номер (поле сортировки) записи по коду УДК
+  -- РџРѕСЃР»РµРґРЅРёР№ РЅРѕРјРµСЂ (РїРѕР»Рµ СЃРѕСЂС‚РёСЂРѕРІРєРё) Р·Р°РїРёСЃРё РїРѕ РєРѕРґСѓ РЈР”Рљ
   func GetLastRecNumberByCode(vFieldName, vCode :String) :Integer;
-    with Query.Create([СвязанныйКлассЗаписей]) do
-      LoadingFieldsMode = СИС2.Константы.mdNone;
+    with Query.Create([РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№]) do
+      LoadingFieldsMode = РЎРРЎ2.РљРѕРЅСЃС‚Р°РЅС‚С‹.mdNone;
       LoadingFields = vFieldName;
       Order = vFieldName + '-';
       Select;
       while not Eof do
         if (Current.GetField(vFieldName) < vCode) then
-          Result = Current.Номер;
+          Result = Current.РќРѕРјРµСЂ;
           Break;
         fi;
         Next;
@@ -81,39 +81,39 @@ inclass public
     end;
   end;
 
-  -- Нумеровать записи, начиная с StartRecord и номера StartNumber
-  proc NumberingFrom (StartRecord :СИС2.Базовая.БазоваяЗапись; StartNumber :Integer);
-    var aRec :СИС2.Базовая.БазоваяЗапись[];
+  -- РќСѓРјРµСЂРѕРІР°С‚СЊ Р·Р°РїРёСЃРё, РЅР°С‡РёРЅР°СЏ СЃ StartRecord Рё РЅРѕРјРµСЂР° StartNumber
+  proc NumberingFrom (StartRecord :РЎРРЎ2.Р‘Р°Р·РѕРІР°СЏ.Р‘Р°Р·РѕРІР°СЏР—Р°РїРёСЃСЊ; StartNumber :Integer);
+    var aRec :РЎРРЎ2.Р‘Р°Р·РѕРІР°СЏ.Р‘Р°Р·РѕРІР°СЏР—Р°РїРёСЃСЊ[];
     var TakeNext :Logical;
     var r, rr :Integer;
-    with Query.Create([СвязанныйКлассЗаписей]) do
-      LoadingFieldsMode = СИС2.Константы.mdNone;
-      LoadingFields = 'Номер';
-      Order = 'Номер';
+    with Query.Create([РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№]) do
+      LoadingFieldsMode = РЎРРЎ2.РљРѕРЅСЃС‚Р°РЅС‚С‹.mdNone;
+      LoadingFields = 'РќРѕРјРµСЂ';
+      Order = 'РќРѕРјРµСЂ';
       Select;
       while not Eof do
         if not TakeNext and (Current = StartRecord) then
           TakeNext = true;
         fi;
         if TakeNext then
-          РКП_СИС.Functions.AddInArray(aRec,  Current);
+          Р РљРџ_РЎРРЎ.Functions.AddInArray(aRec,  Current);
         fi;
         Next;
       od;
       --
       rr = LengthOfArray(aRec);
       for r = 1 .. rr do
-        aRec[r].SetField('Номер', (StartNumber - 1 + r) );
-        РКП_СИС.Recs.RecordPostIfNeed(aRec[r]);
+        aRec[r].SetField('РќРѕРјРµСЂ', (StartNumber - 1 + r) );
+        Р РљРџ_РЎРРЎ.Recs.RecordPostIfNeed(aRec[r]);
       od;
     end;
   end;
 
-  func GetNextByNumberRecord (cRecord :СИС2.Базовая.БазоваяЗапись) :СИС2.Базовая.БазоваяЗапись;
+  func GetNextByNumberRecord (cRecord :РЎРРЎ2.Р‘Р°Р·РѕРІР°СЏ.Р‘Р°Р·РѕРІР°СЏР—Р°РїРёСЃСЊ) :РЎРРЎ2.Р‘Р°Р·РѕРІР°СЏ.Р‘Р°Р·РѕРІР°СЏР—Р°РїРёСЃСЊ;
     var vGetNext :Logical;
-    with Query.Create([СвязанныйКлассЗаписей]) do
-      LoadingFieldsMode = СИС2.Константы.mdNone;
-      Order = 'Номер';
+    with Query.Create([РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№]) do
+      LoadingFieldsMode = РЎРРЎ2.РљРѕРЅСЃС‚Р°РЅС‚С‹.mdNone;
+      Order = 'РќРѕРјРµСЂ';
       Select;
       while not Eof do
         if vGetNext then
@@ -128,11 +128,11 @@ inclass public
     end;
   end;
 
-  func GetPrevByNumberRecord (cRecord :СИС2.Базовая.БазоваяЗапись) :СИС2.Базовая.БазоваяЗапись;
+  func GetPrevByNumberRecord (cRecord :РЎРРЎ2.Р‘Р°Р·РѕРІР°СЏ.Р‘Р°Р·РѕРІР°СЏР—Р°РїРёСЃСЊ) :РЎРРЎ2.Р‘Р°Р·РѕРІР°СЏ.Р‘Р°Р·РѕРІР°СЏР—Р°РїРёСЃСЊ;
     var vGetNext :Logical;
-    with Query.Create([СвязанныйКлассЗаписей]) do
-      LoadingFieldsMode = СИС2.Константы.mdNone;
-      Order = 'Номер-';
+    with Query.Create([РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№]) do
+      LoadingFieldsMode = РЎРРЎ2.РљРѕРЅСЃС‚Р°РЅС‚С‹.mdNone;
+      Order = 'РќРѕРјРµСЂ-';
       Select;
       while not Eof do
         if vGetNext then
@@ -147,21 +147,21 @@ inclass public
     end;
   end;
 
-  func GetNextNumberByNumberRecord (cRecord :СИС2.Базовая.БазоваяЗапись) :Integer;
-    var vRec :СИС2.Базовая.БазоваяЗапись;
+  func GetNextNumberByNumberRecord (cRecord :РЎРРЎ2.Р‘Р°Р·РѕРІР°СЏ.Р‘Р°Р·РѕРІР°СЏР—Р°РїРёСЃСЊ) :Integer;
+    var vRec :РЎРРЎ2.Р‘Р°Р·РѕРІР°СЏ.Р‘Р°Р·РѕРІР°СЏР—Р°РїРёСЃСЊ;
     vRec = GetNextByNumberRecord(cRecord);
     if (vRec <> nil) then
-      Result = vRec.GetField('Номер');
+      Result = vRec.GetField('РќРѕРјРµСЂ');
     else
       Result = -1;
     fi;
   end;
 
-  func GetPrevNumberByNumberRecord (cRecord :СИС2.Базовая.БазоваяЗапись) :Integer;
-    var vRec :СИС2.Базовая.БазоваяЗапись;
+  func GetPrevNumberByNumberRecord (cRecord :РЎРРЎ2.Р‘Р°Р·РѕРІР°СЏ.Р‘Р°Р·РѕРІР°СЏР—Р°РїРёСЃСЊ) :Integer;
+    var vRec :РЎРРЎ2.Р‘Р°Р·РѕРІР°СЏ.Р‘Р°Р·РѕРІР°СЏР—Р°РїРёСЃСЊ;
     vRec = GetPrevByNumberRecord(cRecord);
     if (vRec <> nil) then
-      Result = vRec.GetField('Номер');
+      Result = vRec.GetField('РќРѕРјРµСЂ');
     else
       Result = -1;
     fi;
@@ -189,7 +189,7 @@ inclass public
       Code = Code + '-';
     fi;
     if not(Code in aCode) then
-      СИС2.Функции.AddInArray(aCode, Code);
+      РЎРРЎ2.Р¤СѓРЅРєС†РёРё.AddInArray(aCode, Code);
       Result = Code;
     else
       for j = 1 .. LengthOfArray(aCode) do
@@ -197,12 +197,12 @@ inclass public
           n = n + 1;
         fi;
       od;
-      СИС2.Функции.AddInArray(aCode, Code);
+      РЎРРЎ2.Р¤СѓРЅРєС†РёРё.AddInArray(aCode, Code);
       Code = Code + RepStr('-', n);
       NoActual = true;
       Result = Code;
     fi;
-    -- хэширование
+    -- С…СЌС€РёСЂРѕРІР°РЅРёРµ
     if Hashing then
       AddCRC32(tmpS, Result);
       Result = tmpS;

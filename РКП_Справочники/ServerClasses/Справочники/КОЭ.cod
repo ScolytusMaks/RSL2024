@@ -1,26 +1,26 @@
-class "Количество обязательных экземпляров";
+п»їclass "РљРѕР»РёС‡РµСЃС‚РІРѕ РѕР±СЏР·Р°С‚РµР»СЊРЅС‹С… СЌРєР·РµРјРїР»СЏСЂРѕРІ";
 
-import РКП_СИС Classes Functions;
+import Р РљРџ_РЎРРЎ Classes Functions;
 
 inclass public
 
-  -- Создание репозитория данных
-  proc СоздатьХранилище synonym CreateRepository;
+  -- РЎРѕР·РґР°РЅРёРµ СЂРµРїРѕР·РёС‚РѕСЂРёСЏ РґР°РЅРЅС‹С…
+  proc РЎРѕР·РґР°С‚СЊРҐСЂР°РЅРёР»РёС‰Рµ synonym CreateRepository;
     var i, ii, vY, vN :Integer;
     var vKey :String;
     var vValue :Integer[];
     var vValue2 :Integer[2];
     Repository = Storage.Create;
-    with Query.Create([РКП_Справочники.спрТерриторияРаспространения]) do
-      Order = 'Номер';
+    with Query.Create([Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЃРїСЂРўРµСЂСЂРёС‚РѕСЂРёСЏР Р°СЃРїСЂРѕСЃС‚СЂР°РЅРµРЅРёСЏ]) do
+      Order = 'РќРѕРјРµСЂ';
       Select;
       while not Eof do
         vKey = Current.ExtID;
-        ii = (Current as РКП_Справочники.спрТерриторияРаспространения).ПланКолНом.Count;
+        ii = (Current as Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЃРїСЂРўРµСЂСЂРёС‚РѕСЂРёСЏР Р°СЃРїСЂРѕСЃС‚СЂР°РЅРµРЅРёСЏ).РџР»Р°РЅРљРѕР»РќРѕРј.Count;
         vValue2 = nil;
         for i = 1 .. ii do
-          vY = (Current as РКП_Справочники.спрТерриторияРаспространения).ПланКолНом.Items[i].НормГод;
-          vN = (Current as РКП_Справочники.спрТерриторияРаспространения).ПланКолНом.Items[i].КолНом;
+          vY = (Current as Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЃРїСЂРўРµСЂСЂРёС‚РѕСЂРёСЏР Р°СЃРїСЂРѕСЃС‚СЂР°РЅРµРЅРёСЏ).РџР»Р°РЅРљРѕР»РќРѕРј.Items[i].РќРѕСЂРјР“РѕРґ;
+          vN = (Current as Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЃРїСЂРўРµСЂСЂРёС‚РѕСЂРёСЏР Р°СЃРїСЂРѕСЃС‚СЂР°РЅРµРЅРёСЏ).РџР»Р°РЅРљРѕР»РќРѕРј.Items[i].РљРѕР»РќРѕРј;
           vValue = [vY, vN];
           AddInArray(vValue2, vValue);
         od;
@@ -31,7 +31,7 @@ inclass public
     end;
   end;
 
-  func КоличествоДляГазеты(локИздание :Record; локГод :Integer) :Integer;
+  func РљРѕР»РёС‡РµСЃС‚РІРѕР”Р»СЏР“Р°Р·РµС‚С‹(Р»РѕРєРР·РґР°РЅРёРµ :Record; Р»РѕРєР“РѕРґ :Integer) :Integer;
   end;
 
 inclass private

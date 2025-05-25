@@ -1,36 +1,36 @@
-class inherited RI.Справочники.intBaseType1 'Интерфейс записи (справочник, тип 1)';
+п»їclass inherited RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.intBaseType1 'РРЅС‚РµСЂС„РµР№СЃ Р·Р°РїРёСЃРё (СЃРїСЂР°РІРѕС‡РЅРёРє, С‚РёРї 1)';
 
-import РКП_СИС Classes Functions, Recs;
+import Р РљРџ_РЎРРЎ Classes Functions, Recs;
 
 inclass public
 
-  var ОбязательныеПоля     :String[] = ['Наим', 'НаимБибл'];
+  var РћР±СЏР·Р°С‚РµР»СЊРЅС‹РµРџРѕР»СЏ     :String[] = ['РќР°РёРј', 'РќР°РёРјР‘РёР±Р»'];
 
-  func СвязанныйКлассЗаписей: Class BaseRefType1;
-    Result = спрЯзыкОригинала;
+  func РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№: Class BaseRefType1;
+    Result = СЃРїСЂРЇР·С‹РєРћСЂРёРіРёРЅР°Р»Р°;
   end;
 
-  func Create: RI.Справочники.ЯзыкОригинала;
+  func Create: RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РЇР·С‹РєРћСЂРёРіРёРЅР°Р»Р°;
     Result = inherited Create;
-    Result.Record = спрЯзыкОригинала.Create;
+    Result.Record = СЃРїСЂРЇР·С‹РєРћСЂРёРіРёРЅР°Р»Р°.Create;
   end;
 
-  func ОткрытьПоЗаписи synonym OpenRecord(locRecord: спрЯзыкОригинала): RI.Справочники.ЯзыкОригинала;
+  func РћС‚РєСЂС‹С‚СЊРџРѕР—Р°РїРёСЃРё synonym OpenRecord(locRecord: СЃРїСЂРЇР·С‹РєРћСЂРёРіРёРЅР°Р»Р°): RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РЇР·С‹РєРћСЂРёРіРёРЅР°Р»Р°;
     Result = inherited Create;
     Result.Record = locRecord;
   end;
 
-  func БланкРедакторПоУмолчанию: Class Справочники.editBaseType1;
-    Result = Справочники.редЯзыкОригинала;
+  func Р‘Р»Р°РЅРєР РµРґР°РєС‚РѕСЂРџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class РЎРїСЂР°РІРѕС‡РЅРёРєРё.editBaseType1;
+    Result = РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЂРµРґРЇР·С‹РєРћСЂРёРіРёРЅР°Р»Р°;
   end;
 
-  func КартотекаПоУмолчанию: Class Справочники.CardBaseType1;
-    Result = Справочники.картЯзыкОригинала;
+  func РљР°СЂС‚РѕС‚РµРєР°РџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class РЎРїСЂР°РІРѕС‡РЅРёРєРё.CardBaseType1;
+    Result = РЎРїСЂР°РІРѕС‡РЅРёРєРё.РєР°СЂС‚РЇР·С‹РєРћСЂРёРіРёРЅР°Р»Р°;
   end;
 
 inobject public
 
-  Record: спрЯзыкОригинала;
+  Record: СЃРїСЂРЇР·С‹РєРћСЂРёРіРёРЅР°Р»Р°;
 
 
 end

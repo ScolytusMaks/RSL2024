@@ -1,31 +1,31 @@
-class inherited RI.Справочники.intBaseType3 'Интерфейс записи (справочник, тип 3)';
+п»їclass inherited RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.intBaseType3 'РРЅС‚РµСЂС„РµР№СЃ Р·Р°РїРёСЃРё (СЃРїСЂР°РІРѕС‡РЅРёРє, С‚РёРї 3)';
 
 inclass public
 
-  func СвязанныйКлассЗаписей: Class BaseRefType3;
-    Result = спрТипУд;
+  func РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№: Class BaseRefType3;
+    Result = СЃРїСЂРўРёРїРЈРґ;
   end;
 
-  func Create: RI.Справочники.ТипУД;
+  func Create: RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РўРёРїРЈР”;
     Result = inherited Create;
-    Result.Record = спрТипУд.Create;
+    Result.Record = СЃРїСЂРўРёРїРЈРґ.Create;
   end;
 
-  func ОткрытьПоЗаписи synonym OpenRecord(locRecord: спрТипУД): RI.Справочники.ТипУД;
+  func РћС‚РєСЂС‹С‚СЊРџРѕР—Р°РїРёСЃРё synonym OpenRecord(locRecord: СЃРїСЂРўРёРїРЈР”): RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РўРёРїРЈР”;
     Result = inherited Create;
     Result.Record = locRecord;
   end;
 
-  func БланкРедакторПоУмолчанию: Class Справочники.editBaseType3;
-    Result = Справочники.редТипУД;
+  func Р‘Р»Р°РЅРєР РµРґР°РєС‚РѕСЂРџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class РЎРїСЂР°РІРѕС‡РЅРёРєРё.editBaseType3;
+    Result = РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЂРµРґРўРёРїРЈР”;
   end;
 
-  --func КартотекаПоУмолчанию: Class Справочники.CardBaseType3;
-    --Result = Справочники.картТипУД;
+  --func РљР°СЂС‚РѕС‚РµРєР°РџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class РЎРїСЂР°РІРѕС‡РЅРёРєРё.CardBaseType3;
+    --Result = РЎРїСЂР°РІРѕС‡РЅРёРєРё.РєР°СЂС‚РўРёРїРЈР”;
   --end;
 
 inobject public
 
-  Record: спрТипУД;
+  Record: СЃРїСЂРўРёРїРЈР”;
 
 end

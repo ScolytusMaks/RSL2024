@@ -1,39 +1,39 @@
-class inherited РКП_СИС.RI.intBase "";
+п»їclass inherited Р РљРџ_РЎРРЎ.RI.intBase "";
 
-import СИС2 Classes Математика;
-import РКП_СИС Classes Functions, StringsFunctions, Recs, FilterMaker;
-
-inclass public
-
-  var ТекстРодительный :String = 'записи справочника';
-  var ИмяПоляНаим          :String = 'Наим';
-  var ИмяПоляНеПрименяется :String = 'НеПрименяется';
-  var ОбязательныеПоля     :String[] = ['Наим'];
-  var ХешируемыеПоля       :String[] = ['Наим'];
+import РЎРРЎ2 Classes РњР°С‚РµРјР°С‚РёРєР°;
+import Р РљРџ_РЎРРЎ Classes Functions, StringsFunctions, Recs, FilterMaker;
 
 inclass public
 
-  func СвязанныйКлассЗаписей: Class BaseRefType1;
+  var РўРµРєСЃС‚Р РѕРґРёС‚РµР»СЊРЅС‹Р№ :String = 'Р·Р°РїРёСЃРё СЃРїСЂР°РІРѕС‡РЅРёРєР°';
+  var РРјСЏРџРѕР»СЏРќР°РёРј          :String = 'РќР°РёРј';
+  var РРјСЏРџРѕР»СЏРќРµРџСЂРёРјРµРЅСЏРµС‚СЃСЏ :String = 'РќРµРџСЂРёРјРµРЅСЏРµС‚СЃСЏ';
+  var РћР±СЏР·Р°С‚РµР»СЊРЅС‹РµРџРѕР»СЏ     :String[] = ['РќР°РёРј'];
+  var РҐРµС€РёСЂСѓРµРјС‹РµРџРѕР»СЏ       :String[] = ['РќР°РёРј'];
+
+inclass public
+
+  func РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№: Class BaseRefType1;
     Result = nil;
   end;
 
-  func БланкРедакторПоУмолчанию: Class Справочники.editBaseType1;
+  func Р‘Р»Р°РЅРєР РµРґР°РєС‚РѕСЂРџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class РЎРїСЂР°РІРѕС‡РЅРёРєРё.editBaseType1;
     Result = nil;
   end;
 
-  func КартотекаПоУмолчанию: Class Справочники.CardBaseType1;
+  func РљР°СЂС‚РѕС‚РµРєР°РџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class РЎРїСЂР°РІРѕС‡РЅРёРєРё.CardBaseType1;
     Result = nil;
   end;
 
-  func КартотекаДляВыбора (addParam :Variant = nil) :Class Справочники.CardBaseType1;
-    Result = КартотекаПоУмолчанию;
+  func РљР°СЂС‚РѕС‚РµРєР°Р”Р»СЏР’С‹Р±РѕСЂР° (addParam :Variant = nil) :Class РЎРїСЂР°РІРѕС‡РЅРёРєРё.CardBaseType1;
+    Result = РљР°СЂС‚РѕС‚РµРєР°РџРѕРЈРјРѕР»С‡Р°РЅРёСЋ;
   end;
 
-  func ПолучитьХешируемыеПоля :Variant[2];
+  func РџРѕР»СѓС‡РёС‚СЊРҐРµС€РёСЂСѓРµРјС‹РµРџРѕР»СЏ :Variant[2];
     var f :Integer;
     if (aHashgFields = nil) then
-      for f = 1 .. LengthOfArray(ХешируемыеПоля) do
-        aHashgFields[f] = [ХешируемыеПоля[f], (СвязанныйКлассЗаписей.ClassInfo.MemberByName(ХешируемыеПоля[f]) as FieldInfo).ResultType.VarType];
+      for f = 1 .. LengthOfArray(РҐРµС€РёСЂСѓРµРјС‹РµРџРѕР»СЏ) do
+        aHashgFields[f] = [РҐРµС€РёСЂСѓРµРјС‹РµРџРѕР»СЏ[f], (РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№.ClassInfo.MemberByName(РҐРµС€РёСЂСѓРµРјС‹РµРџРѕР»СЏ[f]) as FieldInfo).ResultType.VarType];
       od;
     fi;
     Return aHashgFields;
@@ -41,34 +41,34 @@ inclass public
 
 inclass private
 
-  var НеХешируемыеСимволы  :String[] = ['.','/','\','(',')',',',';','[',']','{','}','=','+','!','?','<','>','*','@','#','_','%',':','&','-'];
+  var РќРµРҐРµС€РёСЂСѓРµРјС‹РµРЎРёРјРІРѕР»С‹  :String[] = ['.','/','\','(',')',',',';','[',']','{','}','=','+','!','?','<','>','*','@','#','_','%',':','&','-'];
   var aHashgFields         :Variant[2];
 
 inclass public
 
-  -- обновление хеша записей во всей таблице
-  proc UpdateHashFieldsIfNeed synonym ОбновитьХешВсехЗаписей;
+  -- РѕР±РЅРѕРІР»РµРЅРёРµ С…РµС€Р° Р·Р°РїРёСЃРµР№ РІРѕ РІСЃРµР№ С‚Р°Р±Р»РёС†Рµ
+  proc UpdateHashFieldsIfNeed synonym РћР±РЅРѕРІРёС‚СЊРҐРµС€Р’СЃРµС…Р—Р°РїРёСЃРµР№;
     var r :Record;
     var i, ii :Integer;
-    var Tr :СИС2.SmartTransaction;
+    var Tr :РЎРРЎ2.SmartTransaction;
     var WasApplay :Logical;
     if UpdateHashFieldsNeed then
-      ПолучитьХешируемыеПоля;
-      Tr  = СИС2.SmartTransaction.CreateEx([СвязанныйКлассЗаписей], 900);
-      with Query.Create([СвязанныйКлассЗаписей]) do
+      РџРѕР»СѓС‡РёС‚СЊРҐРµС€РёСЂСѓРµРјС‹РµРџРѕР»СЏ;
+      Tr  = РЎРРЎ2.SmartTransaction.CreateEx([РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№], 900);
+      with Query.Create([РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№]) do
         Select;
         ii = Count;
         while not Eof do
           Inc(i);
           r = Current;
           r.SetField( 'Hash', GetHashByRecord(r) );
-          РКП_СИС.Recs.RecordPostIfNeed(r);
+          Р РљРџ_РЎРРЎ.Recs.RecordPostIfNeed(r);
           Next;
           WasApplay = Tr.NextStep;
-          Hint('Обновление хеша значений всех записей...', i, ii);
+          Hint('РћР±РЅРѕРІР»РµРЅРёРµ С…РµС€Р° Р·РЅР°С‡РµРЅРёР№ РІСЃРµС… Р·Р°РїРёСЃРµР№...', i, ii);
         od;
         if (not WasApplay):
-          Hint('Обновление хеша значений всех записей (сохранение)...', i, ii);
+          Hint('РћР±РЅРѕРІР»РµРЅРёРµ С…РµС€Р° Р·РЅР°С‡РµРЅРёР№ РІСЃРµС… Р·Р°РїРёСЃРµР№ (СЃРѕС…СЂР°РЅРµРЅРёРµ)...', i, ii);
           Tr.Apply;
         fi;
         Hint(' ');
@@ -76,21 +76,21 @@ inclass public
     fi;
   end;
 
-  -- обновление хеша записей во всей таблице необходимо
-  func UpdateHashFieldsNeed synonym НеобходимоОбновитьХешВсехЗаписей :Logical;
-    with Query.Create([СвязанныйКлассЗаписей]) do
+  -- РѕР±РЅРѕРІР»РµРЅРёРµ С…РµС€Р° Р·Р°РїРёСЃРµР№ РІРѕ РІСЃРµР№ С‚Р°Р±Р»РёС†Рµ РЅРµРѕР±С…РѕРґРёРјРѕ
+  func UpdateHashFieldsNeed synonym РќРµРѕР±С…РѕРґРёРјРѕРћР±РЅРѕРІРёС‚СЊРҐРµС€Р’СЃРµС…Р—Р°РїРёСЃРµР№ :Logical;
+    with Query.Create([РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№]) do
       Filter = 'Hash=nil';
       Return RecordsExists;
     end;
   end;
 
-  -- вычисление хеша по записи
-  func GetHashByRecord synonym ПолучитьХешПоЗаписи (Rec :BaseRefType1) :String;
+  -- РІС‹С‡РёСЃР»РµРЅРёРµ С…РµС€Р° РїРѕ Р·Р°РїРёСЃРё
+  func GetHashByRecord synonym РџРѕР»СѓС‡РёС‚СЊРҐРµС€РџРѕР—Р°РїРёСЃРё (Rec :BaseRefType1) :String;
     var f :Integer;
     var vOriginalVal :String;
     var vRec :Record;
     var locHashgFields :Variant[2];
-    locHashgFields = ПолучитьХешируемыеПоля;
+    locHashgFields = РџРѕР»СѓС‡РёС‚СЊРҐРµС€РёСЂСѓРµРјС‹РµРџРѕР»СЏ;
     for f = 1 .. LengthOfArray(locHashgFields) do
       if (locHashgFields[f,2] = VarString ) then
         vOriginalVal = vOriginalVal + Rec.GetField(locHashgFields[f,1]);
@@ -104,9 +104,9 @@ inclass public
     Result = GetHashFromValue(vOriginalVal);
   end;
 
-  -- вычисление хеша строкового значения:
-  -- исключение пробелов, замена нехешируемых символов (кроме последнего) на '.', перевод всего в верхний регистр
-  func GetHashFromValue synonym ПолучитьХешЗначения (Original :String) :String;
+  -- РІС‹С‡РёСЃР»РµРЅРёРµ С…РµС€Р° СЃС‚СЂРѕРєРѕРІРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ:
+  -- РёСЃРєР»СЋС‡РµРЅРёРµ РїСЂРѕР±РµР»РѕРІ, Р·Р°РјРµРЅР° РЅРµС…РµС€РёСЂСѓРµРјС‹С… СЃРёРјРІРѕР»РѕРІ (РєСЂРѕРјРµ РїРѕСЃР»РµРґРЅРµРіРѕ) РЅР° '.', РїРµСЂРµРІРѕРґ РІСЃРµРіРѕ РІ РІРµСЂС…РЅРёР№ СЂРµРіРёСЃС‚СЂ
+  func GetHashFromValue synonym РџРѕР»СѓС‡РёС‚СЊРҐРµС€Р—РЅР°С‡РµРЅРёСЏ (Original :String) :String;
     var p, pp :Integer;
     var vLetter, tmpS :String;
     pp = Length(Original);
@@ -114,7 +114,7 @@ inclass public
     for p = pp .. 1 step -1 do
       vLetter = SubStr(Original, p, 1);
       if not vLetter in [' '] then
-        if vLetter in НеХешируемыеСимволы then
+        if vLetter in РќРµРҐРµС€РёСЂСѓРµРјС‹РµРЎРёРјРІРѕР»С‹ then
           if (p < pp) then
             vLetter = '.';
           else
@@ -132,11 +132,11 @@ inclass public
 
 inobject public
 
-  proc ИнициализироватьПоУмолчанию synonym InitByDefault;
+  proc РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊРџРѕРЈРјРѕР»С‡Р°РЅРёСЋ synonym InitByDefault;
     Init;
   end;
 
-  proc Инициализировать synonym Init;
+  proc РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊ synonym Init;
     Assert(Record.State = Kernel.Record.Created);
   end;
 

@@ -1,38 +1,38 @@
-class inherited RI.Справочники.intBaseType1 "Интерфейс записи (справочник, тип 2)";
+п»їclass inherited RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.intBaseType1 "РРЅС‚РµСЂС„РµР№СЃ Р·Р°РїРёСЃРё (СЃРїСЂР°РІРѕС‡РЅРёРє, С‚РёРї 2)";
 
 inclass public
 
-  func СвязанныйКлассЗаписей: Class BaseRefType2;
+  func РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№: Class BaseRefType2;
    end;
 
-  func БланкРедакторПоУмолчанию: Class Справочники.editBaseType2;
+  func Р‘Р»Р°РЅРєР РµРґР°РєС‚РѕСЂРџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class РЎРїСЂР°РІРѕС‡РЅРёРєРё.editBaseType2;
     Result = nil;
   end;
 
-  -- Последний номер (поле сортировки) записи
+  -- РџРѕСЃР»РµРґРЅРёР№ РЅРѕРјРµСЂ (РїРѕР»Рµ СЃРѕСЂС‚РёСЂРѕРІРєРё) Р·Р°РїРёСЃРё
   func GetLastRecNumber :Integer;
-    with Query.Create([СвязанныйКлассЗаписей]) do
-      LoadingFieldsMode = СИС2.Константы.mdNone;
-      LoadingFields = 'Номер';
-      Order = 'Номер-';
+    with Query.Create([РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№]) do
+      LoadingFieldsMode = РЎРРЎ2.РљРѕРЅСЃС‚Р°РЅС‚С‹.mdNone;
+      LoadingFields = 'РќРѕРјРµСЂ';
+      Order = 'РќРѕРјРµСЂ-';
       PacketSize = 2;
       Select;
       if (Current <> nil):
-        Result = Current.Номер;
+        Result = Current.РќРѕРјРµСЂ;
       fi;
     end;
   end;
 
-  -- Последний номер (поле сортировки) записи по значению строкового поля
+  -- РџРѕСЃР»РµРґРЅРёР№ РЅРѕРјРµСЂ (РїРѕР»Рµ СЃРѕСЂС‚РёСЂРѕРІРєРё) Р·Р°РїРёСЃРё РїРѕ Р·РЅР°С‡РµРЅРёСЋ СЃС‚СЂРѕРєРѕРІРѕРіРѕ РїРѕР»СЏ
   func GetLastRecNumberByFieldValue(vFieldName, vValue :String) :Integer;
-    with Query.Create([СвязанныйКлассЗаписей]) do
-      LoadingFieldsMode = СИС2.Константы.mdNone;
+    with Query.Create([РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№]) do
+      LoadingFieldsMode = РЎРРЎ2.РљРѕРЅСЃС‚Р°РЅС‚С‹.mdNone;
       LoadingFields = vFieldName;
       Order = vFieldName + '-';
       Select;
       while not Eof do
         if (Current.GetField(vFieldName) < vValue) then
-          Result = Current.Номер;
+          Result = Current.РќРѕРјРµСЂ;
           Break;
         fi;
         Next;
@@ -40,39 +40,39 @@ inclass public
     end;
   end;
 
-  -- Нумеровать записи, начиная с StartRecord и номера StartNumber
+  -- РќСѓРјРµСЂРѕРІР°С‚СЊ Р·Р°РїРёСЃРё, РЅР°С‡РёРЅР°СЏ СЃ StartRecord Рё РЅРѕРјРµСЂР° StartNumber
   proc NumberingFrom (StartRecord :BaseRefType2; StartNumber :Integer);
     var aRec :BaseRefType2[];
     var TakeNext :Logical;
     var r, rr :Integer;
-    with Query.Create([СвязанныйКлассЗаписей]) do
-      LoadingFieldsMode = СИС2.Константы.mdNone;
-      LoadingFields = 'Номер';
-      Order = 'Номер';
+    with Query.Create([РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№]) do
+      LoadingFieldsMode = РЎРРЎ2.РљРѕРЅСЃС‚Р°РЅС‚С‹.mdNone;
+      LoadingFields = 'РќРѕРјРµСЂ';
+      Order = 'РќРѕРјРµСЂ';
       Select;
       while not Eof do
         if not TakeNext and (Current = StartRecord) then
           TakeNext = true;
         fi;
         if TakeNext then
-          РКП_СИС.Functions.AddInArray(aRec,  Current);
+          Р РљРџ_РЎРРЎ.Functions.AddInArray(aRec,  Current);
         fi;
         Next;
       od;
       --
       rr = LengthOfArray(aRec);
       for r = 1 .. rr do
-        aRec[r].Номер = (StartNumber - 1 + r);
-        РКП_СИС.Recs.RecordPostIfNeed(aRec[r]);
+        aRec[r].РќРѕРјРµСЂ = (StartNumber - 1 + r);
+        Р РљРџ_РЎРРЎ.Recs.RecordPostIfNeed(aRec[r]);
       od;
     end;
   end;
 
   func GetNextByNumberRecord (cRecord :BaseRefType2) :BaseRefType2;
     var vGetNext :Logical;
-    with Query.Create([СвязанныйКлассЗаписей]) do
-      LoadingFieldsMode = СИС2.Константы.mdNone;
-      Order = 'Номер';
+    with Query.Create([РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№]) do
+      LoadingFieldsMode = РЎРРЎ2.РљРѕРЅСЃС‚Р°РЅС‚С‹.mdNone;
+      Order = 'РќРѕРјРµСЂ';
       Select;
       while not Eof do
         if vGetNext then
@@ -89,9 +89,9 @@ inclass public
 
   func GetPrevByNumberRecord (cRecord :BaseRefType2) :BaseRefType2;
     var vGetNext :Logical;
-    with Query.Create([СвязанныйКлассЗаписей]) do
-      LoadingFieldsMode = СИС2.Константы.mdNone;
-      Order = 'Номер-';
+    with Query.Create([РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№]) do
+      LoadingFieldsMode = РЎРРЎ2.РљРѕРЅСЃС‚Р°РЅС‚С‹.mdNone;
+      Order = 'РќРѕРјРµСЂ-';
       Select;
       while not Eof do
         if vGetNext then
@@ -110,7 +110,7 @@ inclass public
     var vRec :BaseRefType2;
     vRec = GetNextByNumberRecord(cRecord);
     if (vRec <> nil) then
-      Result = vRec.Номер;
+      Result = vRec.РќРѕРјРµСЂ;
     else
       Result = -1;
     fi;
@@ -120,34 +120,34 @@ inclass public
     var vRec :BaseRefType2;
     vRec = GetPrevByNumberRecord(cRecord);
     if (vRec <> nil) then
-      Result = vRec.Номер;
+      Result = vRec.РќРѕРјРµСЂ;
     else
       Result = -1;
     fi;
   end;
 
-  -- обновление номера записи во всей таблице
-  proc UpdateNumberFieldIfNeed synonym ОбновитьНомераВсехЗаписей;
+  -- РѕР±РЅРѕРІР»РµРЅРёРµ РЅРѕРјРµСЂР° Р·Р°РїРёСЃРё РІРѕ РІСЃРµР№ С‚Р°Р±Р»РёС†Рµ
+  proc UpdateNumberFieldIfNeed synonym РћР±РЅРѕРІРёС‚СЊРќРѕРјРµСЂР°Р’СЃРµС…Р—Р°РїРёСЃРµР№;
     var r :Record;
     var i :Integer;
     if UpdateNumberFieldNeed then
-      with Query.Create([СвязанныйКлассЗаписей]) do
+      with Query.Create([РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№]) do
         Select;
         while not Eof do
           r = Current;
           i = i + 1;
-          r.SetField( 'Номер', i );
-          РКП_СИС.Recs.RecordPostIfNeed(r);
+          r.SetField( 'РќРѕРјРµСЂ', i );
+          Р РљРџ_РЎРРЎ.Recs.RecordPostIfNeed(r);
           Next;
         od;
       end;
     fi;
   end;
 
-  -- обновление номера записи во всей таблице необходимо
-  func UpdateNumberFieldNeed synonym НеобходимоОбновитьНомераВсехЗаписей :Logical;
-    with Query.Create([СвязанныйКлассЗаписей]) do
-      Filter = 'Номер=nil';
+  -- РѕР±РЅРѕРІР»РµРЅРёРµ РЅРѕРјРµСЂР° Р·Р°РїРёСЃРё РІРѕ РІСЃРµР№ С‚Р°Р±Р»РёС†Рµ РЅРµРѕР±С…РѕРґРёРјРѕ
+  func UpdateNumberFieldNeed synonym РќРµРѕР±С…РѕРґРёРјРѕРћР±РЅРѕРІРёС‚СЊРќРѕРјРµСЂР°Р’СЃРµС…Р—Р°РїРёСЃРµР№ :Logical;
+    with Query.Create([РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№]) do
+      Filter = 'РќРѕРјРµСЂ=nil';
       Return RecordsExists;
     end;
   end;
@@ -156,18 +156,18 @@ inobject public
 
   var Record :BaseRefType2;
 
-  proc Записать synonym Post( аДиалоговыйРежим :Logical = False );
+  proc Р—Р°РїРёСЃР°С‚СЊ synonym Post( Р°Р”РёР°Р»РѕРіРѕРІС‹Р№Р РµР¶РёРј :Logical = False );
     var vRecIsCreate :Logical;
     var vStartRecord :BaseRefType2;
     vRecIsCreate = (Self.Record.State in [Kernel.Record.Created, Kernel.Record.Duplicated]);
     inherited Post;
     if vRecIsCreate then
-      vStartRecord = РКП_СИС.Recs.FindRecord( СвязанныйКлассЗаписей, 'Номер=' + Str(Record.Номер) );
+      vStartRecord = Р РљРџ_РЎРРЎ.Recs.FindRecord( РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№, 'РќРѕРјРµСЂ=' + Str(Record.РќРѕРјРµСЂ) );
     fi;
     if (vStartRecord = nil) then
-      NumberingFrom (Record, Record.Номер);
+      NumberingFrom (Record, Record.РќРѕРјРµСЂ);
     else
-      NumberingFrom (vStartRecord, vStartRecord.Номер);
+      NumberingFrom (vStartRecord, vStartRecord.РќРѕРјРµСЂ);
     fi;
   end;
 

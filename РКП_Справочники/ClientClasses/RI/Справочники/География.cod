@@ -1,47 +1,47 @@
-class inherited RI.Справочники.intBaseType1 'Интерфейс записи (справочник, тип 1)';
+п»їclass inherited RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.intBaseType1 'РРЅС‚РµСЂС„РµР№СЃ Р·Р°РїРёСЃРё (СЃРїСЂР°РІРѕС‡РЅРёРє, С‚РёРї 1)';
 
-import РКП_СИС Classes Functions, Recs;
+import Р РљРџ_РЎРРЎ Classes Functions, Recs;
 
 inclass public
 
-  var ОбязательныеПоля     :String[] = ['Наим', 'НаимСокр'];
-  var ХешируемыеПоля       :String[] = ['НаимБибл'];
+  var РћР±СЏР·Р°С‚РµР»СЊРЅС‹РµРџРѕР»СЏ     :String[] = ['РќР°РёРј', 'РќР°РёРјРЎРѕРєСЂ'];
+  var РҐРµС€РёСЂСѓРµРјС‹РµРџРѕР»СЏ       :String[] = ['РќР°РёРјР‘РёР±Р»'];
 
-  func СвязанныйКлассЗаписей: Class BaseRefType1;
-    Result = спрГеография;
+  func РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№: Class BaseRefType1;
+    Result = СЃРїСЂР“РµРѕРіСЂР°С„РёСЏ;
   end;
 
-  func Create: RI.Справочники.География;
+  func Create: RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.Р“РµРѕРіСЂР°С„РёСЏ;
     Result = inherited Create;
-    Result.Record = спрГеография.Create;
+    Result.Record = СЃРїСЂР“РµРѕРіСЂР°С„РёСЏ.Create;
   end;
 
-  func ОткрытьПоЗаписи synonym OpenRecord(locRecord: спрГеография): RI.Справочники.География;
+  func РћС‚РєСЂС‹С‚СЊРџРѕР—Р°РїРёСЃРё synonym OpenRecord(locRecord: СЃРїСЂР“РµРѕРіСЂР°С„РёСЏ): RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.Р“РµРѕРіСЂР°С„РёСЏ;
     Result = inherited Create;
     Result.Record = locRecord;
   end;
 
-  func БланкРедакторПоУмолчанию: Class Справочники.editBaseType1;
-    Result = Справочники.редГеография;
+  func Р‘Р»Р°РЅРєР РµРґР°РєС‚РѕСЂРџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class РЎРїСЂР°РІРѕС‡РЅРёРєРё.editBaseType1;
+    Result = РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЂРµРґР“РµРѕРіСЂР°С„РёСЏ;
   end;
 
-  func КартотекаПоУмолчанию: Class Справочники.CardBaseType1;
-    Result = Справочники.картГеография;
+  func РљР°СЂС‚РѕС‚РµРєР°РџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class РЎРїСЂР°РІРѕС‡РЅРёРєРё.CardBaseType1;
+    Result = РЎРїСЂР°РІРѕС‡РЅРёРєРё.РєР°СЂС‚Р“РµРѕРіСЂР°С„РёСЏ;
   end;
 
 inobject public
 
-  Record: спрГеография;
+  Record: СЃРїСЂР“РµРѕРіСЂР°С„РёСЏ;
 
-  proc Инициализировать synonym Init;
+  proc РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊ synonym Init;
     var vLevel :Integer;
     Inherited Init;
-    vLevel = РКП_СИС.Recs.RecordsLevel(Record);
-    if    vLevel = 1 then  Record.Категория = Def.ктрФедеральныйОкруг;
-    elsif vLevel = 2 then  Record.Категория = Def.ктрОбласть;
-    elsif vLevel = 3 then  Record.Категория = Def.ктрРайон;
-    elsif vLevel = 4 then  Record.Категория = Def.ктрНаселенныйПункт;
-    elsif vLevel = 5 then  Record.Категория = Def.ктрНаселенныйПункт;
+    vLevel = Р РљРџ_РЎРРЎ.Recs.RecordsLevel(Record);
+    if    vLevel = 1 then  Record.РљР°С‚РµРіРѕСЂРёСЏ = Def.РєС‚СЂР¤РµРґРµСЂР°Р»СЊРЅС‹Р№РћРєСЂСѓРі;
+    elsif vLevel = 2 then  Record.РљР°С‚РµРіРѕСЂРёСЏ = Def.РєС‚СЂРћР±Р»Р°СЃС‚СЊ;
+    elsif vLevel = 3 then  Record.РљР°С‚РµРіРѕСЂРёСЏ = Def.РєС‚СЂР Р°Р№РѕРЅ;
+    elsif vLevel = 4 then  Record.РљР°С‚РµРіРѕСЂРёСЏ = Def.РєС‚СЂРќР°СЃРµР»РµРЅРЅС‹Р№РџСѓРЅРєС‚;
+    elsif vLevel = 5 then  Record.РљР°С‚РµРіРѕСЂРёСЏ = Def.РєС‚СЂРќР°СЃРµР»РµРЅРЅС‹Р№РџСѓРЅРєС‚;
     fi;
   end;
 

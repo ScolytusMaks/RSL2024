@@ -1,6 +1,6 @@
-class "Расширенный метод клетки ПриНаборе (поле вввода значения справочника)";
+п»їclass "Р Р°СЃС€РёСЂРµРЅРЅС‹Р№ РјРµС‚РѕРґ РєР»РµС‚РєРё РџСЂРёРќР°Р±РѕСЂРµ (РїРѕР»Рµ РІРІРІРѕРґР° Р·РЅР°С‡РµРЅРёСЏ СЃРїСЂР°РІРѕС‡РЅРёРєР°)";
 
-  import РКП_СИС classes StringsFunctions;
+  import Р РљРџ_РЎРРЎ classes StringsFunctions;
   import classes Constants;
 
 inclass public
@@ -12,57 +12,57 @@ inclass public
 
 inobject public
 
-  -- Результат - решение о разрешени окончания отработки события
-  -- vNewValue - новое значение
-  -- vEndEditSave - решение о сохранении введенного значения (парметр, далее передаваемый в метод Template.EndEdit() )
+  -- Р РµР·СѓР»СЊС‚Р°С‚ - СЂРµС€РµРЅРёРµ Рѕ СЂР°Р·СЂРµС€РµРЅРё РѕРєРѕРЅС‡Р°РЅРёСЏ РѕС‚СЂР°Р±РѕС‚РєРё СЃРѕР±С‹С‚РёСЏ
+  -- vNewValue - РЅРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ
+  -- vEndEditSave - СЂРµС€РµРЅРёРµ Рѕ СЃРѕС…СЂР°РЅРµРЅРёРё РІРІРµРґРµРЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ (РїР°СЂРјРµС‚СЂ, РґР°Р»РµРµ РїРµСЂРµРґР°РІР°РµРјС‹Р№ РІ РјРµС‚РѕРґ Template.EndEdit() )
   func 2_ReturnResult0.(var vNewValue :Variant; var vEndEditSave :Logical) :Logical;
-    var vRefRec :РКП_Справочники.BaseRefType1;
+    var vRefRec :Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.BaseRefType1;
     var vCountRec :Integer;
     var vAlgIfNoValue :tAlgIfNoValue;
-    vRefRec = РКП_СИС.Recs.FindRecordExt(ClassRecord, FindFilter, , vCountRec);
-    if (vCountRec = 1) then -- найдено точное совпадение => можно продолжить обработку и разрешить присвоение в других обработчиках
+    vRefRec = Р РљРџ_РЎРРЎ.Recs.FindRecordExt(ClassRecord, FindFilter, , vCountRec);
+    if (vCountRec = 1) then -- РЅР°Р№РґРµРЅРѕ С‚РѕС‡РЅРѕРµ СЃРѕРІРїР°РґРµРЅРёРµ => РјРѕР¶РЅРѕ РїСЂРѕРґРѕР»Р¶РёС‚СЊ РѕР±СЂР°Р±РѕС‚РєСѓ Рё СЂР°Р·СЂРµС€РёС‚СЊ РїСЂРёСЃРІРѕРµРЅРёРµ РІ РґСЂСѓРіРёС… РѕР±СЂР°Р±РѕС‚С‡РёРєР°С…
       vNewValue = vRefRec;
       vEndEditSave = true;
       Return true;
-    elsif (vCountRec > 1) then -- найдено более одного совпадение => открываеем картотеку или псевдокартотеку для выбора с фильтром
-      if (ClassCardfile <> nil) and (ClassFalseCardfiles = nil) then -- выбор из картотеки
-        if (cmOk = ClassCardfile.ВыполнитьВыбор(vRefRec, SearchFormParam)) then
+    elsif (vCountRec > 1) then -- РЅР°Р№РґРµРЅРѕ Р±РѕР»РµРµ РѕРґРЅРѕРіРѕ СЃРѕРІРїР°РґРµРЅРёРµ => РѕС‚РєСЂС‹РІР°РµРµРј РєР°СЂС‚РѕС‚РµРєСѓ РёР»Рё РїСЃРµРІРґРѕРєР°СЂС‚РѕС‚РµРєСѓ РґР»СЏ РІС‹Р±РѕСЂР° СЃ С„РёР»СЊС‚СЂРѕРј
+      if (ClassCardfile <> nil) and (ClassFalseCardfiles = nil) then -- РІС‹Р±РѕСЂ РёР· РєР°СЂС‚РѕС‚РµРєРё
+        if (cmOk = ClassCardfile.Р’С‹РїРѕР»РЅРёС‚СЊР’С‹Р±РѕСЂ(vRefRec, SearchFormParam)) then
           vNewValue = vRefRec;
           vEndEditSave = true;
           Return false;
         fi;
-      elsif (ClassCardfile = nil) and (ClassFalseCardfiles <> nil) then -- выбор из псевдокартотеки
-        if (cmOk = ClassFalseCardfiles.ВыполнитьВыбор(vRefRec, SearchFormParam)) then
+      elsif (ClassCardfile = nil) and (ClassFalseCardfiles <> nil) then -- РІС‹Р±РѕСЂ РёР· РїСЃРµРІРґРѕРєР°СЂС‚РѕС‚РµРєРё
+        if (cmOk = ClassFalseCardfiles.Р’С‹РїРѕР»РЅРёС‚СЊР’С‹Р±РѕСЂ(vRefRec, SearchFormParam)) then
           vNewValue = vRefRec;
           vEndEditSave = true;
           Return false;
         fi;
       else
-        SetError(0, 'Неверно заданы параметры расширенного обработчика события клетки ПриНаборе');
+        SetError(0, 'РќРµРІРµСЂРЅРѕ Р·Р°РґР°РЅС‹ РїР°СЂР°РјРµС‚СЂС‹ СЂР°СЃС€РёСЂРµРЅРЅРѕРіРѕ РѕР±СЂР°Р±РѕС‚С‡РёРєР° СЃРѕР±С‹С‚РёСЏ РєР»РµС‚РєРё РџСЂРёРќР°Р±РѕСЂРµ');
       fi;
-    elsif (vCountRec = 0) then -- совпадений не найдено - вызов диалога "что делать"
+    elsif (vCountRec = 0) then -- СЃРѕРІРїР°РґРµРЅРёР№ РЅРµ РЅР°Р№РґРµРЅРѕ - РІС‹Р·РѕРІ РґРёР°Р»РѕРіР° "С‡С‚Рѕ РґРµР»Р°С‚СЊ"
       vAlgIfNoValue = GetAlgorithmIfNoValue(DialogIfNoValue, Value, Preamble);
-      if (vAlgIfNoValue = алгИскать) then
-        if (ClassCardfile <> nil) and (ClassFalseCardfiles = nil) then -- выбор из картотеки
-          if (cmOk = ClassCardfile.ВыполнитьВыбор(vRefRec, SearchFormParamDef)) then
+      if (vAlgIfNoValue = Р°Р»РіРСЃРєР°С‚СЊ) then
+        if (ClassCardfile <> nil) and (ClassFalseCardfiles = nil) then -- РІС‹Р±РѕСЂ РёР· РєР°СЂС‚РѕС‚РµРєРё
+          if (cmOk = ClassCardfile.Р’С‹РїРѕР»РЅРёС‚СЊР’С‹Р±РѕСЂ(vRefRec, SearchFormParamDef)) then
             vNewValue = vRefRec;
             vEndEditSave = true;
             Return false;
           fi;
-        elsif (ClassCardfile = nil) and (ClassFalseCardfiles <> nil) then -- выбор из псевдокартотеки
-          if (cmOk = ClassFalseCardfiles.ВыполнитьВыбор(vRefRec, SearchFormParamDef)) then
+        elsif (ClassCardfile = nil) and (ClassFalseCardfiles <> nil) then -- РІС‹Р±РѕСЂ РёР· РїСЃРµРІРґРѕРєР°СЂС‚РѕС‚РµРєРё
+          if (cmOk = ClassFalseCardfiles.Р’С‹РїРѕР»РЅРёС‚СЊР’С‹Р±РѕСЂ(vRefRec, SearchFormParamDef)) then
             vNewValue = vRefRec;
             vEndEditSave = true;
             Return false;
           fi;
         else
-          SetError(0, 'Неверно заданы параметры расширенного обработчика события клетки ПриНаборе');
+          SetError(0, 'РќРµРІРµСЂРЅРѕ Р·Р°РґР°РЅС‹ РїР°СЂР°РјРµС‚СЂС‹ СЂР°СЃС€РёСЂРµРЅРЅРѕРіРѕ РѕР±СЂР°Р±РѕС‚С‡РёРєР° СЃРѕР±С‹С‚РёСЏ РєР»РµС‚РєРё РџСЂРёРќР°Р±РѕСЂРµ');
         fi;
-      elsif (vAlgIfNoValue = алгДобавить) then
+      elsif (vAlgIfNoValue = Р°Р»РіР”РѕР±Р°РІРёС‚СЊ) then
         vRefRec = ClassRecord.Create;
-        vRefRec.Наим = Value as String;
+        vRefRec.РќР°РёРј = Value as String;
         try
-          vRefRec.SetField('Hash', РКП_Справочники.RI.Справочники.intBaseType1.GetHashByRecord(vRefRec));
+          vRefRec.SetField('Hash', Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.intBaseType1.GetHashByRecord(vRefRec));
         except
         end;
         if (cmOk = ClassEditorForm.ShowFormEx(vRefRec, Window.ModalWindow)) then
@@ -78,18 +78,18 @@ inobject private
 
   func GetAlgorithmIfNoValue(vDialogIfNoValue :tDialogIfNoValue; vValue :variant; vPreamble :String) :tAlgIfNoValue;
     var vAnswer :Integer;
-    if (vDialogIfNoValue = тдДобавитьИскатьПовторить) then
-      vAnswer = Enquiry('', vPreamble + ' "' + vValue +'", не найдено в справочнике. ' + Br +
-                            'Пожалуйста, выберите действие:',
-                            ['Добавить в справочник','Искать в полном списке','Повторить ввод']);
-      if (vAnswer = 1) then    Return алгДобавить;
-      elsif (vAnswer = 2) then Return алгИскать;
+    if (vDialogIfNoValue = С‚РґР”РѕР±Р°РІРёС‚СЊРСЃРєР°С‚СЊРџРѕРІС‚РѕСЂРёС‚СЊ) then
+      vAnswer = Enquiry('', vPreamble + ' "' + vValue +'", РЅРµ РЅР°Р№РґРµРЅРѕ РІ СЃРїСЂР°РІРѕС‡РЅРёРєРµ. ' + Br +
+                            'РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІС‹Р±РµСЂРёС‚Рµ РґРµР№СЃС‚РІРёРµ:',
+                            ['Р”РѕР±Р°РІРёС‚СЊ РІ СЃРїСЂР°РІРѕС‡РЅРёРє','РСЃРєР°С‚СЊ РІ РїРѕР»РЅРѕРј СЃРїРёСЃРєРµ','РџРѕРІС‚РѕСЂРёС‚СЊ РІРІРѕРґ']);
+      if (vAnswer = 1) then    Return Р°Р»РіР”РѕР±Р°РІРёС‚СЊ;
+      elsif (vAnswer = 2) then Return Р°Р»РіРСЃРєР°С‚СЊ;
       fi;
-    elsif (vDialogIfNoValue = тдИскатьПовторить) then
-      vAnswer = Enquiry('', vPreamble + ' "' + vValue +'", не найдено в справочнике. ' + Br +
-                            'Пожалуйста, выберите действие:',
-                            ['Искать в полном списке','Повторить ввод']);
-      if (vAnswer = 1) then    Return алгИскать;
+    elsif (vDialogIfNoValue = С‚РґРСЃРєР°С‚СЊРџРѕРІС‚РѕСЂРёС‚СЊ) then
+      vAnswer = Enquiry('', vPreamble + ' "' + vValue +'", РЅРµ РЅР°Р№РґРµРЅРѕ РІ СЃРїСЂР°РІРѕС‡РЅРёРєРµ. ' + Br +
+                            'РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІС‹Р±РµСЂРёС‚Рµ РґРµР№СЃС‚РІРёРµ:',
+                            ['РСЃРєР°С‚СЊ РІ РїРѕР»РЅРѕРј СЃРїРёСЃРєРµ','РџРѕРІС‚РѕСЂРёС‚СЊ РІРІРѕРґ']);
+      if (vAnswer = 1) then    Return Р°Р»РіРСЃРєР°С‚СЊ;
       fi;
     fi;
   end;
@@ -97,110 +97,110 @@ inobject private
 
 inobject public
 
-  -- Передача значений параметров
+  -- РџРµСЂРµРґР°С‡Р° Р·РЅР°С‡РµРЅРёР№ РїР°СЂР°РјРµС‚СЂРѕРІ
 
-  proc SetClassRecord(locValue :class BaseRefType1);  -- класс записи справочника для поиска
+  proc SetClassRecord(locValue :class BaseRefType1);  -- РєР»Р°СЃСЃ Р·Р°РїРёСЃРё СЃРїСЂР°РІРѕС‡РЅРёРєР° РґР»СЏ РїРѕРёСЃРєР°
     _ClassRecord = locValue;
   end;
 
-  proc SetClassCardfile(locValue :class Справочники.CardBaseType1);  -- класс картотеки для выбора
+  proc SetClassCardfile(locValue :class РЎРїСЂР°РІРѕС‡РЅРёРєРё.CardBaseType1);  -- РєР»Р°СЃСЃ РєР°СЂС‚РѕС‚РµРєРё РґР»СЏ РІС‹Р±РѕСЂР°
     _ClassCardfile = locValue;
   end;
 
-  proc SetClassFalseCardfiles(locValue :class Справочники.FalseCardType1); -- класс псевдокартотеки для выбора
+  proc SetClassFalseCardfiles(locValue :class РЎРїСЂР°РІРѕС‡РЅРёРєРё.FalseCardType1); -- РєР»Р°СЃСЃ РїСЃРµРІРґРѕРєР°СЂС‚РѕС‚РµРєРё РґР»СЏ РІС‹Р±РѕСЂР°
     _ClassFalseCardfiles = locValue;
   end;
 
-  proc SetClassEditorForm(locValue :class Справочники.editBaseType1); -- класс бланка-редактора записи справочника
+  proc SetClassEditorForm(locValue :class РЎРїСЂР°РІРѕС‡РЅРёРєРё.editBaseType1); -- РєР»Р°СЃСЃ Р±Р»Р°РЅРєР°-СЂРµРґР°РєС‚РѕСЂР° Р·Р°РїРёСЃРё СЃРїСЂР°РІРѕС‡РЅРёРєР°
     _ClassEditorForm = locValue;
   end;
 
-  proc SetFindFilter(locValue :String); -- фильтр для поиска
+  proc SetFindFilter(locValue :String); -- С„РёР»СЊС‚СЂ РґР»СЏ РїРѕРёСЃРєР°
     _FindFilter = locValue;
   end;
 
-  proc SetSearchFormParam(locValue :Variant[2]); -- параметры для открытия клааса выбора с фильтром
+  proc SetSearchFormParam(locValue :Variant[2]); -- РїР°СЂР°РјРµС‚СЂС‹ РґР»СЏ РѕС‚РєСЂС‹С‚РёСЏ РєР»Р°Р°СЃР° РІС‹Р±РѕСЂР° СЃ С„РёР»СЊС‚СЂРѕРј
     _SearchFormParam = locValue;
   end;
 
-  proc SetSearchFormParamDef(locValue :Variant[2]); -- параметры для открытия клааса выбора с дефолтовым фильтром
+  proc SetSearchFormParamDef(locValue :Variant[2]); -- РїР°СЂР°РјРµС‚СЂС‹ РґР»СЏ РѕС‚РєСЂС‹С‚РёСЏ РєР»Р°Р°СЃР° РІС‹Р±РѕСЂР° СЃ РґРµС„РѕР»С‚РѕРІС‹Рј С„РёР»СЊС‚СЂРѕРј
     _SearchFormParamDef = locValue;
   end;
 
 
-  proc SetDialogIfNoValue(locValue :tDialogIfNoValue); -- тип диалога, если нет искомого значения
+  proc SetDialogIfNoValue(locValue :tDialogIfNoValue); -- С‚РёРї РґРёР°Р»РѕРіР°, РµСЃР»Рё РЅРµС‚ РёСЃРєРѕРјРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
     _DialogIfNoValue = locValue;
   end;
 
-  proc SetPreamble(locValue :String); -- преамбула диалога
+  proc SetPreamble(locValue :String); -- РїСЂРµР°РјР±СѓР»Р° РґРёР°Р»РѕРіР°
     _Preamble = locValue;
   end;
 
 inobject private
 
-  -- Получение значений параметров
+  -- РџРѕР»СѓС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ РїР°СЂР°РјРµС‚СЂРѕРІ
 
-  func ClassRecord :class BaseRefType1; -- класс записи справочника для поиска
+  func ClassRecord :class BaseRefType1; -- РєР»Р°СЃСЃ Р·Р°РїРёСЃРё СЃРїСЂР°РІРѕС‡РЅРёРєР° РґР»СЏ РїРѕРёСЃРєР°
     Return _ClassRecord;
   end;
 
-  func ClassCardfile :class Справочники.CardBaseType1; -- класс картотеки для выбора
+  func ClassCardfile :class РЎРїСЂР°РІРѕС‡РЅРёРєРё.CardBaseType1; -- РєР»Р°СЃСЃ РєР°СЂС‚РѕС‚РµРєРё РґР»СЏ РІС‹Р±РѕСЂР°
     Return _ClassCardfile;
   end;
 
-  func ClassFalseCardfiles :class Справочники.FalseCardType1; -- класс псевдокартотеки для выбора
+  func ClassFalseCardfiles :class РЎРїСЂР°РІРѕС‡РЅРёРєРё.FalseCardType1; -- РєР»Р°СЃСЃ РїСЃРµРІРґРѕРєР°СЂС‚РѕС‚РµРєРё РґР»СЏ РІС‹Р±РѕСЂР°
     Return _ClassFalseCardfiles;
   end;
 
-  func ClassEditorForm :class Справочники.editBaseType1; -- класс бланка-редактора записи справочника
+  func ClassEditorForm :class РЎРїСЂР°РІРѕС‡РЅРёРєРё.editBaseType1; -- РєР»Р°СЃСЃ Р±Р»Р°РЅРєР°-СЂРµРґР°РєС‚РѕСЂР° Р·Р°РїРёСЃРё СЃРїСЂР°РІРѕС‡РЅРёРєР°
     Return _ClassEditorForm;
   end;
 
-  func Value :Variant; -- введенное значение
+  func Value :Variant; -- РІРІРµРґРµРЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
     Return _Value;
   end;
 
   func FindFilter :String;
     if (_FindFilter = nil) and (_Value <> nil) then
-      Return 'Match(Наим,"*' + _Value as String + '*")';
+      Return 'Match(РќР°РёРј,"*' + _Value as String + '*")';
     elsif (_FindFilter <> nil) then
       Return _FindFilter;
     fi;
   end;
 
-  func SearchFormParam :Variant[2]; -- параметры для открытия клааса выбора с фильтром
+  func SearchFormParam :Variant[2]; -- РїР°СЂР°РјРµС‚СЂС‹ РґР»СЏ РѕС‚РєСЂС‹С‚РёСЏ РєР»Р°Р°СЃР° РІС‹Р±РѕСЂР° СЃ С„РёР»СЊС‚СЂРѕРј
     if (_SearchFormParam = nil) then
-      Result[1] = ['ТипФрагмента', 1];
-      Result[2] = ['Фрагмент', Value];
+      Result[1] = ['РўРёРїР¤СЂР°РіРјРµРЅС‚Р°', 1];
+      Result[2] = ['Р¤СЂР°РіРјРµРЅС‚', Value];
     else
       Return _SearchFormParam;
     fi;
   end;
 
-  func SearchFormParamDef :Variant[2]; -- параметры для открытия клааса выбора с дефолтовым фильтром
+  func SearchFormParamDef :Variant[2]; -- РїР°СЂР°РјРµС‚СЂС‹ РґР»СЏ РѕС‚РєСЂС‹С‚РёСЏ РєР»Р°Р°СЃР° РІС‹Р±РѕСЂР° СЃ РґРµС„РѕР»С‚РѕРІС‹Рј С„РёР»СЊС‚СЂРѕРј
     Return _SearchFormParamDef;
   end;
 
-  func DialogIfNoValue :tDialogIfNoValue; -- тип диалога, если нет искомого значения
-    Result = if(_DialogIfNoValue = nil, тдИскатьПовторить, _DialogIfNoValue);
+  func DialogIfNoValue :tDialogIfNoValue; -- С‚РёРї РґРёР°Р»РѕРіР°, РµСЃР»Рё РЅРµС‚ РёСЃРєРѕРјРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
+    Result = if(_DialogIfNoValue = nil, С‚РґРСЃРєР°С‚СЊРџРѕРІС‚РѕСЂРёС‚СЊ, _DialogIfNoValue);
   end;
 
-  func Preamble :String; -- преамбула диалога
-    Result = if(_Preamble = nil, 'Наименования, похожего на', _Preamble);
+  func Preamble :String; -- РїСЂРµР°РјР±СѓР»Р° РґРёР°Р»РѕРіР°
+    Result = if(_Preamble = nil, 'РќР°РёРјРµРЅРѕРІР°РЅРёСЏ, РїРѕС…РѕР¶РµРіРѕ РЅР°', _Preamble);
   end;
 
-  -- Параметры обработчика
+  -- РџР°СЂР°РјРµС‚СЂС‹ РѕР±СЂР°Р±РѕС‚С‡РёРєР°
 
-  var _ClassRecord: class BaseRefType1;                       -- класс записи справочника для поиска
-  var _ClassCardfile :class Справочники.CardBaseType1;        -- класс картотеки для выбора
-  var _ClassFalseCardfiles :class Справочники.FalseCardType1; -- класс псевдокартотеки для выбора
-  var _ClassEditorForm :class Справочники.editBaseType1;      -- класс бланка-редактора записи справочника
-  var _Value :Variant;                                        -- введенное значение
-  var _NewValue :Variant;                                     -- новое значение
-  var _FindFilter :String;                                    -- фильтр для поиска
-  var _SearchFormParam :Variant[2];                           -- параметры для открытия клааса выбора с фильтром
-  var _SearchFormParamDef :Variant[2];                        -- параметры для открытия клааса выбора с дефолтовым фильтром
-  var _DialogIfNoValue :tDialogIfNoValue;                     -- тип диалога, если нет искомого значения
-  var _Preamble :String;                                      -- преамбула диалога
+  var _ClassRecord: class BaseRefType1;                       -- РєР»Р°СЃСЃ Р·Р°РїРёСЃРё СЃРїСЂР°РІРѕС‡РЅРёРєР° РґР»СЏ РїРѕРёСЃРєР°
+  var _ClassCardfile :class РЎРїСЂР°РІРѕС‡РЅРёРєРё.CardBaseType1;        -- РєР»Р°СЃСЃ РєР°СЂС‚РѕС‚РµРєРё РґР»СЏ РІС‹Р±РѕСЂР°
+  var _ClassFalseCardfiles :class РЎРїСЂР°РІРѕС‡РЅРёРєРё.FalseCardType1; -- РєР»Р°СЃСЃ РїСЃРµРІРґРѕРєР°СЂС‚РѕС‚РµРєРё РґР»СЏ РІС‹Р±РѕСЂР°
+  var _ClassEditorForm :class РЎРїСЂР°РІРѕС‡РЅРёРєРё.editBaseType1;      -- РєР»Р°СЃСЃ Р±Р»Р°РЅРєР°-СЂРµРґР°РєС‚РѕСЂР° Р·Р°РїРёСЃРё СЃРїСЂР°РІРѕС‡РЅРёРєР°
+  var _Value :Variant;                                        -- РІРІРµРґРµРЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
+  var _NewValue :Variant;                                     -- РЅРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ
+  var _FindFilter :String;                                    -- С„РёР»СЊС‚СЂ РґР»СЏ РїРѕРёСЃРєР°
+  var _SearchFormParam :Variant[2];                           -- РїР°СЂР°РјРµС‚СЂС‹ РґР»СЏ РѕС‚РєСЂС‹С‚РёСЏ РєР»Р°Р°СЃР° РІС‹Р±РѕСЂР° СЃ С„РёР»СЊС‚СЂРѕРј
+  var _SearchFormParamDef :Variant[2];                        -- РїР°СЂР°РјРµС‚СЂС‹ РґР»СЏ РѕС‚РєСЂС‹С‚РёСЏ РєР»Р°Р°СЃР° РІС‹Р±РѕСЂР° СЃ РґРµС„РѕР»С‚РѕРІС‹Рј С„РёР»СЊС‚СЂРѕРј
+  var _DialogIfNoValue :tDialogIfNoValue;                     -- С‚РёРї РґРёР°Р»РѕРіР°, РµСЃР»Рё РЅРµС‚ РёСЃРєРѕРјРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
+  var _Preamble :String;                                      -- РїСЂРµР°РјР±СѓР»Р° РґРёР°Р»РѕРіР°
 
 end

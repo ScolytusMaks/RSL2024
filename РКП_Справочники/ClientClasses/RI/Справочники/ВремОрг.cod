@@ -1,31 +1,31 @@
-class inherited RI.Справочники.intBaseType1 'Интерфейс записи (справочник, тип 1)';
+п»їclass inherited RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.intBaseType1 'РРЅС‚РµСЂС„РµР№СЃ Р·Р°РїРёСЃРё (СЃРїСЂР°РІРѕС‡РЅРёРє, С‚РёРї 1)';
 
 inclass public
 
-  func СвязанныйКлассЗаписей: Class BaseRefType1;
-    Result = спрВОрганизация;
+  func РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№: Class BaseRefType1;
+    Result = СЃРїСЂР’РћСЂРіР°РЅРёР·Р°С†РёСЏ;
   end;
 
-  func Create: RI.Справочники.ВремОрг;
+  func Create: RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.Р’СЂРµРјРћСЂРі;
     Result = inherited Create;
-    Result.Record = спрВОрганизация.Create;
+    Result.Record = СЃРїСЂР’РћСЂРіР°РЅРёР·Р°С†РёСЏ.Create;
   end;
 
-  func ОткрытьПоЗаписи synonym OpenRecord(locRecord: спрВОрганизация): RI.Справочники.ВремОрг;
+  func РћС‚РєСЂС‹С‚СЊРџРѕР—Р°РїРёСЃРё synonym OpenRecord(locRecord: СЃРїСЂР’РћСЂРіР°РЅРёР·Р°С†РёСЏ): RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.Р’СЂРµРјРћСЂРі;
     Result = inherited Create;
     Result.Record = locRecord;
   end;
 
-  func БланкРедакторПоУмолчанию: Class Справочники.editBaseType1;
-    Result = Справочники.редВремОрг;
+  func Р‘Р»Р°РЅРєР РµРґР°РєС‚РѕСЂРџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class РЎРїСЂР°РІРѕС‡РЅРёРєРё.editBaseType1;
+    Result = РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЂРµРґР’СЂРµРјРћСЂРі;
   end;
 
-  func КартотекаПоУмолчанию: Class Справочники.CardBaseType1;
-    Result = Справочники.картВремОрг;
+  func РљР°СЂС‚РѕС‚РµРєР°РџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class РЎРїСЂР°РІРѕС‡РЅРёРєРё.CardBaseType1;
+    Result = РЎРїСЂР°РІРѕС‡РЅРёРєРё.РєР°СЂС‚Р’СЂРµРјРћСЂРі;
   end;
 
 inobject public
 
-  Record: спрВОрганизация;
+  Record: СЃРїСЂР’РћСЂРіР°РЅРёР·Р°С†РёСЏ;
 
 end

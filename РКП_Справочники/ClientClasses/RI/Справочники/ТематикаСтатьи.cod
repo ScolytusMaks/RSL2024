@@ -1,34 +1,34 @@
-class inherited RI.Справочники.intBaseType3 'Интерфейс записи (справочник, тип 3)';
+п»їclass inherited RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.intBaseType3 'РРЅС‚РµСЂС„РµР№СЃ Р·Р°РїРёСЃРё (СЃРїСЂР°РІРѕС‡РЅРёРє, С‚РёРї 3)';
 
-import РКП_СИС Classes Functions, Recs;
+import Р РљРџ_РЎРРЎ Classes Functions, Recs;
 
 inclass public
 
-  var ОбязательныеПоля     :String[] = ['Код', 'Наим', 'КрНаим'];
-  var ХешируемыеПоля       :String[] = ['Код'];
+  var РћР±СЏР·Р°С‚РµР»СЊРЅС‹РµРџРѕР»СЏ     :String[] = ['РљРѕРґ', 'РќР°РёРј', 'РљСЂРќР°РёРј'];
+  var РҐРµС€РёСЂСѓРµРјС‹РµРџРѕР»СЏ       :String[] = ['РљРѕРґ'];
 
-  type tFilterByHeadingType synonym типФильтрПоТипуРубрик = (fltByHeadingTypeAny = 0, fltByHeadingTypeSyst, fltByHeadingTypeTemp);
+  type tFilterByHeadingType synonym С‚РёРїР¤РёР»СЊС‚СЂРџРѕРўРёРїСѓР СѓР±СЂРёРє = (fltByHeadingTypeAny = 0, fltByHeadingTypeSyst, fltByHeadingTypeTemp);
 
-  func СвязанныйКлассЗаписей: Class BaseRefType3;
-    Result = спрТематикаСтатьи;
+  func РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№: Class BaseRefType3;
+    Result = СЃРїСЂРўРµРјР°С‚РёРєР°РЎС‚Р°С‚СЊРё;
   end;
 
-  func Create: RI.Справочники.ТематикаСтатьи;
+  func Create: RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РўРµРјР°С‚РёРєР°РЎС‚Р°С‚СЊРё;
     Result = inherited Create;
-    Result.Record = спрТематикаСтатьи.Create;
+    Result.Record = СЃРїСЂРўРµРјР°С‚РёРєР°РЎС‚Р°С‚СЊРё.Create;
   end;
 
-  func ОткрытьПоЗаписи synonym OpenRecord(locRecord: спрТематикаСтатьи): RI.Справочники.ТематикаСтатьи;
+  func РћС‚РєСЂС‹С‚СЊРџРѕР—Р°РїРёСЃРё synonym OpenRecord(locRecord: СЃРїСЂРўРµРјР°С‚РёРєР°РЎС‚Р°С‚СЊРё): RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РўРµРјР°С‚РёРєР°РЎС‚Р°С‚СЊРё;
     Result = inherited Create;
     Result.Record = locRecord;
   end;
 
-  func БланкРедакторПоУмолчанию: Class Справочники.editBaseType3;
-    Result = Справочники.редТематикаСтатьи;
+  func Р‘Р»Р°РЅРєР РµРґР°РєС‚РѕСЂРџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class РЎРїСЂР°РІРѕС‡РЅРёРєРё.editBaseType3;
+    Result = РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЂРµРґРўРµРјР°С‚РёРєР°РЎС‚Р°С‚СЊРё;
   end;
 
 inobject public
 
-  Record: спрТематикаСтатьи;
+  Record: СЃРїСЂРўРµРјР°С‚РёРєР°РЎС‚Р°С‚СЊРё;
 
 end
