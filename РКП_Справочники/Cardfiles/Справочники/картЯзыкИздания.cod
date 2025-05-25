@@ -1,40 +1,40 @@
-Class inherited Справочники.CardBaseType1 "Языки изданий";
+п»їClass inherited РЎРїСЂР°РІРѕС‡РЅРёРєРё.CardBaseType1 "РЇР·С‹РєРё РёР·РґР°РЅРёР№";
 
 inclass private
 
-  var КлассИнтерфейса :Class RI.Справочники.intBaseType1 = RI.Справочники.ЯзыкИздания;
+  var РљР»Р°СЃСЃРРЅС‚РµСЂС„РµР№СЃР° :Class RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.intBaseType1 = RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РЇР·С‹РєРР·РґР°РЅРёСЏ;
 
 inobject private
 
 
--- 2_Обработчики событий 0картотеки. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ 0РєР°СЂС‚РѕС‚РµРєРё. --
 
-  proc Столбец_ПриРисовании(Column :CardfileColumn; Rec :Record; Selected :Logical; var Color :Integer; Font :Font);
-    inherited Столбец_ПриРисовании(Column, Rec, Selected, Color, Font);
-    if (Rec.ГосЯзРФ as logical) then
+  proc РЎС‚РѕР»Р±РµС†_РџСЂРёР РёСЃРѕРІР°РЅРёРё(Column :CardfileColumn; Rec :Record; Selected :Logical; var Color :Integer; Font :Font);
+    inherited РЎС‚РѕР»Р±РµС†_РџСЂРёР РёСЃРѕРІР°РЅРёРё(Column, Rec, Selected, Color, Font);
+    if (Rec.Р“РѕСЃРЇР·Р Р¤ as logical) then
       Font.Bold = true;
     fi;
   end;
 
-  proc картотека_ПриОформлении(Action :Cardfile.RearrangeActions; Column :CardfileColumn);
+  proc РєР°СЂС‚РѕС‚РµРєР°_РџСЂРёРћС„РѕСЂРјР»РµРЅРёРё(Action :Cardfile.RearrangeActions; Column :CardfileColumn);
     var vOrd :String;
-    inherited картотека_ПриОформлении(Action, Column);
+    inherited РєР°СЂС‚РѕС‚РµРєР°_РџСЂРёРћС„РѕСЂРјР»РµРЅРёРё(Action, Column);
     if (Action = Cardfile.SortByColumn) then
       vOrd = Self.Cardfile.Order;
       if (vOrd = nil) then
-        Self.Cardfile.Order = 'ГосЯзРФ-;Наим';
+        Self.Cardfile.Order = 'Р“РѕСЃРЇР·Р Р¤-;РќР°РёРј';
       else
-        Self.Cardfile.Order = 'ГосЯзРФ-;' + vOrd;
+        Self.Cardfile.Order = 'Р“РѕСЃРЇР·Р Р¤-;' + vOrd;
       fi;
     fi;
   end;
 
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
-  proc УстановитьПараметрыПоУмолчанию;
-    СтрокаСортировки = 'ГосЯзРФ-;Наим';
-    ВосстановитьСортировку = true;
+  proc РЈСЃС‚Р°РЅРѕРІРёС‚СЊРџР°СЂР°РјРµС‚СЂС‹РџРѕРЈРјРѕР»С‡Р°РЅРёСЋ;
+    РЎС‚СЂРѕРєР°РЎРѕСЂС‚РёСЂРѕРІРєРё = 'Р“РѕСЃРЇР·Р Р¤-;РќР°РёРј';
+    Р’РѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊРЎРѕСЂС‚РёСЂРѕРІРєСѓ = true;
   end;
 
 

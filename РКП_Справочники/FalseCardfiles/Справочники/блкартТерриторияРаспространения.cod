@@ -1,38 +1,38 @@
-class inherited Справочники.FalseCardType2 "Территории распространения";
+п»їclass inherited РЎРїСЂР°РІРѕС‡РЅРёРєРё.FalseCardType2 "РўРµСЂСЂРёС‚РѕСЂРёРё СЂР°СЃРїСЂРѕСЃС‚СЂР°РЅРµРЅРёСЏ";
 
-import РКП_СИС Classes Profile, StringsFunctions, Functions, Recs, FilterMaker;
+import Р РљРџ_РЎРРЎ Classes Profile, StringsFunctions, Functions, Recs, FilterMaker;
 import Classes Def;
 
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 
 inclass private
 
-  var КлассИнтерфейса :Class RI.Справочники.ТерриторияРаспространения := RI.Справочники.ТерриторияРаспространения;
+  var РљР»Р°СЃСЃРРЅС‚РµСЂС„РµР№СЃР° :Class RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РўРµСЂСЂРёС‚РѕСЂРёСЏР Р°СЃРїСЂРѕСЃС‚СЂР°РЅРµРЅРёСЏ := RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РўРµСЂСЂРёС‚РѕСЂРёСЏР Р°СЃРїСЂРѕСЃС‚СЂР°РЅРµРЅРёСЏ;
 
 inobject private
 
-  var SelectedRecord :спрТерриторияРаспространения; -- Проброс выбранного значения
+  var SelectedRecord :СЃРїСЂРўРµСЂСЂРёС‚РѕСЂРёСЏР Р°СЃРїСЂРѕСЃС‚СЂР°РЅРµРЅРёСЏ; -- РџСЂРѕР±СЂРѕСЃ РІС‹Р±СЂР°РЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 
 --}}
 
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
--- 2_Обработчики событий прочих объектов шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РїСЂРѕС‡РёС… РѕР±СЉРµРєС‚РѕРІ С€Р°Р±Р»РѕРЅР°0. --
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
-  proc ИнициализироватьКартотеку;
-    inherited ИнициализироватьКартотеку;
-    crdBuiltIn.CanInsert = true in [DevAccess, AdmAccess, FullAccess, (кмпОРГПзав in Компетенции)];
-    crdBuiltIn.CanDelete = true in [DevAccess, AdmAccess, FullAccess, (кмпОРГПзав in Компетенции)];
+  proc РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊРљР°СЂС‚РѕС‚РµРєСѓ;
+    inherited РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊРљР°СЂС‚РѕС‚РµРєСѓ;
+    crdBuiltIn.CanInsert = true in [DevAccess, AdmAccess, FullAccess, (РєРјРїРћР Р“РџР·Р°РІ in РљРѕРјРїРµС‚РµРЅС†РёРё)];
+    crdBuiltIn.CanDelete = true in [DevAccess, AdmAccess, FullAccess, (РєРјРїРћР Р“РџР·Р°РІ in РљРѕРјРїРµС‚РµРЅС†РёРё)];
   end;
 
-  proc ИнициализироватьСтолбцыКартотеки;
-    inherited ИнициализироватьСтолбцыКартотеки;
+  proc РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊРЎС‚РѕР»Р±С†С‹РљР°СЂС‚РѕС‚РµРєРё;
+    inherited РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊРЎС‚РѕР»Р±С†С‹РљР°СЂС‚РѕС‚РµРєРё;
     with crdBuiltIn.AddColumn do
-      FieldName = 'Наим';
-      Caption = 'Наименование';
+      FieldName = 'РќР°РёРј';
+      Caption = 'РќР°РёРјРµРЅРѕРІР°РЅРёРµ';
       FieldType = Template.StringField;
       Alignment = Template.LeftAlign;
       Font.Size = crdBuiltIn.Font.Size;
@@ -41,9 +41,9 @@ inobject private
       CanEdit = false;
     end;
     with crdBuiltIn.AddColumn do
-      FieldName = 'НеПрименяется';
-      Caption = 'Не применяется';
-      Hint = 'Более не применяется';
+      FieldName = 'РќРµРџСЂРёРјРµРЅСЏРµС‚СЃСЏ';
+      Caption = 'РќРµ РїСЂРёРјРµРЅСЏРµС‚СЃСЏ';
+      Hint = 'Р‘РѕР»РµРµ РЅРµ РїСЂРёРјРµРЅСЏРµС‚СЃСЏ';
       FieldType = Template.LogicalField;
       Alignment = Template.CenterAlign;
       MinWidth = 160;

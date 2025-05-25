@@ -1,8 +1,8 @@
-Class inherited Справочники.CardBaseType1 "Серии статей";
+п»їClass inherited РЎРїСЂР°РІРѕС‡РЅРёРєРё.CardBaseType1 "РЎРµСЂРёРё СЃС‚Р°С‚РµР№";
 
 inclass private
 
-  var КлассИнтерфейса :Class RI.Справочники.intBaseType1 = RI.Справочники.СерияСтатей;
+  var РљР»Р°СЃСЃРРЅС‚РµСЂС„РµР№СЃР° :Class RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.intBaseType1 = RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РЎРµСЂРёСЏРЎС‚Р°С‚РµР№;
 
 
 end

@@ -1,79 +1,79 @@
-class inherited Справочники.FalseCardType2 "";
+п»їclass inherited РЎРїСЂР°РІРѕС‡РЅРёРєРё.FalseCardType2 "";
 
 import Classes Def;
-import РКП_СИС Classes Functions, FilterMaker;
+import Р РљРџ_РЎРРЎ Classes Functions, FilterMaker;
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 
 inclass private
 
-  var КлассИнтерфейса :Class RI.Справочники.intBaseType3 := RI.Справочники.intBaseType3;
+  var РљР»Р°СЃСЃРРЅС‚РµСЂС„РµР№СЃР° :Class RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.intBaseType3 := RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.intBaseType3;
 
-  stored var ТипФрагмента :Integer;
-  FilterFragment synonym ФрагментФильтра: variant[2] =
-    [[fltByCodeField, 'Фрагмент кода'],            -- 0
-     [fltByNameField, 'Фрагмент наименования']];   -- 1
+  stored var РўРёРїР¤СЂР°РіРјРµРЅС‚Р° :Integer;
+  FilterFragment synonym Р¤СЂР°РіРјРµРЅС‚Р¤РёР»СЊС‚СЂР°: variant[2] =
+    [[fltByCodeField, 'Р¤СЂР°РіРјРµРЅС‚ РєРѕРґР°'],            -- 0
+     [fltByNameField, 'Р¤СЂР°РіРјРµРЅС‚ РЅР°РёРјРµРЅРѕРІР°РЅРёСЏ']];   -- 1
 
 inobject private
 
-  var SelectedRecord :BaseRefType3; -- Проброс выбранного значения
+  var SelectedRecord :BaseRefType3; -- РџСЂРѕР±СЂРѕСЃ РІС‹Р±СЂР°РЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 --}}
 
--- 2_Конструкторы, визуализаторы0. --
+-- 2_РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹, РІРёР·СѓР°Р»РёР·Р°С‚РѕСЂС‹0. --
 
 inclass public
 
 
 inclass private
 
--- 2_Обработчики событий шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ С€Р°Р±Р»РѕРЅР°0. --
 
 inobject private
 
 
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
-  func Поле_Фильтр_ПриНажатии (Cell: TemplateCell; Action: Template.ClickTypes): Logical;
+  func РџРѕР»Рµ_Р¤РёР»СЊС‚СЂ_РџСЂРёРќР°Р¶Р°С‚РёРё (Cell: TemplateCell; Action: Template.ClickTypes): Logical;
     var r: Integer;
-    if (Cell.Contents = 'ПоказатьУстаревшее') then
-      if (ПоказатьУстаревшее in [0, 1]) then
-        ПоказатьУстаревшее = -1;
+    if (Cell.Contents = 'РџРѕРєР°Р·Р°С‚СЊРЈСЃС‚Р°СЂРµРІС€РµРµ') then
+      if (РџРѕРєР°Р·Р°С‚СЊРЈСЃС‚Р°СЂРµРІС€РµРµ in [0, 1]) then
+        РџРѕРєР°Р·Р°С‚СЊРЈСЃС‚Р°СЂРµРІС€РµРµ = -1;
       else
-        ПоказатьУстаревшее = 1;
+        РџРѕРєР°Р·Р°С‚СЊРЈСЃС‚Р°СЂРµРІС€РµРµ = 1;
       fi;
-    elsif (Cell.Contents = 'ТипФрагмента') then
+    elsif (Cell.Contents = 'РўРёРїР¤СЂР°РіРјРµРЅС‚Р°') then
       r = Cell.Row;
-      ТипФрагмента = (r - 1);
+      РўРёРїР¤СЂР°РіРјРµРЅС‚Р° = (r - 1);
     fi;
-    ОбновитьФильтр;
+    РћР±РЅРѕРІРёС‚СЊР¤РёР»СЊС‚СЂ;
   end;
 
-  func Поле_Фильтр_ПриВыводе (Cell: TemplateCell; Value: Variant; Action: Template.OutputTypes; var Format: String): Variant;
+  func РџРѕР»Рµ_Р¤РёР»СЊС‚СЂ_РџСЂРёР’С‹РІРѕРґРµ (Cell: TemplateCell; Value: Variant; Action: Template.OutputTypes; var Format: String): Variant;
     var r: Integer;
-    if (Cell.Contents = 'ТипФрагмента') then
+    if (Cell.Contents = 'РўРёРїР¤СЂР°РіРјРµРЅС‚Р°') then
       r = Cell.Row;
-      Cell.Caption = if( (r - 1) = ТипФрагмента, 'l', '');
+      Cell.Caption = if( (r - 1) = РўРёРїР¤СЂР°РіРјРµРЅС‚Р°, 'l', '');
     else
-      Result = Inherited Поле_Фильтр_ПриВыводе(Cell, Value, Action, Format);
+      Result = Inherited РџРѕР»Рµ_Р¤РёР»СЊС‚СЂ_РџСЂРёР’С‹РІРѕРґРµ(Cell, Value, Action, Format);
     fi;
   end;
 
--- 2_Обработчики событий прочих объектов шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РїСЂРѕС‡РёС… РѕР±СЉРµРєС‚РѕРІ С€Р°Р±Р»РѕРЅР°0. --
 
--- 2_Дополнительные команды0. --
+-- 2_Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ РєРѕРјР°РЅРґС‹0. --
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
 
-  proc ИнициализироватьСтолбцыКартотеки;
-    inherited ИнициализироватьСтолбцыКартотеки;
+  proc РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊРЎС‚РѕР»Р±С†С‹РљР°СЂС‚РѕС‚РµРєРё;
+    inherited РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊРЎС‚РѕР»Р±С†С‹РљР°СЂС‚РѕС‚РµРєРё;
   end;
 
-  func ПолучитьФильтрПоФрагменту :String;
-    if (ТипФрагмента = fltByCodeField) and (Фрагмент <> nil) then
-      Result = 'Match(Код,"*' + Фрагмент +'*")';
-    elsif (ТипФрагмента = fltByNameField) and (Фрагмент <> nil) then
-      Result = 'Match(Наим,"*' + Фрагмент +'*")';
+  func РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРџРѕР¤СЂР°РіРјРµРЅС‚Сѓ :String;
+    if (РўРёРїР¤СЂР°РіРјРµРЅС‚Р° = fltByCodeField) and (Р¤СЂР°РіРјРµРЅС‚ <> nil) then
+      Result = 'Match(РљРѕРґ,"*' + Р¤СЂР°РіРјРµРЅС‚ +'*")';
+    elsif (РўРёРїР¤СЂР°РіРјРµРЅС‚Р° = fltByNameField) and (Р¤СЂР°РіРјРµРЅС‚ <> nil) then
+      Result = 'Match(РќР°РёРј,"*' + Р¤СЂР°РіРјРµРЅС‚ +'*")';
     fi;
   end;
 

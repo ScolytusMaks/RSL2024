@@ -1,107 +1,107 @@
-class inherited Справочники.FalseCardType3 "Тематики статей";
+п»їclass inherited РЎРїСЂР°РІРѕС‡РЅРёРєРё.FalseCardType3 "РўРµРјР°С‚РёРєРё СЃС‚Р°С‚РµР№";
 
-import РКП_СИС Classes Functions, FilterMaker;
+import Р РљРџ_РЎРРЎ Classes Functions, FilterMaker;
 import Classes Def;
 
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 
 inclass private
 
-  var КлассИнтерфейса :Class RI.Справочники.ТематикаСтатьи := RI.Справочники.ТематикаСтатьи;
+  var РљР»Р°СЃСЃРРЅС‚РµСЂС„РµР№СЃР° :Class RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РўРµРјР°С‚РёРєР°РЎС‚Р°С‚СЊРё := RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РўРµРјР°С‚РёРєР°РЎС‚Р°С‚СЊРё;
 
-  ByHeadingType synonym ПоТипуРубрик: variant[2] =
-    [[RI.Справочники.ТематикаСтатьи.fltByHeadingTypeAny,  'Все'],              -- 0
-     [RI.Справочники.ТематикаСтатьи.fltByHeadingTypeSyst, 'Сист. подрубрики'], -- 1
-     [RI.Справочники.ТематикаСтатьи.fltByHeadingTypeTemp, 'Врем. рубрики']];   -- 2
+  ByHeadingType synonym РџРѕРўРёРїСѓР СѓР±СЂРёРє: variant[2] =
+    [[RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РўРµРјР°С‚РёРєР°РЎС‚Р°С‚СЊРё.fltByHeadingTypeAny,  'Р’СЃРµ'],              -- 0
+     [RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РўРµРјР°С‚РёРєР°РЎС‚Р°С‚СЊРё.fltByHeadingTypeSyst, 'РЎРёСЃС‚. РїРѕРґСЂСѓР±СЂРёРєРё'], -- 1
+     [RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РўРµРјР°С‚РёРєР°РЎС‚Р°С‚СЊРё.fltByHeadingTypeTemp, 'Р’СЂРµРј. СЂСѓР±СЂРёРєРё']];   -- 2
 
 inobject private
 
-  var секцФильтрПоТипуРубрик :TemplateSection;
-  var ТипРубрик :Integer;
-  var SelectedRecord :спрТематикаСтатьи; -- Проброс выбранного значения
-  var РежимВыбораСистР :Logical;
-  var РежимВыбораВремР :Logical;
+  var СЃРµРєС†Р¤РёР»СЊС‚СЂРџРѕРўРёРїСѓР СѓР±СЂРёРє :TemplateSection;
+  var РўРёРїР СѓР±СЂРёРє :Integer;
+  var SelectedRecord :СЃРїСЂРўРµРјР°С‚РёРєР°РЎС‚Р°С‚СЊРё; -- РџСЂРѕР±СЂРѕСЃ РІС‹Р±СЂР°РЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
+  var Р РµР¶РёРјР’С‹Р±РѕСЂР°РЎРёСЃС‚Р  :Logical;
+  var Р РµР¶РёРјР’С‹Р±РѕСЂР°Р’СЂРµРјР  :Logical;
 --}}
 
 inobject private
 
 
--- 2_Обработчики событий шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ С€Р°Р±Р»РѕРЅР°0. --
 
-  proc шаблон_ПриОткрытии(Create :Logical);
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(Create :Logical);
     var c, r :Integer;
     var locCell :TemplateCell;
-    inherited шаблон_ПриОткрытии(Create);
-    if (true in [РежимВыбораСистР, РежимВыбораВремР]) then
-      for c = 1 .. секцФильтрПоТипуРубрик.ColumnsCount do
-        for r = 1 .. секцФильтрПоТипуРубрик.RowsCount do
-          locCell = секцФильтрПоТипуРубрик.Cell[c,r];
-          if locCell.Contents = 'ТипРубрик' then
+    inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(Create);
+    if (true in [Р РµР¶РёРјР’С‹Р±РѕСЂР°РЎРёСЃС‚Р , Р РµР¶РёРјР’С‹Р±РѕСЂР°Р’СЂРµРјР ]) then
+      for c = 1 .. СЃРµРєС†Р¤РёР»СЊС‚СЂРџРѕРўРёРїСѓР СѓР±СЂРёРє.ColumnsCount do
+        for r = 1 .. СЃРµРєС†Р¤РёР»СЊС‚СЂРџРѕРўРёРїСѓР СѓР±СЂРёРє.RowsCount do
+          locCell = СЃРµРєС†Р¤РёР»СЊС‚СЂРџРѕРўРёРїСѓР СѓР±СЂРёРє.Cell[c,r];
+          if locCell.Contents = 'РўРёРїР СѓР±СЂРёРє' then
             locCell.Enabled = false;
           fi;
         od;
       od;
     fi;
-    if РежимВыбораСистР and (not РежимВыбораВремР) then
-      Window.Caption = 'Систематические подрубрики';
-    elsif РежимВыбораВремР and (not РежимВыбораСистР) then
-      Window.Caption = 'Временные тематическая рубрика';
+    if Р РµР¶РёРјР’С‹Р±РѕСЂР°РЎРёСЃС‚Р  and (not Р РµР¶РёРјР’С‹Р±РѕСЂР°Р’СЂРµРјР ) then
+      Window.Caption = 'РЎРёСЃС‚РµРјР°С‚РёС‡РµСЃРєРёРµ РїРѕРґСЂСѓР±СЂРёРєРё';
+    elsif Р РµР¶РёРјР’С‹Р±РѕСЂР°Р’СЂРµРјР  and (not Р РµР¶РёРјР’С‹Р±РѕСЂР°РЎРёСЃС‚Р ) then
+      Window.Caption = 'Р’СЂРµРјРµРЅРЅС‹Рµ С‚РµРјР°С‚РёС‡РµСЃРєР°СЏ СЂСѓР±СЂРёРєР°';
     fi;
   end;
 
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
-  func Поле_Фильтр_ПриНажатии (Cell: TemplateCell; Action: Template.ClickTypes): Logical;
+  func РџРѕР»Рµ_Р¤РёР»СЊС‚СЂ_РџСЂРёРќР°Р¶Р°С‚РёРё (Cell: TemplateCell; Action: Template.ClickTypes): Logical;
     var r: Integer;
-    if (Cell.Contents = 'ТипРубрик') then
+    if (Cell.Contents = 'РўРёРїР СѓР±СЂРёРє') then
       r = Cell.Row;
-      ТипРубрик = (r - 1);
-      ОбновитьФильтр;
+      РўРёРїР СѓР±СЂРёРє = (r - 1);
+      РћР±РЅРѕРІРёС‚СЊР¤РёР»СЊС‚СЂ;
     else
-      Result = inherited Поле_Фильтр_ПриНажатии(Cell, Action);
-      Return; -- чтобы не вызывать дважды "ОбновитьФильтр"
+      Result = inherited РџРѕР»Рµ_Р¤РёР»СЊС‚СЂ_РџСЂРёРќР°Р¶Р°С‚РёРё(Cell, Action);
+      Return; -- С‡С‚РѕР±С‹ РЅРµ РІС‹Р·С‹РІР°С‚СЊ РґРІР°Р¶РґС‹ "РћР±РЅРѕРІРёС‚СЊР¤РёР»СЊС‚СЂ"
     fi;
   end;
 
-  func Поле_Фильтр_ПриВыводе (Cell: TemplateCell; Value: Variant; Action: Template.OutputTypes; var Format: String): Variant;
+  func РџРѕР»Рµ_Р¤РёР»СЊС‚СЂ_РџСЂРёР’С‹РІРѕРґРµ (Cell: TemplateCell; Value: Variant; Action: Template.OutputTypes; var Format: String): Variant;
     var r: Integer;
-    if (Cell.Contents = 'ТипРубрик') then
+    if (Cell.Contents = 'РўРёРїР СѓР±СЂРёРє') then
       r = Cell.Row;
       if SimilarDataViewsMode then
         Cell.Caption = if( (r = 1), 'l', '');
       else
-        if РежимВыбораСистР and (not РежимВыбораВремР) then
+        if Р РµР¶РёРјР’С‹Р±РѕСЂР°РЎРёСЃС‚Р  and (not Р РµР¶РёРјР’С‹Р±РѕСЂР°Р’СЂРµРјР ) then
           Cell.Caption = if( (r = 2), 'l', '');
-        elsif (not РежимВыбораСистР) and РежимВыбораВремР then
+        elsif (not Р РµР¶РёРјР’С‹Р±РѕСЂР°РЎРёСЃС‚Р ) and Р РµР¶РёРјР’С‹Р±РѕСЂР°Р’СЂРµРјР  then
           Cell.Caption = if( (r = 3), 'l', '');
         else
-          Cell.Caption = if( (r - 1) = ТипРубрик, 'l', '');
+          Cell.Caption = if( (r - 1) = РўРёРїР СѓР±СЂРёРє, 'l', '');
         fi;
       fi;
     else
-      Result = inherited Поле_Фильтр_ПриВыводе(Cell, Value, Action, Format);
+      Result = inherited РџРѕР»Рµ_Р¤РёР»СЊС‚СЂ_РџСЂРёР’С‹РІРѕРґРµ(Cell, Value, Action, Format);
     fi;
   end;
 
--- 2_Обработчики событий прочих объектов шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РїСЂРѕС‡РёС… РѕР±СЉРµРєС‚РѕРІ С€Р°Р±Р»РѕРЅР°0. --
 
-  proc Столбец_ПриРисовании(Column :CardfileColumn; Rec :Record; Selected :Logical; var Color :Integer; Font :Font);
+  proc РЎС‚РѕР»Р±РµС†_РџСЂРёР РёСЃРѕРІР°РЅРёРё(Column :CardfileColumn; Rec :Record; Selected :Logical; var Color :Integer; Font :Font);
     var vCode :String;
-    inherited Столбец_ПриРисовании(Column, Rec, Selected, Color, Font);
-    vCode = Rec.GetField('Код') as String;
+    inherited РЎС‚РѕР»Р±РµС†_РџСЂРёР РёСЃРѕРІР°РЅРёРё(Column, Rec, Selected, Color, Font);
+    vCode = Rec.GetField('РљРѕРґ') as String;
     if Match(vCode, '?') or Match(vCode, '?/?') then
       Font.Bold = true;
     fi;
   end;
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
-  proc ИнициализироватьСтолбцыКартотеки;
-    inherited ИнициализироватьСтолбцыКартотеки;
+  proc РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊРЎС‚РѕР»Р±С†С‹РљР°СЂС‚РѕС‚РµРєРё;
+    inherited РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊРЎС‚РѕР»Р±С†С‹РљР°СЂС‚РѕС‚РµРєРё;
     with crdBuiltIn.AddColumn do
-      FieldName = 'Код';
-      Caption = 'Код УДК';
+      FieldName = 'РљРѕРґ';
+      Caption = 'РљРѕРґ РЈР”Рљ';
       FieldType = Template.StringField;
       Alignment = Template.LeftAlign;
       Font.Size = crdBuiltIn.Font.Size;
@@ -110,8 +110,8 @@ inobject private
       CanEdit = false;
     end;
     with crdBuiltIn.AddColumn do
-      FieldName = 'Наим';
-      Caption = 'Наименование';
+      FieldName = 'РќР°РёРј';
+      Caption = 'РќР°РёРјРµРЅРѕРІР°РЅРёРµ';
       FieldType = Template.StringField;
       Alignment = Template.LeftAlign;
       Font.Size = crdBuiltIn.Font.Size;
@@ -120,8 +120,8 @@ inobject private
       CanEdit = false;
     end;
     with crdBuiltIn.AddColumn do
-      FieldName = 'КрНаим';
-      Caption = 'Краткое наименование';
+      FieldName = 'РљСЂРќР°РёРј';
+      Caption = 'РљСЂР°С‚РєРѕРµ РЅР°РёРјРµРЅРѕРІР°РЅРёРµ';
       FieldType = Template.StringField;
       Alignment = Template.LeftAlign;
       Font.Size = crdBuiltIn.Font.Size;
@@ -130,9 +130,9 @@ inobject private
       CanEdit = false;
     end;
     with crdBuiltIn.AddColumn do
-      FieldName = 'ВклОгл';
-      Caption = 'Огл. ЛГС';
-      Hint = 'Включать в содержание (оглавление) ЛГС';
+      FieldName = 'Р’РєР»РћРіР»';
+      Caption = 'РћРіР». Р›Р“РЎ';
+      Hint = 'Р’РєР»СЋС‡Р°С‚СЊ РІ СЃРѕРґРµСЂР¶Р°РЅРёРµ (РѕРіР»Р°РІР»РµРЅРёРµ) Р›Р“РЎ';
       FieldType = Template.LogicalField;
       Alignment = Template.CenterAlign;
       MinWidth = 160;
@@ -141,9 +141,9 @@ inobject private
       CanEdit = false;
     end;
     with crdBuiltIn.AddColumn do
-      FieldName = 'Подрубрика';
-      Caption = 'Сист. подрубрика';
-      Hint = 'Систематическая подрубрика';
+      FieldName = 'РџРѕРґСЂСѓР±СЂРёРєР°';
+      Caption = 'РЎРёСЃС‚. РїРѕРґСЂСѓР±СЂРёРєР°';
+      Hint = 'РЎРёСЃС‚РµРјР°С‚РёС‡РµСЃРєР°СЏ РїРѕРґСЂСѓР±СЂРёРєР°';
       FieldType = Template.LogicalField;
       Alignment = Template.CenterAlign;
       MinWidth = 160;
@@ -152,9 +152,9 @@ inobject private
       CanEdit = false;
     end;
     with crdBuiltIn.AddColumn do
-      FieldName = 'Временная';
-      Caption = 'Врем. рубрика';
-      Hint = 'Временная рубрика';
+      FieldName = 'Р’СЂРµРјРµРЅРЅР°СЏ';
+      Caption = 'Р’СЂРµРј. СЂСѓР±СЂРёРєР°';
+      Hint = 'Р’СЂРµРјРµРЅРЅР°СЏ СЂСѓР±СЂРёРєР°';
       FieldType = Template.LogicalField;
       Alignment = Template.CenterAlign;
       MinWidth = 160;
@@ -163,9 +163,9 @@ inobject private
       CanEdit = false;
     end;
     with crdBuiltIn.AddColumn do
-      FieldName = 'БезКода';
-      Caption = 'Без кода в ЛГС';
-      Hint = 'Не показывать код в ЛГС';
+      FieldName = 'Р‘РµР·РљРѕРґР°';
+      Caption = 'Р‘РµР· РєРѕРґР° РІ Р›Р“РЎ';
+      Hint = 'РќРµ РїРѕРєР°Р·С‹РІР°С‚СЊ РєРѕРґ РІ Р›Р“РЎ';
       FieldType = Template.LogicalField;
       Alignment = Template.CenterAlign;
       MinWidth = 160;
@@ -174,9 +174,9 @@ inobject private
       CanEdit = false;
     end;
     with crdBuiltIn.AddColumn do
-      FieldName = 'НеПрименяется';
-      Caption = 'Не применяется';
-      Hint = 'Более не применяется';
+      FieldName = 'РќРµРџСЂРёРјРµРЅСЏРµС‚СЃСЏ';
+      Caption = 'РќРµ РїСЂРёРјРµРЅСЏРµС‚СЃСЏ';
+      Hint = 'Р‘РѕР»РµРµ РЅРµ РїСЂРёРјРµРЅСЏРµС‚СЃСЏ';
       FieldType = Template.LogicalField;
       Alignment = Template.CenterAlign;
       MinWidth = 160;
@@ -186,28 +186,28 @@ inobject private
     end;
   end;
 
-  func СоздатьФильтр :String;
+  func РЎРѕР·РґР°С‚СЊР¤РёР»СЊС‚СЂ :String;
     var aFlt :String[];
-    AddInArray( aFlt, inherited СоздатьФильтр );
-    AddInArray( aFlt, ПолучитьФильтрПоРубрике );
+    AddInArray( aFlt, inherited РЎРѕР·РґР°С‚СЊР¤РёР»СЊС‚СЂ );
+    AddInArray( aFlt, РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРџРѕР СѓР±СЂРёРєРµ );
     Result = MakeFilter(aFlt);
   end;
 
-  func ПолучитьФильтрПоРубрике :String;
+  func РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРџРѕР СѓР±СЂРёРєРµ :String;
     if not SimilarDataViewsMode then
-      if (ТипРубрик = RI.Справочники.ТематикаСтатьи.fltByHeadingTypeAny) then
-      elsif (ТипРубрик = RI.Справочники.ТематикаСтатьи.fltByHeadingTypeSyst) then
-        Result = 'Подрубрика';
-      elsif (ТипРубрик = RI.Справочники.ТематикаСтатьи.fltByHeadingTypeTemp) then
-        Result = 'Временная';
+      if (РўРёРїР СѓР±СЂРёРє = RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РўРµРјР°С‚РёРєР°РЎС‚Р°С‚СЊРё.fltByHeadingTypeAny) then
+      elsif (РўРёРїР СѓР±СЂРёРє = RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РўРµРјР°С‚РёРєР°РЎС‚Р°С‚СЊРё.fltByHeadingTypeSyst) then
+        Result = 'РџРѕРґСЂСѓР±СЂРёРєР°';
+      elsif (РўРёРїР СѓР±СЂРёРє = RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РўРµРјР°С‚РёРєР°РЎС‚Р°С‚СЊРё.fltByHeadingTypeTemp) then
+        Result = 'Р’СЂРµРјРµРЅРЅР°СЏ';
       fi;
     fi;
   end;
 
-  proc УстановитьДоступностьОбъектовШаблона;
-    inherited УстановитьДоступностьОбъектовШаблона;
+  proc РЈСЃС‚Р°РЅРѕРІРёС‚СЊР”РѕСЃС‚СѓРїРЅРѕСЃС‚СЊРћР±СЉРµРєС‚РѕРІРЁР°Р±Р»РѕРЅР°;
+    inherited РЈСЃС‚Р°РЅРѕРІРёС‚СЊР”РѕСЃС‚СѓРїРЅРѕСЃС‚СЊРћР±СЉРµРєС‚РѕРІРЁР°Р±Р»РѕРЅР°;
     if SimilarDataViewsMode then
-      SetSectionDisabled(секцФильтрПоТипуРубрик);
+      SetSectionDisabled(СЃРµРєС†Р¤РёР»СЊС‚СЂРџРѕРўРёРїСѓР СѓР±СЂРёРє);
     fi;
   end;
 

@@ -1,24 +1,24 @@
-class inherited РКП_СИС.CardBaseType0 "Справочники тип 1";
+п»їclass inherited Р РљРџ_РЎРРЎ.CardBaseType0 "РЎРїСЂР°РІРѕС‡РЅРёРєРё С‚РёРї 1";
 
-import СИС2 classes Константы, Исключения;
-import РКП_СИС Classes Functions, FilterMaker;
+import РЎРРЎ2 classes РљРѕРЅСЃС‚Р°РЅС‚С‹, РСЃРєР»СЋС‡РµРЅРёСЏ;
+import Р РљРџ_РЎРРЎ Classes Functions, FilterMaker;
 
 inclass public
 
-  var КлассИнтерфейса :Class РКП_Справочники.RI.Справочники.intBaseType1 = AbstractMethod;
+  var РљР»Р°СЃСЃРРЅС‚РµСЂС„РµР№СЃР° :Class Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.intBaseType1 = AbstractMethod;
 
-  func ВыполнитьВыбор (var vSelectRes :РКП_Справочники.BaseRefType1; addParam :Variant[2] = nil) :Integer;
-    var vForm: РКП_Справочники.Справочники.CardBaseType1;
-    vForm = КлассИнтерфейса.КартотекаДляВыбора.Create;
-    vForm.УстСвойстваДоп(addParam);
+  func Р’С‹РїРѕР»РЅРёС‚СЊР’С‹Р±РѕСЂ (var vSelectRes :Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.BaseRefType1; addParam :Variant[2] = nil) :Integer;
+    var vForm: Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.РЎРїСЂР°РІРѕС‡РЅРёРєРё.CardBaseType1;
+    vForm = РљР»Р°СЃСЃРРЅС‚РµСЂС„РµР№СЃР°.РљР°СЂС‚РѕС‚РµРєР°Р”Р»СЏР’С‹Р±РѕСЂР°.Create;
+    vForm.РЈСЃС‚РЎРІРѕР№СЃС‚РІР°Р”РѕРї(addParam);
     if CmOk = vForm.ShowEx(vSelectRes, , Kernel.Window.ModalWindow) then
       Return CmOk;
     fi;
   end;
 
-  proc ПросмотрПохожихЗаписей (locFilter :String = nil; WinStyle :Window.WindowStyles = Kernel.Window.ModalWindow; addParam :Variant = nil);
-    var vForm: РКП_Справочники.Справочники.CardBaseType1;
-    vForm = КлассИнтерфейса.КартотекаПоУмолчанию.Create;
+  proc РџСЂРѕСЃРјРѕС‚СЂРџРѕС…РѕР¶РёС…Р—Р°РїРёСЃРµР№ (locFilter :String = nil; WinStyle :Window.WindowStyles = Kernel.Window.ModalWindow; addParam :Variant = nil);
+    var vForm: Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.РЎРїСЂР°РІРѕС‡РЅРёРєРё.CardBaseType1;
+    vForm = РљР»Р°СЃСЃРРЅС‚РµСЂС„РµР№СЃР°.РљР°СЂС‚РѕС‚РµРєР°РџРѕРЈРјРѕР»С‡Р°РЅРёСЋ.Create;
     vForm.SimilarDataViewsMode = true;
     vForm.SimilarFilter = locFilter;
     #NoWarning;
@@ -28,45 +28,45 @@ inclass public
 
 inobject private
 
-  proc шаблон_ПриСоздании(Context :Variant);
-    СтрокаСортировки = КлассИнтерфейса.GetClassField('ИмяПоляНаим');
-    ВосстановитьСортировку = true;
-    inherited шаблон_ПриСоздании(Context);
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёРЎРѕР·РґР°РЅРёРё(Context :Variant);
+    РЎС‚СЂРѕРєР°РЎРѕСЂС‚РёСЂРѕРІРєРё = РљР»Р°СЃСЃРРЅС‚РµСЂС„РµР№СЃР°.GetClassField('РРјСЏРџРѕР»СЏРќР°РёРј');
+    Р’РѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊРЎРѕСЂС‚РёСЂРѕРІРєСѓ = true;
+    inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРЎРѕР·РґР°РЅРёРё(Context);
   end;
 
-  proc шаблон_ПриОткрытии(Create :Logical);
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(Create :Logical);
     var c, cc :Integer;
     var locColumn :CardFileColumn;
-    КлассИнтерфейса.UpdateHashFieldsIfNeed;
+    РљР»Р°СЃСЃРРЅС‚РµСЂС„РµР№СЃР°.UpdateHashFieldsIfNeed;
     if SimilarDataViewsMode then
-      Запретить_Выбор = true;
-      Запретить_ВыборГрупп = true;
-      Запретить_Добавление = true;
-      Запретить_ДобавлениеГрупп = true;
-      Запретить_Дублирование = true;
-      Self.Window.Caption = Self.Window.Caption + ' (похожие записи)';
+      Р—Р°РїСЂРµС‚РёС‚СЊ_Р’С‹Р±РѕСЂ = true;
+      Р—Р°РїСЂРµС‚РёС‚СЊ_Р’С‹Р±РѕСЂР“СЂСѓРїРї = true;
+      Р—Р°РїСЂРµС‚РёС‚СЊ_Р”РѕР±Р°РІР»РµРЅРёРµ = true;
+      Р—Р°РїСЂРµС‚РёС‚СЊ_Р”РѕР±Р°РІР»РµРЅРёРµР“СЂСѓРїРї = true;
+      Р—Р°РїСЂРµС‚РёС‚СЊ_Р”СѓР±Р»РёСЂРѕРІР°РЅРёРµ = true;
+      Self.Window.Caption = Self.Window.Caption + ' (РїРѕС…РѕР¶РёРµ Р·Р°РїРёСЃРё)';
       Self.Window.Height = Int(ScreenHeight / 2);
       Self.Window.Width = Int(ScreenWidth / 2);
     fi;
-    inherited шаблон_ПриОткрытии(Create);
+    inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(Create);
   end;
 
-  -- 2_Обработчики событий 0картотеки. --
+  -- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ 0РєР°СЂС‚РѕС‚РµРєРё. --
 
 
-  -- 2_Обработчики событий клеток шаблона0. --
+  -- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
 
-  -- _Прочие методы. --
+  -- _РџСЂРѕС‡РёРµ РјРµС‚РѕРґС‹. --
 
 
-  proc УстановитьПараметрыПоУмолчанию;
-    inherited УстановитьПараметрыПоУмолчанию;
-    СтрокаСортировки = 'Наим';
+  proc РЈСЃС‚Р°РЅРѕРІРёС‚СЊРџР°СЂР°РјРµС‚СЂС‹РџРѕРЈРјРѕР»С‡Р°РЅРёСЋ;
+    inherited РЈСЃС‚Р°РЅРѕРІРёС‚СЊРџР°СЂР°РјРµС‚СЂС‹РџРѕРЈРјРѕР»С‡Р°РЅРёСЋ;
+    РЎС‚СЂРѕРєР°РЎРѕСЂС‚РёСЂРѕРІРєРё = 'РќР°РёРј';
   end;
 
-  -- Установка свойств объекта по дополнительным параметрам конструктора "ВыполнитьВыбор"
-  proc УстСвойстваДоп(addParam :Variant[2]);
+  -- РЈСЃС‚Р°РЅРѕРІРєР° СЃРІРѕР№СЃС‚РІ РѕР±СЉРµРєС‚Р° РїРѕ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рј РїР°СЂР°РјРµС‚СЂР°Рј РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂР° "Р’С‹РїРѕР»РЅРёС‚СЊР’С‹Р±РѕСЂ"
+  proc РЈСЃС‚РЎРІРѕР№СЃС‚РІР°Р”РѕРї(addParam :Variant[2]);
     var i, ii :Integer;
     var aValue :Variant[];
     ii = LengthOfArray(addParam);

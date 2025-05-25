@@ -1,32 +1,32 @@
-class inherited Справочники.FalseCardType2 "Типы учетных документов";
+п»їclass inherited РЎРїСЂР°РІРѕС‡РЅРёРєРё.FalseCardType2 "РўРёРїС‹ СѓС‡РµС‚РЅС‹С… РґРѕРєСѓРјРµРЅС‚РѕРІ";
 
-import РКП_СИС Classes StringsFunctions, Functions, Recs, FilterMaker;
+import Р РљРџ_РЎРРЎ Classes StringsFunctions, Functions, Recs, FilterMaker;
 import Classes Def;
 
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 
 inclass private
 
-  var КлассИнтерфейса :Class RI.Справочники.ТипУД := RI.Справочники.ТипУД;
+  var РљР»Р°СЃСЃРРЅС‚РµСЂС„РµР№СЃР° :Class RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РўРёРїРЈР” := RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РўРёРїРЈР”;
 
 inobject private
 
-  var SelectedRecord :спрТипУД; -- Проброс выбранного значения
+  var SelectedRecord :СЃРїСЂРўРёРїРЈР”; -- РџСЂРѕР±СЂРѕСЃ РІС‹Р±СЂР°РЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 
 --}}
 
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
--- 2_Обработчики событий прочих объектов шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РїСЂРѕС‡РёС… РѕР±СЉРµРєС‚РѕРІ С€Р°Р±Р»РѕРЅР°0. --
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
-  proc ИнициализироватьСтолбцыКартотеки;
-    inherited ИнициализироватьСтолбцыКартотеки;
+  proc РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊРЎС‚РѕР»Р±С†С‹РљР°СЂС‚РѕС‚РµРєРё;
+    inherited РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊРЎС‚РѕР»Р±С†С‹РљР°СЂС‚РѕС‚РµРєРё;
     with crdBuiltIn.AddColumn do
-      FieldName = 'Код';
-      Caption = 'Код';
+      FieldName = 'РљРѕРґ';
+      Caption = 'РљРѕРґ';
       FieldType = Template.StringField;
       Alignment = Template.LeftAlign;
       Font.Size = crdBuiltIn.Font.Size;
@@ -35,8 +35,8 @@ inobject private
       CanEdit = false;
     end;
     with crdBuiltIn.AddColumn do
-      FieldName = 'Наим';
-      Caption = 'Наименование';
+      FieldName = 'РќР°РёРј';
+      Caption = 'РќР°РёРјРµРЅРѕРІР°РЅРёРµ';
       FieldType = Template.StringField;
       Alignment = Template.LeftAlign;
       Font.Size = crdBuiltIn.Font.Size;
@@ -45,9 +45,9 @@ inobject private
       CanEdit = false;
     end;
     with crdBuiltIn.AddColumn do
-      FieldName = 'НеПрименяется';
-      Caption = 'Не применяется';
-      Hint = 'Более не применяется';
+      FieldName = 'РќРµРџСЂРёРјРµРЅСЏРµС‚СЃСЏ';
+      Caption = 'РќРµ РїСЂРёРјРµРЅСЏРµС‚СЃСЏ';
+      Hint = 'Р‘РѕР»РµРµ РЅРµ РїСЂРёРјРµРЅСЏРµС‚СЃСЏ';
       FieldType = Template.LogicalField;
       Alignment = Template.CenterAlign;
       MinWidth = 160;

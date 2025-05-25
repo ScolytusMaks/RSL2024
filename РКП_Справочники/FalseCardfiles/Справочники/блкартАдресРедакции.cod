@@ -1,116 +1,116 @@
-class inherited Справочники.FalseCardType1 "Адреса редакций";
+п»їclass inherited РЎРїСЂР°РІРѕС‡РЅРёРєРё.FalseCardType1 "РђРґСЂРµСЃР° СЂРµРґР°РєС†РёР№";
 
-import РКП_СИС classes Functions, FilterMaker, Recs;
+import Р РљРџ_РЎРРЎ classes Functions, FilterMaker, Recs;
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 
 inclass private
 
-  var КлассИнтерфейса :Class RI.Справочники.Редакция := RI.Справочники.Редакция;
-  var LastCurrentGroupGeo :РКП_Справочники.спрГеография;
+  var РљР»Р°СЃСЃРРЅС‚РµСЂС„РµР№СЃР° :Class RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.Р РµРґР°РєС†РёСЏ := RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.Р РµРґР°РєС†РёСЏ;
+  var LastCurrentGroupGeo :Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЃРїСЂР“РµРѕРіСЂР°С„РёСЏ;
 
 inobject private
 
   var crdtreeBuiltIn :CardTree;
-  var SelectedRecord :спрРедакция;
+  var SelectedRecord :СЃРїСЂР РµРґР°РєС†РёСЏ;
 
-  --stored var ФорматФильтраПоФрагменту :Integer;--0-начало, 1-фрагмент, 2 - точно
-  var ФильтрДереваГео   :String;
-  var ФрагментАдреса1   :String;
-  var ФрагментАдреса2   :String;
-  var ФильтрСправочника :String;
+  --stored var Р¤РѕСЂРјР°С‚Р¤РёР»СЊС‚СЂР°РџРѕР¤СЂР°РіРјРµРЅС‚Сѓ :Integer;--0-РЅР°С‡Р°Р»Рѕ, 1-С„СЂР°РіРјРµРЅС‚, 2 - С‚РѕС‡РЅРѕ
+  var Р¤РёР»СЊС‚СЂР”РµСЂРµРІР°Р“РµРѕ   :String;
+  var Р¤СЂР°РіРјРµРЅС‚РђРґСЂРµСЃР°1   :String;
+  var Р¤СЂР°РіРјРµРЅС‚РђРґСЂРµСЃР°2   :String;
+  var Р¤РёР»СЊС‚СЂРЎРїСЂР°РІРѕС‡РЅРёРєР° :String;
 
 --}}
 
--- 2_Обработчики событий шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ С€Р°Р±Р»РѕРЅР°0. --
 
-  proc шаблон_ПриСоздании(Context :Variant);
-    inherited шаблон_ПриСоздании(Context);
-    ИнициализироватьДеревоКартотеки;
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёРЎРѕР·РґР°РЅРёРё(Context :Variant);
+    inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРЎРѕР·РґР°РЅРёРё(Context);
+    РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊР”РµСЂРµРІРѕРљР°СЂС‚РѕС‚РµРєРё;
   end;
 
-  proc шаблон_ПриОткрытии(Create :Logical);
-    inherited шаблон_ПриОткрытии(Create);
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(Create :Logical);
+    inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(Create);
   end;
 
-  proc шаблон_ПриЗакрытии(Destroy :Logical);
-    inherited шаблон_ПриЗакрытии(Destroy);
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёР—Р°РєСЂС‹С‚РёРё(Destroy :Logical);
+    inherited С€Р°Р±Р»РѕРЅ_РџСЂРёР—Р°РєСЂС‹С‚РёРё(Destroy);
     LastCurrentGroupGeo = crdtreeBuiltIn.CurrentGroup;
   end;
 
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
-  func Поле_Фильтр_ПриНажатии (Cell: TemplateCell; Action: Template.ClickTypes): Logical;
+  func РџРѕР»Рµ_Р¤РёР»СЊС‚СЂ_РџСЂРёРќР°Р¶Р°С‚РёРё (Cell: TemplateCell; Action: Template.ClickTypes): Logical;
     var r: Integer;
-    if (Cell.Contents = 'ФорматФильтраПоФрагменту') then
+    if (Cell.Contents = 'Р¤РѕСЂРјР°С‚Р¤РёР»СЊС‚СЂР°РџРѕР¤СЂР°РіРјРµРЅС‚Сѓ') then
       r = Cell.Row;
-      ФорматФильтраПоФрагменту = (r - 1);
+      Р¤РѕСЂРјР°С‚Р¤РёР»СЊС‚СЂР°РџРѕР¤СЂР°РіРјРµРЅС‚Сѓ = (r - 1);
     else
-      Result = Inherited Поле_Фильтр_ПриНажатии(Cell, Action);
-      Return; -- чтобы не вызывать дважды "ОбновитьФильтр"
+      Result = Inherited РџРѕР»Рµ_Р¤РёР»СЊС‚СЂ_РџСЂРёРќР°Р¶Р°С‚РёРё(Cell, Action);
+      Return; -- С‡С‚РѕР±С‹ РЅРµ РІС‹Р·С‹РІР°С‚СЊ РґРІР°Р¶РґС‹ "РћР±РЅРѕРІРёС‚СЊР¤РёР»СЊС‚СЂ"
     fi;
-    ОбновитьФильтр;
+    РћР±РЅРѕРІРёС‚СЊР¤РёР»СЊС‚СЂ;
   end;
 
-  func Поле_Фильтр_ПриВыводе (Cell: TemplateCell; Value: Variant; Action: Template.OutputTypes; var Format: String): Variant;
+  func РџРѕР»Рµ_Р¤РёР»СЊС‚СЂ_РџСЂРёР’С‹РІРѕРґРµ (Cell: TemplateCell; Value: Variant; Action: Template.OutputTypes; var Format: String): Variant;
     var r: Integer;
-    if (Cell.Contents = 'ФорматФильтраПоФрагменту') then
+    if (Cell.Contents = 'Р¤РѕСЂРјР°С‚Р¤РёР»СЊС‚СЂР°РџРѕР¤СЂР°РіРјРµРЅС‚Сѓ') then
       r = Cell.Row;
-      Cell.Caption = if( (r - 1) = ФорматФильтраПоФрагменту, 'l', '');
+      Cell.Caption = if( (r - 1) = Р¤РѕСЂРјР°С‚Р¤РёР»СЊС‚СЂР°РџРѕР¤СЂР°РіРјРµРЅС‚Сѓ, 'l', '');
     else
-      Result = Inherited Поле_Фильтр_ПриВыводе(Cell, Value, Action, Format);
+      Result = Inherited РџРѕР»Рµ_Р¤РёР»СЊС‚СЂ_РџСЂРёР’С‹РІРѕРґРµ(Cell, Value, Action, Format);
     fi;
   end;
 
--- 2_Обработчики событий прочих объектов шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РїСЂРѕС‡РёС… РѕР±СЉРµРєС‚РѕРІ С€Р°Р±Р»РѕРЅР°0. --
 
 
-  proc кнДобавить_ПриНажатии(Sender :Button);
-    var rAdr, rNewAdr :РКП_Справочники.спрРедакция;
-    var rGeo :РКП_Справочники.СпрГеография;
+  proc РєРЅР”РѕР±Р°РІРёС‚СЊ_РџСЂРёРќР°Р¶Р°С‚РёРё(Sender :Button);
+    var rAdr, rNewAdr :Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЃРїСЂР РµРґР°РєС†РёСЏ;
+    var rGeo :Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.РЎРїСЂР“РµРѕРіСЂР°С„РёСЏ;
     var vEdtFrm :Class BlankForm;
-    rGeo = crdtreeBuiltIn.CurrentGroup; -- Определить, где находится селектор
+    rGeo = crdtreeBuiltIn.CurrentGroup; -- РћРїСЂРµРґРµР»РёС‚СЊ, РіРґРµ РЅР°С…РѕРґРёС‚СЃСЏ СЃРµР»РµРєС‚РѕСЂ
     rAdr = crdBuiltIn.Current;
-    if (rAdr = nil) and (rGeo = nil) then -- Если нигде - сообщение
-      Message('Пожалуйста, установите селектор на населенный пункт, в котором находится редакция!');
+    if (rAdr = nil) and (rGeo = nil) then -- Р•СЃР»Рё РЅРёРіРґРµ - СЃРѕРѕР±С‰РµРЅРёРµ
+      Message('РџРѕР¶Р°Р»СѓР№СЃС‚Р°, СѓСЃС‚Р°РЅРѕРІРёС‚Рµ СЃРµР»РµРєС‚РѕСЂ РЅР° РЅР°СЃРµР»РµРЅРЅС‹Р№ РїСѓРЅРєС‚, РІ РєРѕС‚РѕСЂРѕРј РЅР°С…РѕРґРёС‚СЃСЏ СЂРµРґР°РєС†РёСЏ!');
     else
       if (rGeo <> nil) then
-        rNewAdr = РКП_Справочники.СпрРедакция.Create;
-        rNewAdr.НаселенныйПункт = rGeo;
-        rNewAdr.Наим = rGeo.Наим + ', ';
+        rNewAdr = Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.РЎРїСЂР РµРґР°РєС†РёСЏ.Create;
+        rNewAdr.РќР°СЃРµР»РµРЅРЅС‹Р№РџСѓРЅРєС‚ = rGeo;
+        rNewAdr.РќР°РёРј = rGeo.РќР°РёРј + ', ';
         vEdtFrm = crdBuiltIn.Editors[1];
         if CmOk = vEdtFrm.ShowFormEx(rNewAdr, Window.ModalWindow) then
           crdBuiltIn.Current = rNewAdr;
           crdBuiltIn.SetFocus;
         fi;
       else
-        Message('Пожалуйста, установите селектор на населенный пункт, в котором находится редакция!');
+        Message('РџРѕР¶Р°Р»СѓР№СЃС‚Р°, СѓСЃС‚Р°РЅРѕРІРёС‚Рµ СЃРµР»РµРєС‚РѕСЂ РЅР° РЅР°СЃРµР»РµРЅРЅС‹Р№ РїСѓРЅРєС‚, РІ РєРѕС‚РѕСЂРѕРј РЅР°С…РѕРґРёС‚СЃСЏ СЂРµРґР°РєС†РёСЏ!');
       fi;
     fi;
   end;
 
-  proc кнРедактировать_ПриНажатии(Sender :Button);
-    var rAdr :РКП_Справочники.спрРедакция;
+  proc РєРЅР РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ_РџСЂРёРќР°Р¶Р°С‚РёРё(Sender :Button);
+    var rAdr :Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЃРїСЂР РµРґР°РєС†РёСЏ;
     var vEdtFrm :Class BlankForm;
     rAdr = crdBuiltIn.Current;
     if (rAdr = nil) then
-      Message('Пожалуйста, установите селектор на строку с адресом редакции!');
+      Message('РџРѕР¶Р°Р»СѓР№СЃС‚Р°, СѓСЃС‚Р°РЅРѕРІРёС‚Рµ СЃРµР»РµРєС‚РѕСЂ РЅР° СЃС‚СЂРѕРєСѓ СЃ Р°РґСЂРµСЃРѕРј СЂРµРґР°РєС†РёРё!');
     else
       vEdtFrm = crdBuiltIn.Editors[1];
       vEdtFrm.ShowFormEx(rAdr, Window.ModalWindow);
     fi;
   end;
 
-  proc кнДублировать_ПриНажатии(Sender :Button);
-    var rAdr, rNewAdr :РКП_Справочники.спрРедакция;
+  proc РєРЅР”СѓР±Р»РёСЂРѕРІР°С‚СЊ_РџСЂРёРќР°Р¶Р°С‚РёРё(Sender :Button);
+    var rAdr, rNewAdr :Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЃРїСЂР РµРґР°РєС†РёСЏ;
     var vEdtFrm :Class BlankForm;
     rAdr = crdBuiltIn.Current;
     if (rAdr = nil) then
-      Message('Пожалуйста, установите селектор на строку с адресом редакции!');
+      Message('РџРѕР¶Р°Р»СѓР№СЃС‚Р°, СѓСЃС‚Р°РЅРѕРІРёС‚Рµ СЃРµР»РµРєС‚РѕСЂ РЅР° СЃС‚СЂРѕРєСѓ СЃ Р°РґСЂРµСЃРѕРј СЂРµРґР°РєС†РёРё!');
     else
-      rNewAdr = РКП_Справочники.СпрРедакция.Create;
-      rNewAdr.НаселенныйПункт = rAdr.НаселенныйПункт;
-      rNewAdr.Наим = rAdr.Наим;
+      rNewAdr = Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.РЎРїСЂР РµРґР°РєС†РёСЏ.Create;
+      rNewAdr.РќР°СЃРµР»РµРЅРЅС‹Р№РџСѓРЅРєС‚ = rAdr.РќР°СЃРµР»РµРЅРЅС‹Р№РџСѓРЅРєС‚;
+      rNewAdr.РќР°РёРј = rAdr.РќР°РёРј;
       rNewAdr.Hash = rAdr.Hash;
       vEdtFrm = crdBuiltIn.Editors[1];
       if CmOk = vEdtFrm.ShowFormEx(rNewAdr, Window.ModalWindow) then
@@ -120,16 +120,16 @@ inobject private
     fi;
   end;
 
-  proc кнУдалить_ПриНажатии(Sender :Button);
-    var rAdr :РКП_Справочники.спрРедакция;
+  proc РєРЅРЈРґР°Р»РёС‚СЊ_РџСЂРёРќР°Р¶Р°С‚РёРё(Sender :Button);
+    var rAdr :Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЃРїСЂР РµРґР°РєС†РёСЏ;
     rAdr = crdBuiltIn.Current;
     if (rAdr = nil) then
-      Message('Пожалуйста, установите селектор на строку с адресом редакции!');
+      Message('РџРѕР¶Р°Р»СѓР№СЃС‚Р°, СѓСЃС‚Р°РЅРѕРІРёС‚Рµ СЃРµР»РµРєС‚РѕСЂ РЅР° СЃС‚СЂРѕРєСѓ СЃ Р°РґСЂРµСЃРѕРј СЂРµРґР°РєС†РёРё!');
     else
       try
         crdBuiltIn.Delete;
       except
-        Message('Пожалуйста, повторите попытку удаления! Если запись не удаляется, то, возможно, она используется в базе данных.');
+        Message('РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РїРѕРІС‚РѕСЂРёС‚Рµ РїРѕРїС‹С‚РєСѓ СѓРґР°Р»РµРЅРёСЏ! Р•СЃР»Рё Р·Р°РїРёСЃСЊ РЅРµ СѓРґР°Р»СЏРµС‚СЃСЏ, С‚Рѕ, РІРѕР·РјРѕР¶РЅРѕ, РѕРЅР° РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РІ Р±Р°Р·Рµ РґР°РЅРЅС‹С….');
       end;
     fi;
   end;
@@ -138,34 +138,34 @@ inobject private
   proc crdtreeBuiltIn_OnMove(Sender :CardTree);
     var aFlt :String[];
     if (crdtreeBuiltIn.CurrentGroup <> nil) then
-      AddInArray( aFlt, 'НаселенныйПункт=' + crdtreeBuiltIn.CurrentGroup.DocIDStr );
-      if (ФрагментАдреса1 <> nil) then
-        AddInArray( aFlt, 'Match(Наим,"*' + ФрагментАдреса1 + '*")' );
+      AddInArray( aFlt, 'РќР°СЃРµР»РµРЅРЅС‹Р№РџСѓРЅРєС‚=' + crdtreeBuiltIn.CurrentGroup.DocIDStr );
+      if (Р¤СЂР°РіРјРµРЅС‚РђРґСЂРµСЃР°1 <> nil) then
+        AddInArray( aFlt, 'Match(РќР°РёРј,"*' + Р¤СЂР°РіРјРµРЅС‚РђРґСЂРµСЃР°1 + '*")' );
       fi;
-      if (ФрагментАдреса2 <> nil) then
-        AddInArray( aFlt, 'Match(Наим,"*' + ФрагментАдреса2 + '*")' );
+      if (Р¤СЂР°РіРјРµРЅС‚РђРґСЂРµСЃР°2 <> nil) then
+        AddInArray( aFlt, 'Match(РќР°РёРј,"*' + Р¤СЂР°РіРјРµРЅС‚РђРґСЂРµСЃР°2 + '*")' );
       fi;
-      AddInArray( aFlt, ПолучитьФильтрУстаревшиеЗаписи );
+      AddInArray( aFlt, РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРЈСЃС‚Р°СЂРµРІС€РёРµР—Р°РїРёСЃРё );
       crdBuiltIn.Filter = MakeFilter(aFlt);
     else
       crdBuiltIn.Filter = 'false';
     fi;
   end;
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
-  proc ИнициализироватьДеревоКартотеки;
+  proc РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊР”РµСЂРµРІРѕРљР°СЂС‚РѕС‚РµРєРё;
     crdtreeBuiltIn.Font.Size = 9;
     crdtreeBuiltIn.Font.Name = 'Tahoma';
-    crdtreeBuiltIn.TreeRoot  = "Административная подчиненность";
+    crdtreeBuiltIn.TreeRoot  = "РђРґРјРёРЅРёСЃС‚СЂР°С‚РёРІРЅР°СЏ РїРѕРґС‡РёРЅРµРЅРЅРѕСЃС‚СЊ";
     crdtreeBuiltIn.Align = true;
   end;
 
-  proc ИнициализироватьСтолбцыКартотеки;
-    inherited ИнициализироватьСтолбцыКартотеки;
+  proc РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊРЎС‚РѕР»Р±С†С‹РљР°СЂС‚РѕС‚РµРєРё;
+    inherited РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊРЎС‚РѕР»Р±С†С‹РљР°СЂС‚РѕС‚РµРєРё;
     with crdBuiltIn.AddColumn do
-      FieldName = 'Наим';
-      Caption = 'Наименование';
+      FieldName = 'РќР°РёРј';
+      Caption = 'РќР°РёРјРµРЅРѕРІР°РЅРёРµ';
       FieldType = Template.StringField;
       Alignment = Template.LeftAlign;
       Font.Size = crdBuiltIn.Font.Size;
@@ -175,9 +175,9 @@ inobject private
       CanEdit = false;
     end;
     with crdBuiltIn.AddColumn do
-      FieldName = 'НеПрименяется';
-      Caption = 'Не применяется';
-      Hint = 'Более не применяется';
+      FieldName = 'РќРµРџСЂРёРјРµРЅСЏРµС‚СЃСЏ';
+      Caption = 'РќРµ РїСЂРёРјРµРЅСЏРµС‚СЃСЏ';
+      Hint = 'Р‘РѕР»РµРµ РЅРµ РїСЂРёРјРµРЅСЏРµС‚СЃСЏ';
       FieldType = Template.LogicalField;
       Alignment = Template.CenterAlign;
       MinWidth = 160;
@@ -188,28 +188,28 @@ inobject private
   end;
 
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
-  proc ОбновитьФильтр;
+  proc РћР±РЅРѕРІРёС‚СЊР¤РёР»СЊС‚СЂ;
     var aFlt :String[];
-    var FltMaker :РКП_СИС.FilterMaker;
+    var FltMaker :Р РљРџ_РЎРРЎ.FilterMaker;
     var AggrResult :Variant[2];
     var aDocId :Integer[];
     var vMainFlt, vGroupFilter :String;
-    if (true in [ЗаданоУсловиеГео, ЗаданоУсловиеАдр]) then
-      AddInArray( aFlt, ПолучитьФильтрАдреса_ПоНаимГео );
-      AddInArray( aFlt, ПолучитьФильтрАдреса_ПоНаимАдр );
-      AddInArray( aFlt, ПолучитьФильтрУстаревшиеЗаписи );
-      with Query.Create([РКП_Справочники.спрРедакция]) do
+    if (true in [Р—Р°РґР°РЅРѕРЈСЃР»РѕРІРёРµР“РµРѕ, Р—Р°РґР°РЅРѕРЈСЃР»РѕРІРёРµРђРґСЂ]) then
+      AddInArray( aFlt, РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРђРґСЂРµСЃР°_РџРѕРќР°РёРјР“РµРѕ );
+      AddInArray( aFlt, РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРђРґСЂРµСЃР°_РџРѕРќР°РёРјРђРґСЂ );
+      AddInArray( aFlt, РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРЈСЃС‚Р°СЂРµРІС€РёРµР—Р°РїРёСЃРё );
+      with Query.Create([Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЃРїСЂР РµРґР°РєС†РёСЏ]) do
         Filter = MakeFilter(aFlt);
-        AggrResult = CalcAggregates('GroupBy(НаселенныйПункт.DocId)') as Variant[2];
+        AggrResult = CalcAggregates('GroupBy(РќР°СЃРµР»РµРЅРЅС‹Р№РџСѓРЅРєС‚.DocId)') as Variant[2];
         aDocId = AggrResult[1] as Integer[];
       end;
       vMainFlt = 'DocId in ' + ToStr(aDocId);
-      FltMaker = РКП_СИС.FilterMaker.CreateExt([vMainFlt]);
+      FltMaker = Р РљРџ_РЎРРЎ.FilterMaker.CreateExt([vMainFlt]);
       aFlt = nil;
-      vGroupFilter = FltMaker.GetFilterGroups([РКП_Справочники.спрГеография]);
-      if RecordsExistsInFilter(РКП_Справочники.спрГеография, vGroupFilter) then
+      vGroupFilter = FltMaker.GetFilterGroups([Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЃРїСЂР“РµРѕРіСЂР°С„РёСЏ]);
+      if RecordsExistsInFilter(Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЃРїСЂР“РµРѕРіСЂР°С„РёСЏ, vGroupFilter) then
         AddInArray( aFlt, vGroupFilter );
       fi;
       AddInArray( aFlt, vMainFlt );
@@ -218,47 +218,47 @@ inobject private
       crdtreeBuiltIn.TreeFilter = nil;
       crdBuiltIn.Filter = 'false';
     fi;
-    ПозиционироватьГео;
+    РџРѕР·РёС†РёРѕРЅРёСЂРѕРІР°С‚СЊР“РµРѕ;
   end;
 
-  func ПолучитьФильтрАдреса_ПоНаимГео :String;
-    if (Фрагмент <> nil) then
-      if (ФорматФильтраПоФрагменту = 0) then    Return 'Match(НаселенныйПункт.Наим,"' + Фрагмент + '*")';
-      elsif (ФорматФильтраПоФрагменту = 1) then Return 'Match(НаселенныйПункт.Наим,"*' + Фрагмент + '*")';
-      elsif (ФорматФильтраПоФрагменту = 2) then Return 'НаселенныйПункт.Наим="' + Фрагмент + '"';
+  func РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРђРґСЂРµСЃР°_РџРѕРќР°РёРјР“РµРѕ :String;
+    if (Р¤СЂР°РіРјРµРЅС‚ <> nil) then
+      if (Р¤РѕСЂРјР°С‚Р¤РёР»СЊС‚СЂР°РџРѕР¤СЂР°РіРјРµРЅС‚Сѓ = 0) then    Return 'Match(РќР°СЃРµР»РµРЅРЅС‹Р№РџСѓРЅРєС‚.РќР°РёРј,"' + Р¤СЂР°РіРјРµРЅС‚ + '*")';
+      elsif (Р¤РѕСЂРјР°С‚Р¤РёР»СЊС‚СЂР°РџРѕР¤СЂР°РіРјРµРЅС‚Сѓ = 1) then Return 'Match(РќР°СЃРµР»РµРЅРЅС‹Р№РџСѓРЅРєС‚.РќР°РёРј,"*' + Р¤СЂР°РіРјРµРЅС‚ + '*")';
+      elsif (Р¤РѕСЂРјР°С‚Р¤РёР»СЊС‚СЂР°РџРѕР¤СЂР°РіРјРµРЅС‚Сѓ = 2) then Return 'РќР°СЃРµР»РµРЅРЅС‹Р№РџСѓРЅРєС‚.РќР°РёРј="' + Р¤СЂР°РіРјРµРЅС‚ + '"';
       fi;
     fi;
   end;
 
-  func ПолучитьФильтрАдреса_ПоНаимАдр :String;
+  func РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРђРґСЂРµСЃР°_РџРѕРќР°РёРјРђРґСЂ :String;
     var aFlt :String[];
-    if (ФрагментАдреса1 <> nil) then
-      AddInArray( aFlt, 'Match(Наим,"*' + ФрагментАдреса1 + '*")' );
+    if (Р¤СЂР°РіРјРµРЅС‚РђРґСЂРµСЃР°1 <> nil) then
+      AddInArray( aFlt, 'Match(РќР°РёРј,"*' + Р¤СЂР°РіРјРµРЅС‚РђРґСЂРµСЃР°1 + '*")' );
     fi;
-    if (ФрагментАдреса2 <> nil) then
-      AddInArray( aFlt, 'Match(Наим,"*' + ФрагментАдреса2 + '*")' );
+    if (Р¤СЂР°РіРјРµРЅС‚РђРґСЂРµСЃР°2 <> nil) then
+      AddInArray( aFlt, 'Match(РќР°РёРј,"*' + Р¤СЂР°РіРјРµРЅС‚РђРґСЂРµСЃР°2 + '*")' );
     fi;
     Return MakeFilter(aFlt);
   end;
 
-  func ЗаданоУсловиеГео :Logical;
-    Return (Фрагмент <> nil);
+  func Р—Р°РґР°РЅРѕРЈСЃР»РѕРІРёРµР“РµРѕ :Logical;
+    Return (Р¤СЂР°РіРјРµРЅС‚ <> nil);
   end;
 
-  func ЗаданоУсловиеАдр :Logical;
-    Return true in [(ФрагментАдреса1 <> nil), (ФрагментАдреса2 <> nil)];
+  func Р—Р°РґР°РЅРѕРЈСЃР»РѕРІРёРµРђРґСЂ :Logical;
+    Return true in [(Р¤СЂР°РіРјРµРЅС‚РђРґСЂРµСЃР°1 <> nil), (Р¤СЂР°РіРјРµРЅС‚РђРґСЂРµСЃР°2 <> nil)];
   end;
 
-  proc ПозиционироватьГео;
+  proc РџРѕР·РёС†РёРѕРЅРёСЂРѕРІР°С‚СЊР“РµРѕ;
     var vSearchCompleted :Logical;
     if (crdtreeBuiltIn.TreeFilter <> nil) then
       crdtreeBuiltIn.OnMove = nil;
-      with Query.Create([РКП_Справочники.СпрГеография]) do
+      with Query.Create([Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.РЎРїСЂР“РµРѕРіСЂР°С„РёСЏ]) do
         Filter = crdtreeBuiltIn.TreeFilter + ' and isGroup=0';
-        Order = 'Наим';
+        Order = 'РќР°РёРј';
         Select;
         while not Eof do
-          if ЕстьАдресаВГео(Current) then
+          if Р•СЃС‚СЊРђРґСЂРµСЃР°Р’Р“РµРѕ(Current) then
             crdtreeBuiltIn.CurrentGroup = Current;
             vSearchCompleted = true;
             Break;
@@ -267,12 +267,12 @@ inobject private
         od;
       end;
       if (not vSearchCompleted) then
-        with Query.Create([РКП_Справочники.СпрГеография]) do
+        with Query.Create([Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.РЎРїСЂР“РµРѕРіСЂР°С„РёСЏ]) do
           Filter = crdtreeBuiltIn.TreeFilter + ' and isGroup=-1';
-          Order = 'Наим';
+          Order = 'РќР°РёРј';
           Select;
           while not Eof do
-            if ЕстьАдресаВГео(Current) then
+            if Р•СЃС‚СЊРђРґСЂРµСЃР°Р’Р“РµРѕ(Current) then
               crdtreeBuiltIn.CurrentGroup = Current;
               Break;
             fi;
@@ -283,11 +283,11 @@ inobject private
       crdBuiltIn.Filter = nil;
       crdtreeBuiltIn.OnMove = 'crdtreeBuiltIn_OnMove';
       crdtreeBuiltIn_OnMove(crdtreeBuiltIn);
-    else -- фильтр на дерево не определен
-      if (SelectedRecord = nil) then -- ранее переданное значение не задано
-        if (LastCurrentGroupGeo = nil) then -- форма ранее не открывалась или текущая группа не сохранена
-          with Query.Create([РКП_Справочники.СпрГеография]) do
-            Order = 'Наим';
+    else -- С„РёР»СЊС‚СЂ РЅР° РґРµСЂРµРІРѕ РЅРµ РѕРїСЂРµРґРµР»РµРЅ
+      if (SelectedRecord = nil) then -- СЂР°РЅРµРµ РїРµСЂРµРґР°РЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РЅРµ Р·Р°РґР°РЅРѕ
+        if (LastCurrentGroupGeo = nil) then -- С„РѕСЂРјР° СЂР°РЅРµРµ РЅРµ РѕС‚РєСЂС‹РІР°Р»Р°СЃСЊ РёР»Рё С‚РµРєСѓС‰Р°СЏ РіСЂСѓРїРїР° РЅРµ СЃРѕС…СЂР°РЅРµРЅР°
+          with Query.Create([Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.РЎРїСЂР“РµРѕРіСЂР°С„РёСЏ]) do
+            Order = 'РќР°РёРј';
             Select;
             while not Eof do
               crdtreeBuiltIn.CurrentGroup = Current;
@@ -299,10 +299,10 @@ inobject private
         fi;
       else
         try
-          crdtreeBuiltIn.CurrentGroup = SelectedRecord.НаселенныйПункт;
+          crdtreeBuiltIn.CurrentGroup = SelectedRecord.РќР°СЃРµР»РµРЅРЅС‹Р№РџСѓРЅРєС‚;
         except
           SelectedRecord = nil;
-          ПозиционироватьГео;
+          РџРѕР·РёС†РёРѕРЅРёСЂРѕРІР°С‚СЊР“РµРѕ;
         end;
       fi;
       crdtreeBuiltIn.OnMove = 'crdtreeBuiltIn_OnMove';
@@ -310,9 +310,9 @@ inobject private
     fi;
   end;
 
-  func ЕстьАдресаВГео(vSetting :РКП_Справочники.СпрГеография) :Logical;
-    with Query.Create([РКП_Справочники.спрРедакция]) do
-      Filter = 'НаселенныйПункт=' + vSetting.DocIDStr;
+  func Р•СЃС‚СЊРђРґСЂРµСЃР°Р’Р“РµРѕ(vSetting :Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.РЎРїСЂР“РµРѕРіСЂР°С„РёСЏ) :Logical;
+    with Query.Create([Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЃРїСЂР РµРґР°РєС†РёСЏ]) do
+      Filter = 'РќР°СЃРµР»РµРЅРЅС‹Р№РџСѓРЅРєС‚=' + vSetting.DocIDStr;
       Return RecordsExists;
     end;
   end;

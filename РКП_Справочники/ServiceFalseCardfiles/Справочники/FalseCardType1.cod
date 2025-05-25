@@ -1,40 +1,40 @@
-class inherited РКП_СИС.FalseCardBase "";
+п»їclass inherited Р РљРџ_РЎРРЎ.FalseCardBase "";
 
-import СИС2 classes Константы, Исключения;
-import РКП_СИС Classes StringsFunctions, Functions, Recs, FilterMaker;
+import РЎРРЎ2 classes РљРѕРЅСЃС‚Р°РЅС‚С‹, РСЃРєР»СЋС‡РµРЅРёСЏ;
+import Р РљРџ_РЎРРЎ Classes StringsFunctions, Functions, Recs, FilterMaker;
 import Classes Def;
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 
 inclass private
 
-  var КлассИнтерфейса :Class RI.Справочники.intBaseType1 := RI.Справочники.intBaseType1;
+  var РљР»Р°СЃСЃРРЅС‚РµСЂС„РµР№СЃР° :Class RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.intBaseType1 := RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.intBaseType1;
 
 inobject private
 
-  var SelectedRecord :BaseRefType1; -- Выбранное значение
+  var SelectedRecord :BaseRefType1; -- Р’С‹Р±СЂР°РЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
 --}}
 
--- 2_Конструкторы, визуализаторы0. --
+-- 2_РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹, РІРёР·СѓР°Р»РёР·Р°С‚РѕСЂС‹0. --
 
 inclass public
 
-  func ВыполнитьВыбор (var vSelectRes :РКП_Справочники.BaseRefType1; addParam :Variant[2] = nil) :Integer;
-    Return inherited ВыполнитьВыбор (vSelectRes, addParam);
+  func Р’С‹РїРѕР»РЅРёС‚СЊР’С‹Р±РѕСЂ (var vSelectRes :Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.BaseRefType1; addParam :Variant[2] = nil) :Integer;
+    Return inherited Р’С‹РїРѕР»РЅРёС‚СЊР’С‹Р±РѕСЂ (vSelectRes, addParam);
   end;
 
 inobject private
 
--- 2_Обработчики событий шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ С€Р°Р±Р»РѕРЅР°0. --
 
 
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
 
--- 2_Обработчики событий прочих объектов шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РїСЂРѕС‡РёС… РѕР±СЉРµРєС‚РѕРІ С€Р°Р±Р»РѕРЅР°0. --
 
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
 
 
