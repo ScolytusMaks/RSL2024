@@ -1,0 +1,9 @@
+class "";
+
+inobject
+
+  proc Blank_OnOpen(Create :Logical);
+    CloseApp;
+  end;
+
+end

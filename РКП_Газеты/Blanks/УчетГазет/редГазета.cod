@@ -768,7 +768,7 @@ inobject private
       fi;
       Return false;
     elsif (Cell.Contents = 'ТерриторияРаспространения') then
-      aParam[1] = ['Фрагмент', Value];
+      --aParam[1] = ['Фрагмент', Value];
       if (CmOk = РКП_Справочники.Справочники2.0блкартТерриторияРаспространения.ВыполнитьВыбор(vRefRec, aParam)) then
         NewValue = vRefRec;
         Template.EndEdit(true);
@@ -803,7 +803,7 @@ inobject private
       fi;
       Return false;
     elsif (Cell.Contents = 'Язык.Наим') then
-      aParam[1] = ['Фрагмент', Value];
+      --aParam[1] = ['Фрагмент', Value];
       if (cmOk = РКП_Справочники.Справочники2.0картЯзыкИздания.ВыполнитьВыбор(vRefRec, aParam) ) then
         NewValue = vRefRec;
         Языки[Index].Язык = vRefRec;

@@ -61,6 +61,10 @@ inobject public
       elsif (vAlgIfNoValue = алгДобавить) then
         vRefRec = ClassRecord.Create;
         vRefRec.Наим = Value as String;
+        try
+          vRefRec.SetField('Hash', РКП_Справочники.RI.Справочники.intBaseType1.GetHashByRecord(vRefRec));
+        except
+        end;
         if (cmOk = ClassEditorForm.ShowFormEx(vRefRec, Window.ModalWindow)) then
           vNewValue = Value;
           vEndEditSave = true;
