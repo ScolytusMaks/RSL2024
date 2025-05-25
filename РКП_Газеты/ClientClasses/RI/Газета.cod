@@ -157,6 +157,7 @@ inobject public
 
   proc SetWorkLog(aWorkStateCreate, aWorkStateUpdate :tWorkState);
     var aFlt :String[];
+    var vUpdateDate :Date;
     inherited SetWorkLog(aWorkStateCreate, aWorkStateUpdate);
     -- корректировка логов для газет с/без признака отсылки
     AddInArray(aFlt, 'RClass="РКП_Газеты.Газета"');
@@ -167,13 +168,17 @@ inobject public
       Select;
       if Record.ПризнакОтсылки then
         while not Eof do
+          vUpdateDate = (Current as РКП_СИС.ЛогРабот).UpdateDate;
           (Current as РКП_СИС.ЛогРабот).StoredValL = true;
+          (Current as РКП_СИС.ЛогРабот).UpdateDate = vUpdateDate;
           РКП_СИС.Recs.RecordPostIfNeed(Current);
           Next;
         od;
       else
         while not Eof do
+          vUpdateDate = (Current as РКП_СИС.ЛогРабот).UpdateDate;
           (Current as РКП_СИС.ЛогРабот).StoredValL = false;
+          (Current as РКП_СИС.ЛогРабот).UpdateDate = vUpdateDate;
           РКП_СИС.Recs.RecordPostIfNeed(Current);
           Next;
         od;
