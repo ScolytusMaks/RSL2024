@@ -155,6 +155,32 @@ inobject public
 
   inobject public
 
+  proc SetWorkLog(aWorkStateCreate, aWorkStateUpdate :tWorkState);
+    var aFlt :String[];
+    inherited SetWorkLog(aWorkStateCreate, aWorkStateUpdate);
+    -- корректировка логов для газет с/без признака отсылки
+    AddInArray(aFlt, 'RClass="РКП_Газеты.Газета"');
+    AddInArray(aFlt, 'RID=' + Str(Record.DocId));
+    AddInArray(aFlt, 'UpdateDate<' + Str(Today + 1));
+    with Query.Create([РКП_СИС.ЛогРабот]) do
+      Filter = РКП_СИС.FltMaker.MakeFilter(aFlt);
+      Select;
+      if Record.ПризнакОтсылки then
+        while not Eof do
+          (Current as РКП_СИС.ЛогРабот).StoredValL = true;
+          РКП_СИС.Recs.RecordPostIfNeed(Current);
+          Next;
+        od;
+      else
+        while not Eof do
+          (Current as РКП_СИС.ЛогРабот).StoredValL = false;
+          РКП_СИС.Recs.RecordPostIfNeed(Current);
+          Next;
+        od;
+      fi;
+    end;
+  end;
+
   proc ОбновитьСтатАналитику;
     ОбновитьСтатАналитикуДляГазеты(Self.Record);
   end;
