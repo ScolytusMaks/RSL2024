@@ -1779,11 +1779,7 @@ inobject private
     var Решение1 :Integer;
     var Инициалы_               : string;
     var NameSplitter :РКП_СИС.NameSplitterSrv;
-<<<<<<< HEAD
     var RI :РКП_Справочники.RI.Справочники.Лица;
-=======
-    var RI :RI.Справочники.Лица;
->>>>>>> 6c619fe4fb1628140b679df025776f670bf8150d
     if (Cell.Owner.Cell[Cell.Column - 3, Cell.Row].Value <> nil) then
       Value_ = Cell.Owner.Cell[Cell.Column - 3, Cell.Row].Value + ' ' + Value;
       NameSplitter = РКП_СИС.NameSplitterSrv.CreateExt(Value_);
