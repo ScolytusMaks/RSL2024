@@ -1,15 +1,15 @@
-
-  abstract record BaseRefType1 inherited СИС2.Базовая.БазоваяЗапись title "Базовая запись";
-    field Наим          :String(MaxIndexedStr) title "Наименование";
-    field НеПрименяется :Logical               title "Более не применяется";
-    field Hash          :String; -- хэш строкового поля, по которому будет контролироваться относительная уникальность
-    RecordDescription Наим;
+п»ї
+  abstract record BaseRefType1 inherited РЎРРЎ2.Р‘Р°Р·РѕРІР°СЏ.Р‘Р°Р·РѕРІР°СЏР—Р°РїРёСЃСЊ title "Р‘Р°Р·РѕРІР°СЏ Р·Р°РїРёСЃСЊ";
+    field РќР°РёРј          :String(MaxIndexedStr) title "РќР°РёРјРµРЅРѕРІР°РЅРёРµ";
+    field РќРµРџСЂРёРјРµРЅСЏРµС‚СЃСЏ :Logical               title "Р‘РѕР»РµРµ РЅРµ РїСЂРёРјРµРЅСЏРµС‚СЃСЏ";
+    field Hash          :String; -- С…СЌС€ СЃС‚СЂРѕРєРѕРІРѕРіРѕ РїРѕР»СЏ, РїРѕ РєРѕС‚РѕСЂРѕРјСѓ Р±СѓРґРµС‚ РєРѕРЅС‚СЂРѕР»РёСЂРѕРІР°С‚СЊСЃСЏ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅР°СЏ СѓРЅРёРєР°Р»СЊРЅРѕСЃС‚СЊ
+    RecordDescription РќР°РёРј;
   end;
 
-  abstract record BaseRefType2 inherited BaseRefType1 title "Базовая запись";
-    field Номер         :Integer; -- Кастомный порядок сортировки
+  abstract record BaseRefType2 inherited BaseRefType1 title "Р‘Р°Р·РѕРІР°СЏ Р·Р°РїРёСЃСЊ";
+    field РќРѕРјРµСЂ         :Integer; -- РљР°СЃС‚РѕРјРЅС‹Р№ РїРѕСЂСЏРґРѕРє СЃРѕСЂС‚РёСЂРѕРІРєРё
   end;
 
-  abstract record BaseRefType3 inherited BaseRefType2 title "Базовая запись";
-    field Код           :String                title "Код"; -- Не уникальный, не является внешним ключем
+  abstract record BaseRefType3 inherited BaseRefType2 title "Р‘Р°Р·РѕРІР°СЏ Р·Р°РїРёСЃСЊ";
+    field РљРѕРґ           :String                title "РљРѕРґ"; -- РќРµ СѓРЅРёРєР°Р»СЊРЅС‹Р№, РЅРµ СЏРІР»СЏРµС‚СЃСЏ РІРЅРµС€РЅРёРј РєР»СЋС‡РµРј
   end;

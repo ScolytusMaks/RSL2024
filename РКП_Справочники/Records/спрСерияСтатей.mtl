@@ -1,2 +1,2 @@
-record спрСерияСтатей inherited BaseRefType1 title "Серия статей";
+п»їrecord СЃРїСЂРЎРµСЂРёСЏРЎС‚Р°С‚РµР№ inherited BaseRefType1 title "РЎРµСЂРёСЏ СЃС‚Р°С‚РµР№";
 end;
