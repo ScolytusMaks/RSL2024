@@ -22,7 +22,7 @@ inclass
     Q.Order             = "КодУДК";
     Q.Select;
     for k = 1..Q.Count                                                  do
-      КодОгл            = Q.Current.КодУДК;
+      КодОгл            = Q.Current.Код;
       НаимОгл           = Q.Current.Наим;
         if      КодОгл  = "0"   or
                 КодОгл  = "1"   or

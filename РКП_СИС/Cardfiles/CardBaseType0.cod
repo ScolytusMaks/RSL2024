@@ -11,12 +11,13 @@ inclass private
 
 inobject private
 
-  var фреймќстальное :TemplateFrame;
-  var фрейм‘ильтр    :TemplateFrame;
-  var FrameNil       :TemplateFrame;
-  var ‘рагмент       :String;
+  var фреймќстальное  :TemplateFrame;
+  var фрейм‘ильтр     :TemplateFrame;
+  var FrameNil        :TemplateFrame;
+  var ‘рагмент        :String;
   var SimilarDataViewsMode :Logical; -- –ежим просмотра похожих данных
-  var SimilarFilter  :String;
+  var SimilarFilter   :String;
+  var CurrentExternal :Record; -- “екуща€ запись (при открытии), переданна€ извне
 
 inobject private
 
@@ -121,6 +122,17 @@ inobject private
 
   proc ”становить«аписьѕриќткрытии;
     if (Self.Cardfile.Filter <> nil) then
+      --
+      if (CurrentExternal <> nil) then
+        with Query.Create(Self.Cardfile.Records) do
+          Filter = Self.Cardfile.Filter;
+          if MatchFilter(CurrentExternal) then
+            Self.Cardfile.Current = CurrentExternal;
+            Return;
+          fi;
+        end;
+      fi;
+      --
       with Query.Create(Self.Cardfile.Records) do
         Order = Self.Cardfile.Order;
         Filter = Self.Cardfile.Filter;
@@ -133,7 +145,6 @@ inobject private
           Next;
         od;
       end;
-      
     fi;
 --    var locCell :TemplateCell;
 --    locCell = Template.CellByField['‘рагмент'];

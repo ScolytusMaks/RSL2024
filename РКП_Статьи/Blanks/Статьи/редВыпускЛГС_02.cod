@@ -24,8 +24,8 @@ inobject
           Q0                    = Query.Create([ĞÊÏ_Ñòàòüè.Ğîñïèñü]);
           Q0.Filter             = "ÃîäËåòîïèñè="+Str(ÃîäËåòîïèñè)+
                                   " and ÂûïóñêËåòîïèñè="+Str(ÂûïóñêËåòîïèñè)+
-                                  " and (ÈíäåêñÓÄÊ.Exists(Match(ĞóáğèêàÓÄÊ.ÊîäÓÄÊ,'"+Str(Q1.Current.ÊîäÓÄÊ)+"*')) or"+
-                                  " Match(ÈíäåêñÂÒĞ.ÊîäÓÄÊ,'"+Str(Q1.Current.ÊîäÓÄÊ)+"*'))";
+                                  " and (ÈíäåêñÓÄÊ.Exists(Match(ĞóáğèêàÓÄÊ.Êîä,'"+Str(Q1.Current.Êîä)+"*')) or"+
+                                  " Match(ÈíäåêñÂÒĞ.Êîä,'"+Str(Q1.Current.Êîä)+"*'))";
           Q0.LoadingFieldsMode  = ÑÈÑ2.Êîíñòàíòû.mdNone;
           Q0.Select;
           if Q0.Count>0 then

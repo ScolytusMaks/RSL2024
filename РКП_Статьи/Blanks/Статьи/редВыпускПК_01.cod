@@ -195,7 +195,7 @@ inobject
             if (aRecord.State = Record.Edited)  then
               aRecord.Post;
             end;
-            --КодУдк_[k]          = Q.Current.ИндексУДК.Items[1].РубрикаУДК.КодУДК;
+            --КодУдк_[k]          = Q.Current.ИндексУДК.Items[1].РубрикаУДК.Код;
             КодУдк_[k]          = Q.Current.ИндексУДК.Items[1].РубрикаУДК.Номер; --10.01.2009
             Заголовок_[k]       = Q.Current.Заголовок;
             Запись_[k]          = Q.Current;

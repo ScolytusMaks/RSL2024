@@ -1,66 +1,66 @@
-Class inherited МашинаРеквизитов.Базовые.блРедакторСИнтерфейсом "Выпуск издания в течение года" , editor ВыпускГазеты;
+п»їClass inherited РњР°С€РёРЅР°Р РµРєРІРёР·РёС‚РѕРІ.Р‘Р°Р·РѕРІС‹Рµ.Р±Р»Р РµРґР°РєС‚РѕСЂРЎРРЅС‚РµСЂС„РµР№СЃРѕРј "Р’С‹РїСѓСЃРє РёР·РґР°РЅРёСЏ РІ С‚РµС‡РµРЅРёРµ РіРѕРґР°" , editor Р’С‹РїСѓСЃРєР“Р°Р·РµС‚С‹;
 
-import РКП_СИС classes Profile, Def, StringsFunctions, StdCode, Recs, Functions, FilterMaker;
-import classes Константы;
+import Р РљРџ_РЎРРЎ classes Profile, Def, StringsFunctions, StdCode, Recs, Functions, FilterMaker;
+import classes РљРѕРЅСЃС‚Р°РЅС‚С‹;
 
 inclass public
 
 inobject private
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 
   var aDigitChar :String[] := ['0','1','2','3','4','5','6','7','8','9'];
-  var секцГодВыпуска1 :TemplateSection;
-  var секцГодВыпуска2 :TemplateSection;
-  var секцГодВыпуска3 :TemplateSection;
-  var фреймВводимыеДанные :TemplateFrame;
-  var фреймРасчетныеДанные :TemplateFrame;
+  var СЃРµРєС†Р“РѕРґР’С‹РїСѓСЃРєР°1 :TemplateSection;
+  var СЃРµРєС†Р“РѕРґР’С‹РїСѓСЃРєР°2 :TemplateSection;
+  var СЃРµРєС†Р“РѕРґР’С‹РїСѓСЃРєР°3 :TemplateSection;
+  var С„СЂРµР№РјР’РІРѕРґРёРјС‹РµР”Р°РЅРЅС‹Рµ :TemplateFrame;
+  var С„СЂРµР№РјР Р°СЃС‡РµС‚РЅС‹РµР”Р°РЅРЅС‹Рµ :TemplateFrame;
 
 --}}
 
--- 2_Конструкторы, визуализаторы0. --
+-- 2_РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹, РІРёР·СѓР°Р»РёР·Р°С‚РѕСЂС‹0. --
 
 inclass public
 
 inobject private
 
--- 2_Обработчики событий шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ С€Р°Р±Р»РѕРЅР°0. --
 
-  func шаблон_ПриПроверке :Logical;
-    var vRec :РКП_Газеты.ВыпускГазеты;
-    Result = inherited шаблон_ПриПроверке;
-    if (Газета <> nil) and (ГодВыпуска <> nil) then
-      vRec = FindRecord(РКП_Газеты.ВыпускГазеты, 'Газета=' + Газета.DocIDStr + ' and ГодВыпуска=' + Str(ГодВыпуска) + ' and DocId<>' + Str(DocId));
+  func С€Р°Р±Р»РѕРЅ_РџСЂРёРџСЂРѕРІРµСЂРєРµ :Logical;
+    var vRec :Р РљРџ_Р“Р°Р·РµС‚С‹.Р’С‹РїСѓСЃРєР“Р°Р·РµС‚С‹;
+    Result = inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРџСЂРѕРІРµСЂРєРµ;
+    if (Р“Р°Р·РµС‚Р° <> nil) and (Р“РѕРґР’С‹РїСѓСЃРєР° <> nil) then
+      vRec = FindRecord(Р РљРџ_Р“Р°Р·РµС‚С‹.Р’С‹РїСѓСЃРєР“Р°Р·РµС‚С‹, 'Р“Р°Р·РµС‚Р°=' + Р“Р°Р·РµС‚Р°.DocIDStr + ' and Р“РѕРґР’С‹РїСѓСЃРєР°=' + Str(Р“РѕРґР’С‹РїСѓСЃРєР°) + ' and DocId<>' + Str(DocId));
       Result = (vRec = nil);
       if (not Result) then
-        Message('Год выпуска ' + Str(ГодВыпуска) + ' уже сохранена в базе данных!');
+        Message('Р“РѕРґ РІС‹РїСѓСЃРєР° ' + Str(Р“РѕРґР’С‹РїСѓСЃРєР°) + ' СѓР¶Рµ СЃРѕС…СЂР°РЅРµРЅР° РІ Р±Р°Р·Рµ РґР°РЅРЅС‹С…!');
       fi;
     else
       Result = false;
-      Message('Не заполнены поля "Газета" или "Год выпуска"!');
+      Message('РќРµ Р·Р°РїРѕР»РЅРµРЅС‹ РїРѕР»СЏ "Р“Р°Р·РµС‚Р°" РёР»Рё "Р“РѕРґ РІС‹РїСѓСЃРєР°"!');
     fi;
   end;
 
 
 
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
-  func Поле_ПриВыводе_ЗаголовокОкнаФормы(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
-    if (Газета <> nil) then
-      Result = Газета.НазваниеОсн;
+  func РџРѕР»Рµ_РџСЂРёР’С‹РІРѕРґРµ_Р—Р°РіРѕР»РѕРІРѕРєРћРєРЅР°Р¤РѕСЂРјС‹(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    if (Р“Р°Р·РµС‚Р° <> nil) then
+      Result = Р“Р°Р·РµС‚Р°.РќР°Р·РІР°РЅРёРµРћСЃРЅ;
       if not (Self.Record.State in [Kernel.Record.Created,Kernel.Record.Duplicated]) then
-        Result = Result + Br + '<s+><s+>' + Str(ГодВыпуска);
+        Result = Result + Br + '<s+><s+>' + Str(Р“РѕРґР’С‹РїСѓСЃРєР°);
       fi;
     fi;
   end;
 
-  func Поле_ПриВыводе_Формат(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+  func РџРѕР»Рµ_РџСЂРёР’С‹РІРѕРґРµ_Р¤РѕСЂРјР°С‚(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
     var Res, Smb :String;
     var p :Integer;
     var part2 :Logical;
     if (Cell.Contents = 'A') then
-      for p = 1 .. Length(ФорматВыпуска) do
-        Smb = SubStr(ФорматВыпуска, p, 1);
+      for p = 1 .. Length(Р¤РѕСЂРјР°С‚Р’С‹РїСѓСЃРєР°) do
+        Smb = SubStr(Р¤РѕСЂРјР°С‚Р’С‹РїСѓСЃРєР°, p, 1);
         if SmbIsDigit(Smb) then
           Res = Res + Smb;
         else
@@ -73,8 +73,8 @@ inobject private
         Return 0;
       fi;
     elsif (Cell.Contents = 'B') then
-      for p = 1 .. Length(ФорматВыпуска) do
-        Smb = SubStr(ФорматВыпуска, p, 1);
+      for p = 1 .. Length(Р¤РѕСЂРјР°С‚Р’С‹РїСѓСЃРєР°) do
+        Smb = SubStr(Р¤РѕСЂРјР°С‚Р’С‹РїСѓСЃРєР°, p, 1);
         if part2 and SmbIsDigit(Smb) then
           Res = Res + Smb;
         fi;
@@ -90,87 +90,87 @@ inobject private
     fi;
   end;
 
-  func Поле_ПриВходе_Формат(Cell :TemplateCell; Index :Integer; Action :Template.EnterTypes) :Logical;
+  func РџРѕР»Рµ_РџСЂРёР’С…РѕРґРµ_Р¤РѕСЂРјР°С‚(Cell :TemplateCell; Index :Integer; Action :Template.EnterTypes) :Logical;
     var p, pp :Integer;
     var Smb :String;
     if (Cell.Contents = 'A') and (Action = Template.Clear) then
-      pp = Length(ФорматВыпуска);
+      pp = Length(Р¤РѕСЂРјР°С‚Р’С‹РїСѓСЃРєР°);
       for p = 1 .. pp do
-        Smb = SubStr(ФорматВыпуска, p, 1);
+        Smb = SubStr(Р¤РѕСЂРјР°С‚Р’С‹РїСѓСЃРєР°, p, 1);
         if not SmbIsDigit(Smb) then
           Break;
         fi;
       od;
-      ФорматВыпуска = SubStr(ФорматВыпуска, p);
-      ПроверитьДанныеФормата;
+      Р¤РѕСЂРјР°С‚Р’С‹РїСѓСЃРєР° = SubStr(Р¤РѕСЂРјР°С‚Р’С‹РїСѓСЃРєР°, p);
+      РџСЂРѕРІРµСЂРёС‚СЊР”Р°РЅРЅС‹РµР¤РѕСЂРјР°С‚Р°;
     elsif (Cell.Contents = 'A') and (Action <> Template.Clear) then
       Return true;
     elsif (Cell.Contents = 'B') and (Action = Template.Clear) then
-      pp = Length(ФорматВыпуска);
+      pp = Length(Р¤РѕСЂРјР°С‚Р’С‹РїСѓСЃРєР°);
       for p = pp .. 1 step -1 do
-        Smb = SubStr(ФорматВыпуска, p, 1);
+        Smb = SubStr(Р¤РѕСЂРјР°С‚Р’С‹РїСѓСЃРєР°, p, 1);
         if not SmbIsDigit(Smb) then
           Break;
         fi;
       od;
-      ФорматВыпуска = SubStr(ФорматВыпуска, 1, p);
-      ПроверитьДанныеФормата;
+      Р¤РѕСЂРјР°С‚Р’С‹РїСѓСЃРєР° = SubStr(Р¤РѕСЂРјР°С‚Р’С‹РїСѓСЃРєР°, 1, p);
+      РџСЂРѕРІРµСЂРёС‚СЊР”Р°РЅРЅС‹РµР¤РѕСЂРјР°С‚Р°;
     elsif (Cell.Contents = 'B') and (Action <> Template.Clear) then
       Return true;
     fi;
   end;
 
-  func Поле_ПриПроверке_Формат(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+  func РџРѕР»Рµ_РџСЂРёРџСЂРѕРІРµСЂРєРµ_Р¤РѕСЂРјР°С‚(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
     Result = Value is Integer;
     if not Result then
-      Message('Введенное значение должно быть целым положительным числом!');
+      Message('Р’РІРµРґРµРЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ С†РµР»С‹Рј РїРѕР»РѕР¶РёС‚РµР»СЊРЅС‹Рј С‡РёСЃР»РѕРј!');
     else
       if (Value as Integer) < 1 then
         Result = false;
-        Message('Введенное значение должно быть целым положительным числом!');
+        Message('Р’РІРµРґРµРЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ С†РµР»С‹Рј РїРѕР»РѕР¶РёС‚РµР»СЊРЅС‹Рј С‡РёСЃР»РѕРј!');
       fi;
     fi;
   end;
 
-  func Поле_ПриВводе_Формат(Cell :TemplateCell; Value :Variant) :Logical;
+  func РџРѕР»Рµ_РџСЂРёР’РІРѕРґРµ_Р¤РѕСЂРјР°С‚(Cell :TemplateCell; Value :Variant) :Logical;
     if (Cell.Contents = 'A') then
-      ФорматВыпуска = Str(Value) + 'X' + Str(фреймВводимыеДанные.CellByField['B'].Text);
+      Р¤РѕСЂРјР°С‚Р’С‹РїСѓСЃРєР° = Str(Value) + 'X' + Str(С„СЂРµР№РјР’РІРѕРґРёРјС‹РµР”Р°РЅРЅС‹Рµ.CellByField['B'].Text);
     elsif (Cell.Contents = 'B') then
-      ФорматВыпуска = Str(фреймВводимыеДанные.CellByField['A'].Text) + 'X' + Str(Value);
+      Р¤РѕСЂРјР°С‚Р’С‹РїСѓСЃРєР° = Str(С„СЂРµР№РјР’РІРѕРґРёРјС‹РµР”Р°РЅРЅС‹Рµ.CellByField['A'].Text) + 'X' + Str(Value);
     fi;
   end;
 
-  proc Поле_ПриВыходе(Cell :TemplateCell; Index :Integer);
-    if (Cell.Contents = 'ГодВыпуска')      then  фреймВводимыеДанные.CellByField['A'].SetFocus;
-    elsif (Cell.Contents = 'ШифрХранения') then  фреймВводимыеДанные.CellByField['A'].SetFocus;
-    elsif (Cell.Contents = 'A')            then  фреймВводимыеДанные.CellByField['B'].SetFocus;
-    elsif (Cell.Contents = 'B')            then  фреймВводимыеДанные.CellByField['ЧислоПолос'].SetFocus;
-    elsif (Cell.Contents = 'ЧислоПолос')   then  фреймВводимыеДанные.CellByField['Комментарий'].SetFocus;
+  proc РџРѕР»Рµ_РџСЂРёР’С‹С…РѕРґРµ(Cell :TemplateCell; Index :Integer);
+    if (Cell.Contents = 'Р“РѕРґР’С‹РїСѓСЃРєР°')      then  С„СЂРµР№РјР’РІРѕРґРёРјС‹РµР”Р°РЅРЅС‹Рµ.CellByField['A'].SetFocus;
+    elsif (Cell.Contents = 'РЁРёС„СЂРҐСЂР°РЅРµРЅРёСЏ') then  С„СЂРµР№РјР’РІРѕРґРёРјС‹РµР”Р°РЅРЅС‹Рµ.CellByField['A'].SetFocus;
+    elsif (Cell.Contents = 'A')            then  С„СЂРµР№РјР’РІРѕРґРёРјС‹РµР”Р°РЅРЅС‹Рµ.CellByField['B'].SetFocus;
+    elsif (Cell.Contents = 'B')            then  С„СЂРµР№РјР’РІРѕРґРёРјС‹РµР”Р°РЅРЅС‹Рµ.CellByField['Р§РёСЃР»РѕРџРѕР»РѕСЃ'].SetFocus;
+    elsif (Cell.Contents = 'Р§РёСЃР»РѕРџРѕР»РѕСЃ')   then  С„СЂРµР№РјР’РІРѕРґРёРјС‹РµР”Р°РЅРЅС‹Рµ.CellByField['РљРѕРјРјРµРЅС‚Р°СЂРёР№'].SetFocus;
     fi;
   end;
 
 
 
--- 2_Обработчики событий прочих объектов шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РїСЂРѕС‡РёС… РѕР±СЉРµРєС‚РѕРІ С€Р°Р±Р»РѕРЅР°0. --
 
 
--- 2_Дополнительные команды0. --
+-- 2_Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ РєРѕРјР°РЅРґС‹0. --
 
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
-  proc МодифицироватьШаблон;
+  proc РњРѕРґРёС„РёС†РёСЂРѕРІР°С‚СЊРЁР°Р±Р»РѕРЅ;
     if OPPIAccess then
-      секцГодВыпуска1.Visible = (Self.Record.State in [Kernel.Record.Created,Kernel.Record.Duplicated]);
-      секцГодВыпуска2.Visible = false;
-      секцГодВыпуска3.Visible = not секцГодВыпуска2.Visible;
-      секцГодВыпуска3.CellByField['КомплектПолучен'].Enabled = false;
-      фреймВводимыеДанные.Visible = false;
-      фреймРасчетныеДанные.Visible = false;
+      СЃРµРєС†Р“РѕРґР’С‹РїСѓСЃРєР°1.Visible = (Self.Record.State in [Kernel.Record.Created,Kernel.Record.Duplicated]);
+      СЃРµРєС†Р“РѕРґР’С‹РїСѓСЃРєР°2.Visible = false;
+      СЃРµРєС†Р“РѕРґР’С‹РїСѓСЃРєР°3.Visible = not СЃРµРєС†Р“РѕРґР’С‹РїСѓСЃРєР°2.Visible;
+      СЃРµРєС†Р“РѕРґР’С‹РїСѓСЃРєР°3.CellByField['РљРѕРјРїР»РµРєС‚РџРѕР»СѓС‡РµРЅ'].Enabled = false;
+      С„СЂРµР№РјР’РІРѕРґРёРјС‹РµР”Р°РЅРЅС‹Рµ.Visible = false;
+      С„СЂРµР№РјР Р°СЃС‡РµС‚РЅС‹РµР”Р°РЅРЅС‹Рµ.Visible = false;
     else
-      секцГодВыпуска1.Visible = false;
-      секцГодВыпуска2.Visible = (Self.Record.State in [Kernel.Record.Created,Kernel.Record.Duplicated]);
-      секцГодВыпуска3.Visible = not секцГодВыпуска2.Visible;
+      СЃРµРєС†Р“РѕРґР’С‹РїСѓСЃРєР°1.Visible = false;
+      СЃРµРєС†Р“РѕРґР’С‹РїСѓСЃРєР°2.Visible = (Self.Record.State in [Kernel.Record.Created,Kernel.Record.Duplicated]);
+      СЃРµРєС†Р“РѕРґР’С‹РїСѓСЃРєР°3.Visible = not СЃРµРєС†Р“РѕРґР’С‹РїСѓСЃРєР°2.Visible;
     fi;
   end;
 
@@ -178,20 +178,20 @@ inobject private
     Return (vChar in aDigitChar);
   end;
 
-  proc ПроверитьДанныеФормата;
+  proc РџСЂРѕРІРµСЂРёС‚СЊР”Р°РЅРЅС‹РµР¤РѕСЂРјР°С‚Р°;
     var p :Integer;
     var Smb :String;
     var NoDigSmb :Logical;
     NoDigSmb = true;
-    for p = 1 .. Length(ФорматВыпуска) do
-      Smb = SubStr(ФорматВыпуска, p, 1);
+    for p = 1 .. Length(Р¤РѕСЂРјР°С‚Р’С‹РїСѓСЃРєР°) do
+      Smb = SubStr(Р¤РѕСЂРјР°С‚Р’С‹РїСѓСЃРєР°, p, 1);
       if SmbIsDigit(Smb) then
         NoDigSmb = false;
         Break;
       fi;
     od;
     if NoDigSmb then
-      ФорматВыпуска = nil;
+      Р¤РѕСЂРјР°С‚Р’С‹РїСѓСЃРєР° = nil;
     fi;
   end;
 

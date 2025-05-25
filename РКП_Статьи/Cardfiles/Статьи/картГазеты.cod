@@ -23,7 +23,7 @@ inobject private
   proc кнРедактировать_ПриНажатии(Sender :Button);
     if (Self.Cardfile.Current <> nil) then
       #NoWarning;
-      РКП_Статьи.Статьи.редГазета.ShowFormEx( Self.Cardfile.Current, Kernel.Window.ModalWindow );
+      РКП_Газеты.УчетГазет.редГазета.ShowFormEx( Self.Cardfile.Current, Kernel.Window.ModalWindow );
     fi;
   end;
 

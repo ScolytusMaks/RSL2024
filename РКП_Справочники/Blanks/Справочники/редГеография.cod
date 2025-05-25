@@ -50,6 +50,20 @@ inobject private
     Result = inherited шаблон_ПриПроверке;
   end;
 
+  func шаблон_ПриЗаписи :Logical;
+    var i, ii :Integer;
+    var vObj :РКП_Справочники.Справочники.картГеография;
+    Result = inherited шаблон_ПриЗаписи;
+    ii = РКП_Справочники.Справочники.картГеография.ObjectsCount;
+    for i = 1 .. ii do
+      vObj = РКП_Справочники.Справочники.картГеография.Objects[i];
+      if (vObj.Cardfile.Filter <> nil) then
+        vObj.ОбновитьФильтр;
+      fi;
+    od;
+  end;
+
+
 -- 2_Обработчики событий 0клеток 2шаблона0. --
 
   proc Поле_ПриВыходе_Наим(Cell :TemplateCell; Index :Integer);

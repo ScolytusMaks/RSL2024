@@ -4,6 +4,7 @@ Query=.спрГеография
 MBlank=.Справочники.редГеография
 ActionOnType=2
 Hierarchical=1
+OnOpenBlank=картотека_ПриОткрытииБланка
 OnCreateRecord=картотека_ПриСозданииЗаписи
 OnPost=картотека_ПриЗаписи
 OnCancel=картотека_ПриОтмене

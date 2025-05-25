@@ -1,0 +1,54 @@
+﻿Class inherited МашинаРеквизитов.Базовые.блРедакторСИнтерфейсом "Годовая статистика поступлений" , editor ПоступлениеГазеты;
+
+import РКП_СИС classes Profile, Def, StringsFunctions, StdCode, Recs, Functions, FilterMaker;
+import classes Константы;
+
+inclass public
+
+inobject private
+
+--{{ 2_Свойства
+
+  флСтатус :CheckBox;
+  кнОбновитьСтатистику :Button;
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inclass public
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриСоздании(Context :Variant);
+    inherited шаблон_ПриСоздании(Context);
+    флСтатус.Enabled = false;
+  end;
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func Поле_ПриВыводе_ЗаголовокОкнаФормы(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    if (Газета <> nil) then
+      Result = Газета.НазваниеОсн;
+      Result = Result + Br + '<s+><s+>' + Str(ГодПоступления);
+    fi;
+  end;
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+  proc кнРасчетПриНажатии(Sender :Button);
+    if (Year(today) = ГодПоступления) then
+      Message('За текущий год поступления статистические показатели вычисляются в автоматичесом режиме.');
+      кнОбновитьСтатистику.Enabled = false;
+    else
+      СИС2.ФункцииДокумента.RecordEdit(Self.Record);
+      RI.ПоступлениеГазеты.ОбновитьСтатистику(Self.Record.Газета, Self.Record.ГодПоступления, РКП_Газеты.RI.Газета.опОбновитьКэшСтатАн, false );
+    fi;
+  end;
+-- 2_Дополнительные команды0. --
+
+-- 2_Вспомогательные методы0. --
+
+
+end

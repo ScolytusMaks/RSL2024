@@ -1,13 +1,11 @@
 ﻿[Options]
 Version=7
 Query=РКП_Газеты.Газета
-MBlank=.Статьи.редГазета
-HBlank=.Статьи.редГазета
-CanEdit=0
+MBlank=РКП_Газеты.УчетГазет.редГазета
+HBlank=РКП_Газеты.УчетГазет.редГазета
 CanHGroupModify=0
 OrderBy=НазваниеОсн
 CaptionRows=3
-CanInplace=1
 CanInsert=0
 CanDelete=0
 CanMove=0

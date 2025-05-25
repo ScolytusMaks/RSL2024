@@ -50,13 +50,13 @@ inobject public
 
 inclass public
 
-  proc ОбновитьСтатистику (vNsp :РКП_Газеты.Газета; vYear :Integer; vOpt :РКП_Газеты.RI.Газета.типОпцияПолученияСтатАн);
+  proc ОбновитьСтатистику (vNsp :РКП_Газеты.Газета; vYear :Integer; vOpt :РКП_Газеты.RI.Газета.типОпцияПолученияСтатАн; SaveImm :Logical = true );
     var rStat :РКП_Газеты.ПоступлениеГазеты;
     var НомеровПолученоП :Integer;
     var ГодовойТиражП, СреднийРазовыйТиражП :Numeric;
     var aAnlt :Variant[];
     rStat = ПолучитьЗаписьСтат(vNsp, vYear);
-    if not rStat.ИзмененияЗапрещены then -- Обработка происходит, если изменения не запрещены
+    if (not rStat.ИзмененияЗапрещены) and (vYear>=0) then -- Обработка происходит, если изменения не запрещены
       with Query.Create([РКП_Газеты.НомерГазеты]) do
         with FltMaker.CreateExt do
           AddCondition( 'isGroup=0' );
@@ -71,6 +71,9 @@ inclass public
           ГодовойТиражП        = CalcAggregates("Sum(Тираж)") / 1000;
           СреднийРазовыйТиражП = Round(ГодовойТиражП/НомеровПолученоП, 1);
           ГодовойТиражП        = Round(ГодовойТиражП, 1);
+        else
+          ГодовойТиражП        = 0;
+          СреднийРазовыйТиражП = 0.0;
         fi;
       end;
       -- Аналитика
@@ -90,7 +93,9 @@ inclass public
         rStat.КоличествоВПериоде        = aAnlt[анКоличествоВПериоде] as Integer;
         rStat.Периодичность             = aAnlt[анПериодичность] as String;
       end;
-      RecordPostIfNeed(rStat);
+      if SaveImm then
+        RecordPostIfNeed(rStat);
+      fi;
     fi;
   end;
 

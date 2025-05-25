@@ -17,6 +17,7 @@ inclass private
 inobject public
 
   var »гнорировать’ранимые—войства   :Logical;
+  var –ежим—ложного‘ильтра           :Logical;
 
 inobject private
 
@@ -243,6 +244,24 @@ inobject private
     fi;
   end;
 
+  proc кн»спр250109_ѕриЌажатии(Sender :Button);
+    var i :Integer;
+    Hint('¬ыполнение...');
+    with Query.Create([– ѕ_√азеты.Ќомер√азеты]) do
+      Filter = 'CreateDate>=09.01.2025 and CreateDate<10.01.2025';
+      Select;
+      while not Eof do
+        if (Current.ƒатаѕрин€ти€Ќа’ранение <> nil) and (Current.ѕрин€лЌа’ранение = nil) then
+          Current.ѕрин€лЌа’ранение = Current.CreateUser;
+          – ѕ_—»—.Recs.RecordPostIfNeed(Current);
+          i = i + 1;
+        fi;
+        Next;
+      od;
+    end;
+    Hint('');
+    Message('«авершено. »зменено записей : ' + Str(i));
+  end;
 
 
 -- 2_ќбработчики событий картотеки0. --
@@ -265,9 +284,11 @@ inobject private
 
   func картотека_ѕриќткрытииЅланка(Action :Integer; Record :Record) :Logical;
     Result = inherited картотека_ѕриќткрытииЅланка(Action, Record);
-    ‘рагментЌазвани€ = nil;
-    ‘рагментѕодзаголовка = nil;
-    ќбновить‘ильтр;
+    if (not –ежим—ложного‘ильтра) then
+      ‘рагментЌазвани€ = nil;
+      ‘рагментѕодзаголовка = nil;
+      ќбновить‘ильтр;
+    fi;
   end;
 
   func картотека_ѕеред»зменением(Action :Cardfile.ModifyActions; Rec :Record; Group :Record; var AskConfirm :Logical) :Logical;

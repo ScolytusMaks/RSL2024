@@ -1,3 +1,2 @@
 record спр∆анр inherited BaseRefType2 title "∆анр";
-  field TEST        :String;
 end;
