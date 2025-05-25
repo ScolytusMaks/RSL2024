@@ -1,124 +1,124 @@
-Class inherited Справочники.editBaseType1 "Место издания" , editor спрГеография;
+п»їClass inherited РЎРїСЂР°РІРѕС‡РЅРёРєРё.editBaseType1 "РњРµСЃС‚Рѕ РёР·РґР°РЅРёСЏ" , editor СЃРїСЂР“РµРѕРіСЂР°С„РёСЏ;
 
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 
 
 inobject private
 
-  var Интерфейс :RI.Справочники.География;
+  var РРЅС‚РµСЂС„РµР№СЃ :RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.Р“РµРѕРіСЂР°С„РёСЏ;
 
   var Level     :Integer;
 
-  var фреймАдмСтуртура          :TemplateFrame;
-  var фреймШаблоны              :TemplateFrame;
-  var секцЗаголовокАдмСтруктура :TemplateSection;
-  var секцАдмСтатусУровень1     :TemplateSection;
-  var секцАдмСтатусУровень2     :TemplateSection;
-  var секцАдмСтатусУровень3     :TemplateSection;
-  var секцАдмСтатусУровень4     :TemplateSection;
-  var секцАдмСтатусУровень5     :TemplateSection;
-  var секцДопДанные             :TemplateSection;
+  var С„СЂРµР№РјРђРґРјРЎС‚СѓСЂС‚СѓСЂР°          :TemplateFrame;
+  var С„СЂРµР№РјРЁР°Р±Р»РѕРЅС‹              :TemplateFrame;
+  var СЃРµРєС†Р—Р°РіРѕР»РѕРІРѕРєРђРґРјРЎС‚СЂСѓРєС‚СѓСЂР° :TemplateSection;
+  var СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ1     :TemplateSection;
+  var СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ2     :TemplateSection;
+  var СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ3     :TemplateSection;
+  var СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ4     :TemplateSection;
+  var СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ5     :TemplateSection;
+  var СЃРµРєС†Р”РѕРїР”Р°РЅРЅС‹Рµ             :TemplateSection;
 
 --}}
 
 
--- 2_Обработчики событий шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ С€Р°Р±Р»РѕРЅР°0. --
 
-  proc шаблон_ПриСчитывании;
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёРЎС‡РёС‚С‹РІР°РЅРёРё;
     var vCell :TemplateCell;
-    inherited шаблон_ПриСчитывании;
-    vCell = SectionCellByContents (секцАдмСтатусУровень1, 'Категория');                                       UpdateFieldList(vCell, Def.TerrEntityLevel1);
-    vCell = SectionCellByContents (секцАдмСтатусУровень2, 'GroupDoc.Категория');                              UpdateFieldList(vCell, Def.TerrEntity);
-    vCell = SectionCellByContents (секцАдмСтатусУровень2, 'Категория');                                       UpdateFieldList(vCell, Def.TerrEntityLevel2);
-    vCell = SectionCellByContents (секцАдмСтатусУровень3, 'GroupDoc.GroupDoc.Категория');                     UpdateFieldList(vCell, Def.TerrEntity);
-    vCell = SectionCellByContents (секцАдмСтатусУровень3, 'GroupDoc.Категория');                              UpdateFieldList(vCell, Def.TerrEntity);
-    vCell = SectionCellByContents (секцАдмСтатусУровень3, 'Категория');                                       UpdateFieldList(vCell, Def.TerrEntityLevel3);
-    vCell = SectionCellByContents (секцАдмСтатусУровень4, 'GroupDoc.GroupDoc.GroupDoc.Категория');            UpdateFieldList(vCell, Def.TerrEntity);
-    vCell = SectionCellByContents (секцАдмСтатусУровень4, 'GroupDoc.GroupDoc.Категория');                     UpdateFieldList(vCell, Def.TerrEntity);
-    vCell = SectionCellByContents (секцАдмСтатусУровень4, 'GroupDoc.Категория');                              UpdateFieldList(vCell, Def.TerrEntity);
-    vCell = SectionCellByContents (секцАдмСтатусУровень4, 'Категория');                                       UpdateFieldList(vCell, Def.TerrEntityLevel4);
-    vCell = SectionCellByContents (секцАдмСтатусУровень5, 'GroupDoc.GroupDoc.GroupDoc.GroupDoc.Категория');   UpdateFieldList(vCell, Def.TerrEntity);
-    vCell = SectionCellByContents (секцАдмСтатусУровень5, 'GroupDoc.GroupDoc.GroupDoc.Категория');            UpdateFieldList(vCell, Def.TerrEntity);
-    vCell = SectionCellByContents (секцАдмСтатусУровень5, 'GroupDoc.GroupDoc.Категория');                     UpdateFieldList(vCell, Def.TerrEntity);
-    vCell = SectionCellByContents (секцАдмСтатусУровень5, 'GroupDoc.Категория');                              UpdateFieldList(vCell, Def.TerrEntity);
-    vCell = SectionCellByContents (секцАдмСтатусУровень5, 'Категория');                                       UpdateFieldList(vCell, Def.TerrEntityLevel5);
-    МодифицироватьШаблон;
+    inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРЎС‡РёС‚С‹РІР°РЅРёРё;
+    vCell = SectionCellByContents (СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ1, 'РљР°С‚РµРіРѕСЂРёСЏ');                                       UpdateFieldList(vCell, Def.TerrEntityLevel1);
+    vCell = SectionCellByContents (СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ2, 'GroupDoc.РљР°С‚РµРіРѕСЂРёСЏ');                              UpdateFieldList(vCell, Def.TerrEntity);
+    vCell = SectionCellByContents (СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ2, 'РљР°С‚РµРіРѕСЂРёСЏ');                                       UpdateFieldList(vCell, Def.TerrEntityLevel2);
+    vCell = SectionCellByContents (СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ3, 'GroupDoc.GroupDoc.РљР°С‚РµРіРѕСЂРёСЏ');                     UpdateFieldList(vCell, Def.TerrEntity);
+    vCell = SectionCellByContents (СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ3, 'GroupDoc.РљР°С‚РµРіРѕСЂРёСЏ');                              UpdateFieldList(vCell, Def.TerrEntity);
+    vCell = SectionCellByContents (СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ3, 'РљР°С‚РµРіРѕСЂРёСЏ');                                       UpdateFieldList(vCell, Def.TerrEntityLevel3);
+    vCell = SectionCellByContents (СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ4, 'GroupDoc.GroupDoc.GroupDoc.РљР°С‚РµРіРѕСЂРёСЏ');            UpdateFieldList(vCell, Def.TerrEntity);
+    vCell = SectionCellByContents (СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ4, 'GroupDoc.GroupDoc.РљР°С‚РµРіРѕСЂРёСЏ');                     UpdateFieldList(vCell, Def.TerrEntity);
+    vCell = SectionCellByContents (СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ4, 'GroupDoc.РљР°С‚РµРіРѕСЂРёСЏ');                              UpdateFieldList(vCell, Def.TerrEntity);
+    vCell = SectionCellByContents (СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ4, 'РљР°С‚РµРіРѕСЂРёСЏ');                                       UpdateFieldList(vCell, Def.TerrEntityLevel4);
+    vCell = SectionCellByContents (СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ5, 'GroupDoc.GroupDoc.GroupDoc.GroupDoc.РљР°С‚РµРіРѕСЂРёСЏ');   UpdateFieldList(vCell, Def.TerrEntity);
+    vCell = SectionCellByContents (СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ5, 'GroupDoc.GroupDoc.GroupDoc.РљР°С‚РµРіРѕСЂРёСЏ');            UpdateFieldList(vCell, Def.TerrEntity);
+    vCell = SectionCellByContents (СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ5, 'GroupDoc.GroupDoc.РљР°С‚РµРіРѕСЂРёСЏ');                     UpdateFieldList(vCell, Def.TerrEntity);
+    vCell = SectionCellByContents (СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ5, 'GroupDoc.РљР°С‚РµРіРѕСЂРёСЏ');                              UpdateFieldList(vCell, Def.TerrEntity);
+    vCell = SectionCellByContents (СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ5, 'РљР°С‚РµРіРѕСЂРёСЏ');                                       UpdateFieldList(vCell, Def.TerrEntityLevel5);
+    РњРѕРґРёС„РёС†РёСЂРѕРІР°С‚СЊРЁР°Р±Р»РѕРЅ;
   end;
 
-  func шаблон_ПриПроверке :Logical;
-    Result = inherited шаблон_ПриПроверке;
+  func С€Р°Р±Р»РѕРЅ_РџСЂРёРџСЂРѕРІРµСЂРєРµ :Logical;
+    Result = inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРџСЂРѕРІРµСЂРєРµ;
   end;
 
-  func шаблон_ПриЗаписи :Logical;
+  func С€Р°Р±Р»РѕРЅ_РџСЂРёР—Р°РїРёСЃРё :Logical;
     var i, ii :Integer;
-    var vObj :РКП_Справочники.Справочники.картГеография;
-    Result = inherited шаблон_ПриЗаписи;
-    ii = РКП_Справочники.Справочники.картГеография.ObjectsCount;
+    var vObj :Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РєР°СЂС‚Р“РµРѕРіСЂР°С„РёСЏ;
+    Result = inherited С€Р°Р±Р»РѕРЅ_РџСЂРёР—Р°РїРёСЃРё;
+    ii = Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РєР°СЂС‚Р“РµРѕРіСЂР°С„РёСЏ.ObjectsCount;
     for i = 1 .. ii do
-      vObj = РКП_Справочники.Справочники.картГеография.Objects[i];
+      vObj = Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РєР°СЂС‚Р“РµРѕРіСЂР°С„РёСЏ.Objects[i];
       if (vObj.Cardfile.Filter <> nil) then
-        vObj.ОбновитьФильтр;
+        vObj.РћР±РЅРѕРІРёС‚СЊР¤РёР»СЊС‚СЂ;
       fi;
     od;
   end;
 
 
--- 2_Обработчики событий 0клеток 2шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ 0РєР»РµС‚РѕРє 2С€Р°Р±Р»РѕРЅР°0. --
 
-  proc Поле_ПриВыходе_Наим(Cell :TemplateCell; Index :Integer);
-    if Cell.Contents = 'Наим' then
-      if (НаимСокр = nil) then
-        НаимСокр = Наим;
-        НаимБибл = BiblioRecord.НаимГео(Record);
-        Hash = Интерфейс.GetHashByRecord(Self.Record);
+  proc РџРѕР»Рµ_РџСЂРёР’С‹С…РѕРґРµ_РќР°РёРј(Cell :TemplateCell; Index :Integer);
+    if Cell.Contents = 'РќР°РёРј' then
+      if (РќР°РёРјРЎРѕРєСЂ = nil) then
+        РќР°РёРјРЎРѕРєСЂ = РќР°РёРј;
+        РќР°РёРјР‘РёР±Р» = BiblioRecord.РќР°РёРјР“РµРѕ(Record);
+        Hash = РРЅС‚РµСЂС„РµР№СЃ.GetHashByRecord(Self.Record);
       fi;
     fi;
   end;
 
-  proc Поле_ПриВыходе_НаимСокр(Cell :TemplateCell; Index :Integer);
-    НаимБибл = BiblioRecord.НаимГео(Record);
-    Hash = Интерфейс.GetHashByRecord(Self.Record);
+  proc РџРѕР»Рµ_РџСЂРёР’С‹С…РѕРґРµ_РќР°РёРјРЎРѕРєСЂ(Cell :TemplateCell; Index :Integer);
+    РќР°РёРјР‘РёР±Р» = BiblioRecord.РќР°РёРјР“РµРѕ(Record);
+    Hash = РРЅС‚РµСЂС„РµР№СЃ.GetHashByRecord(Self.Record);
   end;
 
-  proc ПолеОбл_Центр_ПриВыходе(Cell :TemplateCell; Index :Integer);
-    НаимБибл = BiblioRecord.НаимГео(Record);
-    Hash = Интерфейс.GetHashByRecord(Self.Record);
+  proc РџРѕР»РµРћР±Р»_Р¦РµРЅС‚СЂ_РџСЂРёР’С‹С…РѕРґРµ(Cell :TemplateCell; Index :Integer);
+    РќР°РёРјР‘РёР±Р» = BiblioRecord.РќР°РёРјР“РµРѕ(Record);
+    Hash = РРЅС‚РµСЂС„РµР№СЃ.GetHashByRecord(Self.Record);
   end;
 
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
-   proc УстановитьФокусНаПервоеПолеВвода;
-    --Template.CellByField['Имя'].SetFocus;
+   proc РЈСЃС‚Р°РЅРѕРІРёС‚СЊР¤РѕРєСѓСЃРќР°РџРµСЂРІРѕРµРџРѕР»РµР’РІРѕРґР°;
+    --Template.CellByField['РРјСЏ'].SetFocus;
    end;
 
-   proc МодифицироватьШаблон;
-     фреймАдмСтуртура.Clear;
-     Level = РКП_СИС.Recs.RecordsLevel(Self.Record);
+   proc РњРѕРґРёС„РёС†РёСЂРѕРІР°С‚СЊРЁР°Р±Р»РѕРЅ;
+     С„СЂРµР№РјРђРґРјРЎС‚СѓСЂС‚СѓСЂР°.Clear;
+     Level = Р РљРџ_РЎРРЎ.Recs.RecordsLevel(Self.Record);
      if (Level in [1,2,3,4]) or ((Level = 5) and (not isGroup)) then
-       CloneSection(фреймАдмСтуртура, 'секцЗаголовокАдмСтруктура', фреймШаблоны);
+       CloneSection(С„СЂРµР№РјРђРґРјРЎС‚СѓСЂС‚СѓСЂР°, 'СЃРµРєС†Р—Р°РіРѕР»РѕРІРѕРєРђРґРјРЎС‚СЂСѓРєС‚СѓСЂР°', С„СЂРµР№РјРЁР°Р±Р»РѕРЅС‹);
      fi;
      if (Level in [5]) and not isGroup then
-       CloneSection(фреймАдмСтуртура, 'секцЗаголовокАдмСтруктура', фреймШаблоны);
+       CloneSection(С„СЂРµР№РјРђРґРјРЎС‚СѓСЂС‚СѓСЂР°, 'СЃРµРєС†Р—Р°РіРѕР»РѕРІРѕРєРђРґРјРЎС‚СЂСѓРєС‚СѓСЂР°', С„СЂРµР№РјРЁР°Р±Р»РѕРЅС‹);
      fi;
      if (Level = 1) then
-       CloneSection(фреймАдмСтуртура, 'секцАдмСтатусУровень1', фреймШаблоны);
+       CloneSection(С„СЂРµР№РјРђРґРјРЎС‚СѓСЂС‚СѓСЂР°, 'СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ1', С„СЂРµР№РјРЁР°Р±Р»РѕРЅС‹);
      elsif (Level = 2) then
-       CloneSection(фреймАдмСтуртура, 'секцАдмСтатусУровень2', фреймШаблоны);
+       CloneSection(С„СЂРµР№РјРђРґРјРЎС‚СѓСЂС‚СѓСЂР°, 'СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ2', С„СЂРµР№РјРЁР°Р±Р»РѕРЅС‹);
      elsif (Level = 3) then
-       CloneSection(фреймАдмСтуртура, 'секцАдмСтатусУровень3', фреймШаблоны);
+       CloneSection(С„СЂРµР№РјРђРґРјРЎС‚СѓСЂС‚СѓСЂР°, 'СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ3', С„СЂРµР№РјРЁР°Р±Р»РѕРЅС‹);
      elsif (Level = 4) then
-       CloneSection(фреймАдмСтуртура, 'секцАдмСтатусУровень4', фреймШаблоны);
+       CloneSection(С„СЂРµР№РјРђРґРјРЎС‚СѓСЂС‚СѓСЂР°, 'СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ4', С„СЂРµР№РјРЁР°Р±Р»РѕРЅС‹);
      elsif (Level = 5) and not isGroup then
-       CloneSection(фреймАдмСтуртура, 'секцАдмСтатусУровень5', фреймШаблоны);
+       CloneSection(С„СЂРµР№РјРђРґРјРЎС‚СѓСЂС‚СѓСЂР°, 'СЃРµРєС†РђРґРјРЎС‚Р°С‚СѓСЃРЈСЂРѕРІРµРЅСЊ5', С„СЂРµР№РјРЁР°Р±Р»РѕРЅС‹);
      elsif (Level = 5) and isGroup then
-       CloneSection(фреймАдмСтуртура, 'секцОграничение1', фреймШаблоны);
+       CloneSection(С„СЂРµР№РјРђРґРјРЎС‚СѓСЂС‚СѓСЂР°, 'СЃРµРєС†РћРіСЂР°РЅРёС‡РµРЅРёРµ1', С„СЂРµР№РјРЁР°Р±Р»РѕРЅС‹);
      elsif (Level > 5) then
-       CloneSection(фреймАдмСтуртура, 'секцОграничение2', фреймШаблоны);
+       CloneSection(С„СЂРµР№РјРђРґРјРЎС‚СѓСЂС‚СѓСЂР°, 'СЃРµРєС†РћРіСЂР°РЅРёС‡РµРЅРёРµ2', С„СЂРµР№РјРЁР°Р±Р»РѕРЅС‹);
      fi;
      if (Level in [1,2,3,4]) or ((Level = 5) and (not isGroup)) then
-       CloneSection(фреймАдмСтуртура, 'секцДопДанные',         фреймШаблоны);
+       CloneSection(С„СЂРµР№РјРђРґРјРЎС‚СѓСЂС‚СѓСЂР°, 'СЃРµРєС†Р”РѕРїР”Р°РЅРЅС‹Рµ',         С„СЂРµР№РјРЁР°Р±Р»РѕРЅС‹);
      fi;
    end;
 

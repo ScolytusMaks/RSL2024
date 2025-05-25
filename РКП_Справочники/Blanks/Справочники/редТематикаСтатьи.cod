@@ -1,58 +1,58 @@
-Class inherited Справочники.editBaseType3 "Тематика статьи" , editor спрТематикаСтатьи;
+п»їClass inherited РЎРїСЂР°РІРѕС‡РЅРёРєРё.editBaseType3 "РўРµРјР°С‚РёРєР° СЃС‚Р°С‚СЊРё" , editor СЃРїСЂРўРµРјР°С‚РёРєР°РЎС‚Р°С‚СЊРё;
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 
 inobject private
 
-  var Интерфейс :RI.Справочники.ТематикаСтатьи;
+  var РРЅС‚РµСЂС„РµР№СЃ :RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РўРµРјР°С‚РёРєР°РЎС‚Р°С‚СЊРё;
 
 --}}
 
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
-  proc Поле_ПриВыходе_Наим(Cell :TemplateCell; Index :Integer);
-    if (КрНаим = nil) then
-      КрНаим = Наим;
+  proc РџРѕР»Рµ_РџСЂРёР’С‹С…РѕРґРµ_РќР°РёРј(Cell :TemplateCell; Index :Integer);
+    if (РљСЂРќР°РёРј = nil) then
+      РљСЂРќР°РёРј = РќР°РёРј;
     fi;
-    if (Cell.Contents in Интерфейс.ХешируемыеПоля) then
-      Hash = Интерфейс.GetHashByRecord(Self.Record);
-    fi;
-  end;
-
-  proc Поле_ПриВыходе(Cell :TemplateCell; Index :Integer);
-    if (Cell.Contents = 'ВклОгл') then
-      if ВклОгл then
-        БезКода    = false;
-        Временная  = false;
-        Подрубрика = false;
-      fi;
-    elsif (Cell.Contents = 'Временная') then
-      if Временная then
-        ВклОгл     = false;
-        Подрубрика = false;
-        БезКода    = true;
-        if (КрНаим = nil) then
-          КрНаим = Наим;
-        fi;
-      fi;
-    elsif (Cell.Contents = 'Подрубрика') then
-      if Подрубрика then
-        Временная = false;
-        if (КрНаим = nil) then
-          КрНаим = Наим;
-        fi;
-      fi;
-    elsif (Cell.Contents = 'БезКода') then
-      if БезКода then
-        ВклОгл = false;
-        if (КрНаим = nil) then
-          КрНаим = Наим;
-        fi;
-      fi;
+    if (Cell.Contents in РРЅС‚РµСЂС„РµР№СЃ.РҐРµС€РёСЂСѓРµРјС‹РµРџРѕР»СЏ) then
+      Hash = РРЅС‚РµСЂС„РµР№СЃ.GetHashByRecord(Self.Record);
     fi;
   end;
 
--- 2_Вспомогательные методы0. --
+  proc РџРѕР»Рµ_РџСЂРёР’С‹С…РѕРґРµ(Cell :TemplateCell; Index :Integer);
+    if (Cell.Contents = 'Р’РєР»РћРіР»') then
+      if Р’РєР»РћРіР» then
+        Р‘РµР·РљРѕРґР°    = false;
+        Р’СЂРµРјРµРЅРЅР°СЏ  = false;
+        РџРѕРґСЂСѓР±СЂРёРєР° = false;
+      fi;
+    elsif (Cell.Contents = 'Р’СЂРµРјРµРЅРЅР°СЏ') then
+      if Р’СЂРµРјРµРЅРЅР°СЏ then
+        Р’РєР»РћРіР»     = false;
+        РџРѕРґСЂСѓР±СЂРёРєР° = false;
+        Р‘РµР·РљРѕРґР°    = true;
+        if (РљСЂРќР°РёРј = nil) then
+          РљСЂРќР°РёРј = РќР°РёРј;
+        fi;
+      fi;
+    elsif (Cell.Contents = 'РџРѕРґСЂСѓР±СЂРёРєР°') then
+      if РџРѕРґСЂСѓР±СЂРёРєР° then
+        Р’СЂРµРјРµРЅРЅР°СЏ = false;
+        if (РљСЂРќР°РёРј = nil) then
+          РљСЂРќР°РёРј = РќР°РёРј;
+        fi;
+      fi;
+    elsif (Cell.Contents = 'Р‘РµР·РљРѕРґР°') then
+      if Р‘РµР·РљРѕРґР° then
+        Р’РєР»РћРіР» = false;
+        if (РљСЂРќР°РёРј = nil) then
+          РљСЂРќР°РёРј = РќР°РёРј;
+        fi;
+      fi;
+    fi;
+  end;
+
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
 
 end

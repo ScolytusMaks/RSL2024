@@ -1,89 +1,89 @@
-Class inherited Справочники.editBaseType1 "Персоналия" , editor спрЛица;
+п»їClass inherited РЎРїСЂР°РІРѕС‡РЅРёРєРё.editBaseType1 "РџРµСЂСЃРѕРЅР°Р»РёСЏ" , editor СЃРїСЂР›РёС†Р°;
 
-import РКП_СИС Classes StringsFunctions;
+import Р РљРџ_РЎРРЎ Classes StringsFunctions;
 
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 inobject private
 
-  var Интерфейс :RI.Справочники.Лица;
+  var РРЅС‚РµСЂС„РµР№СЃ :RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.Р›РёС†Р°;
 
 --}}
 
 
--- 2_Обработчики событий шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ С€Р°Р±Р»РѕРЅР°0. --
 
-  func шаблон_ПриПроверке :Logical;
+  func С€Р°Р±Р»РѕРЅ_РџСЂРёРџСЂРѕРІРµСЂРєРµ :Logical;
     var aTest :Logical[];
-    aTest[1] = (Trim(Наим) <> nil);
-    aTest[2] = (Trim(Имя) <> nil);
-    aTest[3] = (Trim(Отчество) <> nil);
-    aTest[4] = (Trim(Инициалы) <> nil);
-    aTest[5] = (Trim(Частица) <> nil);
+    aTest[1] = (Trim(РќР°РёРј) <> nil);
+    aTest[2] = (Trim(РРјСЏ) <> nil);
+    aTest[3] = (Trim(РћС‚С‡РµСЃС‚РІРѕ) <> nil);
+    aTest[4] = (Trim(РРЅРёС†РёР°Р»С‹) <> nil);
+    aTest[5] = (Trim(Р§Р°СЃС‚РёС†Р°) <> nil);
     Result = (true in aTest);
     if (not Result) then
-      Message('Хотя бы одно из полей, ' +
-              'несущих элементы идентифицирующией лицо информации, ' +
-              'должно быть заполнено!' + Br +
-              'Пожалуйста, исправьте или откажитесь от сохранения записи.');
+      Message('РҐРѕС‚СЏ Р±С‹ РѕРґРЅРѕ РёР· РїРѕР»РµР№, ' +
+              'РЅРµСЃСѓС‰РёС… СЌР»РµРјРµРЅС‚С‹ РёРґРµРЅС‚РёС„РёС†РёСЂСѓСЋС‰РёРµР№ Р»РёС†Рѕ РёРЅС„РѕСЂРјР°С†РёРё, ' +
+              'РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ Р·Р°РїРѕР»РЅРµРЅРѕ!' + Br +
+              'РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РёСЃРїСЂР°РІСЊС‚Рµ РёР»Рё РѕС‚РєР°Р¶РёС‚РµСЃСЊ РѕС‚ СЃРѕС…СЂР°РЅРµРЅРёСЏ Р·Р°РїРёСЃРё.');
       Return;
     else
-      Result = inherited шаблон_ПриПроверке;
+      Result = inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРџСЂРѕРІРµСЂРєРµ;
     fi;
   end;
 
 
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
-  proc Поле_ПриВыходе_Частица(Cell :TemplateCell; Index :Integer);
-    Hash = Интерфейс.GetHashByRecord(Self.Record);
+  proc РџРѕР»Рµ_РџСЂРёР’С‹С…РѕРґРµ_Р§Р°СЃС‚РёС†Р°(Cell :TemplateCell; Index :Integer);
+    Hash = РРЅС‚РµСЂС„РµР№СЃ.GetHashByRecord(Self.Record);
   end;
 
-  func Поле_ПриПроверке_Наим(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+  func РџРѕР»Рµ_РџСЂРёРџСЂРѕРІРµСЂРєРµ_РќР°РёРј(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
     Value = Trim(Value);
     Value = Up(SubStr(Value, 1, 1)) + SubStr(Value, 2);
     Return true;
   end;
 
-  proc Поле_ПриВыходе_Наим(Cell :TemplateCell; Index :Integer);
-    Hash = Интерфейс.GetHashByRecord(Self.Record);
+  proc РџРѕР»Рµ_РџСЂРёР’С‹С…РѕРґРµ_РќР°РёРј(Cell :TemplateCell; Index :Integer);
+    Hash = РРЅС‚РµСЂС„РµР№СЃ.GetHashByRecord(Self.Record);
   end;
 
-  func Поле_ПриПроверке_Имя(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+  func РџРѕР»Рµ_РџСЂРёРџСЂРѕРІРµСЂРєРµ_РРјСЏ(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
     Value = Trim(Value);
     Value = Up(SubStr(Value, 1, 1)) + SubStr(Value, 2);
     Return true;
   end;
 
-  proc Поле_ПриВыходе_Имя(Cell :TemplateCell; Index :Integer);
-    ОбновитьИнициалы;
-    Hash = Интерфейс.GetHashByRecord(Self.Record);
+  proc РџРѕР»Рµ_РџСЂРёР’С‹С…РѕРґРµ_РРјСЏ(Cell :TemplateCell; Index :Integer);
+    РћР±РЅРѕРІРёС‚СЊРРЅРёС†РёР°Р»С‹;
+    Hash = РРЅС‚РµСЂС„РµР№СЃ.GetHashByRecord(Self.Record);
   end;
 
-  func Поле_ПриПроверке_Отчество(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+  func РџРѕР»Рµ_РџСЂРёРџСЂРѕРІРµСЂРєРµ_РћС‚С‡РµСЃС‚РІРѕ(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
     Value = Trim(Value);
     Value = Up(SubStr(Value, 1, 1)) + SubStr(Value, 2);
     Return true;
   end;
 
-  proc Поле_ПриВыходе_Отчество(Cell :TemplateCell; Index :Integer);
-    ОбновитьИнициалы;
-    Hash = Интерфейс.GetHashByRecord(Self.Record);
+  proc РџРѕР»Рµ_РџСЂРёР’С‹С…РѕРґРµ_РћС‚С‡РµСЃС‚РІРѕ(Cell :TemplateCell; Index :Integer);
+    РћР±РЅРѕРІРёС‚СЊРРЅРёС†РёР°Р»С‹;
+    Hash = РРЅС‚РµСЂС„РµР№СЃ.GetHashByRecord(Self.Record);
   end;
 
-  proc Поле_ПриВыходе_Инициалы(Cell :TemplateCell; Index :Integer);
-    Hash = Интерфейс.GetHashByRecord(Self.Record);
+  proc РџРѕР»Рµ_РџСЂРёР’С‹С…РѕРґРµ_РРЅРёС†РёР°Р»С‹(Cell :TemplateCell; Index :Integer);
+    Hash = РРЅС‚РµСЂС„РµР№СЃ.GetHashByRecord(Self.Record);
   end;
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
-  proc ОбновитьИнициалы;
-    if not (nil in [Имя, Отчество]) then
-      Инициалы = SubStr(Имя, 1, 1) + '. ' + SubStr(Отчество, 1, 1) + '.';
-    elsif (Имя <> nil) and (Отчество = nil) then
-      Инициалы = SubStr(Имя, 1, 1) + '.';
+  proc РћР±РЅРѕРІРёС‚СЊРРЅРёС†РёР°Р»С‹;
+    if not (nil in [РРјСЏ, РћС‚С‡РµСЃС‚РІРѕ]) then
+      РРЅРёС†РёР°Р»С‹ = SubStr(РРјСЏ, 1, 1) + '. ' + SubStr(РћС‚С‡РµСЃС‚РІРѕ, 1, 1) + '.';
+    elsif (РРјСЏ <> nil) and (РћС‚С‡РµСЃС‚РІРѕ = nil) then
+      РРЅРёС†РёР°Р»С‹ = SubStr(РРјСЏ, 1, 1) + '.';
     else
-      Инициалы = nil;
+      РРЅРёС†РёР°Р»С‹ = nil;
     fi;
   end;
 

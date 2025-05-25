@@ -1,28 +1,28 @@
-class inherited МашинаРеквизитов.Базовые.блРедакторСИнтерфейсом "", editor BaseRefType1;
+п»їclass inherited РњР°С€РёРЅР°Р РµРєРІРёР·РёС‚РѕРІ.Р‘Р°Р·РѕРІС‹Рµ.Р±Р»Р РµРґР°РєС‚РѕСЂРЎРРЅС‚РµСЂС„РµР№СЃРѕРј "", editor BaseRefType1;
 
-import РКП_СИС Classes Functions, StringsFunctions, Recs, FilterMaker;
+import Р РљРџ_РЎРРЎ Classes Functions, StringsFunctions, Recs, FilterMaker;
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 
 inobject private
 
-  Интерфейс :РКП_Справочники.RI.Справочники.intBaseType1;
+  РРЅС‚РµСЂС„РµР№СЃ :Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.intBaseType1;
   frInternalInfo :TemplateFrame;
 --}}
 
--- 2_Конструкторы, визуализаторы0. --
+-- 2_РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹, РІРёР·СѓР°Р»РёР·Р°С‚РѕСЂС‹0. --
 
 inobject private
 
-  proc ПросмотрПохожихЗаписей( aFilter :String; WinStyle :Window.WindowStyles = Kernel.Window.ModalWindow; addParam :Variant = nil);
-    Интерфейс.КартотекаПоУмолчанию.ПросмотрПохожихЗаписей(aFilter, WinStyle, addParam);
+  proc РџСЂРѕСЃРјРѕС‚СЂРџРѕС…РѕР¶РёС…Р—Р°РїРёСЃРµР№( aFilter :String; WinStyle :Window.WindowStyles = Kernel.Window.ModalWindow; addParam :Variant = nil);
+    РРЅС‚РµСЂС„РµР№СЃ.РљР°СЂС‚РѕС‚РµРєР°РџРѕРЈРјРѕР»С‡Р°РЅРёСЋ.РџСЂРѕСЃРјРѕС‚СЂРџРѕС…РѕР¶РёС…Р—Р°РїРёСЃРµР№(aFilter, WinStyle, addParam);
   end;
 
--- 2_Обработчики событий шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ С€Р°Р±Р»РѕРЅР°0. --
 
-  proc шаблон_ПриОткрытии( aCreate :Logical );
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё( aCreate :Logical );
     var j, x, y :Integer;
-    inherited  шаблон_ПриОткрытии(aCreate);
+    inherited  С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(aCreate);
     j = Self.ClassType.ObjectsCount;
     if (j > 1) then
       j = j - 1;
@@ -35,32 +35,32 @@ inobject private
     fi;
   end;
 
-  func шаблон_ПриПроверке :Logical;
-    Result = inherited шаблон_ПриПроверке;
+  func С€Р°Р±Р»РѕРЅ_РџСЂРёРџСЂРѕРІРµСЂРєРµ :Logical;
+    Result = inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРџСЂРѕРІРµСЂРєРµ;
     if Result then
-      Result = ПроверкаОбязательныхПолей;
+      Result = РџСЂРѕРІРµСЂРєР°РћР±СЏР·Р°С‚РµР»СЊРЅС‹С…РџРѕР»РµР№;
     fi;
     if Result then
-      Result = ПроверкаПохожихЗначений;
+      Result = РџСЂРѕРІРµСЂРєР°РџРѕС…РѕР¶РёС…Р—РЅР°С‡РµРЅРёР№;
     fi;
   end;
 
-  func ПроверкаОбязательныхПолей :Logical;
-    var мОбязательныеПоля :String[];
+  func РџСЂРѕРІРµСЂРєР°РћР±СЏР·Р°С‚РµР»СЊРЅС‹С…РџРѕР»РµР№ :Logical;
+    var РјРћР±СЏР·Р°С‚РµР»СЊРЅС‹РµРџРѕР»СЏ :String[];
     var i, ii :Integer;
     var aTest :Logical[];
     var aTxt :String[];
-    мОбязательныеПоля = Интерфейс.ОбязательныеПоля;
-    if (мОбязательныеПоля <> nil) then
-      ii = LengthOfArray(мОбязательныеПоля);
+    РјРћР±СЏР·Р°С‚РµР»СЊРЅС‹РµРџРѕР»СЏ = РРЅС‚РµСЂС„РµР№СЃ.РћР±СЏР·Р°С‚РµР»СЊРЅС‹РµРџРѕР»СЏ;
+    if (РјРћР±СЏР·Р°С‚РµР»СЊРЅС‹РµРџРѕР»СЏ <> nil) then
+      ii = LengthOfArray(РјРћР±СЏР·Р°С‚РµР»СЊРЅС‹РµРџРѕР»СЏ);
       for i = 1 .. ii do
-        aTest[i] = ( Record.GetField(мОбязательныеПоля[i]) <> nil );
+        aTest[i] = ( Record.GetField(РјРћР±СЏР·Р°С‚РµР»СЊРЅС‹РµРџРѕР»СЏ[i]) <> nil );
       od;
       Result = not false in aTest;
       if not Result then
-        AddInArray( aTxt, 'Не заполнено одно или несколько обязательных для заполнения полей:' );
+        AddInArray( aTxt, 'РќРµ Р·Р°РїРѕР»РЅРµРЅРѕ РѕРґРЅРѕ РёР»Рё РЅРµСЃРєРѕР»СЊРєРѕ РѕР±СЏР·Р°С‚РµР»СЊРЅС‹С… РґР»СЏ Р·Р°РїРѕР»РЅРµРЅРёСЏ РїРѕР»РµР№:' );
         for i = 1 .. ii do
-          AddInArray( aTxt, '- ' + мОбязательныеПоля[i] );
+          AddInArray( aTxt, '- ' + РјРћР±СЏР·Р°С‚РµР»СЊРЅС‹РµРџРѕР»СЏ[i] );
         od;
         Message( ArrayToText(aTxt) );
       fi;
@@ -69,14 +69,14 @@ inobject private
     fi;
   end;
 
-  func ПроверкаПохожихЗначений :Logical;
+  func РџСЂРѕРІРµСЂРєР°РџРѕС…РѕР¶РёС…Р—РЅР°С‡РµРЅРёР№ :Logical;
     var vOriginalVal, vHash, vRequest :String;
     var vRec :Record;
     var aFlt, aButtonFace :String[];
     var f, vAnswer :Integer;
     var aDocId :Integer[];
     var aHashgFields :Variant[2];
-    aHashgFields = Интерфейс.ПолучитьХешируемыеПоля;
+    aHashgFields = РРЅС‚РµСЂС„РµР№СЃ.РџРѕР»СѓС‡РёС‚СЊРҐРµС€РёСЂСѓРµРјС‹РµРџРѕР»СЏ;
     for f = 1 .. LengthOfArray(aHashgFields) do
       if (aHashgFields[f,2] = VarString ) then
         vOriginalVal = vOriginalVal + Self.Record.GetField(aHashgFields[f,1]);
@@ -87,23 +87,23 @@ inobject private
         vOriginalVal = vOriginalVal + Str(Self.Record.GetField(aHashgFields[f,1]));
       fi;
     od;
-    vHash = Интерфейс.GetHashFromValue(vOriginalVal);
-    with Query.Create([Интерфейс.СвязанныйКлассЗаписей]) do
+    vHash = РРЅС‚РµСЂС„РµР№СЃ.GetHashFromValue(vOriginalVal);
+    with Query.Create([РРЅС‚РµСЂС„РµР№СЃ.РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№]) do
       aFlt[1] = 'Hash="' + vHash + '"';
       aFlt[2] = 'DocId<>' + Str(Self.Record.DocId);
-      aFlt[3] = 'not ' + Интерфейс.ИмяПоляНеПрименяется;
+      aFlt[3] = 'not ' + РРЅС‚РµСЂС„РµР№СЃ.РРјСЏРџРѕР»СЏРќРµРџСЂРёРјРµРЅСЏРµС‚СЃСЏ;
       Filter = MakeFilter(aFlt);
       Select;
       if (Count > 0) then
-        vRequest = 'Справочник уже содержит похожие записи (' + Str(Count) + ').' + br + 'Выберите действие:';
-        aButtonFace = ['Просмотр', 'Продолжить сохранение', 'Отмена'];
-        vAnswer = Enquiry('Запрос', vRequest, aButtonFace, 1, itWarning);
+        vRequest = 'РЎРїСЂР°РІРѕС‡РЅРёРє СѓР¶Рµ СЃРѕРґРµСЂР¶РёС‚ РїРѕС…РѕР¶РёРµ Р·Р°РїРёСЃРё (' + Str(Count) + ').' + br + 'Р’С‹Р±РµСЂРёС‚Рµ РґРµР№СЃС‚РІРёРµ:';
+        aButtonFace = ['РџСЂРѕСЃРјРѕС‚СЂ', 'РџСЂРѕРґРѕР»Р¶РёС‚СЊ СЃРѕС…СЂР°РЅРµРЅРёРµ', 'РћС‚РјРµРЅР°'];
+        vAnswer = Enquiry('Р—Р°РїСЂРѕСЃ', vRequest, aButtonFace, 1, itWarning);
         if (vAnswer = 1) then
           while not Eof do
             AddInArray(aDocId, Current.DocID);
             Next;
           od;
-          ПросмотрПохожихЗаписей('DocId in ' + ToStr(aDocId));
+          РџСЂРѕСЃРјРѕС‚СЂРџРѕС…РѕР¶РёС…Р—Р°РїРёСЃРµР№('DocId in ' + ToStr(aDocId));
           Return false;
         elsif (vAnswer = 2) then
           Return true;
@@ -116,9 +116,9 @@ inobject private
     end;
   end;
 
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
-  func Поле_ПриПроверке_Наим(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+  func РџРѕР»Рµ_РџСЂРёРџСЂРѕРІРµСЂРєРµ_РќР°РёРј(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
     var vHash :String;
     var aFlt :String[];
     var vRequest :String;
@@ -126,24 +126,24 @@ inobject private
     var aButtonFace :String[];
     var aDocId :Integer[];
     Value = Trim(Value);
-    if Интерфейс.ХешируемыеПоля = [Интерфейс.ИмяПоляНаим] then -- проверка имеет смысл, если единственное хэшируемое поле - 'Наим'
-      vHash = Интерфейс.GetHashFromValue(Value);
-      with Query.Create([Интерфейс.СвязанныйКлассЗаписей]) do
+    if РРЅС‚РµСЂС„РµР№СЃ.РҐРµС€РёСЂСѓРµРјС‹РµРџРѕР»СЏ = [РРЅС‚РµСЂС„РµР№СЃ.РРјСЏРџРѕР»СЏРќР°РёРј] then -- РїСЂРѕРІРµСЂРєР° РёРјРµРµС‚ СЃРјС‹СЃР», РµСЃР»Рё РµРґРёРЅСЃС‚РІРµРЅРЅРѕРµ С…СЌС€РёСЂСѓРµРјРѕРµ РїРѕР»Рµ - 'РќР°РёРј'
+      vHash = РРЅС‚РµСЂС„РµР№СЃ.GetHashFromValue(Value);
+      with Query.Create([РРЅС‚РµСЂС„РµР№СЃ.РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№]) do
         aFlt[1] = 'Hash="' + vHash + '"';
         aFlt[2] = 'DocId<>' + Str(Record.DocId);
-        aFlt[3] = 'not ' + Интерфейс.ИмяПоляНеПрименяется;
+        aFlt[3] = 'not ' + РРЅС‚РµСЂС„РµР№СЃ.РРјСЏРџРѕР»СЏРќРµРџСЂРёРјРµРЅСЏРµС‚СЃСЏ;
         Filter = MakeFilter(aFlt);
         Select;
         if (Count > 0) then
-          vRequest = 'Справочник уже содержит похожие записи (' + Str(Count) + ').' + br + 'Выберите действие:';
-          aButtonFace = ['Просмотр', 'Принять введенное значение', 'Отмена'];
-          vAnswer = Enquiry('Запрос', vRequest, aButtonFace, 1, itWarning);
+          vRequest = 'РЎРїСЂР°РІРѕС‡РЅРёРє СѓР¶Рµ СЃРѕРґРµСЂР¶РёС‚ РїРѕС…РѕР¶РёРµ Р·Р°РїРёСЃРё (' + Str(Count) + ').' + br + 'Р’С‹Р±РµСЂРёС‚Рµ РґРµР№СЃС‚РІРёРµ:';
+          aButtonFace = ['РџСЂРѕСЃРјРѕС‚СЂ', 'РџСЂРёРЅСЏС‚СЊ РІРІРµРґРµРЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ', 'РћС‚РјРµРЅР°'];
+          vAnswer = Enquiry('Р—Р°РїСЂРѕСЃ', vRequest, aButtonFace, 1, itWarning);
           if (vAnswer = 1) then
             while not Eof do
               AddInArray(aDocId, Current.DocID);
               Next;
             od;
-            Интерфейс.КартотекаПоУмолчанию.ПросмотрПохожихЗаписей('DocId in ' + ToStr(aDocId));
+            РРЅС‚РµСЂС„РµР№СЃ.РљР°СЂС‚РѕС‚РµРєР°РџРѕРЈРјРѕР»С‡Р°РЅРёСЋ.РџСЂРѕСЃРјРѕС‚СЂРџРѕС…РѕР¶РёС…Р—Р°РїРёСЃРµР№('DocId in ' + ToStr(aDocId));
           elsif (vAnswer = 2) then
             Return true;
           else
@@ -158,27 +158,27 @@ inobject private
     fi;
   end;
 
-  proc Поле_ПриВыходе_Наим(Cell :TemplateCell; Index :Integer);
-    if (Cell.Contents = 'Наим') and (Cell.Contents in Интерфейс.ХешируемыеПоля) then
-      Hash = Интерфейс.GetHashByRecord (Self.Record);
+  proc РџРѕР»Рµ_РџСЂРёР’С‹С…РѕРґРµ_РќР°РёРј(Cell :TemplateCell; Index :Integer);
+    if (Cell.Contents = 'РќР°РёРј') and (Cell.Contents in РРЅС‚РµСЂС„РµР№СЃ.РҐРµС€РёСЂСѓРµРјС‹РµРџРѕР»СЏ) then
+      Hash = РРЅС‚РµСЂС„РµР№СЃ.GetHashByRecord (Self.Record);
     fi;
   end;
 
-  func Поле_ПриВыводе_ЗаголовокОкнаФормы(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
-    inherited ПолеЗаголовокОкнаФормы_ПриВыводе(Cell, Value, Action, Format);
+  func РџРѕР»Рµ_РџСЂРёР’С‹РІРѕРґРµ_Р—Р°РіРѕР»РѕРІРѕРєРћРєРЅР°Р¤РѕСЂРјС‹(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    inherited РџРѕР»РµР—Р°РіРѕР»РѕРІРѕРєРћРєРЅР°Р¤РѕСЂРјС‹_РџСЂРёР’С‹РІРѕРґРµ(Cell, Value, Action, Format);
     Return '';
   end;
 
--- 2_Обработчики событий прочих объектов шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РїСЂРѕС‡РёС… РѕР±СЉРµРєС‚РѕРІ С€Р°Р±Р»РѕРЅР°0. --
 
 
--- 2_Дополнительные команды0. --
+-- 2_Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ РєРѕРјР°РЅРґС‹0. --
 
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
-  proc УстановитьФокусНаПервоеПолеВвода;
-    Template.CellByField['Наим'].SetFocus;
+  proc РЈСЃС‚Р°РЅРѕРІРёС‚СЊР¤РѕРєСѓСЃРќР°РџРµСЂРІРѕРµРџРѕР»РµР’РІРѕРґР°;
+    Template.CellByField['РќР°РёРј'].SetFocus;
   end;
 
 

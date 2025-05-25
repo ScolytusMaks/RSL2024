@@ -1,45 +1,45 @@
-class inherited Справочники.editBaseType2 "", editor BaseRefType3;
+п»їclass inherited РЎРїСЂР°РІРѕС‡РЅРёРєРё.editBaseType2 "", editor BaseRefType3;
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 
 inobject private
 
-  Интерфейс :РКП_Справочники.RI.Справочники.intBaseType3;
+  РРЅС‚РµСЂС„РµР№СЃ :Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.intBaseType3;
 --}}
 
--- 2_Конструкторы, визуализаторы0. --
+-- 2_РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹, РІРёР·СѓР°Р»РёР·Р°С‚РѕСЂС‹0. --
 
 inobject private
 
--- 2_Обработчики событий шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ С€Р°Р±Р»РѕРЅР°0. --
 
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
-  func Поле_ПриПроверке_Код(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+  func РџРѕР»Рµ_РџСЂРёРџСЂРѕРІРµСЂРєРµ_РљРѕРґ(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
     Value = Trim(Value as String);
     Return true;
   end;
 
-  proc Поле_ПриВыходе_Код(Cell :TemplateCell; Index :Integer);
-    if (Cell.Contents in Интерфейс.ХешируемыеПоля) then
-      Hash = Интерфейс.GetHashByRecord(Self.Record);
+  proc РџРѕР»Рµ_РџСЂРёР’С‹С…РѕРґРµ_РљРѕРґ(Cell :TemplateCell; Index :Integer);
+    if (Cell.Contents in РРЅС‚РµСЂС„РµР№СЃ.РҐРµС€РёСЂСѓРµРјС‹РµРџРѕР»СЏ) then
+      Hash = РРЅС‚РµСЂС„РµР№СЃ.GetHashByRecord(Self.Record);
     fi;
   end;
 
-  proc Поле_ПриВыходе_Наим(Cell :TemplateCell; Index :Integer);
-    if (Cell.Contents in Интерфейс.ХешируемыеПоля) then
-      Hash = Интерфейс.GetHashByRecord(Self.Record);
+  proc РџРѕР»Рµ_РџСЂРёР’С‹С…РѕРґРµ_РќР°РёРј(Cell :TemplateCell; Index :Integer);
+    if (Cell.Contents in РРЅС‚РµСЂС„РµР№СЃ.РҐРµС€РёСЂСѓРµРјС‹РµРџРѕР»СЏ) then
+      Hash = РРЅС‚РµСЂС„РµР№СЃ.GetHashByRecord(Self.Record);
     fi;
   end;
 
--- 2_Обработчики событий прочих объектов шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РїСЂРѕС‡РёС… РѕР±СЉРµРєС‚РѕРІ С€Р°Р±Р»РѕРЅР°0. --
 
--- 2_Дополнительные команды0. --
+-- 2_Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ РєРѕРјР°РЅРґС‹0. --
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
-  proc УстановитьФокусНаПервоеПолеВвода;
-    Template.CellByField['Код'].SetFocus;
+  proc РЈСЃС‚Р°РЅРѕРІРёС‚СЊР¤РѕРєСѓСЃРќР°РџРµСЂРІРѕРµРџРѕР»РµР’РІРѕРґР°;
+    Template.CellByField['РљРѕРґ'].SetFocus;
   end;
 
 end

@@ -1,34 +1,34 @@
-Class inherited Ñïðàâî÷íèêè.editBaseType2 "Òåððèòîðèÿ ðàñïðîñòðàíåíèÿ" , editor ñïðÒåððèòîðèÿÐàñïðîñòðàíåíèÿ;
+ï»¿Class inherited Ð¡Ð¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸ÐºÐ¸.editBaseType2 "Ð¢ÐµÑ€Ñ€Ð¸Ñ‚Ð¾Ñ€Ð¸Ñ Ñ€Ð°ÑÐ¿Ñ€Ð¾ÑÑ‚Ñ€Ð°Ð½ÐµÐ½Ð¸Ñ" , editor ÑÐ¿Ñ€Ð¢ÐµÑ€Ñ€Ð¸Ñ‚Ð¾Ñ€Ð¸ÑÐ Ð°ÑÐ¿Ñ€Ð¾ÑÑ‚Ñ€Ð°Ð½ÐµÐ½Ð¸Ñ;
 
 
---{{ 2_Ñâîéñòâà
+--{{ 2_Ð¡Ð²Ð¾Ð¹ÑÑ‚Ð²Ð°
 
 inobject private
 
-  var Èíòåðôåéñ :RI.Ñïðàâî÷íèêè.ÒåððèòîðèÿÐàñïðîñòðàíåíèÿ;
+  var Ð˜Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹Ñ :RI.Ð¡Ð¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸ÐºÐ¸.Ð¢ÐµÑ€Ñ€Ð¸Ñ‚Ð¾Ñ€Ð¸ÑÐ Ð°ÑÐ¿Ñ€Ð¾ÑÑ‚Ñ€Ð°Ð½ÐµÐ½Ð¸Ñ;
 
 --}}
 
--- 2_Îáðàáîò÷èêè ñîáûòèé øàáëîíà0. --
+-- 2_ÐžÐ±Ñ€Ð°Ð±Ð¾Ñ‚Ñ‡Ð¸ÐºÐ¸ ÑÐ¾Ð±Ñ‹Ñ‚Ð¸Ð¹ ÑˆÐ°Ð±Ð»Ð¾Ð½Ð°0. --
 
-  func øàáëîí_ÏðèÇàïèñè :Logical;
-    Result = inherited øàáëîí_ÏðèÇàïèñè;
-    ÐÊÏ_Ñïðàâî÷íèêè.Ñïðàâî÷íèêè.ÊÎÝ.CreateRepository;
+  func ÑˆÐ°Ð±Ð»Ð¾Ð½_ÐŸÑ€Ð¸Ð—Ð°Ð¿Ð¸ÑÐ¸ :Logical;
+    Result = inherited ÑˆÐ°Ð±Ð»Ð¾Ð½_ÐŸÑ€Ð¸Ð—Ð°Ð¿Ð¸ÑÐ¸;
+    Ð ÐšÐŸ_Ð¡Ð¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸ÐºÐ¸.Ð¡Ð¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸ÐºÐ¸.ÐšÐžÐ­.CreateRepository;
   end;
 
 inobject private
 
--- _Îáðàáîò÷èêè ñîáûòèé êëåòîê øàáëîíà. --
+-- _ÐžÐ±Ñ€Ð°Ð±Ð¾Ñ‚Ñ‡Ð¸ÐºÐ¸ ÑÐ¾Ð±Ñ‹Ñ‚Ð¸Ð¹ ÐºÐ»ÐµÑ‚Ð¾Ðº ÑˆÐ°Ð±Ð»Ð¾Ð½Ð°. --
 
-  func Ïîëå_ÏðèÍàæàòèè_ÄîáàâèòüÏîçèöèþ(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
-    ÏëàíÊîëÍîì.Add;
+  func ÐŸÐ¾Ð»Ðµ_ÐŸÑ€Ð¸ÐÐ°Ð¶Ð°Ñ‚Ð¸Ð¸_Ð”Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒÐŸÐ¾Ð·Ð¸Ñ†Ð¸ÑŽ(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    ÐŸÐ»Ð°Ð½ÐšÐ¾Ð»ÐÐ¾Ð¼.Add;
   end;
 
-  func Ïîëå_ÏðèÍàæàòèè_ÓäàëèòüÏîçèöèþ(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+  func ÐŸÐ¾Ð»Ðµ_ÐŸÑ€Ð¸ÐÐ°Ð¶Ð°Ñ‚Ð¸Ð¸_Ð£Ð´Ð°Ð»Ð¸Ñ‚ÑŒÐŸÐ¾Ð·Ð¸Ñ†Ð¸ÑŽ(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
     var Index :Integer;
     Index = Cell.Frame;
-    if (Index > 0) and (Index <= ÏëàíÊîëÍîì.Count) then
-      ÏëàíÊîëÍîì.Delete(Index);
+    if (Index > 0) and (Index <= ÐŸÐ»Ð°Ð½ÐšÐ¾Ð»ÐÐ¾Ð¼.Count) then
+      ÐŸÐ»Ð°Ð½ÐšÐ¾Ð»ÐÐ¾Ð¼.Delete(Index);
       Cell.SetFocus;
       ExecuteCommand('Kernel.Move.Up', false);
     fi;

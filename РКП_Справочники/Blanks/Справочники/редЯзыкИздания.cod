@@ -1,26 +1,26 @@
-Class inherited Справочники.editBaseType1 "Язык издания" , editor спрЯзыкИздания;
+п»їClass inherited РЎРїСЂР°РІРѕС‡РЅРёРєРё.editBaseType1 "РЇР·С‹Рє РёР·РґР°РЅРёСЏ" , editor СЃРїСЂРЇР·С‹РєРР·РґР°РЅРёСЏ;
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 
 inobject private
 
-  var Интерфейс :RI.Справочники.ЯзыкИздания;
+  var РРЅС‚РµСЂС„РµР№СЃ :RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РЇР·С‹РєРР·РґР°РЅРёСЏ;
 
 --}}
 
--- 2_Обработчики событий шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ С€Р°Р±Р»РѕРЅР°0. --
 
-  func шаблон_ПриПроверке :Logical;
-    Result = inherited шаблон_ПриПроверке;
-    if Result and Self.Record.ГосЯзРФ then
+  func С€Р°Р±Р»РѕРЅ_РџСЂРёРџСЂРѕРІРµСЂРєРµ :Logical;
+    Result = inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРџСЂРѕРІРµСЂРєРµ;
+    if Result and Self.Record.Р“РѕСЃРЇР·Р Р¤ then
       BeginTransaction([Record.ClassType] as Class[] Record);
       try
         with Query.Create([Record.ClassType] as Class[] Record) do
           Filter = 'ExtID<>"' + Self.Record.ExtID  + '"';
           Select;
           while not Eof do
-            if Current.ГосЯзРФ then
-              Current.ГосЯзРФ = false;
+            if Current.Р“РѕСЃРЇР·Р Р¤ then
+              Current.Р“РѕСЃРЇР·Р Р¤ = false;
             fi;
             Next;
           od;
@@ -32,7 +32,7 @@ inobject private
     fi;
   end;
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
 
 end

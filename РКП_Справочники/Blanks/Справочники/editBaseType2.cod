@@ -1,30 +1,30 @@
-class inherited Справочники.editBaseType1 "", editor BaseRefType2;
+п»їclass inherited РЎРїСЂР°РІРѕС‡РЅРёРєРё.editBaseType1 "", editor BaseRefType2;
 
---import РКП_СИС Classes Functions, StringsFunctions, Recs, FilterMaker;
+--import Р РљРџ_РЎРРЎ Classes Functions, StringsFunctions, Recs, FilterMaker;
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 
 inobject private
 
-  Интерфейс :РКП_Справочники.RI.Справочники.intBaseType2;
+  РРЅС‚РµСЂС„РµР№СЃ :Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.intBaseType2;
   --frInternalInfo :TemplateFrame;
 --}}
 
--- 2_Конструкторы, визуализаторы0. --
+-- 2_РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹, РІРёР·СѓР°Р»РёР·Р°С‚РѕСЂС‹0. --
 
 inobject private
 
-  proc ПросмотрПохожихЗаписей( aFilter :String; WinStyle :Window.WindowStyles = Kernel.Window.ModalWindow; addParam :Variant = nil );
-    var aChildClasses :Class[] Справочники.FalseCardType2;
-    var vClass :Class Справочники.FalseCardType2;
-    var vForm :Справочники.FalseCardType2;
+  proc РџСЂРѕСЃРјРѕС‚СЂРџРѕС…РѕР¶РёС…Р—Р°РїРёСЃРµР№( aFilter :String; WinStyle :Window.WindowStyles = Kernel.Window.ModalWindow; addParam :Variant = nil );
+    var aChildClasses :Class[] РЎРїСЂР°РІРѕС‡РЅРёРєРё.FalseCardType2;
+    var vClass :Class РЎРїСЂР°РІРѕС‡РЅРёРєРё.FalseCardType2;
+    var vForm :РЎРїСЂР°РІРѕС‡РЅРёРєРё.FalseCardType2;
     var i :Integer;
     var MInfoTest, MInfoSelf :MethodInfo;
-    aChildClasses = Справочники.FalseCardType2.ChildClasses(true) as Class[] Справочники.FalseCardType2;
+    aChildClasses = РЎРїСЂР°РІРѕС‡РЅРёРєРё.FalseCardType2.ChildClasses(true) as Class[] РЎРїСЂР°РІРѕС‡РЅРёРєРё.FalseCardType2;
     for i = 1 .. LengthOfArray(aChildClasses) do
       vClass = aChildClasses[i];
-      MInfoTest = vClass.ClassInfo.MemberByName('КлассИнтерфейса');
-      MInfoSelf = Self.ClassInfo.MemberByName('Интерфейс');
+      MInfoTest = vClass.ClassInfo.MemberByName('РљР»Р°СЃСЃРРЅС‚РµСЂС„РµР№СЃР°');
+      MInfoSelf = Self.ClassInfo.MemberByName('РРЅС‚РµСЂС„РµР№СЃ');
       if MInfoTest.ResultType = MInfoSelf.ResultType then
         vForm = vClass.Create;
         vForm.SimilarFilter = aFilter;
@@ -35,19 +35,19 @@ inobject private
     od;
   end;
 
--- 2_Обработчики событий шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ С€Р°Р±Р»РѕРЅР°0. --
 
 
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
 
--- 2_Обработчики событий прочих объектов шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РїСЂРѕС‡РёС… РѕР±СЉРµРєС‚РѕРІ С€Р°Р±Р»РѕРЅР°0. --
 
 
--- 2_Дополнительные команды0. --
+-- 2_Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ РєРѕРјР°РЅРґС‹0. --
 
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
 
 

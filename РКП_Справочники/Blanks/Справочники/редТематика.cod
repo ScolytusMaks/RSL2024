@@ -1,36 +1,36 @@
-Class inherited Справочники.editBaseType3 "Тематика / Читательский адрес / Целевое назначение" , editor спрТематика;
+п»їClass inherited РЎРїСЂР°РІРѕС‡РЅРёРєРё.editBaseType3 "РўРµРјР°С‚РёРєР° / Р§РёС‚Р°С‚РµР»СЊСЃРєРёР№ Р°РґСЂРµСЃ / Р¦РµР»РµРІРѕРµ РЅР°Р·РЅР°С‡РµРЅРёРµ" , editor СЃРїСЂРўРµРјР°С‚РёРєР°;
 
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 
 inobject private
 
-  var Интерфейс :RI.Справочники.Тематика;
+  var РРЅС‚РµСЂС„РµР№СЃ :RI.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РўРµРјР°С‚РёРєР°;
 --}}
 
 inobject private
 
--- 2_Обработчики событий шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ С€Р°Р±Р»РѕРЅР°0. --
 
 
-  proc шаблон_ПриОткрытии( aCreate :Logical );
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё( aCreate :Logical );
     var locCell :TemplateCell;
-    inherited  шаблон_ПриОткрытии(aCreate);
-    locCell = Template.CellByField['ЦельАнализа'];
+    inherited  С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(aCreate);
+    locCell = Template.CellByField['Р¦РµР»СЊРђРЅР°Р»РёР·Р°'];
     UpdateFieldList(locCell, Def.ContentsCategory);
   end;
 
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
-  proc Поле_ПриВыходе_ЦельАнализа(Cell :TemplateCell; Index :Integer);
-    if (Cell.Contents in Интерфейс.ХешируемыеПоля) then
-      Hash = Интерфейс.GetHashByRecord(Self.Record);
+  proc РџРѕР»Рµ_РџСЂРёР’С‹С…РѕРґРµ_Р¦РµР»СЊРђРЅР°Р»РёР·Р°(Cell :TemplateCell; Index :Integer);
+    if (Cell.Contents in РРЅС‚РµСЂС„РµР№СЃ.РҐРµС€РёСЂСѓРµРјС‹РµРџРѕР»СЏ) then
+      Hash = РРЅС‚РµСЂС„РµР№СЃ.GetHashByRecord(Self.Record);
     fi;
   end;
 
-  proc Поле_ПриВыходе_Код(Cell :TemplateCell; Index :Integer);
-    if (Cell.Contents in Интерфейс.ХешируемыеПоля) then
-      Hash = Интерфейс.GetHashByRecord(Self.Record);
+  proc РџРѕР»Рµ_РџСЂРёР’С‹С…РѕРґРµ_РљРѕРґ(Cell :TemplateCell; Index :Integer);
+    if (Cell.Contents in РРЅС‚РµСЂС„РµР№СЃ.РҐРµС€РёСЂСѓРµРјС‹РµРџРѕР»СЏ) then
+      Hash = РРЅС‚РµСЂС„РµР№СЃ.GetHashByRecord(Self.Record);
     fi;
   end;
 
