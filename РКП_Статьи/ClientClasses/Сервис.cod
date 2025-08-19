@@ -1,7 +1,7 @@
-class "";
+Ôªøclass "";
 
 inclass
-  proc  ¬—;
+  proc –ö–í–°;
     var From_           : Form;
     var Cell_           : TemplateCell;
     var Template_       : Template;
@@ -12,10 +12,10 @@ inclass
       if From_<>nil                                                     then
         Template_           = From_.Template;
         Cell_               = Template_.CurrentCell;
-          if Pos("—“¿“‹»\–≈ƒ—“¿“‹ﬂ",Up(From_.ClassFileName))>0          then
-            if Cell_.Contents=" ‡ÚÍÓÂ—Ó‰ÂÊ‡ÌËÂ—Ú‡Ú¸Ë"                 or
-             Cell_.Contents="ŒÚ‚ÂÚÒÚ‚ÂÌÌÓÒÚ¸1"                          or
-             Cell_.Contents="ŒÚ‚ÂÚÒÚ‚ÂÌÌÓÒÚ¸2"                          then
+          if Pos("–°–¢–ê–¢–¨–ò\–†–ï–î–°–¢–ê–¢–¨–Ø",Up(From_.ClassFileName))>0          then
+            if Cell_.Contents="–ö—Ä–∞—Ç–∫–æ–µ–°–æ–¥–µ—Ä–∂–∞–Ω–∏–µ–°—Ç–∞—Ç—å–∏"                 or
+             Cell_.Contents="–û—Ç–≤–µ—Ç—Å—Ç–≤–µ–Ω–Ω–æ—Å—Ç—å1"                          or
+             Cell_.Contents="–û—Ç–≤–µ—Ç—Å—Ç–≤–µ–Ω–Ω–æ—Å—Ç—å2"                          then
              Template_.EndEdit;
              if (Pos("[",Cell_.Value)=0 or Pos("]",Cell_.Value)=0)      and
                 (Cell_.Value<>nil)                                      then

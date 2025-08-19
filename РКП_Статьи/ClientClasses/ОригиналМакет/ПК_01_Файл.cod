@@ -1,15 +1,15 @@
-class "";
+п»їclass "";
 
 inclass
 --~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  proc Создание(ПапкаКарточек:string;ФайлКарточек:string;var ПК:TextFile);
-    if    ExistFolder(ПапкаКарточек) = false    then
-      CreateFolder(ПапкаКарточек);
+  proc РЎРѕР·РґР°РЅРёРµ(РџР°РїРєР°РљР°СЂС‚РѕС‡РµРє:string;Р¤Р°Р№Р»РљР°СЂС‚РѕС‡РµРє:string;var РџРљ:TextFile);
+    if    ExistFolder(РџР°РїРєР°РљР°СЂС‚РѕС‡РµРє) = false    then
+      CreateFolder(РџР°РїРєР°РљР°СЂС‚РѕС‡РµРє);
     end;
-    if  ExistFile(ФайлКарточек) = true          then
-      RemoveFile(ФайлКарточек);
+    if  ExistFile(Р¤Р°Р№Р»РљР°СЂС‚РѕС‡РµРє) = true          then
+      RemoveFile(Р¤Р°Р№Р»РљР°СЂС‚РѕС‡РµРє);
     end;
-    ПК          = TextFile.Create(ФайлКарточек,fmCreate);
+    РџРљ          = TextFile.Create(Р¤Р°Р№Р»РљР°СЂС‚РѕС‡РµРє,fmCreate);
   end;
 --~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

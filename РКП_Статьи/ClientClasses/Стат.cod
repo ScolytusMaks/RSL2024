@@ -1,41 +1,41 @@
-class  'Расчет статистических показателей';
+п»їclass  'Р Р°СЃС‡РµС‚ СЃС‚Р°С‚РёСЃС‚РёС‡РµСЃРєРёС… РїРѕРєР°Р·Р°С‚РµР»РµР№';
 
-import СИС2 classes Константы;
-import РКП_СИС classes Recs, StringsFunctions, StdCode, Functions, FilterMaker;
+import РЎРРЎ2 classes РљРѕРЅСЃС‚Р°РЅС‚С‹;
+import Р РљРџ_РЎРРЎ classes Recs, StringsFunctions, StdCode, Functions, FilterMaker;
 
 inclass public
 
-  func ВведеноСтатейЗаСмену(Оператор :String; ДатаСмены :Date) :Integer;
+  func Р’РІРµРґРµРЅРѕРЎС‚Р°С‚РµР№Р—Р°РЎРјРµРЅСѓ(РћРїРµСЂР°С‚РѕСЂ :String; Р”Р°С‚Р°РЎРјРµРЅС‹ :Date) :Integer;
     var aFlt :String[];
     AddInArray( aFlt, 'isGroup=0' );
-    AddInArray( aFlt, 'CreateUser="' + Оператор + '"' );
-    AddInArray( aFlt, 'CreateDate>=' + Str(ДатаСмены) );
-    AddInArray( aFlt, 'CreateDate<' + Str(ДатаСмены + 1) );
-    with Query.Create([РКП_Статьи.Роспись]) do
+    AddInArray( aFlt, 'CreateUser="' + РћРїРµСЂР°С‚РѕСЂ + '"' );
+    AddInArray( aFlt, 'CreateDate>=' + Str(Р”Р°С‚Р°РЎРјРµРЅС‹) );
+    AddInArray( aFlt, 'CreateDate<' + Str(Р”Р°С‚Р°РЎРјРµРЅС‹ + 1) );
+    with Query.Create([Р РљРџ_РЎС‚Р°С‚СЊРё.Р РѕСЃРїРёСЃСЊ]) do
       Filter = MakeFilter(aFlt);
       Return Count;
     end;
   end;
 
-  func ВведеноСтатейЗаПериод(Оператор :String; ДатаНачала, ДатаОкончания :Date) :Integer; -- (включительно)
+  func Р’РІРµРґРµРЅРѕРЎС‚Р°С‚РµР№Р—Р°РџРµСЂРёРѕРґ(РћРїРµСЂР°С‚РѕСЂ :String; Р”Р°С‚Р°РќР°С‡Р°Р»Р°, Р”Р°С‚Р°РћРєРѕРЅС‡Р°РЅРёСЏ :Date) :Integer; -- (РІРєР»СЋС‡РёС‚РµР»СЊРЅРѕ)
     var aFlt :String[];
     AddInArray( aFlt, 'isGroup=0' );
-    AddInArray( aFlt, 'CreateUser="' + Оператор + '"' );
-    AddInArray( aFlt, 'CreateDate>=' + Str(ДатаНачала) );
-    AddInArray( aFlt, 'CreateDate<' + Str(ДатаОкончания + 1) );
-    with Query.Create([РКП_Статьи.Роспись]) do
+    AddInArray( aFlt, 'CreateUser="' + РћРїРµСЂР°С‚РѕСЂ + '"' );
+    AddInArray( aFlt, 'CreateDate>=' + Str(Р”Р°С‚Р°РќР°С‡Р°Р»Р°) );
+    AddInArray( aFlt, 'CreateDate<' + Str(Р”Р°С‚Р°РћРєРѕРЅС‡Р°РЅРёСЏ + 1) );
+    with Query.Create([Р РљРџ_РЎС‚Р°С‚СЊРё.Р РѕСЃРїРёСЃСЊ]) do
       Filter = MakeFilter(aFlt);
       Return Count;
     end;
   end;
 
-  func РедактированоСтатейЗаПериод(Оператор :String; ДатаНачала, ДатаОкончания :Date) :Integer; -- (включительно)
+  func Р РµРґР°РєС‚РёСЂРѕРІР°РЅРѕРЎС‚Р°С‚РµР№Р—Р°РџРµСЂРёРѕРґ(РћРїРµСЂР°С‚РѕСЂ :String; Р”Р°С‚Р°РќР°С‡Р°Р»Р°, Р”Р°С‚Р°РћРєРѕРЅС‡Р°РЅРёСЏ :Date) :Integer; -- (РІРєР»СЋС‡РёС‚РµР»СЊРЅРѕ)
     var aFlt :String[];
     AddInArray( aFlt, 'isGroup=0' );
-    AddInArray( aFlt, 'UpdateUser="' + Оператор + '"' );
-    AddInArray( aFlt, 'UpdateDate>=' + Str(ДатаНачала) );
-    AddInArray( aFlt, 'UpdateDate<' + Str(ДатаОкончания + 1) );
-    with Query.Create([РКП_Статьи.Роспись]) do
+    AddInArray( aFlt, 'UpdateUser="' + РћРїРµСЂР°С‚РѕСЂ + '"' );
+    AddInArray( aFlt, 'UpdateDate>=' + Str(Р”Р°С‚Р°РќР°С‡Р°Р»Р°) );
+    AddInArray( aFlt, 'UpdateDate<' + Str(Р”Р°С‚Р°РћРєРѕРЅС‡Р°РЅРёСЏ + 1) );
+    with Query.Create([Р РљРџ_РЎС‚Р°С‚СЊРё.Р РѕСЃРїРёСЃСЊ]) do
       Filter = MakeFilter(aFlt);
       Return Count;
     end;

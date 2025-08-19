@@ -1,52 +1,52 @@
-class inherited РКП_СИС.RI.intBase 'Интерфейс записи';
+п»їclass inherited Р РљРџ_РЎРРЎ.RI.intBase 'РРЅС‚РµСЂС„РµР№СЃ Р·Р°РїРёСЃРё';
 
-import РКП_СИС Classes Functions, Recs, StdCode, StringsFunctions;
+import Р РљРџ_РЎРРЎ Classes Functions, Recs, StdCode, StringsFunctions;
 
 inclass public
 
-  var ИмяПоляНеПрименяется :String = 'Завершен';
-  var ИмяПоляНаим          :String = 'НазваниеОсн';
+  var РРјСЏРџРѕР»СЏРќРµРџСЂРёРјРµРЅСЏРµС‚СЃСЏ :String = 'Р—Р°РІРµСЂС€РµРЅ';
+  var РРјСЏРџРѕР»СЏРќР°РёРј          :String = 'РќР°Р·РІР°РЅРёРµРћСЃРЅ';
 
-  func СвязанныйКлассЗаписей: Class СИС2.Базовая.БазоваяЗапись;
-    Result = РКП_Статьи.Роспись;
+  func РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№: Class РЎРРЎ2.Р‘Р°Р·РѕРІР°СЏ.Р‘Р°Р·РѕРІР°СЏР—Р°РїРёСЃСЊ;
+    Result = Р РљРџ_РЎС‚Р°С‚СЊРё.Р РѕСЃРїРёСЃСЊ;
   end;
 
-  func Create: РКП_Статьи.RI.Роспись;
+  func Create: Р РљРџ_РЎС‚Р°С‚СЊРё.RI.Р РѕСЃРїРёСЃСЊ;
     Result = inherited Create;
-    Result.Record = РКП_Статьи.Роспись.Create;
+    Result.Record = Р РљРџ_РЎС‚Р°С‚СЊРё.Р РѕСЃРїРёСЃСЊ.Create;
   end;
 
-  func ОткрытьПоЗаписи synonym OpenRecord(locRecord: РКП_Статьи.Роспись): РКП_Статьи.RI.Роспись;
+  func РћС‚РєСЂС‹С‚СЊРџРѕР—Р°РїРёСЃРё synonym OpenRecord(locRecord: Р РљРџ_РЎС‚Р°С‚СЊРё.Р РѕСЃРїРёСЃСЊ): Р РљРџ_РЎС‚Р°С‚СЊРё.RI.Р РѕСЃРїРёСЃСЊ;
     Result = inherited Create;
     Result.Record = locRecord;
   end;
 
-  func БланкРедакторПоУмолчанию: Class BlankForm;
-    Result = Статьи.редСтатья;
+  func Р‘Р»Р°РЅРєР РµРґР°РєС‚РѕСЂРџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class BlankForm;
+    Result = РЎС‚Р°С‚СЊРё.СЂРµРґРЎС‚Р°С‚СЊСЏ;
   end;
 
-  func КартотекаПоУмолчанию: Class CardForm;
-    Result = Статьи.картРосписьСтатей;
+  func РљР°СЂС‚РѕС‚РµРєР°РџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class CardForm;
+    Result = РЎС‚Р°С‚СЊРё.РєР°СЂС‚Р РѕСЃРїРёСЃСЊРЎС‚Р°С‚РµР№;
   end;
 
 inobject public
 
-  Record: РКП_Статьи.Роспись;
+  Record: Р РљРџ_РЎС‚Р°С‚СЊРё.Р РѕСЃРїРёСЃСЊ;
 
-  proc ИнициализироватьПоУмолчанию synonym InitByDefault;
+  proc РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊРџРѕРЈРјРѕР»С‡Р°РЅРёСЋ synonym InitByDefault;
     Init;
   end;
 
-  proc Инициализировать synonym Init;
+  proc РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊ synonym Init;
     Assert(Record.State = Kernel.Record.Created);
   end;
 
-  proc Записать synonym Post( аДиалоговыйРежим :Logical = False );
+  proc Р—Р°РїРёСЃР°С‚СЊ synonym Post( Р°Р”РёР°Р»РѕРіРѕРІС‹Р№Р РµР¶РёРј :Logical = False );
     SetWorkLog(wsRecCreated, wsRecUpdated);
-    inherited Post(аДиалоговыйРежим);
+    inherited Post(Р°Р”РёР°Р»РѕРіРѕРІС‹Р№Р РµР¶РёРј);
   end;
 
-  proc ВыполнитьУдаление synonym DoDelete( const aCheckRefs :Logical );
+  proc Р’С‹РїРѕР»РЅРёС‚СЊРЈРґР°Р»РµРЅРёРµ synonym DoDelete( const aCheckRefs :Logical );
     ClearWorkLog(wsRecCreated, false);
     inherited DoDelete(aCheckRefs);
   end;

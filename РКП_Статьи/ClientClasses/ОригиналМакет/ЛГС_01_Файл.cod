@@ -1,15 +1,15 @@
-class  '';
+п»їclass  '';
 
 inclass public
 
-  proc Создание (ПапкаЛетописи: String; ФайлЛетописи: String; var ЛГС :TextFile);
-    if not ExistFolder(ПапкаЛетописи) then
-      CreateFolder(ПапкаЛетописи);
+  proc РЎРѕР·РґР°РЅРёРµ (РџР°РїРєР°Р›РµС‚РѕРїРёСЃРё: String; Р¤Р°Р№Р»Р›РµС‚РѕРїРёСЃРё: String; var Р›Р“РЎ :TextFile);
+    if not ExistFolder(РџР°РїРєР°Р›РµС‚РѕРїРёСЃРё) then
+      CreateFolder(РџР°РїРєР°Р›РµС‚РѕРїРёСЃРё);
     fi;
-    if ExistFile(ФайлЛетописи) then
-      RemoveFile(ФайлЛетописи);
+    if ExistFile(Р¤Р°Р№Р»Р›РµС‚РѕРїРёСЃРё) then
+      RemoveFile(Р¤Р°Р№Р»Р›РµС‚РѕРїРёСЃРё);
     fi;
-    ЛГС = TextFile.Create(ФайлЛетописи, fmCreate);
+    Р›Р“РЎ = TextFile.Create(Р¤Р°Р№Р»Р›РµС‚РѕРїРёСЃРё, fmCreate);
   end;
 
 end

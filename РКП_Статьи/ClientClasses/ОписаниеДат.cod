@@ -1,173 +1,173 @@
-class "Описание дат";
+п»їclass "РћРїРёСЃР°РЅРёРµ РґР°С‚";
 
 inclass
-  func НачалоНомера(Газета:РКП_Газеты.Газета;ДатаВыпуска:date):date;
-    if    Газета.КатегорияПериодичности<= 1     then            Result = ДатаВыпуска;
-    elsif Газета.КатегорияПериодичности = 2     then
-      if    Газета.КоличествоВПериоде = 1       then            Result = ДатаВыпуска-6;
-      elsif Газета.КоличествоВПериоде = 2       then            Result = ДатаВыпуска-2;
-      elsif Газета.КоличествоВПериоде = 3       then            Result = ДатаВыпуска-1;
-      elsif Газета.КоличествоВПериоде = 4       then            Result = ДатаВыпуска;
-      elsif Газета.КоличествоВПериоде = 5       then            Result = ДатаВыпуска;
-      elsif Газета.КоличествоВПериоде = 6       then            Result = ДатаВыпуска;
-      elsif Газета.КоличествоВПериоде = 7       then            Result = ДатаВыпуска;
+  func РќР°С‡Р°Р»РѕРќРѕРјРµСЂР°(Р“Р°Р·РµС‚Р°:Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°;Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°:date):date;
+    if    Р“Р°Р·РµС‚Р°.РљР°С‚РµРіРѕСЂРёСЏРџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚Рё<= 1     then            Result = Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°;
+    elsif Р“Р°Р·РµС‚Р°.РљР°С‚РµРіРѕСЂРёСЏРџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚Рё = 2     then
+      if    Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 1       then            Result = Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-6;
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 2       then            Result = Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-2;
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 3       then            Result = Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-1;
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 4       then            Result = Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°;
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 5       then            Result = Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°;
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 6       then            Result = Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°;
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 7       then            Result = Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°;
       end;
-    elsif Газета.КатегорияПериодичности = 3     then
-      if    Газета.КоличествоВПериоде = 1       then
-        if Mon(ДатаВыпуска)>1                   then            Result = Dat(Day(ДатаВыпуска),Mon(ДатаВыпуска)-1,Year(ДатаВыпуска));
-        else                                                    Result = Dat(Day(ДатаВыпуска),12,Year(ДатаВыпуска)-1);
+    elsif Р“Р°Р·РµС‚Р°.РљР°С‚РµРіРѕСЂРёСЏРџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚Рё = 3     then
+      if    Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 1       then
+        if Mon(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°)>1                   then            Result = Dat(Day(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°),Mon(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°)-1,Year(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°));
+        else                                                    Result = Dat(Day(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°),12,Year(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°)-1);
         end;
-      elsif Газета.КоличествоВПериоде = 2       then            Result = ДатаВыпуска-13;
-      elsif Газета.КоличествоВПериоде = 3       then            Result = ДатаВыпуска-9;
-      elsif Газета.КоличествоВПериоде = 4       then            Result = ДатаВыпуска-6;
-      elsif Газета.КоличествоВПериоде = 5       then            Result = ДатаВыпуска-5;
-      elsif Газета.КоличествоВПериоде = 6       then            Result = ДатаВыпуска-4;
-      elsif Газета.КоличествоВПериоде = 7       then            Result = ДатаВыпуска-3;
-      elsif Газета.КоличествоВПериоде = 8       then            Result = ДатаВыпуска-2;
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 2       then            Result = Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-13;
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 3       then            Result = Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-9;
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 4       then            Result = Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-6;
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 5       then            Result = Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-5;
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 6       then            Result = Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-4;
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 7       then            Result = Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-3;
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 8       then            Result = Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-2;
       end;
-    elsif Газета.КатегорияПериодичности = 4     then
-      if    Газета.КоличествоВПериоде = 1       then            Result = Dat(Day(ДатаВыпуска),Mon(ДатаВыпуска),Year(ДатаВыпуска)-0);
-      elsif Газета.КоличествоВПериоде = 2       then            Result = Dat(Day(ДатаВыпуска),Mon(ДатаВыпуска-182),Year(ДатаВыпуска-181));
-      elsif Газета.КоличествоВПериоде = 3       then            Result = Dat(Day(ДатаВыпуска),Mon(ДатаВыпуска-122),Year(ДатаВыпуска-121));
-      elsif Газета.КоличествоВПериоде = 4       then            Result = Dat(Day(ДатаВыпуска),Mon(ДатаВыпуска-91),Year(ДатаВыпуска-90));
-      elsif Газета.КоличествоВПериоде = 5       then            Result = Dat(Day(ДатаВыпуска),Mon(ДатаВыпуска-73),Year(ДатаВыпуска-72));
-      elsif Газета.КоличествоВПериоде = 6       then            Result = Dat(Day(ДатаВыпуска),Mon(ДатаВыпуска-60),Year(ДатаВыпуска-59));
-      elsif Газета.КоличествоВПериоде = 7       then            Result = Dat(Day(ДатаВыпуска),Mon(ДатаВыпуска-52),Year(ДатаВыпуска-51));
-      elsif Газета.КоличествоВПериоде = 8       then            Result = Dat(Day(ДатаВыпуска),Mon(ДатаВыпуска-46),Year(ДатаВыпуска-45));
-      elsif Газета.КоличествоВПериоде = 9       then            Result = Dat(Day(ДатаВыпуска),Mon(ДатаВыпуска-41),Year(ДатаВыпуска-40));
-      elsif Газета.КоличествоВПериоде =10       then            Result = Dat(Day(ДатаВыпуска),Mon(ДатаВыпуска-37),Year(ДатаВыпуска-36));
-      elsif Газета.КоличествоВПериоде =11       then            Result = Dat(Day(ДатаВыпуска),Mon(ДатаВыпуска-33),Year(ДатаВыпуска-32));
-      elsif Газета.КоличествоВПериоде =12       then            Result = Dat(Day(ДатаВыпуска),Mon(ДатаВыпуска-30),Year(ДатаВыпуска-29));
+    elsif Р“Р°Р·РµС‚Р°.РљР°С‚РµРіРѕСЂРёСЏРџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚Рё = 4     then
+      if    Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 1       then            Result = Dat(Day(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°),Mon(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°),Year(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°)-0);
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 2       then            Result = Dat(Day(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°),Mon(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-182),Year(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-181));
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 3       then            Result = Dat(Day(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°),Mon(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-122),Year(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-121));
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 4       then            Result = Dat(Day(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°),Mon(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-91),Year(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-90));
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 5       then            Result = Dat(Day(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°),Mon(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-73),Year(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-72));
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 6       then            Result = Dat(Day(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°),Mon(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-60),Year(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-59));
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 7       then            Result = Dat(Day(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°),Mon(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-52),Year(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-51));
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 8       then            Result = Dat(Day(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°),Mon(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-46),Year(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-45));
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ = 9       then            Result = Dat(Day(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°),Mon(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-41),Year(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-40));
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ =10       then            Result = Dat(Day(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°),Mon(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-37),Year(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-36));
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ =11       then            Result = Dat(Day(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°),Mon(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-33),Year(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-32));
+      elsif Р“Р°Р·РµС‚Р°.РљРѕР»РёС‡РµСЃС‚РІРѕР’РџРµСЂРёРѕРґРµ =12       then            Result = Dat(Day(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°),Mon(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-30),Year(Р”Р°С‚Р°Р’С‹РїСѓСЃРєР°-29));
       end;
     end;
   end;
 
-  --Перевод диапазона дат в строковое предстваление согласно правилам библиографии
-  --dds-Дата начала, ddf-Дата окончания
-  func ВСтроку (dds :Date;ddf:Date;NoteS:integer;NoteF:integer):String;
+  --РџРµСЂРµРІРѕРґ РґРёР°РїР°Р·РѕРЅР° РґР°С‚ РІ СЃС‚СЂРѕРєРѕРІРѕРµ РїСЂРµРґСЃС‚РІР°Р»РµРЅРёРµ СЃРѕРіР»Р°СЃРЅРѕ РїСЂР°РІРёР»Р°Рј Р±РёР±Р»РёРѕРіСЂР°С„РёРё
+  --dds-Р”Р°С‚Р° РЅР°С‡Р°Р»Р°, ddf-Р”Р°С‚Р° РѕРєРѕРЅС‡Р°РЅРёСЏ
+  func Р’РЎС‚СЂРѕРєСѓ (dds :Date;ddf:Date;NoteS:integer;NoteF:integer):String;
     if    dds>01.01.1901 and ddf>01.01.1901     then
       if    dds=ddf                             then
         if      NoteF = 0                       then
-          if      Mon(ddf)=1                    then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" янв.";
-          elsif   Mon(ddf)=2                    then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" февр.";
-          elsif   Mon(ddf)=3                    then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" марта";
-          elsif   Mon(ddf)=4                    then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" апр.";
-          elsif   Mon(ddf)=5                    then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" мая";
-          elsif   Mon(ddf)=6                    then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" июня";
-          elsif   Mon(ddf)=7                    then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" июля";
-          elsif   Mon(ddf)=8                    then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" авг.";
-          elsif   Mon(ddf)=9                    then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" сент.";
-          elsif   Mon(ddf)=10                   then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" окт.";
-          elsif   Mon(ddf)=11                   then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" нояб.";
-          elsif   Mon(ddf)=12                   then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" дек.";
+          if      Mon(ddf)=1                    then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" СЏРЅРІ.";
+          elsif   Mon(ddf)=2                    then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" С„РµРІСЂ.";
+          elsif   Mon(ddf)=3                    then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" РјР°СЂС‚Р°";
+          elsif   Mon(ddf)=4                    then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" Р°РїСЂ.";
+          elsif   Mon(ddf)=5                    then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" РјР°СЏ";
+          elsif   Mon(ddf)=6                    then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" РёСЋРЅСЏ";
+          elsif   Mon(ddf)=7                    then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" РёСЋР»СЏ";
+          elsif   Mon(ddf)=8                    then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" Р°РІРі.";
+          elsif   Mon(ddf)=9                    then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" СЃРµРЅС‚.";
+          elsif   Mon(ddf)=10                   then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" РѕРєС‚.";
+          elsif   Mon(ddf)=11                   then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" РЅРѕСЏР±.";
+          elsif   Mon(ddf)=12                   then   Result = Str(Year(ddf))+". - "+Str(Day(dds))+" РґРµРє.";
           end;
         elsif   NoteF = 1                       then
-          if      Mon(ddf)=1                    then   Result = Str(Year(ddf))+". - "+"Янв.";
-          elsif   Mon(ddf)=2                    then   Result = Str(Year(ddf))+". - "+"Февр.";
-          elsif   Mon(ddf)=3                    then   Result = Str(Year(ddf))+". - "+"Март";
-          elsif   Mon(ddf)=4                    then   Result = Str(Year(ddf))+". - "+"Апр.";
-          elsif   Mon(ddf)=5                    then   Result = Str(Year(ddf))+". - "+"Май";
-          elsif   Mon(ddf)=6                    then   Result = Str(Year(ddf))+". - "+"Июнь";
-          elsif   Mon(ddf)=7                    then   Result = Str(Year(ddf))+". - "+"Июль";
-          elsif   Mon(ddf)=8                    then   Result = Str(Year(ddf))+". - "+"Авг.";
-          elsif   Mon(ddf)=9                    then   Result = Str(Year(ddf))+". - "+"Сент.";
-          elsif   Mon(ddf)=10                   then   Result = Str(Year(ddf))+". - "+"Окт.";
-          elsif   Mon(ddf)=11                   then   Result = Str(Year(ddf))+". - "+"Нояб.";
-          elsif   Mon(ddf)=12                   then   Result = Str(Year(ddf))+". - "+"Дек.";
+          if      Mon(ddf)=1                    then   Result = Str(Year(ddf))+". - "+"РЇРЅРІ.";
+          elsif   Mon(ddf)=2                    then   Result = Str(Year(ddf))+". - "+"Р¤РµРІСЂ.";
+          elsif   Mon(ddf)=3                    then   Result = Str(Year(ddf))+". - "+"РњР°СЂС‚";
+          elsif   Mon(ddf)=4                    then   Result = Str(Year(ddf))+". - "+"РђРїСЂ.";
+          elsif   Mon(ddf)=5                    then   Result = Str(Year(ddf))+". - "+"РњР°Р№";
+          elsif   Mon(ddf)=6                    then   Result = Str(Year(ddf))+". - "+"РСЋРЅСЊ";
+          elsif   Mon(ddf)=7                    then   Result = Str(Year(ddf))+". - "+"РСЋР»СЊ";
+          elsif   Mon(ddf)=8                    then   Result = Str(Year(ddf))+". - "+"РђРІРі.";
+          elsif   Mon(ddf)=9                    then   Result = Str(Year(ddf))+". - "+"РЎРµРЅС‚.";
+          elsif   Mon(ddf)=10                   then   Result = Str(Year(ddf))+". - "+"РћРєС‚.";
+          elsif   Mon(ddf)=11                   then   Result = Str(Year(ddf))+". - "+"РќРѕСЏР±.";
+          elsif   Mon(ddf)=12                   then   Result = Str(Year(ddf))+". - "+"Р”РµРє.";
           end;
         end;
       elsif dds<ddf                             then
         if      Mon(dds)=Mon(ddf)               and
                 Year(dds)=Year(ddf)             and
                 NoteF = 0                       then
-          if      Mon(dds)=1                    then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" янв.";
-          elsif   Mon(dds)=2                    then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" февр.";
-          elsif   Mon(dds)=3                    then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" марта";
-          elsif   Mon(dds)=4                    then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" апр.";
-          elsif   Mon(dds)=5                    then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" мая";
-          elsif   Mon(dds)=6                    then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" июня";
-          elsif   Mon(dds)=7                    then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" июля";
-          elsif   Mon(dds)=8                    then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" авг.";
-          elsif   Mon(dds)=9                    then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" сент.";
-          elsif   Mon(dds)=10                   then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" окт.";
-          elsif   Mon(dds)=11                   then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" нояб.";
-          elsif   Mon(dds)=12                   then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" дек.";
+          if      Mon(dds)=1                    then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" СЏРЅРІ.";
+          elsif   Mon(dds)=2                    then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" С„РµРІСЂ.";
+          elsif   Mon(dds)=3                    then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" РјР°СЂС‚Р°";
+          elsif   Mon(dds)=4                    then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" Р°РїСЂ.";
+          elsif   Mon(dds)=5                    then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" РјР°СЏ";
+          elsif   Mon(dds)=6                    then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" РёСЋРЅСЏ";
+          elsif   Mon(dds)=7                    then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" РёСЋР»СЏ";
+          elsif   Mon(dds)=8                    then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" Р°РІРі.";
+          elsif   Mon(dds)=9                    then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" СЃРµРЅС‚.";
+          elsif   Mon(dds)=10                   then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" РѕРєС‚.";
+          elsif   Mon(dds)=11                   then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" РЅРѕСЏР±.";
+          elsif   Mon(dds)=12                   then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" - "+Str(Day(ddf))+" РґРµРє.";
           end;
         elsif   Mon(dds)=Mon(ddf)               and
                 Year(dds)=Year(ddf)             and
                 NoteF = 1                       then
-          if      Mon(ddf)=1                    then   Result = Str(Year(ddf))+". - "+"Янв.";
-          elsif   Mon(ddf)=2                    then   Result = Str(Year(ddf))+". - "+"Февр.";
-          elsif   Mon(ddf)=3                    then   Result = Str(Year(ddf))+". - "+"Март";
-          elsif   Mon(ddf)=4                    then   Result = Str(Year(ddf))+". - "+"Апр.";
-          elsif   Mon(ddf)=5                    then   Result = Str(Year(ddf))+". - "+"Май";
-          elsif   Mon(ddf)=6                    then   Result = Str(Year(ddf))+". - "+"Июнь";
-          elsif   Mon(ddf)=7                    then   Result = Str(Year(ddf))+". - "+"Июль";
-          elsif   Mon(ddf)=8                    then   Result = Str(Year(ddf))+". - "+"Авг.";
-          elsif   Mon(ddf)=9                    then   Result = Str(Year(ddf))+". - "+"Сент.";
-          elsif   Mon(ddf)=10                   then   Result = Str(Year(ddf))+". - "+"Окт.";
-          elsif   Mon(ddf)=11                   then   Result = Str(Year(ddf))+". - "+"Нояб.";
-          elsif   Mon(ddf)=12                   then   Result = Str(Year(ddf))+". - "+"Дек.";
+          if      Mon(ddf)=1                    then   Result = Str(Year(ddf))+". - "+"РЇРЅРІ.";
+          elsif   Mon(ddf)=2                    then   Result = Str(Year(ddf))+". - "+"Р¤РµРІСЂ.";
+          elsif   Mon(ddf)=3                    then   Result = Str(Year(ddf))+". - "+"РњР°СЂС‚";
+          elsif   Mon(ddf)=4                    then   Result = Str(Year(ddf))+". - "+"РђРїСЂ.";
+          elsif   Mon(ddf)=5                    then   Result = Str(Year(ddf))+". - "+"РњР°Р№";
+          elsif   Mon(ddf)=6                    then   Result = Str(Year(ddf))+". - "+"РСЋРЅСЊ";
+          elsif   Mon(ddf)=7                    then   Result = Str(Year(ddf))+". - "+"РСЋР»СЊ";
+          elsif   Mon(ddf)=8                    then   Result = Str(Year(ddf))+". - "+"РђРІРі.";
+          elsif   Mon(ddf)=9                    then   Result = Str(Year(ddf))+". - "+"РЎРµРЅС‚.";
+          elsif   Mon(ddf)=10                   then   Result = Str(Year(ddf))+". - "+"РћРєС‚.";
+          elsif   Mon(ddf)=11                   then   Result = Str(Year(ddf))+". - "+"РќРѕСЏР±.";
+          elsif   Mon(ddf)=12                   then   Result = Str(Year(ddf))+". - "+"Р”РµРє.";
           end;
         elsif   Mon(ddf)-Mon(dds)=1             and
                 Year(dds)=Year(ddf)             then
           if     NoteS = 0 and NoteF = 0        then
-            if      Mon(ddf)=2                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" янв. - "   +Str(Day(ddf))+" февр.";
-            elsif   Mon(ddf)=3                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" февр. - "  +Str(Day(ddf))+" марта";
-            elsif   Mon(ddf)=4                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" марта - "  +Str(Day(ddf))+" апр.";
-            elsif   Mon(ddf)=5                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" апр. - "   +Str(Day(ddf))+" мая";
-            elsif   Mon(ddf)=6                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" мая - "    +Str(Day(ddf))+" июня";
-            elsif   Mon(ddf)=7                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" июня - "   +Str(Day(ddf))+" июля";
-            elsif   Mon(ddf)=8                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" июля - "   +Str(Day(ddf))+" авг.";
-            elsif   Mon(ddf)=9                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" авг. - "   +Str(Day(ddf))+" сент.";
-            elsif   Mon(ddf)=10                 then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" сент. - "  +Str(Day(ddf))+" окт.";
-            elsif   Mon(ddf)=11                 then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" окт. - "   +Str(Day(ddf))+" нояб.";
-            elsif   Mon(ddf)=12                 then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" нояб. - "  +Str(Day(ddf))+" дек.";
+            if      Mon(ddf)=2                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" СЏРЅРІ. - "   +Str(Day(ddf))+" С„РµРІСЂ.";
+            elsif   Mon(ddf)=3                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" С„РµРІСЂ. - "  +Str(Day(ddf))+" РјР°СЂС‚Р°";
+            elsif   Mon(ddf)=4                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" РјР°СЂС‚Р° - "  +Str(Day(ddf))+" Р°РїСЂ.";
+            elsif   Mon(ddf)=5                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" Р°РїСЂ. - "   +Str(Day(ddf))+" РјР°СЏ";
+            elsif   Mon(ddf)=6                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" РјР°СЏ - "    +Str(Day(ddf))+" РёСЋРЅСЏ";
+            elsif   Mon(ddf)=7                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" РёСЋРЅСЏ - "   +Str(Day(ddf))+" РёСЋР»СЏ";
+            elsif   Mon(ddf)=8                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" РёСЋР»СЏ - "   +Str(Day(ddf))+" Р°РІРі.";
+            elsif   Mon(ddf)=9                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" Р°РІРі. - "   +Str(Day(ddf))+" СЃРµРЅС‚.";
+            elsif   Mon(ddf)=10                 then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" СЃРµРЅС‚. - "  +Str(Day(ddf))+" РѕРєС‚.";
+            elsif   Mon(ddf)=11                 then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" РѕРєС‚. - "   +Str(Day(ddf))+" РЅРѕСЏР±.";
+            elsif   Mon(ddf)=12                 then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" РЅРѕСЏР±. - "  +Str(Day(ddf))+" РґРµРє.";
             end;
           elsif  NoteS = 1 and NoteF = 0        then
-            if      Mon(ddf)=2                  then   Result = Str(Year(dds))+". - "+"Янв. - " +Str(Day(ddf))+" февр.";
-            elsif   Mon(ddf)=3                  then   Result = Str(Year(dds))+". - "+"Февр. - "+Str(Day(ddf))+" марта";
-            elsif   Mon(ddf)=4                  then   Result = Str(Year(dds))+". - "+"Март - " +Str(Day(ddf))+" апр.";
-            elsif   Mon(ddf)=5                  then   Result = Str(Year(dds))+". - "+"Апр. - " +Str(Day(ddf))+" мая";
-            elsif   Mon(ddf)=6                  then   Result = Str(Year(dds))+". - "+"Май - "  +Str(Day(ddf))+" июня";
-            elsif   Mon(ddf)=7                  then   Result = Str(Year(dds))+". - "+"Июнь - " +Str(Day(ddf))+" июля";
-            elsif   Mon(ddf)=8                  then   Result = Str(Year(dds))+". - "+"Июль - " +Str(Day(ddf))+" авг.";
-            elsif   Mon(ddf)=9                  then   Result = Str(Year(dds))+". - "+"Авг. - " +Str(Day(ddf))+" сент.";
-            elsif   Mon(ddf)=10                 then   Result = Str(Year(dds))+". - "+"Сент. - "+Str(Day(ddf))+" окт.";
-            elsif   Mon(ddf)=11                 then   Result = Str(Year(dds))+". - "+"Окт. - " +Str(Day(ddf))+" нояб.";
-            elsif   Mon(ddf)=12                 then   Result = Str(Year(dds))+". - "+"Нояб. - "+Str(Day(ddf))+" дек.";
+            if      Mon(ddf)=2                  then   Result = Str(Year(dds))+". - "+"РЇРЅРІ. - " +Str(Day(ddf))+" С„РµРІСЂ.";
+            elsif   Mon(ddf)=3                  then   Result = Str(Year(dds))+". - "+"Р¤РµРІСЂ. - "+Str(Day(ddf))+" РјР°СЂС‚Р°";
+            elsif   Mon(ddf)=4                  then   Result = Str(Year(dds))+". - "+"РњР°СЂС‚ - " +Str(Day(ddf))+" Р°РїСЂ.";
+            elsif   Mon(ddf)=5                  then   Result = Str(Year(dds))+". - "+"РђРїСЂ. - " +Str(Day(ddf))+" РјР°СЏ";
+            elsif   Mon(ddf)=6                  then   Result = Str(Year(dds))+". - "+"РњР°Р№ - "  +Str(Day(ddf))+" РёСЋРЅСЏ";
+            elsif   Mon(ddf)=7                  then   Result = Str(Year(dds))+". - "+"РСЋРЅСЊ - " +Str(Day(ddf))+" РёСЋР»СЏ";
+            elsif   Mon(ddf)=8                  then   Result = Str(Year(dds))+". - "+"РСЋР»СЊ - " +Str(Day(ddf))+" Р°РІРі.";
+            elsif   Mon(ddf)=9                  then   Result = Str(Year(dds))+". - "+"РђРІРі. - " +Str(Day(ddf))+" СЃРµРЅС‚.";
+            elsif   Mon(ddf)=10                 then   Result = Str(Year(dds))+". - "+"РЎРµРЅС‚. - "+Str(Day(ddf))+" РѕРєС‚.";
+            elsif   Mon(ddf)=11                 then   Result = Str(Year(dds))+". - "+"РћРєС‚. - " +Str(Day(ddf))+" РЅРѕСЏР±.";
+            elsif   Mon(ddf)=12                 then   Result = Str(Year(dds))+". - "+"РќРѕСЏР±. - "+Str(Day(ddf))+" РґРµРє.";
             end;
           elsif  NoteS = 0 and NoteF = 1        then
-            if      Mon(ddf)=2                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" янв. - "   +"Февр.";
-            elsif   Mon(ddf)=3                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" февр. - "  +"Март";
-            elsif   Mon(ddf)=4                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" марта - "  +"Апр.";
-            elsif   Mon(ddf)=5                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" апр. - "   +"Май";
-            elsif   Mon(ddf)=6                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" мая - "    +"Июнь";
-            elsif   Mon(ddf)=7                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" июня - "   +"Июль";
-            elsif   Mon(ddf)=8                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" июля - "   +"Авг.";
-            elsif   Mon(ddf)=9                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" авг. - "   +"Сент.";
-            elsif   Mon(ddf)=10                 then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" сент. - "  +"Окт.";
-            elsif   Mon(ddf)=11                 then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" окт. - "   +"Нояб.";
-            elsif   Mon(ddf)=12                 then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" нояб. - "  +"Дек.";
+            if      Mon(ddf)=2                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" СЏРЅРІ. - "   +"Р¤РµРІСЂ.";
+            elsif   Mon(ddf)=3                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" С„РµРІСЂ. - "  +"РњР°СЂС‚";
+            elsif   Mon(ddf)=4                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" РјР°СЂС‚Р° - "  +"РђРїСЂ.";
+            elsif   Mon(ddf)=5                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" Р°РїСЂ. - "   +"РњР°Р№";
+            elsif   Mon(ddf)=6                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" РјР°СЏ - "    +"РСЋРЅСЊ";
+            elsif   Mon(ddf)=7                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" РёСЋРЅСЏ - "   +"РСЋР»СЊ";
+            elsif   Mon(ddf)=8                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" РёСЋР»СЏ - "   +"РђРІРі.";
+            elsif   Mon(ddf)=9                  then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" Р°РІРі. - "   +"РЎРµРЅС‚.";
+            elsif   Mon(ddf)=10                 then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" СЃРµРЅС‚. - "  +"РћРєС‚.";
+            elsif   Mon(ddf)=11                 then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" РѕРєС‚. - "   +"РќРѕСЏР±.";
+            elsif   Mon(ddf)=12                 then   Result = Str(Year(dds))+". - "+Str(Day(dds))+" РЅРѕСЏР±. - "  +"Р”РµРє.";
             end;
           elsif  NoteS = 1 and NoteF = 1        then
-            if      Mon(ddf)=2                  then   Result = Str(Year(dds))+". - "+"Янв. - " +"Февр.";
-            elsif   Mon(ddf)=3                  then   Result = Str(Year(dds))+". - "+"Февр. - "+"Март";
-            elsif   Mon(ddf)=4                  then   Result = Str(Year(dds))+". - "+"Март - " +"Апр.";
-            elsif   Mon(ddf)=5                  then   Result = Str(Year(dds))+". - "+"Апр. - " +"Май";
-            elsif   Mon(ddf)=6                  then   Result = Str(Year(dds))+". - "+"Май - "  +"Июнь";
-            elsif   Mon(ddf)=7                  then   Result = Str(Year(dds))+". - "+"Июнь - " +"Июль";
-            elsif   Mon(ddf)=8                  then   Result = Str(Year(dds))+". - "+"Июль - " +"Авг.";
-            elsif   Mon(ddf)=9                  then   Result = Str(Year(dds))+". - "+"Авг. - " +"Сент.";
-            elsif   Mon(ddf)=10                 then   Result = Str(Year(dds))+". - "+"Сент. - "+"Окт.";
-            elsif   Mon(ddf)=11                 then   Result = Str(Year(dds))+". - "+"Окт. - " +"Нояб.";
-            elsif   Mon(ddf)=12                 then   Result = Str(Year(dds))+". - "+"Нояб. - "+"Дек.";
+            if      Mon(ddf)=2                  then   Result = Str(Year(dds))+". - "+"РЇРЅРІ. - " +"Р¤РµРІСЂ.";
+            elsif   Mon(ddf)=3                  then   Result = Str(Year(dds))+". - "+"Р¤РµРІСЂ. - "+"РњР°СЂС‚";
+            elsif   Mon(ddf)=4                  then   Result = Str(Year(dds))+". - "+"РњР°СЂС‚ - " +"РђРїСЂ.";
+            elsif   Mon(ddf)=5                  then   Result = Str(Year(dds))+". - "+"РђРїСЂ. - " +"РњР°Р№";
+            elsif   Mon(ddf)=6                  then   Result = Str(Year(dds))+". - "+"РњР°Р№ - "  +"РСЋРЅСЊ";
+            elsif   Mon(ddf)=7                  then   Result = Str(Year(dds))+". - "+"РСЋРЅСЊ - " +"РСЋР»СЊ";
+            elsif   Mon(ddf)=8                  then   Result = Str(Year(dds))+". - "+"РСЋР»СЊ - " +"РђРІРі.";
+            elsif   Mon(ddf)=9                  then   Result = Str(Year(dds))+". - "+"РђРІРі. - " +"РЎРµРЅС‚.";
+            elsif   Mon(ddf)=10                 then   Result = Str(Year(dds))+". - "+"РЎРµРЅС‚. - "+"РћРєС‚.";
+            elsif   Mon(ddf)=11                 then   Result = Str(Year(dds))+". - "+"РћРєС‚. - " +"РќРѕСЏР±.";
+            elsif   Mon(ddf)=12                 then   Result = Str(Year(dds))+". - "+"РќРѕСЏР±. - "+"Р”РµРє.";
             end;
           end;
-        elsif   Mon(ddf)-Mon(dds)=-11           and      --вариант декабрь-январь
+        elsif   Mon(ddf)-Mon(dds)=-11           and      --РІР°СЂРёР°РЅС‚ РґРµРєР°Р±СЂСЊ-СЏРЅРІР°СЂСЊ
                 Year(dds)-Year(ddf)=-1          then
           if     NoteS = 0 and NoteF = 0        then
-                                                       Result = Str(Day(dds))+" дек. - "+Str(Day(ddf))+" янв. "+Str(Year(ddf));
+                                                       Result = Str(Day(dds))+" РґРµРє. - "+Str(Day(ddf))+" СЏРЅРІ. "+Str(Year(ddf));
           end;
         end;
       end;
