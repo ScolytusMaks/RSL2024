@@ -1,243 +1,243 @@
-class "Расчет статистических показателей";
-import СИС2 classes Константы;
-import РКП_СИС classes Recs, StringsFunctions, StdCode, Functions, FilterMaker;
+п»їclass "Р Р°СЃС‡РµС‚ СЃС‚Р°С‚РёСЃС‚РёС‡РµСЃРєРёС… РїРѕРєР°Р·Р°С‚РµР»РµР№";
+import РЎРРЎ2 classes РљРѕРЅСЃС‚Р°РЅС‚С‹;
+import Р РљРџ_РЎРРЎ classes Recs, StringsFunctions, StdCode, Functions, FilterMaker;
 
 inclass public
 
-  func НомеровВыпущено (Издание :РКП_Газеты.Газета; ГодВыпуска :integer) :integer;
+  func РќРѕРјРµСЂРѕРІР’С‹РїСѓС‰РµРЅРѕ (РР·РґР°РЅРёРµ :Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°; Р“РѕРґР’С‹РїСѓСЃРєР° :integer) :integer;
     var aFlt :String[];
-    AddInArray( aFlt, 'Газета=' + Издание.DocIDStr );
-    AddInArray( aFlt, 'ГодВыпуска=' + Str(ГодВыпуска) );
+    AddInArray( aFlt, 'Р“Р°Р·РµС‚Р°=' + РР·РґР°РЅРёРµ.DocIDStr );
+    AddInArray( aFlt, 'Р“РѕРґР’С‹РїСѓСЃРєР°=' + Str(Р“РѕРґР’С‹РїСѓСЃРєР°) );
     AddInArray( aFlt, 'isGroup=0' );
-    AddInArray( aFlt, 'not(СозданОЛГС and НеПолучен)' );
-    with Query.Create([РКП_Газеты.НомерГазеты]) do
+    AddInArray( aFlt, 'not(РЎРѕР·РґР°РЅРћР›Р“РЎ and РќРµРџРѕР»СѓС‡РµРЅ)' );
+    with Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹]) do
       Filter = MakeFilter(aFlt);
       Return Count;
     end;
   end;
 
-  func НомеровПолучено (Издание :РКП_Газеты.Газета; ГодВыпуска :integer) :integer;
+  func РќРѕРјРµСЂРѕРІРџРѕР»СѓС‡РµРЅРѕ (РР·РґР°РЅРёРµ :Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°; Р“РѕРґР’С‹РїСѓСЃРєР° :integer) :integer;
     var aFlt :String[];
-    AddInArray( aFlt, 'Газета=' + Издание.DocIDStr );
-    AddInArray( aFlt, 'ГодВыпуска=' + Str(ГодВыпуска) );
-    AddInArray( aFlt, 'not НеПолучен' );
+    AddInArray( aFlt, 'Р“Р°Р·РµС‚Р°=' + РР·РґР°РЅРёРµ.DocIDStr );
+    AddInArray( aFlt, 'Р“РѕРґР’С‹РїСѓСЃРєР°=' + Str(Р“РѕРґР’С‹РїСѓСЃРєР°) );
+    AddInArray( aFlt, 'not РќРµРџРѕР»СѓС‡РµРЅ' );
     AddInArray( aFlt, 'isGroup=0' );
-    AddInArray( aFlt, 'not(СозданОЛГС and НеПолучен)' );
-    with Query.Create([РКП_Газеты.НомерГазеты]) do
+    AddInArray( aFlt, 'not(РЎРѕР·РґР°РЅРћР›Р“РЎ and РќРµРџРѕР»СѓС‡РµРЅ)' );
+    with Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹]) do
       Filter = MakeFilter(aFlt);
       Return Count;
     end;
   end;
 
-  func НомерПоследнихИзмененийИстории(Издание :РКП_Газеты.Газета; Категория :Integer) :Integer;
+  func РќРѕРјРµСЂРџРѕСЃР»РµРґРЅРёС…РР·РјРµРЅРµРЅРёР№РСЃС‚РѕСЂРёРё(РР·РґР°РЅРёРµ :Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°; РљР°С‚РµРіРѕСЂРёСЏ :Integer) :Integer;
     var aFlt :String[];
-    var rHst :РКП_Газеты.ИсторияГазеты;
-    AddInArray( aFlt, 'Газета=' + Издание.DocIDStr );
-    AddInArray( aFlt, 'НомерПоля=' + Str(Категория) );
-    rHst = FindRecord(РКП_Газеты.ИсторияГазеты, MakeFilter(aFlt), 'НомерИзменений-');
+    var rHst :Р РљРџ_Р“Р°Р·РµС‚С‹.РСЃС‚РѕСЂРёСЏР“Р°Р·РµС‚С‹;
+    AddInArray( aFlt, 'Р“Р°Р·РµС‚Р°=' + РР·РґР°РЅРёРµ.DocIDStr );
+    AddInArray( aFlt, 'РќРѕРјРµСЂРџРѕР»СЏ=' + Str(РљР°С‚РµРіРѕСЂРёСЏ) );
+    rHst = FindRecord(Р РљРџ_Р“Р°Р·РµС‚С‹.РСЃС‚РѕСЂРёСЏР“Р°Р·РµС‚С‹, MakeFilter(aFlt), 'РќРѕРјРµСЂРР·РјРµРЅРµРЅРёР№-');
     if (rHst <> nil) then
-      Return rHst.НомерИзменений;
+      Return rHst.РќРѕРјРµСЂРР·РјРµРЅРµРЅРёР№;
     fi;
   end;
 
-  func ПоследнееИзменениеИстории(Издание :РКП_Газеты.Газета; Категория :Integer) :РКП_Газеты.ИсторияГазеты;
+  func РџРѕСЃР»РµРґРЅРµРµРР·РјРµРЅРµРЅРёРµРСЃС‚РѕСЂРёРё(РР·РґР°РЅРёРµ :Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°; РљР°С‚РµРіРѕСЂРёСЏ :Integer) :Р РљРџ_Р“Р°Р·РµС‚С‹.РСЃС‚РѕСЂРёСЏР“Р°Р·РµС‚С‹;
     var aFlt :String[];
-    AddInArray( aFlt, 'Газета=' + Издание.DocIDStr );
-    AddInArray( aFlt, 'НомерПоля=' + Str(Категория) );
-    Return FindRecord(РКП_Газеты.ИсторияГазеты, MakeFilter(aFlt), 'НомерИзменений-');
+    AddInArray( aFlt, 'Р“Р°Р·РµС‚Р°=' + РР·РґР°РЅРёРµ.DocIDStr );
+    AddInArray( aFlt, 'РќРѕРјРµСЂРџРѕР»СЏ=' + Str(РљР°С‚РµРіРѕСЂРёСЏ) );
+    Return FindRecord(Р РљРџ_Р“Р°Р·РµС‚С‹.РСЃС‚РѕСЂРёСЏР“Р°Р·РµС‚С‹, MakeFilter(aFlt), 'РќРѕРјРµСЂРР·РјРµРЅРµРЅРёР№-');
   end;
 
-  func ПоследнийПолученныйНомер(Издание :РКП_Газеты.Газета) :РКП_Газеты.НомерГазеты;
+  func РџРѕСЃР»РµРґРЅРёР№РџРѕР»СѓС‡РµРЅРЅС‹Р№РќРѕРјРµСЂ(РР·РґР°РЅРёРµ :Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°) :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
     var aFlt :String[];
-    AddInArray( aFlt, 'Газета=' + Издание.DocIDStr );
-    AddInArray( aFlt, 'not НеПолучен' );
+    AddInArray( aFlt, 'Р“Р°Р·РµС‚Р°=' + РР·РґР°РЅРёРµ.DocIDStr );
+    AddInArray( aFlt, 'not РќРµРџРѕР»СѓС‡РµРЅ' );
     AddInArray( aFlt, 'isGroup=0' );
-    AddInArray( aFlt, 'not(СозданОЛГС and НеПолучен)' );
-    Return FindRecord(РКП_Газеты.НомерГазеты, MakeFilter(aFlt), 'ГодВыпуска-;СерияНумерации-;Номер-');
+    AddInArray( aFlt, 'not(РЎРѕР·РґР°РЅРћР›Р“РЎ and РќРµРџРѕР»СѓС‡РµРЅ)' );
+    Return FindRecord(Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹, MakeFilter(aFlt), 'Р“РѕРґР’С‹РїСѓСЃРєР°-;РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё-;РќРѕРјРµСЂ-');
   end;
 
-  func ПоследнийПолученныйНомерЗаГодВыпуска(Издание :РКП_Газеты.Газета; ГодВыпуска :Integer) :РКП_Газеты.НомерГазеты;
+  func РџРѕСЃР»РµРґРЅРёР№РџРѕР»СѓС‡РµРЅРЅС‹Р№РќРѕРјРµСЂР—Р°Р“РѕРґР’С‹РїСѓСЃРєР°(РР·РґР°РЅРёРµ :Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°; Р“РѕРґР’С‹РїСѓСЃРєР° :Integer) :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
     var aFlt :String[];
-    AddInArray( aFlt, 'Газета=' + Издание.DocIDStr );
-    AddInArray( aFlt, 'ГодВыпуска=' + Str(ГодВыпуска) );
-    AddInArray( aFlt, 'not НеПолучен' );
+    AddInArray( aFlt, 'Р“Р°Р·РµС‚Р°=' + РР·РґР°РЅРёРµ.DocIDStr );
+    AddInArray( aFlt, 'Р“РѕРґР’С‹РїСѓСЃРєР°=' + Str(Р“РѕРґР’С‹РїСѓСЃРєР°) );
+    AddInArray( aFlt, 'not РќРµРџРѕР»СѓС‡РµРЅ' );
     AddInArray( aFlt, 'isGroup=0' );
-    AddInArray( aFlt, 'not(СозданОЛГС and НеПолучен)' );
-    Return FindRecord(РКП_Газеты.НомерГазеты, MakeFilter(aFlt), 'СерияНумерации-;Номер-');
+    AddInArray( aFlt, 'not(РЎРѕР·РґР°РЅРћР›Р“РЎ and РќРµРџРѕР»СѓС‡РµРЅ)' );
+    Return FindRecord(Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹, MakeFilter(aFlt), 'РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё-;РќРѕРјРµСЂ-');
   end;
 
-  func ПервыйПолученныйНомер(Издание :РКП_Газеты.Газета) :РКП_Газеты.НомерГазеты;
+  func РџРµСЂРІС‹Р№РџРѕР»СѓС‡РµРЅРЅС‹Р№РќРѕРјРµСЂ(РР·РґР°РЅРёРµ :Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°) :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
     var aFlt :String[];
-    AddInArray( aFlt, 'Газета=' + Издание.DocIDStr );
-    AddInArray( aFlt, 'not НеПолучен' );
+    AddInArray( aFlt, 'Р“Р°Р·РµС‚Р°=' + РР·РґР°РЅРёРµ.DocIDStr );
+    AddInArray( aFlt, 'not РќРµРџРѕР»СѓС‡РµРЅ' );
     AddInArray( aFlt, 'isGroup=0' );
-    AddInArray( aFlt, 'not(СозданОЛГС and НеПолучен)' );
-    Return FindRecord(РКП_Газеты.НомерГазеты, MakeFilter(aFlt), 'ГодВыпуска;СерияНумерации;Номер');
+    AddInArray( aFlt, 'not(РЎРѕР·РґР°РЅРћР›Р“РЎ and РќРµРџРѕР»СѓС‡РµРЅ)' );
+    Return FindRecord(Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹, MakeFilter(aFlt), 'Р“РѕРґР’С‹РїСѓСЃРєР°;РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё;РќРѕРјРµСЂ');
   end;
 
-  func ПервыйВыпущенныйНомер(Издание :РКП_Газеты.Газета) :РКП_Газеты.НомерГазеты;
+  func РџРµСЂРІС‹Р№Р’С‹РїСѓС‰РµРЅРЅС‹Р№РќРѕРјРµСЂ(РР·РґР°РЅРёРµ :Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°) :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
     var aFlt :String[];
-    AddInArray( aFlt, 'Газета=' + Издание.DocIDStr );
+    AddInArray( aFlt, 'Р“Р°Р·РµС‚Р°=' + РР·РґР°РЅРёРµ.DocIDStr );
     AddInArray( aFlt, 'isGroup=0' );
-    AddInArray( aFlt, 'not(СозданОЛГС and НеПолучен)' );
-    Return FindRecord(РКП_Газеты.НомерГазеты, MakeFilter(aFlt), 'ГодВыпуска;СерияНумерации;Номер');
+    AddInArray( aFlt, 'not(РЎРѕР·РґР°РЅРћР›Р“РЎ and РќРµРџРѕР»СѓС‡РµРЅ)' );
+    Return FindRecord(Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹, MakeFilter(aFlt), 'Р“РѕРґР’С‹РїСѓСЃРєР°;РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё;РќРѕРјРµСЂ');
   end;
 
-  func ПоследнийВыпущенныйНомер(Издание :РКП_Газеты.Газета) :РКП_Газеты.НомерГазеты;
+  func РџРѕСЃР»РµРґРЅРёР№Р’С‹РїСѓС‰РµРЅРЅС‹Р№РќРѕРјРµСЂ(РР·РґР°РЅРёРµ :Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°) :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
     var aFlt :String[];
-    AddInArray( aFlt, 'Газета=' + Издание.DocIDStr );
+    AddInArray( aFlt, 'Р“Р°Р·РµС‚Р°=' + РР·РґР°РЅРёРµ.DocIDStr );
     AddInArray( aFlt, 'isGroup=0' );
-    AddInArray( aFlt, 'not(СозданОЛГС and НеПолучен)' );
-    Return FindRecord(РКП_Газеты.НомерГазеты, MakeFilter(aFlt), 'ГодВыпуска-;СерияНумерации-;Номер-');
+    AddInArray( aFlt, 'not(РЎРѕР·РґР°РЅРћР›Р“РЎ and РќРµРџРѕР»СѓС‡РµРЅ)' );
+    Return FindRecord(Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹, MakeFilter(aFlt), 'Р“РѕРґР’С‹РїСѓСЃРєР°-;РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё-;РќРѕРјРµСЂ-');
   end;
 
-  func НомерПрекращения(Издание :РКП_Газеты.Газета) :РКП_Газеты.НомерГазеты;
+  func РќРѕРјРµСЂРџСЂРµРєСЂР°С‰РµРЅРёСЏ(РР·РґР°РЅРёРµ :Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°) :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
     var aFlt :String[];
-    AddInArray( aFlt, 'Газета=' + Издание.DocIDStr );
+    AddInArray( aFlt, 'Р“Р°Р·РµС‚Р°=' + РР·РґР°РЅРёРµ.DocIDStr );
     AddInArray( aFlt, 'isGroup=0' );
-    AddInArray( aFlt, 'ПрекращениеИздания' );
-    AddInArray( aFlt, 'not(СозданОЛГС and НеПолучен)' );
-    Return FindRecord(РКП_Газеты.НомерГазеты, MakeFilter(aFlt), 'ГодВыпуска-;СерияНумерации-;Номер-');
+    AddInArray( aFlt, 'РџСЂРµРєСЂР°С‰РµРЅРёРµРР·РґР°РЅРёСЏ' );
+    AddInArray( aFlt, 'not(РЎРѕР·РґР°РЅРћР›Р“РЎ and РќРµРџРѕР»СѓС‡РµРЅ)' );
+    Return FindRecord(Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹, MakeFilter(aFlt), 'Р“РѕРґР’С‹РїСѓСЃРєР°-;РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё-;РќРѕРјРµСЂ-');
   end;
 
-  func ПринятоНомеровЗаСмену(Оператор :String; ДатаСмены :Date) :Integer;
+  func РџСЂРёРЅСЏС‚РѕРќРѕРјРµСЂРѕРІР—Р°РЎРјРµРЅСѓ(РћРїРµСЂР°С‚РѕСЂ :String; Р”Р°С‚Р°РЎРјРµРЅС‹ :Date) :Integer;
     var aFlt :String[];
-    AddInArray( aFlt, 'RClass="РКП_Газеты.НомерГазеты"' );
-    AddInArray( aFlt, 'CreateUser="' + Оператор + '"' );
-    AddInArray( aFlt, 'CreateDate>=' +  Str(ДатаСмены) );
-    AddInArray( aFlt, 'CreateDate<' +  Str(ДатаСмены + 1) );
+    AddInArray( aFlt, 'RClass="Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹"' );
+    AddInArray( aFlt, 'CreateUser="' + РћРїРµСЂР°С‚РѕСЂ + '"' );
+    AddInArray( aFlt, 'CreateDate>=' +  Str(Р”Р°С‚Р°РЎРјРµРЅС‹) );
+    AddInArray( aFlt, 'CreateDate<' +  Str(Р”Р°С‚Р°РЎРјРµРЅС‹ + 1) );
     AddInArray( aFlt, 'ActionType=' + Str(RI.intBase.wsAccepted) );
-    with Query.Create([РКП_СИС.ЛогРабот]) do
+    with Query.Create([Р РљРџ_РЎРРЎ.Р›РѕРіР Р°Р±РѕС‚]) do
       Filter = MakeFilter(aFlt);
       Return Count;
     end;
-    --AddInArray( aFlt, 'ФункцияГруппы=0' );
-    --AddInArray( aFlt, 'not НеПолучен' );
-    --AddInArray( aFlt, 'ПринялНаХранение="' + Оператор + '"' );
-    --AddInArray( aFlt, 'ДатаПринятияНаХранение>=' + Str(ДатаСмены) );
-    --AddInArray( aFlt, 'ДатаПринятияНаХранение<' + Str(ДатаСмены + 1) );
-    --with Query.Create([РКП_Газеты.НомерГазеты]) do
+    --AddInArray( aFlt, 'Р¤СѓРЅРєС†РёСЏР“СЂСѓРїРїС‹=0' );
+    --AddInArray( aFlt, 'not РќРµРџРѕР»СѓС‡РµРЅ' );
+    --AddInArray( aFlt, 'РџСЂРёРЅСЏР»РќР°РҐСЂР°РЅРµРЅРёРµ="' + РћРїРµСЂР°С‚РѕСЂ + '"' );
+    --AddInArray( aFlt, 'Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ>=' + Str(Р”Р°С‚Р°РЎРјРµРЅС‹) );
+    --AddInArray( aFlt, 'Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ<' + Str(Р”Р°С‚Р°РЎРјРµРЅС‹ + 1) );
+    --with Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹]) do
     --  Filter = MakeFilter(aFlt);
     --  Return Count;
     --end;
   end;
 
-  func ПринятоНомеровЗаПериод(Оператор :String; ДатаНачала :Date; ДатаОкончания :Date) :Integer; -- (включительно)
+  func РџСЂРёРЅСЏС‚РѕРќРѕРјРµСЂРѕРІР—Р°РџРµСЂРёРѕРґ(РћРїРµСЂР°С‚РѕСЂ :String; Р”Р°С‚Р°РќР°С‡Р°Р»Р° :Date; Р”Р°С‚Р°РћРєРѕРЅС‡Р°РЅРёСЏ :Date) :Integer; -- (РІРєР»СЋС‡РёС‚РµР»СЊРЅРѕ)
     var aFlt :String[];
-    AddInArray( aFlt, 'ФункцияГруппы=0' );
-    AddInArray( aFlt, 'not НеПолучен' );
-    AddInArray( aFlt, 'ПринялНаХранение="' + Оператор + '"' );
-    AddInArray( aFlt, 'ДатаПринятияНаХранение>=' + Str(ДатаНачала) );
-    AddInArray( aFlt, 'ДатаПринятияНаХранение<' + Str(ДатаОкончания + 1) );
-    with Query.Create([РКП_Газеты.НомерГазеты]) do
+    AddInArray( aFlt, 'Р¤СѓРЅРєС†РёСЏР“СЂСѓРїРїС‹=0' );
+    AddInArray( aFlt, 'not РќРµРџРѕР»СѓС‡РµРЅ' );
+    AddInArray( aFlt, 'РџСЂРёРЅСЏР»РќР°РҐСЂР°РЅРµРЅРёРµ="' + РћРїРµСЂР°С‚РѕСЂ + '"' );
+    AddInArray( aFlt, 'Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ>=' + Str(Р”Р°С‚Р°РќР°С‡Р°Р»Р°) );
+    AddInArray( aFlt, 'Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ<' + Str(Р”Р°С‚Р°РћРєРѕРЅС‡Р°РЅРёСЏ + 1) );
+    with Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹]) do
       Filter = MakeFilter(aFlt);
       Return Count;
     end;
   end;
 
-  func РедактированоНомеровЗаПериод(Оператор :String; ДатаНачала :Date; ДатаОкончания :Date) :Integer; -- (включительно)
+  func Р РµРґР°РєС‚РёСЂРѕРІР°РЅРѕРќРѕРјРµСЂРѕРІР—Р°РџРµСЂРёРѕРґ(РћРїРµСЂР°С‚РѕСЂ :String; Р”Р°С‚Р°РќР°С‡Р°Р»Р° :Date; Р”Р°С‚Р°РћРєРѕРЅС‡Р°РЅРёСЏ :Date) :Integer; -- (РІРєР»СЋС‡РёС‚РµР»СЊРЅРѕ)
     var aFlt :String[];
-    AddInArray( aFlt, 'ФункцияГруппы=0' );
-    AddInArray( aFlt, 'not НеПолучен' );
-    AddInArray( aFlt, 'UpdateUser="' + Оператор + '"' );
-    AddInArray( aFlt, 'UpdateDate>=' + Str(ДатаНачала) );
-    AddInArray( aFlt, 'UpdateDate<' + Str(ДатаОкончания + 1) );
-    with Query.Create([РКП_Газеты.НомерГазеты]) do
+    AddInArray( aFlt, 'Р¤СѓРЅРєС†РёСЏР“СЂСѓРїРїС‹=0' );
+    AddInArray( aFlt, 'not РќРµРџРѕР»СѓС‡РµРЅ' );
+    AddInArray( aFlt, 'UpdateUser="' + РћРїРµСЂР°С‚РѕСЂ + '"' );
+    AddInArray( aFlt, 'UpdateDate>=' + Str(Р”Р°С‚Р°РќР°С‡Р°Р»Р°) );
+    AddInArray( aFlt, 'UpdateDate<' + Str(Р”Р°С‚Р°РћРєРѕРЅС‡Р°РЅРёСЏ + 1) );
+    with Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹]) do
       Filter = MakeFilter(aFlt);
       Return Count;
     end;
   end;
 
-  func ПринятоНомеровВсегоЗаПериод(ДатаНачала, ДатаОкончания :Date) :Integer; -- (включительно)
+  func РџСЂРёРЅСЏС‚РѕРќРѕРјРµСЂРѕРІР’СЃРµРіРѕР—Р°РџРµСЂРёРѕРґ(Р”Р°С‚Р°РќР°С‡Р°Р»Р°, Р”Р°С‚Р°РћРєРѕРЅС‡Р°РЅРёСЏ :Date) :Integer; -- (РІРєР»СЋС‡РёС‚РµР»СЊРЅРѕ)
     var aFlt :String[];
-    AddInArray( aFlt, 'ФункцияГруппы=0' );
-    AddInArray( aFlt, 'Газета<>nil' );
-    AddInArray( aFlt, 'not НеПолучен' );
-    AddInArray( aFlt, 'ПринялНаХранение<>"Администратор"' );
-    AddInArray( aFlt, 'ДатаПринятияНаХранение>=' + Str(ДатаНачала) );
-    AddInArray( aFlt, 'ДатаПринятияНаХранение<' + Str(ДатаОкончания + 1) );
-    with Query.Create([РКП_Газеты.НомерГазеты]) do
+    AddInArray( aFlt, 'Р¤СѓРЅРєС†РёСЏР“СЂСѓРїРїС‹=0' );
+    AddInArray( aFlt, 'Р“Р°Р·РµС‚Р°<>nil' );
+    AddInArray( aFlt, 'not РќРµРџРѕР»СѓС‡РµРЅ' );
+    AddInArray( aFlt, 'РџСЂРёРЅСЏР»РќР°РҐСЂР°РЅРµРЅРёРµ<>"РђРґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂ"' );
+    AddInArray( aFlt, 'Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ>=' + Str(Р”Р°С‚Р°РќР°С‡Р°Р»Р°) );
+    AddInArray( aFlt, 'Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ<' + Str(Р”Р°С‚Р°РћРєРѕРЅС‡Р°РЅРёСЏ + 1) );
+    with Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹]) do
       Filter = MakeFilter(aFlt);
       Return Count;
     end;
   end;
 
-  func ПринятоГазетЗаСмену(Оператор :String; ДатаСмены :Date) :Integer;
+  func РџСЂРёРЅСЏС‚РѕР“Р°Р·РµС‚Р—Р°РЎРјРµРЅСѓ(РћРїРµСЂР°С‚РѕСЂ :String; Р”Р°С‚Р°РЎРјРµРЅС‹ :Date) :Integer;
     var aFlt :String[];
-    AddInArray( aFlt, 'CreateUser="' + Оператор + '"' );
-    AddInArray( aFlt, 'CreateDate>=' + Str(ДатаСмены) );
-    AddInArray( aFlt, 'CreateDate<' + Str(ДатаСмены + 1) );
-    AddInArray( aFlt, 'not ПризнакОтсылки' );
-    with Query.Create([РКП_Газеты.Газета]) do
+    AddInArray( aFlt, 'CreateUser="' + РћРїРµСЂР°С‚РѕСЂ + '"' );
+    AddInArray( aFlt, 'CreateDate>=' + Str(Р”Р°С‚Р°РЎРјРµРЅС‹) );
+    AddInArray( aFlt, 'CreateDate<' + Str(Р”Р°С‚Р°РЎРјРµРЅС‹ + 1) );
+    AddInArray( aFlt, 'not РџСЂРёР·РЅР°РєРћС‚СЃС‹Р»РєРё' );
+    with Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°]) do
       Filter = MakeFilter(aFlt);
       Return Count;
     end;
   end;
 
-  func ПринятоГазетЗаПериод(Оператор :String; ДатаНачала :Date; ДатаОкончания :Date) :Integer; -- (включительно)
+  func РџСЂРёРЅСЏС‚РѕР“Р°Р·РµС‚Р—Р°РџРµСЂРёРѕРґ(РћРїРµСЂР°С‚РѕСЂ :String; Р”Р°С‚Р°РќР°С‡Р°Р»Р° :Date; Р”Р°С‚Р°РћРєРѕРЅС‡Р°РЅРёСЏ :Date) :Integer; -- (РІРєР»СЋС‡РёС‚РµР»СЊРЅРѕ)
     var aFlt :String[];
-    AddInArray( aFlt, 'CreateUser="' + Оператор + '"' );
-    AddInArray( aFlt, 'CreateDate>=' + Str(ДатаНачала) );
-    AddInArray( aFlt, 'CreateDate<' + Str(ДатаОкончания + 1) );
-    AddInArray( aFlt, 'not ПризнакОтсылки' );
-    with Query.Create([РКП_Газеты.Газета]) do
+    AddInArray( aFlt, 'CreateUser="' + РћРїРµСЂР°С‚РѕСЂ + '"' );
+    AddInArray( aFlt, 'CreateDate>=' + Str(Р”Р°С‚Р°РќР°С‡Р°Р»Р°) );
+    AddInArray( aFlt, 'CreateDate<' + Str(Р”Р°С‚Р°РћРєРѕРЅС‡Р°РЅРёСЏ + 1) );
+    AddInArray( aFlt, 'not РџСЂРёР·РЅР°РєРћС‚СЃС‹Р»РєРё' );
+    with Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°]) do
       Filter = MakeFilter(aFlt);
       Return Count;
     end;
   end;
 
-  func РедактированоГазетЗаПериод(Оператор :String; ДатаНачала :Date; ДатаОкончания :Date) :Integer; -- (включительно)
+  func Р РµРґР°РєС‚РёСЂРѕРІР°РЅРѕР“Р°Р·РµС‚Р—Р°РџРµСЂРёРѕРґ(РћРїРµСЂР°С‚РѕСЂ :String; Р”Р°С‚Р°РќР°С‡Р°Р»Р° :Date; Р”Р°С‚Р°РћРєРѕРЅС‡Р°РЅРёСЏ :Date) :Integer; -- (РІРєР»СЋС‡РёС‚РµР»СЊРЅРѕ)
     var aFlt :String[];
-    AddInArray( aFlt, 'UpdateUser="' + Оператор + '"' );
-    AddInArray( aFlt, 'UpdateDate>=' + Str(ДатаНачала) );
-    AddInArray( aFlt, 'UpdateDate<' + Str(ДатаОкончания + 1) );
-    with Query.Create([РКП_Газеты.Газета]) do
+    AddInArray( aFlt, 'UpdateUser="' + РћРїРµСЂР°С‚РѕСЂ + '"' );
+    AddInArray( aFlt, 'UpdateDate>=' + Str(Р”Р°С‚Р°РќР°С‡Р°Р»Р°) );
+    AddInArray( aFlt, 'UpdateDate<' + Str(Р”Р°С‚Р°РћРєРѕРЅС‡Р°РЅРёСЏ + 1) );
+    with Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°]) do
       Filter = MakeFilter(aFlt);
       Return Count;
     end;
   end;
 
-  func ПринятоЕдХраненияЗаСмену(Оператор :String; ДатаСмены :Date) :Integer; -- (включительно)
+  func РџСЂРёРЅСЏС‚РѕР•РґРҐСЂР°РЅРµРЅРёСЏР—Р°РЎРјРµРЅСѓ(РћРїРµСЂР°С‚РѕСЂ :String; Р”Р°С‚Р°РЎРјРµРЅС‹ :Date) :Integer; -- (РІРєР»СЋС‡РёС‚РµР»СЊРЅРѕ)
     var aFlt :String[];
-    AddInArray( aFlt, 'RClass="РКП_Газеты.ЕдиницаХранения"' );
-    AddInArray( aFlt, 'CreateUser="' + Оператор + '"' );
-    AddInArray( aFlt, 'CreateDate>=' +  Str(ДатаСмены) );
-    AddInArray( aFlt, 'CreateDate<' +  Str(ДатаСмены + 1) );
+    AddInArray( aFlt, 'RClass="Р РљРџ_Р“Р°Р·РµС‚С‹.Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ"' );
+    AddInArray( aFlt, 'CreateUser="' + РћРїРµСЂР°С‚РѕСЂ + '"' );
+    AddInArray( aFlt, 'CreateDate>=' +  Str(Р”Р°С‚Р°РЎРјРµРЅС‹) );
+    AddInArray( aFlt, 'CreateDate<' +  Str(Р”Р°С‚Р°РЎРјРµРЅС‹ + 1) );
     AddInArray( aFlt, 'ActionType=' + Str(RI.intBase.wsRecCreated) );
-    with Query.Create([РКП_СИС.ЛогРабот]) do
+    with Query.Create([Р РљРџ_РЎРРЎ.Р›РѕРіР Р°Р±РѕС‚]) do
       Filter = MakeFilter(aFlt);
       Return CalcAggregates('Sum(StoredValI)') as Integer;
     end;
 --    var aFlt :String[];
---    AddInArray( aFlt, 'CreateUser="' + Оператор + '"' );
---    AddInArray( aFlt, 'CreateDate>=' + Str(ДатаНачала) );
---    AddInArray( aFlt, 'CreateDate<' + Str(ДатаОкончания + 1) );
---    with Query.Create([РКП_Газеты.ЕдиницаХранения]) do
+--    AddInArray( aFlt, 'CreateUser="' + РћРїРµСЂР°С‚РѕСЂ + '"' );
+--    AddInArray( aFlt, 'CreateDate>=' + Str(Р”Р°С‚Р°РќР°С‡Р°Р»Р°) );
+--    AddInArray( aFlt, 'CreateDate<' + Str(Р”Р°С‚Р°РћРєРѕРЅС‡Р°РЅРёСЏ + 1) );
+--    with Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ]) do
 --      Filter = MakeFilter(aFlt);
 --      Return Count;
 --    end;
   end;
 
 
-  func ПринятоЕдХраненияЗаПериод(Оператор :String; ДатаНачала :Date; ДатаОкончания :Date) :Integer; -- (включительно)
+  func РџСЂРёРЅСЏС‚РѕР•РґРҐСЂР°РЅРµРЅРёСЏР—Р°РџРµСЂРёРѕРґ(РћРїРµСЂР°С‚РѕСЂ :String; Р”Р°С‚Р°РќР°С‡Р°Р»Р° :Date; Р”Р°С‚Р°РћРєРѕРЅС‡Р°РЅРёСЏ :Date) :Integer; -- (РІРєР»СЋС‡РёС‚РµР»СЊРЅРѕ)
     var aFlt :String[];
-    AddInArray( aFlt, 'CreateUser="' + Оператор + '"' );
-    AddInArray( aFlt, 'CreateDate>=' + Str(ДатаНачала) );
-    AddInArray( aFlt, 'CreateDate<' + Str(ДатаОкончания + 1) );
-    with Query.Create([РКП_Газеты.ЕдиницаХранения]) do
+    AddInArray( aFlt, 'CreateUser="' + РћРїРµСЂР°С‚РѕСЂ + '"' );
+    AddInArray( aFlt, 'CreateDate>=' + Str(Р”Р°С‚Р°РќР°С‡Р°Р»Р°) );
+    AddInArray( aFlt, 'CreateDate<' + Str(Р”Р°С‚Р°РћРєРѕРЅС‡Р°РЅРёСЏ + 1) );
+    with Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ]) do
       Filter = MakeFilter(aFlt);
       Return Count;
     end;
   end;
 
 
-  func РедактированоЕдХраненияЗаПериод(Оператор :String; ДатаНачала :Date; ДатаОкончания :Date) :Integer; -- (включительно)
+  func Р РµРґР°РєС‚РёСЂРѕРІР°РЅРѕР•РґРҐСЂР°РЅРµРЅРёСЏР—Р°РџРµСЂРёРѕРґ(РћРїРµСЂР°С‚РѕСЂ :String; Р”Р°С‚Р°РќР°С‡Р°Р»Р° :Date; Р”Р°С‚Р°РћРєРѕРЅС‡Р°РЅРёСЏ :Date) :Integer; -- (РІРєР»СЋС‡РёС‚РµР»СЊРЅРѕ)
     var aFlt :String[];
-    AddInArray( aFlt, 'UpdateUser="' + Оператор + '"' );
-    AddInArray( aFlt, 'UpdateDate>=' + Str(ДатаНачала) );
-    AddInArray( aFlt, 'UpdateDate<' + Str(ДатаОкончания + 1) );
-    AddInArray( aFlt, 'CreateDate<' + Str(ДатаНачала) );
-    with Query.Create([РКП_Газеты.ЕдиницаХранения]) do
+    AddInArray( aFlt, 'UpdateUser="' + РћРїРµСЂР°С‚РѕСЂ + '"' );
+    AddInArray( aFlt, 'UpdateDate>=' + Str(Р”Р°С‚Р°РќР°С‡Р°Р»Р°) );
+    AddInArray( aFlt, 'UpdateDate<' + Str(Р”Р°С‚Р°РћРєРѕРЅС‡Р°РЅРёСЏ + 1) );
+    AddInArray( aFlt, 'CreateDate<' + Str(Р”Р°С‚Р°РќР°С‡Р°Р»Р°) );
+    with Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ]) do
       Filter = MakeFilter(aFlt);
       Return Count;
     end;

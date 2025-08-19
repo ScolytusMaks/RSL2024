@@ -1,407 +1,407 @@
-Class inherited СИС2.БазовыйБланк "Библиографическая справка" ;
+п»їClass inherited РЎРРЎ2.Р‘Р°Р·РѕРІС‹Р№Р‘Р»Р°РЅРє "Р‘РёР±Р»РёРѕРіСЂР°С„РёС‡РµСЃРєР°СЏ СЃРїСЂР°РІРєР°" ;
 
 InClass Private
-  Фл_ПРЕКР:logical;             ШР_ПРЕКР:integer;
-  Фл_N_ГОСРЕГ:logical;          ШР_N_ГОСРЕГ:integer;
-  Фл_ISSN:logical;              ШР_ISSN:integer;
-  Фл_НАЗВ:logical;              ШР_НАЗВ:integer;
-  Фл_НАЗВ_ИН:logical;           ШР_НАЗВ_ИН:integer;
-  Фл_НАЗВ_НАЦ:logical;          ШР_НАЗВ_НАЦ:integer;
-  Фл_ПОДЗАГ:logical;            ШР_ПОДЗАГ:integer;
-  Фл_ТГ:logical;                ШР_ТГ:integer;
-  Фл_ГЕО:logical;               ШР_ГЕО:integer;
-  Фл_РЕД:logical;               ШР_РЕД:integer;
-  Фл_ТФ:logical;                ШР_ТФ:integer;
-  Фл_EMAIL:logical;             ШР_EMAIL:integer;
-  Фл_ТИ:logical;                ШР_ТИ:integer;
-  Фл_ТЕМ:logical;               ШР_ТЕМ:integer;
-  Фл_ЯЗ:logical;                ШР_ЯЗ:integer;
-  Фл_ЖАНР:logical;              ШР_ЖАНР:integer;
-  Фл_УЧР:logical;               ШР_УЧР:integer;
-  Фл_Дата1:logical;             ШР_Дата1:integer;
-  Фл_РЕДАКТОР:logical;          ШР_РЕДАКТОР:integer;
-  Фл_ГОД_РЕГ:logical;           ШР_ГОД_РЕГ:integer;
-  Фл_ПЕРИОДИЧН:logical;         ШР_ПЕРИОДИЧН:integer;
-  Фл_СР_РАЗ_ТИРАЖ:logical;      ШР_СР_РАЗ_ТИРАЖ:integer;
-  Фл_ЛППИ:logical;              ШР_ЛППИ:integer;
-  Фл_ПослНом:logical;           ШР_ПослНом:integer;
+  Р¤Р»_РџР Р•РљР :logical;             РЁР _РџР Р•РљР :integer;
+  Р¤Р»_N_Р“РћРЎР Р•Р“:logical;          РЁР _N_Р“РћРЎР Р•Р“:integer;
+  Р¤Р»_ISSN:logical;              РЁР _ISSN:integer;
+  Р¤Р»_РќРђР—Р’:logical;              РЁР _РќРђР—Р’:integer;
+  Р¤Р»_РќРђР—Р’_РРќ:logical;           РЁР _РќРђР—Р’_РРќ:integer;
+  Р¤Р»_РќРђР—Р’_РќРђР¦:logical;          РЁР _РќРђР—Р’_РќРђР¦:integer;
+  Р¤Р»_РџРћР”Р—РђР“:logical;            РЁР _РџРћР”Р—РђР“:integer;
+  Р¤Р»_РўР“:logical;                РЁР _РўР“:integer;
+  Р¤Р»_Р“Р•Рћ:logical;               РЁР _Р“Р•Рћ:integer;
+  Р¤Р»_Р Р•Р”:logical;               РЁР _Р Р•Р”:integer;
+  Р¤Р»_РўР¤:logical;                РЁР _РўР¤:integer;
+  Р¤Р»_EMAIL:logical;             РЁР _EMAIL:integer;
+  Р¤Р»_РўР:logical;                РЁР _РўР:integer;
+  Р¤Р»_РўР•Рњ:logical;               РЁР _РўР•Рњ:integer;
+  Р¤Р»_РЇР—:logical;                РЁР _РЇР—:integer;
+  Р¤Р»_Р–РђРќР :logical;              РЁР _Р–РђРќР :integer;
+  Р¤Р»_РЈР§Р :logical;               РЁР _РЈР§Р :integer;
+  Р¤Р»_Р”Р°С‚Р°1:logical;             РЁР _Р”Р°С‚Р°1:integer;
+  Р¤Р»_Р Р•Р”РђРљРўРћР :logical;          РЁР _Р Р•Р”РђРљРўРћР :integer;
+  Р¤Р»_Р“РћР”_Р Р•Р“:logical;           РЁР _Р“РћР”_Р Р•Р“:integer;
+  Р¤Р»_РџР•Р РРћР”РР§Рќ:logical;         РЁР _РџР•Р РРћР”РР§Рќ:integer;
+  Р¤Р»_РЎР _Р РђР—_РўРР РђР–:logical;      РЁР _РЎР _Р РђР—_РўРР РђР–:integer;
+  Р¤Р»_Р›РџРџР:logical;              РЁР _Р›РџРџР:integer;
+  Р¤Р»_РџРѕСЃР»РќРѕРј:logical;           РЁР _РџРѕСЃР»РќРѕРј:integer;
 
 InObject Private
-  фреймУсловияОтбора            : TemplateFrame;
-  фреймНастройкаСтолбцов        : TemplateFrame;
-  фреймРезультат                : TemplateFrame;
-  секцУсловияОтбора             : Section;
-  СекцШапкаСПР                  : Section;
-  СекцТелоСПР                   : Section;
-  кнНастройка                   : Button;
+  С„СЂРµР№РјРЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°            : TemplateFrame;
+  С„СЂРµР№РјРќР°СЃС‚СЂРѕР№РєР°РЎС‚РѕР»Р±С†РѕРІ        : TemplateFrame;
+  С„СЂРµР№РјР РµР·СѓР»СЊС‚Р°С‚                : TemplateFrame;
+  СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°             : Section;
+  РЎРµРєС†РЁР°РїРєР°РЎРџР                   : Section;
+  РЎРµРєС†РўРµР»РѕРЎРџР                    : Section;
+  РєРЅРќР°СЃС‚СЂРѕР№РєР°                   : Button;
 
-  ПоказатьНастройку             : logical;
-  МестоИздания                  : Record;
-  ТипИздания                    : Integer;
-  Периодичность                 : String;
-  ТерриторияРаспространения     : Record;
-  Тематика                      : Record;
-  ЧАЦН                          : Record;
-  Язык                          : Record;
-  ГодНачалаИздания              : Integer;
-  ГодЛППИ                       : Integer;
-  ГодВыпуска                    : Integer;
+  РџРѕРєР°Р·Р°С‚СЊРќР°СЃС‚СЂРѕР№РєСѓ             : logical;
+  РњРµСЃС‚РѕРР·РґР°РЅРёСЏ                  : Record;
+  РўРёРїРР·РґР°РЅРёСЏ                    : Integer;
+  РџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ                 : String;
+  РўРµСЂСЂРёС‚РѕСЂРёСЏР Р°СЃРїСЂРѕСЃС‚СЂР°РЅРµРЅРёСЏ     : Record;
+  РўРµРјР°С‚РёРєР°                      : Record;
+  Р§РђР¦Рќ                          : Record;
+  РЇР·С‹Рє                          : Record;
+  Р“РѕРґРќР°С‡Р°Р»Р°РР·РґР°РЅРёСЏ              : Integer;
+  Р“РѕРґР›РџРџР                       : Integer;
+  Р“РѕРґР’С‹РїСѓСЃРєР°                    : Integer;
 
 
   NNN                         []: integer;
-  ПРЕКР                       []: logical;
-  N_ГОСРЕГ                    []: string;
+  РџР Р•РљР                        []: logical;
+  N_Р“РћРЎР Р•Р“                    []: string;
   ISSN                        []: string;
-  НАЗВ                        []: string;
-  НАЗВ_ИН                     []: string;
-  НАЗВ_НАЦ                    []: string;
-  ПОДЗАГ                      []: string;
-  ТГ                          []: record;
-  ГЕО                         []: record;
-  РЕД                         []: record;
-  ТФ                          []: string;
+  РќРђР—Р’                        []: string;
+  РќРђР—Р’_РРќ                     []: string;
+  РќРђР—Р’_РќРђР¦                    []: string;
+  РџРћР”Р—РђР“                      []: string;
+  РўР“                          []: record;
+  Р“Р•Рћ                         []: record;
+  Р Р•Р”                         []: record;
+  РўР¤                          []: string;
   EMAIL                       []: string;
-  ТИ                          []: integer;
-  ТЕМ                         []: record;
-  ЯЗ                          []: record;
-  ЖАНР                        []: record;
-  УЧР                         []: string;
-  Дата1                       []: string;
-  РЕДАКТОР_ГАЗЕТЫ             []: string;
-  ГОД_РЕГ                     []: integer;
-  Периодичность_Газеты        []: string;
-  СР_РАЗ_ТИРАЖ                []: numeric;
-  ЛППИ                        []: string;
-  ПослНом                     []: string;
-  --Газета                      []: variant;
-  Газета                      []: record;
-  --Газета                      []: integer;
+  РўР                          []: integer;
+  РўР•Рњ                         []: record;
+  РЇР—                          []: record;
+  Р–РђРќР                         []: record;
+  РЈР§Р                          []: string;
+  Р”Р°С‚Р°1                       []: string;
+  Р Р•Р”РђРљРўРћР _Р“РђР—Р•РўР«             []: string;
+  Р“РћР”_Р Р•Р“                     []: integer;
+  РџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ_Р“Р°Р·РµС‚С‹        []: string;
+  РЎР _Р РђР—_РўРР РђР–                []: numeric;
+  Р›РџРџР                        []: string;
+  РџРѕСЃР»РќРѕРј                     []: string;
+  --Р“Р°Р·РµС‚Р°                      []: variant;
+  Р“Р°Р·РµС‚Р°                      []: record;
+  --Р“Р°Р·РµС‚Р°                      []: integer;
 --------------------------------------------------------------------------------
-  proc ВидСекцииУсловияотбора;
-    секцУсловияОтбора.Row[1].Visible    = true;
-    секцУсловияОтбора.Row[2].Visible    = true;
-    секцУсловияОтбора.Row[3].Visible    = true;
-    секцУсловияОтбора.Row[4].Visible    = true;
-    секцУсловияОтбора.Row[5].Visible    = true;
-    секцУсловияОтбора.Row[6].Visible    = true;
-    секцУсловияОтбора.Row[7].Visible    = true;
-    секцУсловияОтбора.Row[8].Visible    = true;
-    секцУсловияОтбора.Row[9].Visible    = true;
-    секцУсловияОтбора.Row[10].Visible   = true;
-    секцУсловияОтбора.Row[11].Visible   = true;
-    секцУсловияОтбора.Row[12].Visible   = true;
-    if МестоИздания                     = nil   then
-      секцУсловияОтбора.Row[1].Visible          = false;
+  proc Р’РёРґРЎРµРєС†РёРёРЈСЃР»РѕРІРёСЏРѕС‚Р±РѕСЂР°;
+    СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[1].Visible    = true;
+    СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[2].Visible    = true;
+    СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[3].Visible    = true;
+    СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[4].Visible    = true;
+    СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[5].Visible    = true;
+    СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[6].Visible    = true;
+    СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[7].Visible    = true;
+    СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[8].Visible    = true;
+    СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[9].Visible    = true;
+    СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[10].Visible   = true;
+    СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[11].Visible   = true;
+    СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[12].Visible   = true;
+    if РњРµСЃС‚РѕРР·РґР°РЅРёСЏ                     = nil   then
+      СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[1].Visible          = false;
     end;
-    if ТипИздания                       = nil   then
-      секцУсловияОтбора.Row[2].Visible          = false;
+    if РўРёРїРР·РґР°РЅРёСЏ                       = nil   then
+      СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[2].Visible          = false;
     end;
-    if Периодичность                    = nil   or
-       Периодичность                    = "Все" then
-      секцУсловияОтбора.Row[3].Visible          = false;
+    if РџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ                    = nil   or
+       РџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ                    = "Р’СЃРµ" then
+      СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[3].Visible          = false;
     end;
-    if ТерриторияРаспространения        = nil   then
-      секцУсловияОтбора.Row[4].Visible          = false;
-      секцУсловияОтбора.Row[5].Visible          = false;
+    if РўРµСЂСЂРёС‚РѕСЂРёСЏР Р°СЃРїСЂРѕСЃС‚СЂР°РЅРµРЅРёСЏ        = nil   then
+      СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[4].Visible          = false;
+      СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[5].Visible          = false;
     end;
-    if Тематика                         = nil   then
-      секцУсловияОтбора.Row[6].Visible          = false;
+    if РўРµРјР°С‚РёРєР°                         = nil   then
+      СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[6].Visible          = false;
     end;
-    if ЧАЦН                             = nil   then
-      секцУсловияОтбора.Row[7].Visible          = false;
-      секцУсловияОтбора.Row[8].Visible          = false;
+    if Р§РђР¦Рќ                             = nil   then
+      СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[7].Visible          = false;
+      СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[8].Visible          = false;
     end;
-    if Язык                             = nil   then
-      секцУсловияОтбора.Row[9].Visible          = false;
+    if РЇР·С‹Рє                             = nil   then
+      СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[9].Visible          = false;
     end;
-    if ГодНачалаИздания                 = nil   then
-      секцУсловияОтбора.Row[10].Visible         = false;
+    if Р“РѕРґРќР°С‡Р°Р»Р°РР·РґР°РЅРёСЏ                 = nil   then
+      СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[10].Visible         = false;
     end;
-    if ГодЛППИ                          = nil   then
-      секцУсловияОтбора.Row[11].Visible         = false;
+    if Р“РѕРґР›РџРџР                          = nil   then
+      СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[11].Visible         = false;
     end;
-    if ГодВыпуска                       = nil   then
-      секцУсловияОтбора.Row[12].Visible         = false;
+    if Р“РѕРґР’С‹РїСѓСЃРєР°                       = nil   then
+      СЃРµРєС†РЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Row[12].Visible         = false;
     end;
   end;
 
-  Proc ОформитьОтчет;
-    if Фл_ПРЕКР:    СекцШапкаСПР.Column[2].Visible = True;  СекцТелоСПР.Column[2].Visible = True;         СекцШапкаСПР.Column[2].Width = ШР_ПРЕКР*1;           СекцТелоСПР.Column[2].Width = ШР_ПРЕКР*1;
-    else            СекцШапкаСПР.Column[2].Visible = False; СекцТелоСПР.Column[2].Visible = False;        СекцШапкаСПР.Column[2].Width = 0;                     СекцТелоСПР.Column[2].Width = 0;
+  Proc РћС„РѕСЂРјРёС‚СЊРћС‚С‡РµС‚;
+    if Р¤Р»_РџР Р•РљР :    РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[2].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[2].Visible = True;         РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[2].Width = РЁР _РџР Р•РљР *1;           РЎРµРєС†РўРµР»РѕРЎРџР .Column[2].Width = РЁР _РџР Р•РљР *1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[2].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[2].Visible = False;        РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[2].Width = 0;                     РЎРµРєС†РўРµР»РѕРЎРџР .Column[2].Width = 0;
     end;
-    if Фл_N_ГОСРЕГ: СекцШапкаСПР.Column[3].Visible = True;  СекцТелоСПР.Column[3].Visible = True;         СекцШапкаСПР.Column[3].Width = ШР_N_ГОСРЕГ*1;        СекцТелоСПР.Column[3].Width = ШР_N_ГОСРЕГ*1;
-    else            СекцШапкаСПР.Column[3].Visible = False; СекцТелоСПР.Column[3].Visible = False;        СекцШапкаСПР.Column[3].Width = 0;                     СекцТелоСПР.Column[3].Width = 0;
+    if Р¤Р»_N_Р“РћРЎР Р•Р“: РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[3].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[3].Visible = True;         РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[3].Width = РЁР _N_Р“РћРЎР Р•Р“*1;        РЎРµРєС†РўРµР»РѕРЎРџР .Column[3].Width = РЁР _N_Р“РћРЎР Р•Р“*1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[3].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[3].Visible = False;        РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[3].Width = 0;                     РЎРµРєС†РўРµР»РѕРЎРџР .Column[3].Width = 0;
     end;
-    if Фл_ISSN:     СекцШапкаСПР.Column[4].Visible = True;  СекцТелоСПР.Column[4].Visible = True;         СекцШапкаСПР.Column[4].Width = ШР_ISSN*1;            СекцТелоСПР.Column[4].Width = ШР_ISSN*1;
-    else            СекцШапкаСПР.Column[4].Visible = False; СекцТелоСПР.Column[4].Visible = False;        СекцШапкаСПР.Column[4].Width = 0;                     СекцТелоСПР.Column[4].Width = 0;
+    if Р¤Р»_ISSN:     РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[4].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[4].Visible = True;         РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[4].Width = РЁР _ISSN*1;            РЎРµРєС†РўРµР»РѕРЎРџР .Column[4].Width = РЁР _ISSN*1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[4].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[4].Visible = False;        РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[4].Width = 0;                     РЎРµРєС†РўРµР»РѕРЎРџР .Column[4].Width = 0;
     end;
-    if Фл_НАЗВ:     СекцШапкаСПР.Column[5].Visible = True;  СекцТелоСПР.Column[5].Visible = True;         СекцШапкаСПР.Column[5].Width = ШР_НАЗВ*1;            СекцТелоСПР.Column[5].Width = ШР_НАЗВ*1;
-    else            СекцШапкаСПР.Column[5].Visible = False; СекцТелоСПР.Column[5].Visible = False;        СекцШапкаСПР.Column[5].Width = 0;                     СекцТелоСПР.Column[5].Width = 0;
+    if Р¤Р»_РќРђР—Р’:     РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[5].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[5].Visible = True;         РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[5].Width = РЁР _РќРђР—Р’*1;            РЎРµРєС†РўРµР»РѕРЎРџР .Column[5].Width = РЁР _РќРђР—Р’*1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[5].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[5].Visible = False;        РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[5].Width = 0;                     РЎРµРєС†РўРµР»РѕРЎРџР .Column[5].Width = 0;
     end;
-    if Фл_НАЗВ_ИН:  СекцШапкаСПР.Column[6].Visible = True;  СекцТелоСПР.Column[6].Visible = True;         СекцШапкаСПР.Column[6].Width = ШР_НАЗВ_ИН*1;         СекцТелоСПР.Column[6].Width = ШР_НАЗВ_ИН*1;
-    else            СекцШапкаСПР.Column[6].Visible = False; СекцТелоСПР.Column[6].Visible = False;        СекцШапкаСПР.Column[6].Width = 0;                     СекцТелоСПР.Column[6].Width = 0;
+    if Р¤Р»_РќРђР—Р’_РРќ:  РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[6].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[6].Visible = True;         РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[6].Width = РЁР _РќРђР—Р’_РРќ*1;         РЎРµРєС†РўРµР»РѕРЎРџР .Column[6].Width = РЁР _РќРђР—Р’_РРќ*1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[6].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[6].Visible = False;        РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[6].Width = 0;                     РЎРµРєС†РўРµР»РѕРЎРџР .Column[6].Width = 0;
     end;
-    if Фл_НАЗВ_НАЦ: СекцШапкаСПР.Column[7].Visible = True;  СекцТелоСПР.Column[7].Visible = True;         СекцШапкаСПР.Column[7].Width = ШР_НАЗВ_НАЦ*1;        СекцТелоСПР.Column[7].Width = ШР_НАЗВ_НАЦ*1;
-    else            СекцШапкаСПР.Column[7].Visible = False; СекцТелоСПР.Column[7].Visible = False;        СекцШапкаСПР.Column[7].Width = 0;                     СекцТелоСПР.Column[7].Width = 0;
+    if Р¤Р»_РќРђР—Р’_РќРђР¦: РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[7].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[7].Visible = True;         РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[7].Width = РЁР _РќРђР—Р’_РќРђР¦*1;        РЎРµРєС†РўРµР»РѕРЎРџР .Column[7].Width = РЁР _РќРђР—Р’_РќРђР¦*1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[7].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[7].Visible = False;        РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[7].Width = 0;                     РЎРµРєС†РўРµР»РѕРЎРџР .Column[7].Width = 0;
     end;
-    if Фл_ПОДЗАГ:   СекцШапкаСПР.Column[8].Visible = True;  СекцТелоСПР.Column[8].Visible = True;         СекцШапкаСПР.Column[8].Width = ШР_НАЗВ_НАЦ*1;        СекцТелоСПР.Column[8].Width = ШР_НАЗВ_НАЦ*1;
-    else            СекцШапкаСПР.Column[8].Visible = False; СекцТелоСПР.Column[8].Visible = False;        СекцШапкаСПР.Column[8].Width = 0;                     СекцТелоСПР.Column[8].Width = 0;
+    if Р¤Р»_РџРћР”Р—РђР“:   РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[8].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[8].Visible = True;         РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[8].Width = РЁР _РќРђР—Р’_РќРђР¦*1;        РЎРµРєС†РўРµР»РѕРЎРџР .Column[8].Width = РЁР _РќРђР—Р’_РќРђР¦*1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[8].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[8].Visible = False;        РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[8].Width = 0;                     РЎРµРєС†РўРµР»РѕРЎРџР .Column[8].Width = 0;
     end;
-    if Фл_ТГ:       СекцШапкаСПР.Column[9].Visible = True;  СекцТелоСПР.Column[9].Visible = True;         СекцШапкаСПР.Column[9].Width = ШР_ТГ*1;              СекцТелоСПР.Column[9].Width = ШР_ТГ*1;
-    else            СекцШапкаСПР.Column[9].Visible = False; СекцТелоСПР.Column[9].Visible = False;        СекцШапкаСПР.Column[9].Width = 0;                     СекцТелоСПР.Column[9].Width = 0;
+    if Р¤Р»_РўР“:       РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[9].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[9].Visible = True;         РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[9].Width = РЁР _РўР“*1;              РЎРµРєС†РўРµР»РѕРЎРџР .Column[9].Width = РЁР _РўР“*1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[9].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[9].Visible = False;        РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[9].Width = 0;                     РЎРµРєС†РўРµР»РѕРЎРџР .Column[9].Width = 0;
     end;
-    if Фл_ГЕО:      СекцШапкаСПР.Column[10].Visible = True;  СекцТелоСПР.Column[10].Visible = True;       СекцШапкаСПР.Column[10].Width = ШР_ГЕО*1;            СекцТелоСПР.Column[10].Width = ШР_ГЕО*1;
-    else            СекцШапкаСПР.Column[10].Visible = False; СекцТелоСПР.Column[10].Visible = False;      СекцШапкаСПР.Column[10].Width = 0;                    СекцТелоСПР.Column[10].Width = 0;
+    if Р¤Р»_Р“Р•Рћ:      РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[10].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[10].Visible = True;       РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[10].Width = РЁР _Р“Р•Рћ*1;            РЎРµРєС†РўРµР»РѕРЎРџР .Column[10].Width = РЁР _Р“Р•Рћ*1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[10].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[10].Visible = False;      РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[10].Width = 0;                    РЎРµРєС†РўРµР»РѕРЎРџР .Column[10].Width = 0;
     end;
-    if Фл_РЕД:      СекцШапкаСПР.Column[11].Visible = True;  СекцТелоСПР.Column[11].Visible = True;       СекцШапкаСПР.Column[11].Width = ШР_РЕД*1;            СекцТелоСПР.Column[11].Width = ШР_РЕД*1;
-    else            СекцШапкаСПР.Column[11].Visible = False; СекцТелоСПР.Column[11].Visible = False;      СекцШапкаСПР.Column[11].Width = 0;                    СекцТелоСПР.Column[11].Width = 0;
+    if Р¤Р»_Р Р•Р”:      РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[11].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[11].Visible = True;       РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[11].Width = РЁР _Р Р•Р”*1;            РЎРµРєС†РўРµР»РѕРЎРџР .Column[11].Width = РЁР _Р Р•Р”*1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[11].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[11].Visible = False;      РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[11].Width = 0;                    РЎРµРєС†РўРµР»РѕРЎРџР .Column[11].Width = 0;
     end;
-    if Фл_ТФ:       СекцШапкаСПР.Column[12].Visible = True;  СекцТелоСПР.Column[12].Visible = True;       СекцШапкаСПР.Column[12].Width = ШР_ТФ*1;             СекцТелоСПР.Column[12].Width = ШР_ТФ*1;
-    else            СекцШапкаСПР.Column[12].Visible = False; СекцТелоСПР.Column[12].Visible = False;      СекцШапкаСПР.Column[12].Width = 0;                    СекцТелоСПР.Column[12].Width = 0;
+    if Р¤Р»_РўР¤:       РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[12].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[12].Visible = True;       РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[12].Width = РЁР _РўР¤*1;             РЎРµРєС†РўРµР»РѕРЎРџР .Column[12].Width = РЁР _РўР¤*1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[12].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[12].Visible = False;      РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[12].Width = 0;                    РЎРµРєС†РўРµР»РѕРЎРџР .Column[12].Width = 0;
     end;
-    if Фл_EMAIL:    СекцШапкаСПР.Column[13].Visible = True;  СекцТелоСПР.Column[13].Visible = True;       СекцШапкаСПР.Column[13].Width = ШР_EMAIL*1;          СекцТелоСПР.Column[13].Width = ШР_EMAIL*1;
-    else            СекцШапкаСПР.Column[13].Visible = False; СекцТелоСПР.Column[13].Visible = False;      СекцШапкаСПР.Column[13].Width = 0;                    СекцТелоСПР.Column[13].Width = 0;
+    if Р¤Р»_EMAIL:    РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[13].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[13].Visible = True;       РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[13].Width = РЁР _EMAIL*1;          РЎРµРєС†РўРµР»РѕРЎРџР .Column[13].Width = РЁР _EMAIL*1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[13].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[13].Visible = False;      РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[13].Width = 0;                    РЎРµРєС†РўРµР»РѕРЎРџР .Column[13].Width = 0;
     end;
-    if Фл_ТИ:       СекцШапкаСПР.Column[14].Visible = True;  СекцТелоСПР.Column[14].Visible = True;       СекцШапкаСПР.Column[14].Width = ШР_ТИ*1;             СекцТелоСПР.Column[14].Width = ШР_ТИ*1;
-    else            СекцШапкаСПР.Column[14].Visible = False; СекцТелоСПР.Column[14].Visible = False;      СекцШапкаСПР.Column[14].Width = 0;                    СекцТелоСПР.Column[14].Width = 0;
+    if Р¤Р»_РўР:       РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[14].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[14].Visible = True;       РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[14].Width = РЁР _РўР*1;             РЎРµРєС†РўРµР»РѕРЎРџР .Column[14].Width = РЁР _РўР*1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[14].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[14].Visible = False;      РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[14].Width = 0;                    РЎРµРєС†РўРµР»РѕРЎРџР .Column[14].Width = 0;
     end;
-    if Фл_ТЕМ:      СекцШапкаСПР.Column[15].Visible = True;  СекцТелоСПР.Column[15].Visible = True;       СекцШапкаСПР.Column[15].Width = ШР_ТЕМ*1;            СекцТелоСПР.Column[15].Width = ШР_ТЕМ*1;
-    else            СекцШапкаСПР.Column[15].Visible = False; СекцТелоСПР.Column[15].Visible = False;      СекцШапкаСПР.Column[15].Width = 0;                    СекцТелоСПР.Column[15].Width = 0;
+    if Р¤Р»_РўР•Рњ:      РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[15].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[15].Visible = True;       РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[15].Width = РЁР _РўР•Рњ*1;            РЎРµРєС†РўРµР»РѕРЎРџР .Column[15].Width = РЁР _РўР•Рњ*1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[15].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[15].Visible = False;      РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[15].Width = 0;                    РЎРµРєС†РўРµР»РѕРЎРџР .Column[15].Width = 0;
     end;
-    if Фл_ЯЗ:       СекцШапкаСПР.Column[16].Visible = True;  СекцТелоСПР.Column[16].Visible = True;       СекцШапкаСПР.Column[16].Width = ШР_ЯЗ*1;             СекцТелоСПР.Column[16].Width = ШР_ЯЗ*1;
-    else            СекцШапкаСПР.Column[16].Visible = False; СекцТелоСПР.Column[16].Visible = False;      СекцШапкаСПР.Column[16].Width = 0;                    СекцТелоСПР.Column[16].Width = 0;
+    if Р¤Р»_РЇР—:       РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[16].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[16].Visible = True;       РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[16].Width = РЁР _РЇР—*1;             РЎРµРєС†РўРµР»РѕРЎРџР .Column[16].Width = РЁР _РЇР—*1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[16].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[16].Visible = False;      РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[16].Width = 0;                    РЎРµРєС†РўРµР»РѕРЎРџР .Column[16].Width = 0;
     end;
-    if Фл_ЖАНР:     СекцШапкаСПР.Column[17].Visible = True;  СекцТелоСПР.Column[17].Visible = True;       СекцШапкаСПР.Column[17].Width = ШР_ЖАНР*1;           СекцТелоСПР.Column[17].Width = ШР_ЖАНР*1;
-    else            СекцШапкаСПР.Column[17].Visible = False; СекцТелоСПР.Column[17].Visible = False;      СекцШапкаСПР.Column[17].Width = 0;                    СекцТелоСПР.Column[17].Width = 0;
+    if Р¤Р»_Р–РђРќР :     РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[17].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[17].Visible = True;       РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[17].Width = РЁР _Р–РђРќР *1;           РЎРµРєС†РўРµР»РѕРЎРџР .Column[17].Width = РЁР _Р–РђРќР *1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[17].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[17].Visible = False;      РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[17].Width = 0;                    РЎРµРєС†РўРµР»РѕРЎРџР .Column[17].Width = 0;
     end;
-    if Фл_УЧР:      СекцШапкаСПР.Column[18].Visible = True;  СекцТелоСПР.Column[18].Visible = True;       СекцШапкаСПР.Column[18].Width = ШР_УЧР*1;            СекцТелоСПР.Column[18].Width = ШР_УЧР*1;
-    else            СекцШапкаСПР.Column[18].Visible = False; СекцТелоСПР.Column[18].Visible = False;      СекцШапкаСПР.Column[18].Width = 0;                    СекцТелоСПР.Column[18].Width = 0;
+    if Р¤Р»_РЈР§Р :      РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[18].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[18].Visible = True;       РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[18].Width = РЁР _РЈР§Р *1;            РЎРµРєС†РўРµР»РѕРЎРџР .Column[18].Width = РЁР _РЈР§Р *1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[18].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[18].Visible = False;      РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[18].Width = 0;                    РЎРµРєС†РўРµР»РѕРЎРџР .Column[18].Width = 0;
     end;
-    if Фл_ДАТА1:    СекцШапкаСПР.Column[19].Visible = True;  СекцТелоСПР.Column[19].Visible = True;       СекцШапкаСПР.Column[19].Width = ШР_ДАТА1*1;          СекцТелоСПР.Column[19].Width = ШР_ДАТА1*1;
-    else            СекцШапкаСПР.Column[19].Visible = False; СекцТелоСПР.Column[19].Visible = False;      СекцШапкаСПР.Column[19].Width = 0;                    СекцТелоСПР.Column[19].Width = 0;
+    if Р¤Р»_Р”РђРўРђ1:    РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[19].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[19].Visible = True;       РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[19].Width = РЁР _Р”РђРўРђ1*1;          РЎРµРєС†РўРµР»РѕРЎРџР .Column[19].Width = РЁР _Р”РђРўРђ1*1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[19].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[19].Visible = False;      РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[19].Width = 0;                    РЎРµРєС†РўРµР»РѕРЎРџР .Column[19].Width = 0;
     end;
-    if Фл_РЕДАКТОР: СекцШапкаСПР.Column[20].Visible = True;  СекцТелоСПР.Column[20].Visible = True;       СекцШапкаСПР.Column[20].Width = ШР_РЕДАКТОР*1;       СекцТелоСПР.Column[20].Width = ШР_РЕДАКТОР*1;
-    else            СекцШапкаСПР.Column[20].Visible = False; СекцТелоСПР.Column[20].Visible = False;      СекцШапкаСПР.Column[20].Width = 0;                    СекцТелоСПР.Column[20].Width = 0;
+    if Р¤Р»_Р Р•Р”РђРљРўРћР : РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[20].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[20].Visible = True;       РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[20].Width = РЁР _Р Р•Р”РђРљРўРћР *1;       РЎРµРєС†РўРµР»РѕРЎРџР .Column[20].Width = РЁР _Р Р•Р”РђРљРўРћР *1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[20].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[20].Visible = False;      РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[20].Width = 0;                    РЎРµРєС†РўРµР»РѕРЎРџР .Column[20].Width = 0;
     end;
-    if Фл_ГОД_РЕГ:  СекцШапкаСПР.Column[21].Visible = True;  СекцТелоСПР.Column[21].Visible = True;       СекцШапкаСПР.Column[21].Width = ШР_ГОД_РЕГ*1;        СекцТелоСПР.Column[21].Width = ШР_ГОД_РЕГ*1;
-    else            СекцШапкаСПР.Column[21].Visible = False; СекцТелоСПР.Column[21].Visible = False;      СекцШапкаСПР.Column[21].Width = 0;                    СекцТелоСПР.Column[21].Width = 0;
+    if Р¤Р»_Р“РћР”_Р Р•Р“:  РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[21].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[21].Visible = True;       РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[21].Width = РЁР _Р“РћР”_Р Р•Р“*1;        РЎРµРєС†РўРµР»РѕРЎРџР .Column[21].Width = РЁР _Р“РћР”_Р Р•Р“*1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[21].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[21].Visible = False;      РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[21].Width = 0;                    РЎРµРєС†РўРµР»РѕРЎРџР .Column[21].Width = 0;
     end;
-    if Фл_ПЕРИОДИЧН:СекцШапкаСПР.Column[22].Visible = True;  СекцТелоСПР.Column[22].Visible = True;       СекцШапкаСПР.Column[22].Width = ШР_ПЕРИОДИЧН*1;      СекцТелоСПР.Column[22].Width = ШР_ПЕРИОДИЧН*1;
-    else            СекцШапкаСПР.Column[22].Visible = False; СекцТелоСПР.Column[22].Visible = False;      СекцШапкаСПР.Column[22].Width = 0;                    СекцТелоСПР.Column[22].Width = 0;
+    if Р¤Р»_РџР•Р РРћР”РР§Рќ:РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[22].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[22].Visible = True;       РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[22].Width = РЁР _РџР•Р РРћР”РР§Рќ*1;      РЎРµРєС†РўРµР»РѕРЎРџР .Column[22].Width = РЁР _РџР•Р РРћР”РР§Рќ*1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[22].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[22].Visible = False;      РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[22].Width = 0;                    РЎРµРєС†РўРµР»РѕРЎРџР .Column[22].Width = 0;
     end;
-    if Фл_СР_РАЗ_ТИРАЖ:СекцШапкаСПР.Column[23].Visible = True;  СекцТелоСПР.Column[23].Visible = True;   СекцШапкаСПР.Column[23].Width = ШР_СР_РАЗ_ТИРАЖ*1;    СекцТелоСПР.Column[23].Width = ШР_СР_РАЗ_ТИРАЖ*1;
-    else               СекцШапкаСПР.Column[23].Visible = False; СекцТелоСПР.Column[23].Visible = False;  СекцШапкаСПР.Column[23].Width = 0;                     СекцТелоСПР.Column[23].Width = 0;
+    if Р¤Р»_РЎР _Р РђР—_РўРР РђР–:РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[23].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[23].Visible = True;   РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[23].Width = РЁР _РЎР _Р РђР—_РўРР РђР–*1;    РЎРµРєС†РўРµР»РѕРЎРџР .Column[23].Width = РЁР _РЎР _Р РђР—_РўРР РђР–*1;
+    else               РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[23].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[23].Visible = False;  РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[23].Width = 0;                     РЎРµРєС†РўРµР»РѕРЎРџР .Column[23].Width = 0;
     end;
-    if Фл_ЛППИ:     СекцШапкаСПР.Column[24].Visible = True;  СекцТелоСПР.Column[24].Visible = True;       СекцШапкаСПР.Column[24].Width = ШР_ЛППИ*1;           СекцТелоСПР.Column[24].Width = ШР_ЛППИ*1;
-    else            СекцШапкаСПР.Column[24].Visible = False; СекцТелоСПР.Column[24].Visible = False;      СекцШапкаСПР.Column[24].Width = 0;                    СекцТелоСПР.Column[24].Width = 0;
+    if Р¤Р»_Р›РџРџР:     РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[24].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[24].Visible = True;       РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[24].Width = РЁР _Р›РџРџР*1;           РЎРµРєС†РўРµР»РѕРЎРџР .Column[24].Width = РЁР _Р›РџРџР*1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[24].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[24].Visible = False;      РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[24].Width = 0;                    РЎРµРєС†РўРµР»РѕРЎРџР .Column[24].Width = 0;
     end;
-    if Фл_ПослНом:  СекцШапкаСПР.Column[25].Visible = True;  СекцТелоСПР.Column[25].Visible = True;       СекцШапкаСПР.Column[25].Width = ШР_Послном*1;         СекцТелоСПР.Column[25].Width = ШР_ПослНом*1;
-    else            СекцШапкаСПР.Column[25].Visible = False; СекцТелоСПР.Column[25].Visible = False;      СекцШапкаСПР.Column[25].Width = 0;                    СекцТелоСПР.Column[25].Width = 0;
+    if Р¤Р»_РџРѕСЃР»РќРѕРј:  РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[25].Visible = True;  РЎРµРєС†РўРµР»РѕРЎРџР .Column[25].Visible = True;       РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[25].Width = РЁР _РџРѕСЃР»РЅРѕРј*1;         РЎРµРєС†РўРµР»РѕРЎРџР .Column[25].Width = РЁР _РџРѕСЃР»РќРѕРј*1;
+    else            РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[25].Visible = False; РЎРµРєС†РўРµР»РѕРЎРџР .Column[25].Visible = False;      РЎРµРєС†РЁР°РїРєР°РЎРџР .Column[25].Width = 0;                    РЎРµРєС†РўРµР»РѕРЎРџР .Column[25].Width = 0;
     end;
   End;
 
-  proc НастройкаСтолбцовПоУмолчанию;
-    Фл_ПРЕКР            = false;        ШР_ПРЕКР        = 15;
-    Фл_N_ГОСРЕГ         = true ;        ШР_N_ГОСРЕГ     = 30;
-    Фл_ISSN             = false;        ШР_ISSN         = 20;
-    Фл_НАЗВ             = true ;        ШР_НАЗВ         = 80;
-    Фл_НАЗВ_ИН          = false;        ШР_НАЗВ_ИН      = 40;
-    Фл_НАЗВ_НАЦ         = false;        ШР_НАЗВ_НАЦ     = 40;
-    Фл_ПОДЗАГ           = true ;        ШР_ПОДЗАГ       = 60;
-    Фл_ТГ               = false;        ШР_ТГ           = 30;
-    Фл_ГЕО              = false;        ШР_ГЕО          = 40;
-    Фл_РЕД              = true ;        ШР_РЕД          = 70;
-    Фл_ТФ               = true ;        ШР_ТФ           = 45;
-    Фл_EMAIL            = false;        ШР_EMAIL        = 40;
-    Фл_ТИ               = false;        ШР_ТИ           = 20;
-    Фл_ТЕМ              = false;        ШР_ТЕМ          = 70;
-    Фл_ЯЗ               = false;        ШР_ЯЗ           = 30;
-    Фл_ЖАНР             = false;        ШР_ЖАНР         = 70;
-    Фл_УЧР              = false;        ШР_УЧР          = 40;
-    Фл_Дата1            = false;        ШР_Дата1        = 18;
-    Фл_РЕДАКТОР         = true ;        ШР_РЕДАКТОР     = 40;
-    Фл_ГОД_РЕГ          = false;        ШР_ГОД_РЕГ      = 20;
-    Фл_ПЕРИОДИЧН        = false;        ШР_ПЕРИОДИЧН    = 30;
-    Фл_СР_РАЗ_ТИРАЖ     = false;        ШР_СР_РАЗ_ТИРАЖ = 30;
-    Фл_ЛППИ             = false;        ШР_ЛППИ         = 15;
-    Фл_ПослНом          = false;        ШР_ПослНом      = 25;
+  proc РќР°СЃС‚СЂРѕР№РєР°РЎС‚РѕР»Р±С†РѕРІРџРѕРЈРјРѕР»С‡Р°РЅРёСЋ;
+    Р¤Р»_РџР Р•РљР             = false;        РЁР _РџР Р•РљР         = 15;
+    Р¤Р»_N_Р“РћРЎР Р•Р“         = true ;        РЁР _N_Р“РћРЎР Р•Р“     = 30;
+    Р¤Р»_ISSN             = false;        РЁР _ISSN         = 20;
+    Р¤Р»_РќРђР—Р’             = true ;        РЁР _РќРђР—Р’         = 80;
+    Р¤Р»_РќРђР—Р’_РРќ          = false;        РЁР _РќРђР—Р’_РРќ      = 40;
+    Р¤Р»_РќРђР—Р’_РќРђР¦         = false;        РЁР _РќРђР—Р’_РќРђР¦     = 40;
+    Р¤Р»_РџРћР”Р—РђР“           = true ;        РЁР _РџРћР”Р—РђР“       = 60;
+    Р¤Р»_РўР“               = false;        РЁР _РўР“           = 30;
+    Р¤Р»_Р“Р•Рћ              = false;        РЁР _Р“Р•Рћ          = 40;
+    Р¤Р»_Р Р•Р”              = true ;        РЁР _Р Р•Р”          = 70;
+    Р¤Р»_РўР¤               = true ;        РЁР _РўР¤           = 45;
+    Р¤Р»_EMAIL            = false;        РЁР _EMAIL        = 40;
+    Р¤Р»_РўР               = false;        РЁР _РўР           = 20;
+    Р¤Р»_РўР•Рњ              = false;        РЁР _РўР•Рњ          = 70;
+    Р¤Р»_РЇР—               = false;        РЁР _РЇР—           = 30;
+    Р¤Р»_Р–РђРќР              = false;        РЁР _Р–РђРќР          = 70;
+    Р¤Р»_РЈР§Р               = false;        РЁР _РЈР§Р           = 40;
+    Р¤Р»_Р”Р°С‚Р°1            = false;        РЁР _Р”Р°С‚Р°1        = 18;
+    Р¤Р»_Р Р•Р”РђРљРўРћР          = true ;        РЁР _Р Р•Р”РђРљРўРћР      = 40;
+    Р¤Р»_Р“РћР”_Р Р•Р“          = false;        РЁР _Р“РћР”_Р Р•Р“      = 20;
+    Р¤Р»_РџР•Р РРћР”РР§Рќ        = false;        РЁР _РџР•Р РРћР”РР§Рќ    = 30;
+    Р¤Р»_РЎР _Р РђР—_РўРР РђР–     = false;        РЁР _РЎР _Р РђР—_РўРР РђР– = 30;
+    Р¤Р»_Р›РџРџР             = false;        РЁР _Р›РџРџР         = 15;
+    Р¤Р»_РџРѕСЃР»РќРѕРј          = false;        РЁР _РџРѕСЃР»РќРѕРј      = 25;
   end;
 
 
---{ Обработчики событий бланка
-  proc шаблон_ПриОткрытии(Create :Logical);
+--{ РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ Р±Р»Р°РЅРєР°
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(Create :Logical);
     try
-    self.LoadObject("БибСправкаГазеты01");
+    self.LoadObject("Р‘РёР±РЎРїСЂР°РІРєР°Р“Р°Р·РµС‚С‹01");
     except
-    НастройкаСтолбцовПоУмолчанию;
+    РќР°СЃС‚СЂРѕР№РєР°РЎС‚РѕР»Р±С†РѕРІРџРѕРЈРјРѕР»С‡Р°РЅРёСЋ;
     end;
-    фреймУсловияОтбора.Visible          = true;
-    фреймНастройкаСтолбцов.Visible      = false;
-    ВидСекцииУсловияотбора;
-    ОформитьОтчет;
+    С„СЂРµР№РјРЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Visible          = true;
+    С„СЂРµР№РјРќР°СЃС‚СЂРѕР№РєР°РЎС‚РѕР»Р±С†РѕРІ.Visible      = false;
+    Р’РёРґРЎРµРєС†РёРёРЈСЃР»РѕРІРёСЏРѕС‚Р±РѕСЂР°;
+    РћС„РѕСЂРјРёС‚СЊРћС‚С‡РµС‚;
   end;
 
-  proc КнНастройка_ПриНажатии(Sender :Button);
-    if ПоказатьНастройку = false then
-      фреймУсловияОтбора.Visible        = false;
-      фреймНастройкаСтолбцов.Visible    = true;
-      фреймРезультат.Visible            = false;
-      ПоказатьНастройку                 = true;
+  proc РљРЅРќР°СЃС‚СЂРѕР№РєР°_РџСЂРёРќР°Р¶Р°С‚РёРё(Sender :Button);
+    if РџРѕРєР°Р·Р°С‚СЊРќР°СЃС‚СЂРѕР№РєСѓ = false then
+      С„СЂРµР№РјРЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Visible        = false;
+      С„СЂРµР№РјРќР°СЃС‚СЂРѕР№РєР°РЎС‚РѕР»Р±С†РѕРІ.Visible    = true;
+      С„СЂРµР№РјР РµР·СѓР»СЊС‚Р°С‚.Visible            = false;
+      РџРѕРєР°Р·Р°С‚СЊРќР°СЃС‚СЂРѕР№РєСѓ                 = true;
     else
-      фреймУсловияОтбора.Visible        = true;
-      фреймНастройкаСтолбцов.Visible    = false;
-      фреймРезультат.Visible            = true;
-      ПоказатьНастройку                 = false;
-      ОформитьОтчет;
+      С„СЂРµР№РјРЈСЃР»РѕРІРёСЏРћС‚Р±РѕСЂР°.Visible        = true;
+      С„СЂРµР№РјРќР°СЃС‚СЂРѕР№РєР°РЎС‚РѕР»Р±С†РѕРІ.Visible    = false;
+      С„СЂРµР№РјР РµР·СѓР»СЊС‚Р°С‚.Visible            = true;
+      РџРѕРєР°Р·Р°С‚СЊРќР°СЃС‚СЂРѕР№РєСѓ                 = false;
+      РћС„РѕСЂРјРёС‚СЊРћС‚С‡РµС‚;
     end;
   end;
 
-  proc ПостроениеОтчета(ФильтрГазет:string);
+  proc РџРѕСЃС‚СЂРѕРµРЅРёРµРћС‚С‡РµС‚Р°(Р¤РёР»СЊС‚СЂР“Р°Р·РµС‚:string);
     var Q,Q2            : query;
     var k               : integer;
     var rec             : record;
       ----------------------------------------------
-      СекцТелоСПР.Count         = nil;
+      РЎРµРєС†РўРµР»РѕРЎРџР .Count         = nil;
       NNN                       = nil;
-      ПРЕКР                     = nil;
-      N_ГОСРЕГ                  = nil;
+      РџР Р•РљР                      = nil;
+      N_Р“РћРЎР Р•Р“                  = nil;
       ISSN                      = nil;
-      НАЗВ                      = nil;
-      НАЗВ_ИН                   = nil;
-      НАЗВ_НАЦ                  = nil;
-      ПОДЗАГ                    = nil;
-      ТГ                        = nil;
-      ГЕО                       = nil;
-      РЕД                       = nil;
-      ТФ                        = nil;
+      РќРђР—Р’                      = nil;
+      РќРђР—Р’_РРќ                   = nil;
+      РќРђР—Р’_РќРђР¦                  = nil;
+      РџРћР”Р—РђР“                    = nil;
+      РўР“                        = nil;
+      Р“Р•Рћ                       = nil;
+      Р Р•Р”                       = nil;
+      РўР¤                        = nil;
       EMAIL                     = nil;
-      ТИ                        = nil;
-      ТЕМ                       = nil;
-      ЯЗ                        = nil;
-      ЖАНР                      = nil;
-      УЧР                       = nil;
-      Дата1                     = nil;
-      РЕДАКТОР_ГАЗЕТЫ           = nil;
-      ГОД_РЕГ                   = nil;
-      Периодичность_Газеты      = nil;
-      СР_РАЗ_ТИРАЖ              = nil;
-      ЛППИ                      = nil;
-      ПослНом                   = nil;
-      Газета                    = nil;
+      РўР                        = nil;
+      РўР•Рњ                       = nil;
+      РЇР—                        = nil;
+      Р–РђРќР                       = nil;
+      РЈР§Р                        = nil;
+      Р”Р°С‚Р°1                     = nil;
+      Р Р•Р”РђРљРўРћР _Р“РђР—Р•РўР«           = nil;
+      Р“РћР”_Р Р•Р“                   = nil;
+      РџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ_Р“Р°Р·РµС‚С‹      = nil;
+      РЎР _Р РђР—_РўРР РђР–              = nil;
+      Р›РџРџР                      = nil;
+      РџРѕСЃР»РќРѕРј                   = nil;
+      Р“Р°Р·РµС‚Р°                    = nil;
       ----------------------------------------------
-      Q                 = Query.Create([РКП_Газеты.Газета]);
-      Q.Order           = "НазваниеОсн";
-      Q.Filter          = ФильтрГазет;
+      Q                 = Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°]);
+      Q.Order           = "РќР°Р·РІР°РЅРёРµРћСЃРЅ";
+      Q.Filter          = Р¤РёР»СЊС‚СЂР“Р°Р·РµС‚;
       Q.Select;
       Q.First;
         for k =  1..Q.Count       do
-          Hint("Выборка данных...",k,Q.Count);
+          Hint("Р’С‹Р±РѕСЂРєР° РґР°РЅРЅС‹С…...",k,Q.Count);
           NNN[k]        = k;
-          --Газета[k]               = Q.Current.DocId;
-          Газета[k]               = Q.Current;
-          if Фл_ПРЕКР           = true          then
-            ПРЕКР[k]            = Q.Current.Прекращено;
+          --Р“Р°Р·РµС‚Р°[k]               = Q.Current.DocId;
+          Р“Р°Р·РµС‚Р°[k]               = Q.Current;
+          if Р¤Р»_РџР Р•РљР            = true          then
+            РџР Р•РљР [k]            = Q.Current.РџСЂРµРєСЂР°С‰РµРЅРѕ;
           end;
-          if Фл_N_ГОСРЕГ        = true          then
-            N_ГОСРЕГ[k]         = Q.Current.РегНомер;
+          if Р¤Р»_N_Р“РћРЎР Р•Р“        = true          then
+            N_Р“РћРЎР Р•Р“[k]         = Q.Current.Р РµРіРќРѕРјРµСЂ;
           end;
-          if Фл_ISSN            = true          then
+          if Р¤Р»_ISSN            = true          then
             ISSN[k]             = Q.Current.ISSN;
           end;
-          if Фл_НАЗВ            = true          then
-            НАЗВ[k]             = Q.Current.НазваниеОсн;
+          if Р¤Р»_РќРђР—Р’            = true          then
+            РќРђР—Р’[k]             = Q.Current.РќР°Р·РІР°РЅРёРµРћСЃРЅ;
           end;
-          if Фл_НАЗВ_ИН         = true          then
-            НАЗВ_ИН[k]          = Q.Current.НазваниеИнЯз;
+          if Р¤Р»_РќРђР—Р’_РРќ         = true          then
+            РќРђР—Р’_РРќ[k]          = Q.Current.РќР°Р·РІР°РЅРёРµРРЅРЇР·;
           end;
-          if Фл_НАЗВ_НАЦ        = true          then
-            НАЗВ_НАЦ[k]         = Q.Current.НазваниеНацЯз;
+          if Р¤Р»_РќРђР—Р’_РќРђР¦        = true          then
+            РќРђР—Р’_РќРђР¦[k]         = Q.Current.РќР°Р·РІР°РЅРёРµРќР°С†РЇР·;
           end;
-          if Фл_ПОДЗАГ          = true          then
-            ПОДЗАГ[k]           = Q.Current.Подзаголовок;
+          if Р¤Р»_РџРћР”Р—РђР“          = true          then
+            РџРћР”Р—РђР“[k]           = Q.Current.РџРѕРґР·Р°РіРѕР»РѕРІРѕРє;
           end;
-          if Фл_ТГ              = true          then
-            ТГ[k]               = Q.Current.ТерриторияРаспространения;
+          if Р¤Р»_РўР“              = true          then
+            РўР“[k]               = Q.Current.РўРµСЂСЂРёС‚РѕСЂРёСЏР Р°СЃРїСЂРѕСЃС‚СЂР°РЅРµРЅРёСЏ;
           end;
-          if Фл_ГЕО             = true          then
-            if Q.Current.МестаИздания.Count > 0 then
-            ГЕО[k]              = Q.Current.МестаИздания.Items[1].МестоИздания;
+          if Р¤Р»_Р“Р•Рћ             = true          then
+            if Q.Current.РњРµСЃС‚Р°РР·РґР°РЅРёСЏ.Count > 0 then
+            Р“Р•Рћ[k]              = Q.Current.РњРµСЃС‚Р°РР·РґР°РЅРёСЏ.Items[1].РњРµСЃС‚РѕРР·РґР°РЅРёСЏ;
             end;
           end;
-          if Фл_РЕД             = true          then
-            РЕД[k]              = Q.Current.Редакция;
+          if Р¤Р»_Р Р•Р”             = true          then
+            Р Р•Р”[k]              = Q.Current.Р РµРґР°РєС†РёСЏ;
           end;
-          if Фл_ТФ              = true          then
-            ТФ[k]               = Q.Current.Телефон;
+          if Р¤Р»_РўР¤              = true          then
+            РўР¤[k]               = Q.Current.РўРµР»РµС„РѕРЅ;
           end;
-          if Фл_EMAIL           = true          then
+          if Р¤Р»_EMAIL           = true          then
             EMAIL[k]            = Q.Current.E_mail;
           end;
-          if Фл_ТИ              = true          then
-            ТИ[k]               = Q.Current.ТипИздания;
+          if Р¤Р»_РўР              = true          then
+            РўР[k]               = Q.Current.РўРёРїРР·РґР°РЅРёСЏ;
           end;
-          if Фл_ТЕМ             = true          then
-            if Q.Current.Тематики.Count > 0     then
-              ТЕМ[k]            = Q.Current.Тематики.Items[1].Тематика;
+          if Р¤Р»_РўР•Рњ             = true          then
+            if Q.Current.РўРµРјР°С‚РёРєРё.Count > 0     then
+              РўР•Рњ[k]            = Q.Current.РўРµРјР°С‚РёРєРё.Items[1].РўРµРјР°С‚РёРєР°;
             end;
           end;
-          if Фл_ЯЗ              = true          then
-            if Q.Current.Языки.Count > 0        then
-              ЯЗ[k]             = Q.Current.Языки.Items[1].Язык;
+          if Р¤Р»_РЇР—              = true          then
+            if Q.Current.РЇР·С‹РєРё.Count > 0        then
+              РЇР—[k]             = Q.Current.РЇР·С‹РєРё.Items[1].РЇР·С‹Рє;
             end;
           end;
-          if Фл_УЧР             = true          then
-            УЧР[k]              = Q.Current.Учред;
+          if Р¤Р»_РЈР§Р              = true          then
+            РЈР§Р [k]              = Q.Current.РЈС‡СЂРµРґ;
           end;
-          if Фл_Дата1           = true          then
-            if Q.Current.ДатаВыходаПервогоНомера>01.01.1990     then
-              if        Q.Current.ТочностьДатыПервогоНомера = 0 then
-                Дата1[k]        = Str(Q.Current.ДатаВыходаПервогоНомера);
-              elsif     Q.Current.ТочностьДатыПервогоНомера = 1 then
-                Дата1[k]        =   РКП_СИС.DateDescription.ToString(Q.Current.ДатаВыходаПервогоНомера, РКП_СИС.DateDescription.dfYYYYMMM);
-              elsif     Q.Current.ТочностьДатыПервогоНомера = 2 then
-                Дата1[k]        = Str(Year(Q.Current.ДатаВыходаПервогоНомера))+' г.';
+          if Р¤Р»_Р”Р°С‚Р°1           = true          then
+            if Q.Current.Р”Р°С‚Р°Р’С‹С…РѕРґР°РџРµСЂРІРѕРіРѕРќРѕРјРµСЂР°>01.01.1990     then
+              if        Q.Current.РўРѕС‡РЅРѕСЃС‚СЊР”Р°С‚С‹РџРµСЂРІРѕРіРѕРќРѕРјРµСЂР° = 0 then
+                Р”Р°С‚Р°1[k]        = Str(Q.Current.Р”Р°С‚Р°Р’С‹С…РѕРґР°РџРµСЂРІРѕРіРѕРќРѕРјРµСЂР°);
+              elsif     Q.Current.РўРѕС‡РЅРѕСЃС‚СЊР”Р°С‚С‹РџРµСЂРІРѕРіРѕРќРѕРјРµСЂР° = 1 then
+                Р”Р°С‚Р°1[k]        =   Р РљРџ_РЎРРЎ.DateDescription.ToString(Q.Current.Р”Р°С‚Р°Р’С‹С…РѕРґР°РџРµСЂРІРѕРіРѕРќРѕРјРµСЂР°, Р РљРџ_РЎРРЎ.DateDescription.dfYYYYMMM);
+              elsif     Q.Current.РўРѕС‡РЅРѕСЃС‚СЊР”Р°С‚С‹РџРµСЂРІРѕРіРѕРќРѕРјРµСЂР° = 2 then
+                Р”Р°С‚Р°1[k]        = Str(Year(Q.Current.Р”Р°С‚Р°Р’С‹С…РѕРґР°РџРµСЂРІРѕРіРѕРќРѕРјРµСЂР°))+' Рі.';
               end;
             end;
           end;
-          if Фл_РЕДАКТОР        = true          then
-            РЕДАКТОР_ГАЗЕТЫ[k]  = Q.Current.РедакторГазеты;
+          if Р¤Р»_Р Р•Р”РђРљРўРћР         = true          then
+            Р Р•Р”РђРљРўРћР _Р“РђР—Р•РўР«[k]  = Q.Current.Р РµРґР°РєС‚РѕСЂР“Р°Р·РµС‚С‹;
           end;
-          if Фл_ГОД_РЕГ         = true          then
-            ГОД_РЕГ[k]          = Q.Current.ГодЛетописи;
+          if Р¤Р»_Р“РћР”_Р Р•Р“         = true          then
+            Р“РћР”_Р Р•Р“[k]          = Q.Current.Р“РѕРґР›РµС‚РѕРїРёСЃРё;
           end;
-          if Фл_ПЕРИОДИЧН       = true          then
-            Периодичность_ГАЗЕТЫ[k]             = Q.Current.Периодичность;
+          if Р¤Р»_РџР•Р РРћР”РР§Рќ       = true          then
+            РџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ_Р“РђР—Р•РўР«[k]             = Q.Current.РџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ;
           end;
-          if Фл_СР_РАЗ_ТИРАЖ    = true          then
-            Q2                  = Query.Create([РКП_Газеты.ПоступлениеГазеты]);
-            Q2.Order            = "ГодПоступления";
-            Q2.Filter           = "Газета="+Str(Q.Current);
+          if Р¤Р»_РЎР _Р РђР—_РўРР РђР–    = true          then
+            Q2                  = Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.РџРѕСЃС‚СѓРїР»РµРЅРёРµР“Р°Р·РµС‚С‹]);
+            Q2.Order            = "Р“РѕРґРџРѕСЃС‚СѓРїР»РµРЅРёСЏ";
+            Q2.Filter           = "Р“Р°Р·РµС‚Р°="+Str(Q.Current);
             Q2.Select;
             if Q2.Count>0       then
               Q2.Last;
-              СР_РАЗ_ТИРАЖ[k]   = Q2.Current.СреднийРазовыйТираж;
+              РЎР _Р РђР—_РўРР РђР–[k]   = Q2.Current.РЎСЂРµРґРЅРёР№Р Р°Р·РѕРІС‹Р№РўРёСЂР°Р¶;
             end;
             Q2.Close;
           end;
-          if Фл_ЛППИ            = true          then
-            if Q.Current.ГодЛетописи>0          then
-            ЛППИ[k]             = Str(Q.Current.ГодЛетописи);
-              if Q.Current.НомерВЛетописи<>nil  then
-                ЛППИ[k]         = ЛППИ[k]+" / "+Str(Q.Current.НомерВЛетописи);
+          if Р¤Р»_Р›РџРџР            = true          then
+            if Q.Current.Р“РѕРґР›РµС‚РѕРїРёСЃРё>0          then
+            Р›РџРџР[k]             = Str(Q.Current.Р“РѕРґР›РµС‚РѕРїРёСЃРё);
+              if Q.Current.РќРѕРјРµСЂР’Р›РµС‚РѕРїРёСЃРё<>nil  then
+                Р›РџРџР[k]         = Р›РџРџР[k]+" / "+Str(Q.Current.РќРѕРјРµСЂР’Р›РµС‚РѕРїРёСЃРё);
               end;
             end;
 
           end;
-          if Фл_ЖАНР            = true          then
-            ЖАНР[k]             = Q.Current.ЖАНР;
+          if Р¤Р»_Р–РђРќР             = true          then
+            Р–РђРќР [k]             = Q.Current.Р–РђРќР ;
           end;
-          if Фл_ПослНом         = true          then
-            rec                 = РКП_ГАЗЕТЫ.Стат.ПоследнийПолученныйНомер(Q.Current);
+          if Р¤Р»_РџРѕСЃР»РќРѕРј         = true          then
+            rec                 = Р РљРџ_Р“РђР—Р•РўР«.РЎС‚Р°С‚.РџРѕСЃР»РµРґРЅРёР№РџРѕР»СѓС‡РµРЅРЅС‹Р№РќРѕРјРµСЂ(Q.Current);
             if rec<>nil                         then
-              ПослНом[k]        = rec.Номер;
-              if  rec.ДатаВыхода>01.01.1990 then
-                ПослНом[k]      = ПослНом[k]+' от '+str(rec.ДатаВыхода);
+              РџРѕСЃР»РќРѕРј[k]        = rec.РќРѕРјРµСЂ;
+              if  rec.Р”Р°С‚Р°Р’С‹С…РѕРґР°>01.01.1990 then
+                РџРѕСЃР»РќРѕРј[k]      = РџРѕСЃР»РќРѕРј[k]+' РѕС‚ '+str(rec.Р”Р°С‚Р°Р’С‹С…РѕРґР°);
               end;
             end;
           end;
@@ -409,52 +409,52 @@ InObject Private
           Q.Next;
         end;
       Q.Close;
-      СекцТелоСПР.Count         = k-1;
+      РЎРµРєС†РўРµР»РѕРЎРџР .Count         = k-1;
   end;
 
-  proc КнРасчет_ПриНажатии(Sender :Button);
-    var локФорма :UserObject;
-    локФорма  = РКП_Газеты.УчетГазет.Запросы.блОтборГазетСпр1.Create;
-    if  CmOk = локФорма.Show(Window.ModalWindow)        then
-      МестоИздания              = локФорма.МестоИздания;
-      ТипИздания                = локФорма.ТипИздания;
-      Периодичность             = локФорма.Периодичность;
-      ТерриторияРаспространения = локФорма.ТерриторияРаспространения;
-      Тематика                  = локФорма.Тематика;
-      ЧАЦН                      = локФорма.ЧАЦН;
-      Язык                      = локФорма.Язык;
-      ГодНачалаИздания          = локФорма.ГодНачалаИздания;
-      ГодЛППИ                   = локФорма.ГодЛППИ;
-      ГодВыпуска                = локФорма.ГодВыпуска;
+  proc РљРЅР Р°СЃС‡РµС‚_РџСЂРёРќР°Р¶Р°С‚РёРё(Sender :Button);
+    var Р»РѕРєР¤РѕСЂРјР° :UserObject;
+    Р»РѕРєР¤РѕСЂРјР°  = Р РљРџ_Р“Р°Р·РµС‚С‹.РЈС‡РµС‚Р“Р°Р·РµС‚.Р—Р°РїСЂРѕСЃС‹.Р±Р»РћС‚Р±РѕСЂР“Р°Р·РµС‚РЎРїСЂ1.Create;
+    if  CmOk = Р»РѕРєР¤РѕСЂРјР°.Show(Window.ModalWindow)        then
+      РњРµСЃС‚РѕРР·РґР°РЅРёСЏ              = Р»РѕРєР¤РѕСЂРјР°.РњРµСЃС‚РѕРР·РґР°РЅРёСЏ;
+      РўРёРїРР·РґР°РЅРёСЏ                = Р»РѕРєР¤РѕСЂРјР°.РўРёРїРР·РґР°РЅРёСЏ;
+      РџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ             = Р»РѕРєР¤РѕСЂРјР°.РџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ;
+      РўРµСЂСЂРёС‚РѕСЂРёСЏР Р°СЃРїСЂРѕСЃС‚СЂР°РЅРµРЅРёСЏ = Р»РѕРєР¤РѕСЂРјР°.РўРµСЂСЂРёС‚РѕСЂРёСЏР Р°СЃРїСЂРѕСЃС‚СЂР°РЅРµРЅРёСЏ;
+      РўРµРјР°С‚РёРєР°                  = Р»РѕРєР¤РѕСЂРјР°.РўРµРјР°С‚РёРєР°;
+      Р§РђР¦Рќ                      = Р»РѕРєР¤РѕСЂРјР°.Р§РђР¦Рќ;
+      РЇР·С‹Рє                      = Р»РѕРєР¤РѕСЂРјР°.РЇР·С‹Рє;
+      Р“РѕРґРќР°С‡Р°Р»Р°РР·РґР°РЅРёСЏ          = Р»РѕРєР¤РѕСЂРјР°.Р“РѕРґРќР°С‡Р°Р»Р°РР·РґР°РЅРёСЏ;
+      Р“РѕРґР›РџРџР                   = Р»РѕРєР¤РѕСЂРјР°.Р“РѕРґР›РџРџР;
+      Р“РѕРґР’С‹РїСѓСЃРєР°                = Р»РѕРєР¤РѕСЂРјР°.Р“РѕРґР’С‹РїСѓСЃРєР°;
         -----------------
-        ПостроениеОтчета(локФорма.ПолучитьУсловиеОтбораГазет);
+        РџРѕСЃС‚СЂРѕРµРЅРёРµРћС‚С‡РµС‚Р°(Р»РѕРєР¤РѕСЂРјР°.РџРѕР»СѓС‡РёС‚СЊРЈСЃР»РѕРІРёРµРћС‚Р±РѕСЂР°Р“Р°Р·РµС‚);
         -----------------
-      ПоказатьНастройку         = true;
-      КнНастройка_ПриНажатии(кнНастройка);
-      кнНастройка.State         = false;
-      ОформитьОтчет;
+      РџРѕРєР°Р·Р°С‚СЊРќР°СЃС‚СЂРѕР№РєСѓ         = true;
+      РљРЅРќР°СЃС‚СЂРѕР№РєР°_РџСЂРёРќР°Р¶Р°С‚РёРё(РєРЅРќР°СЃС‚СЂРѕР№РєР°);
+      РєРЅРќР°СЃС‚СЂРѕР№РєР°.State         = false;
+      РћС„РѕСЂРјРёС‚СЊРћС‚С‡РµС‚;
     end;
-    ВидСекцииУсловияотбора;
+    Р’РёРґРЎРµРєС†РёРёРЈСЃР»РѕРІРёСЏРѕС‚Р±РѕСЂР°;
   end;
 
-  func КнВосстановитьНастройкуСтолбцов(Cell :TemplateCell;Action :Template.ClickTypes) :Logical;
-    НастройкаСтолбцовПоУмолчанию;
+  func РљРЅР’РѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊРќР°СЃС‚СЂРѕР№РєСѓРЎС‚РѕР»Р±С†РѕРІ(Cell :TemplateCell;Action :Template.ClickTypes) :Logical;
+    РќР°СЃС‚СЂРѕР№РєР°РЎС‚РѕР»Р±С†РѕРІРџРѕРЈРјРѕР»С‡Р°РЅРёСЋ;
     Result = False;
   end;
 
-  func ОтрытьГазету(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+  func РћС‚СЂС‹С‚СЊР“Р°Р·РµС‚Сѓ(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
     var Index   : integer;
     var UForm   : BlankForm;
     Index       = Cell.Frame;
-    UForm       = РКП_Газеты.УчетГазет.редГазета.Create;
-    UForm.ShowEx(Газета[Index],Window.ModalWindow);
+    UForm       = Р РљРџ_Р“Р°Р·РµС‚С‹.РЈС‡РµС‚Р“Р°Р·РµС‚.СЂРµРґР“Р°Р·РµС‚Р°.Create;
+    UForm.ShowEx(Р“Р°Р·РµС‚Р°[Index],Window.ModalWindow);
      
-    Result = True; -- Разрешаем стандартную обработку
+    Result = True; -- Р Р°Р·СЂРµС€Р°РµРј СЃС‚Р°РЅРґР°СЂС‚РЅСѓСЋ РѕР±СЂР°Р±РѕС‚РєСѓ
   end;
 
 
-  proc шаблон_ПриЗакрытии(Destroy :Logical);
-    self.SaveClass("БибСправкаГазеты01");
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёР—Р°РєСЂС‹С‚РёРё(Destroy :Logical);
+    self.SaveClass("Р‘РёР±РЎРїСЂР°РІРєР°Р“Р°Р·РµС‚С‹01");
   end;
 
 --}

@@ -1,19 +1,19 @@
-class inherited РКП_Справочники.BiblioRecord;
+п»їclass inherited Р РљРџ_РЎРїСЂР°РІРѕС‡РЅРёРєРё.BiblioRecord;
 
-import РКП_СИС classes StdCode;
+import Р РљРџ_РЎРРЎ classes StdCode;
 
 inclass public
 
-  func ОписаниеНомера(Rec :РКП_Газеты.НомерГазеты) :String;
+  func РћРїРёСЃР°РЅРёРµРќРѕРјРµСЂР°(Rec :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) :String;
     if (Rec <> nil) then
-      Return ОписаниеНомераПоРеквизитам(Rec.Номер, Rec.ВаловыйНомер, Rec.ДатаВыхода, Rec.ТочностьДатыВыхода);
+      Return РћРїРёСЃР°РЅРёРµРќРѕРјРµСЂР°РџРѕР РµРєРІРёР·РёС‚Р°Рј(Rec.РќРѕРјРµСЂ, Rec.Р’Р°Р»РѕРІС‹Р№РќРѕРјРµСЂ, Rec.Р”Р°С‚Р°Р’С‹С…РѕРґР°, Rec.РўРѕС‡РЅРѕСЃС‚СЊР”Р°С‚С‹Р’С‹С…РѕРґР°);
     fi;
   end;
 
-  func ОписаниеНомераПоРеквизитам(IssueNom :String;    -- номер
-                                  IssueValNom :String; -- валовый номер
-                                  IssueDat :Date;      -- дата выпуска номера
-                                  IssueNot :Integer    -- точность даты выпуска номера
+  func РћРїРёСЃР°РЅРёРµРќРѕРјРµСЂР°РџРѕР РµРєРІРёР·РёС‚Р°Рј(IssueNom :String;    -- РЅРѕРјРµСЂ
+                                  IssueValNom :String; -- РІР°Р»РѕРІС‹Р№ РЅРѕРјРµСЂ
+                                  IssueDat :Date;      -- РґР°С‚Р° РІС‹РїСѓСЃРєР° РЅРѕРјРµСЂР°
+                                  IssueNot :Integer    -- С‚РѕС‡РЅРѕСЃС‚СЊ РґР°С‚С‹ РІС‹РїСѓСЃРєР° РЅРѕРјРµСЂР°
                                   ) :String;
     IssueNom    = NoSpace(IssueNom);
     IssueValNom = NoSpace(IssueValNom);
@@ -22,14 +22,14 @@ inclass public
     fi;
     if (IssueDat <> nil) then
       if (IssueNot = 0) then
-        Result = IssueNom + ' от ' + Str(IssueDat);
+        Result = IssueNom + ' РѕС‚ ' + Str(IssueDat);
       elsif (IssueNot = 1) then
-        with РКП_СИС.DateDescription do
-          Result = IssueNom + ' от ' + ToString(IssueDat, dfMMMM) + ' ' + ToString(IssueDat, dfYYYYг);
+        with Р РљРџ_РЎРРЎ.DateDescription do
+          Result = IssueNom + ' РѕС‚ ' + ToString(IssueDat, dfMMMM) + ' ' + ToString(IssueDat, dfYYYYРі);
         end;
       elsif (IssueNot = 2) then
-        with РКП_СИС.DateDescription do
-          Result = IssueNom + ' от ' + ToString(IssueDat, dfYYYYг);
+        with Р РљРџ_РЎРРЎ.DateDescription do
+          Result = IssueNom + ' РѕС‚ ' + ToString(IssueDat, dfYYYYРі);
         end;
       fi;
     else

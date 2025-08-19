@@ -1,46 +1,46 @@
-class inherited РКП_СИС.RI.intBase "";
+п»їclass inherited Р РљРџ_РЎРРЎ.RI.intBase "";
 
-import РКП_СИС Classes Functions, StringsFunctions, Recs, FilterMaker;
-
-inclass public
-
-  var ТекстРодительный :String = 'записи';
-
+import Р РљРџ_РЎРРЎ Classes Functions, StringsFunctions, Recs, FilterMaker;
 
 inclass public
 
-  func СвязанныйКлассЗаписей: Class СИС2.Базовая.БазоваяЗапись;
-    Result = РКП_Газеты.ПротоколВводаОРГП;
+  var РўРµРєСЃС‚Р РѕРґРёС‚РµР»СЊРЅС‹Р№ :String = 'Р·Р°РїРёСЃРё';
+
+
+inclass public
+
+  func РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№: Class РЎРРЎ2.Р‘Р°Р·РѕРІР°СЏ.Р‘Р°Р·РѕРІР°СЏР—Р°РїРёСЃСЊ;
+    Result = Р РљРџ_Р“Р°Р·РµС‚С‹.РџСЂРѕС‚РѕРєРѕР»Р’РІРѕРґР°РћР Р“Рџ;
   end;
 
-  func Create: RI.ПротоколВводаОРГП;
+  func Create: RI.РџСЂРѕС‚РѕРєРѕР»Р’РІРѕРґР°РћР Р“Рџ;
     Result = inherited Create;
-    Result.Record = РКП_Газеты.ПротоколВводаОРГП.Create;
+    Result.Record = Р РљРџ_Р“Р°Р·РµС‚С‹.РџСЂРѕС‚РѕРєРѕР»Р’РІРѕРґР°РћР Р“Рџ.Create;
   end;
 
-  func ОткрытьПоЗаписи synonym OpenRecord(aRec :РКП_Газеты.ПротоколВводаОРГП): РКП_Газеты.RI.ПротоколВводаОРГП;
+  func РћС‚РєСЂС‹С‚СЊРџРѕР—Р°РїРёСЃРё synonym OpenRecord(aRec :Р РљРџ_Р“Р°Р·РµС‚С‹.РџСЂРѕС‚РѕРєРѕР»Р’РІРѕРґР°РћР Р“Рџ): Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РџСЂРѕС‚РѕРєРѕР»Р’РІРѕРґР°РћР Р“Рџ;
     Result = inherited Create;
     Result.Record = aRec;
   end;
 
 
-  func БланкРедакторПоУмолчанию: Class BlankForm;
-    Result = РКП_Газеты.УчетГазет.Отчеты.редПротоколВводаОРГП;
+  func Р‘Р»Р°РЅРєР РµРґР°РєС‚РѕСЂРџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class BlankForm;
+    Result = Р РљРџ_Р“Р°Р·РµС‚С‹.РЈС‡РµС‚Р“Р°Р·РµС‚.РћС‚С‡РµС‚С‹.СЂРµРґРџСЂРѕС‚РѕРєРѕР»Р’РІРѕРґР°РћР Р“Рџ;
   end;
 
-  func КартотекаПоУмолчанию: Class CardForm;
-    Result = РКП_Газеты.УчетГазет.Отчеты.картПротоколВводаОРГП;
+  func РљР°СЂС‚РѕС‚РµРєР°РџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class CardForm;
+    Result = Р РљРџ_Р“Р°Р·РµС‚С‹.РЈС‡РµС‚Р“Р°Р·РµС‚.РћС‚С‡РµС‚С‹.РєР°СЂС‚РџСЂРѕС‚РѕРєРѕР»Р’РІРѕРґР°РћР Р“Рџ;
   end;
 
 inobject public
 
-  Record: РКП_Газеты.ПротоколВводаОРГП;
+  Record: Р РљРџ_Р“Р°Р·РµС‚С‹.РџСЂРѕС‚РѕРєРѕР»Р’РІРѕРґР°РћР Р“Рџ;
 
-  proc ИнициализироватьПоУмолчанию synonym InitByDefault;
+  proc РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊРџРѕРЈРјРѕР»С‡Р°РЅРёСЋ synonym InitByDefault;
     Init;
   end;
 
-  proc Инициализировать synonym Init;
+  proc РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊ synonym Init;
     Assert(Record.State = Kernel.Record.Created);
   end;
 

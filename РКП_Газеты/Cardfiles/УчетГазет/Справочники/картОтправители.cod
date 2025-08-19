@@ -1,18 +1,18 @@
-Class inherited РКП_СИС.CardBaseType0 "Отправители печатной продукции";
+п»їClass inherited Р РљРџ_РЎРРЎ.CardBaseType0 "РћС‚РїСЂР°РІРёС‚РµР»Рё РїРµС‡Р°С‚РЅРѕР№ РїСЂРѕРґСѓРєС†РёРё";
 
-import СИС2 classes Константы, Исключения;
-import РКП_СИС Classes Profile, Functions, StringsFunctions, FilterMaker, Recs;
+import РЎРРЎ2 classes РљРѕРЅСЃС‚Р°РЅС‚С‹, РСЃРєР»СЋС‡РµРЅРёСЏ;
+import Р РљРџ_РЎРРЎ Classes Profile, Functions, StringsFunctions, FilterMaker, Recs;
 
 inclass private
 
-  var КлассИнтерфейса :Class МашинаРеквизитов.Базовые.интЗапись = Базовый.Данные.интСубъект;
+  var РљР»Р°СЃСЃРРЅС‚РµСЂС„РµР№СЃР° :Class РњР°С€РёРЅР°Р РµРєРІРёР·РёС‚РѕРІ.Р‘Р°Р·РѕРІС‹Рµ.РёРЅС‚Р—Р°РїРёСЃСЊ = Р‘Р°Р·РѕРІС‹Р№.Р”Р°РЅРЅС‹Рµ.РёРЅС‚РЎСѓР±СЉРµРєС‚;
 
 inclass public
 
-  func ВыполнитьВыбор (var vSelectRes :Базовый.Данные.Субъект; addParam :Variant[2] = nil) :Integer;
-    var vForm: РКП_Газеты.УчетГазет.Справочники.картОтправители;
-    vForm = РКП_Газеты.УчетГазет.Справочники.картОтправители.Create;
-    vForm.УстСвойстваДоп(addParam);
+  func Р’С‹РїРѕР»РЅРёС‚СЊР’С‹Р±РѕСЂ (var vSelectRes :Р‘Р°Р·РѕРІС‹Р№.Р”Р°РЅРЅС‹Рµ.РЎСѓР±СЉРµРєС‚; addParam :Variant[2] = nil) :Integer;
+    var vForm: Р РљРџ_Р“Р°Р·РµС‚С‹.РЈС‡РµС‚Р“Р°Р·РµС‚.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РєР°СЂС‚РћС‚РїСЂР°РІРёС‚РµР»Рё;
+    vForm = Р РљРџ_Р“Р°Р·РµС‚С‹.РЈС‡РµС‚Р“Р°Р·РµС‚.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РєР°СЂС‚РћС‚РїСЂР°РІРёС‚РµР»Рё.Create;
+    vForm.РЈСЃС‚РЎРІРѕР№СЃС‚РІР°Р”РѕРї(addParam);
     if CmOk = vForm.ShowEx(vSelectRes, , Kernel.Window.ModalWindow) then
       Return CmOk;
     fi;
@@ -20,27 +20,27 @@ inclass public
 
 inobject private
 
-  var ФрагментИНН :String;
-  var фреймСервис :TemplateFrame;
+  var Р¤СЂР°РіРјРµРЅС‚РРќРќ :String;
+  var С„СЂРµР№РјРЎРµСЂРІРёСЃ :TemplateFrame;
 
 
--- 2_Обработчики событий шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ С€Р°Р±Р»РѕРЅР°0. --
 
-  proc шаблон_ПриСоздании(Context :Variant);
-    inherited шаблон_ПриСоздании(Context);
-    фреймСервис.Visible = DevAccess;
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёРЎРѕР·РґР°РЅРёРё(Context :Variant);
+    inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРЎРѕР·РґР°РЅРёРё(Context);
+    С„СЂРµР№РјРЎРµСЂРІРёСЃ.Visible = DevAccess;
     --Self.CanHideTemplate = true;
   end;
 
--- 2_Обработчики событий прочих объектов шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РїСЂРѕС‡РёС… РѕР±СЉРµРєС‚РѕРІ С€Р°Р±Р»РѕРЅР°0. --
 
-  proc кнЗагрузить_ПриНажатии(Sender :Button);
+  proc РєРЅР—Р°РіСЂСѓР·РёС‚СЊ_РџСЂРёРќР°Р¶Р°С‚РёРё(Sender :Button);
     var vFileName, vLine, sValue, vCode, vName, smb :String;
     var vFileCsv :TextFile;
     var aValue :String[];
-    var rSbj :Базовый.Данные.Субъект;
+    var rSbj :Р‘Р°Р·РѕРІС‹Р№.Р”Р°РЅРЅС‹Рµ.РЎСѓР±СЉРµРєС‚;
     var i :Integer;
-    if (cmOk = ChooseFile(vFileName, 'Данные для загрузки', 'csv|*.csv')) then
+    if (cmOk = ChooseFile(vFileName, 'Р”Р°РЅРЅС‹Рµ РґР»СЏ Р·Р°РіСЂСѓР·РєРё', 'csv|*.csv')) then
       vFileCsv = TextFile.Create(vFileName, fmOpenRead);
       ClearTrace;
       vFileCsv.ReadLn;
@@ -58,11 +58,11 @@ inobject private
           fi;
         od;
         --vCode = Trim(aValue[1]);
-        rSbj = FindRecord(Базовый.Данные.Субъект, 'Код="' + vCode + '"');
+        rSbj = FindRecord(Р‘Р°Р·РѕРІС‹Р№.Р”Р°РЅРЅС‹Рµ.РЎСѓР±СЉРµРєС‚, 'РљРѕРґ="' + vCode + '"');
         if (rSbj = nil) then
-          rSbj = Базовый.Данные.Субъект.Create;
+          rSbj = Р‘Р°Р·РѕРІС‹Р№.Р”Р°РЅРЅС‹Рµ.РЎСѓР±СЉРµРєС‚.Create;
         fi;
-        try rSbj.Код = vCode;                   except Trace('Код: ' + vLine); end;
+        try rSbj.РљРѕРґ = vCode;                   except Trace('РљРѕРґ: ' + vLine); end;
         ---
         sValue = Trim(aValue[3]);
         if (SubStr(sValue,1,1) = '"') and (SubStr(sValue,Length(sValue),1) = '"') then
@@ -70,8 +70,8 @@ inobject private
         else
           vName = sValue;
         fi;
-        try rSbj.Имя = vName;                   except Trace('Имя: ' + vLine); end;
-        try rSbj.ПолнИмя = vName;               except Trace('ПолнИмя: ' + vLine); end;
+        try rSbj.РРјСЏ = vName;                   except Trace('РРјСЏ: ' + vLine); end;
+        try rSbj.РџРѕР»РЅРРјСЏ = vName;               except Trace('РџРѕР»РЅРРјСЏ: ' + vLine); end;
         ---
         sValue = Trim(aValue[4]);
         if (SubStr(sValue,1,1) = '"') and (SubStr(sValue,Length(sValue),1) = '"') then
@@ -79,26 +79,26 @@ inobject private
         else
           vName = sValue;
         fi;
-        try rSbj.КраткоеИмя = vName;            except Trace('КраткоеИмя: ' + vLine); end;
-        if (rSbj.КраткоеИмя = nil) and (rSbj.ПолнИмя <> nil) then
-          try rSbj.КраткоеИмя = rSbj.ПолнИмя;   except Trace('КраткоеИмя испр.: ' + vLine); end;
+        try rSbj.РљСЂР°С‚РєРѕРµРРјСЏ = vName;            except Trace('РљСЂР°С‚РєРѕРµРРјСЏ: ' + vLine); end;
+        if (rSbj.РљСЂР°С‚РєРѕРµРРјСЏ = nil) and (rSbj.РџРѕР»РЅРРјСЏ <> nil) then
+          try rSbj.РљСЂР°С‚РєРѕРµРРјСЏ = rSbj.РџРѕР»РЅРРјСЏ;   except Trace('РљСЂР°С‚РєРѕРµРРјСЏ РёСЃРїСЂ.: ' + vLine); end;
         fi;
         ---
-        if (aValue[5] = 'Физическое лицо') then
-          try rSbj.ТипКонтрагента = 1;          except Trace('ТипКонтрагента: ' + vLine); end;
+        if (aValue[5] = 'Р¤РёР·РёС‡РµСЃРєРѕРµ Р»РёС†Рѕ') then
+          try rSbj.РўРёРїРљРѕРЅС‚СЂР°РіРµРЅС‚Р° = 1;          except Trace('РўРёРїРљРѕРЅС‚СЂР°РіРµРЅС‚Р°: ' + vLine); end;
         fi;
-        try rSbj.ИНН = aValue[6];               except Trace('ИНН: ' + vLine); end;
-        --if (rSbj.ИНН <> nil) then
-        --  try rSbj.Код = rSbj.ИНН;              except Trace('Код испр.: ' + vLine); end;
+        try rSbj.РРќРќ = aValue[6];               except Trace('РРќРќ: ' + vLine); end;
+        --if (rSbj.РРќРќ <> nil) then
+        --  try rSbj.РљРѕРґ = rSbj.РРќРќ;              except Trace('РљРѕРґ РёСЃРїСЂ.: ' + vLine); end;
         --fi;
-        try rSbj.КодПричины = aValue[7];        except Trace('КодПричины: ' + vLine); end;
-        try rSbj.ОГРН = aValue[8];              except Trace('ОРГН: ' + vLine); end;
-        try rSbj.Телефон = aValue[9];           except Trace('Телефон: ' + vLine); end;
-        try rSbj.Телефон2 = aValue[10];         except Trace('Телефон2: ' + vLine); end;
-        try rSbj.Факс = aValue[11];             except Trace('Факс: ' + vLine); end;
+        try rSbj.РљРѕРґРџСЂРёС‡РёРЅС‹ = aValue[7];        except Trace('РљРѕРґРџСЂРёС‡РёРЅС‹: ' + vLine); end;
+        try rSbj.РћР“Р Рќ = aValue[8];              except Trace('РћР Р“Рќ: ' + vLine); end;
+        try rSbj.РўРµР»РµС„РѕРЅ = aValue[9];           except Trace('РўРµР»РµС„РѕРЅ: ' + vLine); end;
+        try rSbj.РўРµР»РµС„РѕРЅ2 = aValue[10];         except Trace('РўРµР»РµС„РѕРЅ2: ' + vLine); end;
+        try rSbj.Р¤Р°РєСЃ = aValue[11];             except Trace('Р¤Р°РєСЃ: ' + vLine); end;
         try rSbj.E_Mail = aValue[13];           except Trace('E_Mail: ' + vLine); end;
-        try rSbj.АдресФактический = Trim(aValue[14]); except Trace('АдресФактический: ' + vLine); end;
-        try rSbj.ЮрАдрес = Trim(aValue[15]);          except Trace('ЮрАдрес: ' + vLine); end;
+        try rSbj.РђРґСЂРµСЃР¤Р°РєС‚РёС‡РµСЃРєРёР№ = Trim(aValue[14]); except Trace('РђРґСЂРµСЃР¤Р°РєС‚РёС‡РµСЃРєРёР№: ' + vLine); end;
+        try rSbj.Р®СЂРђРґСЂРµСЃ = Trim(aValue[15]);          except Trace('Р®СЂРђРґСЂРµСЃ: ' + vLine); end;
         try
           RecordPostIfNeed(rSbj);
         except
@@ -108,21 +108,21 @@ inobject private
     fi;
   end;
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
-  func ПолучитьФильтрКартотеки (var locTreeFilter :String = nil) :String;
+  func РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРљР°СЂС‚РѕС‚РµРєРё (var locTreeFilter :String = nil) :String;
     var aFlt :String[];
-    AddInArray( aFlt, inherited ПолучитьФильтрКартотеки(locTreeFilter) );
-    AddInArray( aFlt, ПолучитьФильтрПоФрагментуИНН );
+    AddInArray( aFlt, inherited РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРљР°СЂС‚РѕС‚РµРєРё(locTreeFilter) );
+    AddInArray( aFlt, РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРџРѕР¤СЂР°РіРјРµРЅС‚СѓРРќРќ );
     Result = MakeFilter(aFlt);
   end;
 
-  func ПолучитьФильтрПоФрагментуИНН :String;
-    Result = if((ФрагментИНН <> nil), "Match(ИНН,'*" + ФрагментИНН +"*')", nil);
+  func РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРџРѕР¤СЂР°РіРјРµРЅС‚СѓРРќРќ :String;
+    Result = if((Р¤СЂР°РіРјРµРЅС‚РРќРќ <> nil), "Match(РРќРќ,'*" + Р¤СЂР°РіРјРµРЅС‚РРќРќ +"*')", nil);
   end;
 
-  -- Установка свойств объекта по дополнительным параметрам конструктора "ВыполнитьВыбор"
-  proc УстСвойстваДоп(addParam :Variant[2]);
+  -- РЈСЃС‚Р°РЅРѕРІРєР° СЃРІРѕР№СЃС‚РІ РѕР±СЉРµРєС‚Р° РїРѕ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рј РїР°СЂР°РјРµС‚СЂР°Рј РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂР° "Р’С‹РїРѕР»РЅРёС‚СЊР’С‹Р±РѕСЂ"
+  proc РЈСЃС‚РЎРІРѕР№СЃС‚РІР°Р”РѕРї(addParam :Variant[2]);
     var i, ii :Integer;
     var aValue :Variant[];
     ii = LengthOfArray(addParam);

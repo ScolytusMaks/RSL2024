@@ -1,47 +1,47 @@
-extends Базовый.Данные.интСубъект;
+п»їextends Р‘Р°Р·РѕРІС‹Р№.Р”Р°РЅРЅС‹Рµ.РёРЅС‚РЎСѓР±СЉРµРєС‚;
 
 inclass public
 
-  func БланкРедакторПоУмолчанию :Class BlankForm;
-    Return УчетГазет.Справочники.редОтправитель;
+  func Р‘Р»Р°РЅРєР РµРґР°РєС‚РѕСЂРџРѕРЈРјРѕР»С‡Р°РЅРёСЋ :Class BlankForm;
+    Return РЈС‡РµС‚Р“Р°Р·РµС‚.РЎРїСЂР°РІРѕС‡РЅРёРєРё.СЂРµРґРћС‚РїСЂР°РІРёС‚РµР»СЊ;
   end;
 
-  func КартотекаПоУмолчанию: Class CardForm;
-    Result = УчетГазет.Справочники.картОтправители;
+  func РљР°СЂС‚РѕС‚РµРєР°РџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class CardForm;
+    Result = РЈС‡РµС‚Р“Р°Р·РµС‚.РЎРїСЂР°РІРѕС‡РЅРёРєРё.РєР°СЂС‚РћС‚РїСЂР°РІРёС‚РµР»Рё;
   end;
 
 inobject public
 
-  proc ИнициализироватьПоУмолчанию synonym InitByDefault;
-    Init('Новый отправитель', Record.ExtID);
+  proc РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊРџРѕРЈРјРѕР»С‡Р°РЅРёСЋ synonym InitByDefault;
+    Init('РќРѕРІС‹Р№ РѕС‚РїСЂР°РІРёС‚РµР»СЊ', Record.ExtID);
     with Record do
-      if (КраткоеИмя = nil) and (Имя <> nil) then
-        КраткоеИмя = Имя;
+      if (РљСЂР°С‚РєРѕРµРРјСЏ = nil) and (РРјСЏ <> nil) then
+        РљСЂР°С‚РєРѕРµРРјСЏ = РРјСЏ;
       fi;
     end;
   end;
 
 inobject private
 
-  proc ДействияПриДублировании;
-    extended ДействияПриДублировании;
-    Record.ИНН = nil;
-    Record.Код = Record.ExtID;
+  proc Р”РµР№СЃС‚РІРёСЏРџСЂРёР”СѓР±Р»РёСЂРѕРІР°РЅРёРё;
+    extended Р”РµР№СЃС‚РІРёСЏРџСЂРёР”СѓР±Р»РёСЂРѕРІР°РЅРёРё;
+    Record.РРќРќ = nil;
+    Record.РљРѕРґ = Record.ExtID;
   end;
 
-  proc Записать synonym Post( аДиалоговыйРежим :Logical = False );
-    if (Record.ЮрАдрес = nil) and (Record.АдресФактический = nil) and (Record.АдресПочтовый = nil) then
-      Record.Адрес = nil;
+  proc Р—Р°РїРёСЃР°С‚СЊ synonym Post( Р°Р”РёР°Р»РѕРіРѕРІС‹Р№Р РµР¶РёРј :Logical = False );
+    if (Record.Р®СЂРђРґСЂРµСЃ = nil) and (Record.РђРґСЂРµСЃР¤Р°РєС‚РёС‡РµСЃРєРёР№ = nil) and (Record.РђРґСЂРµСЃРџРѕС‡С‚РѕРІС‹Р№ = nil) then
+      Record.РђРґСЂРµСЃ = nil;
     else
-      if (Record.АдресПочтовый <> nil) then    Record.Адрес = Record.АдресПочтовый; fi;
-      if (Record.АдресФактический <> nil) then Record.Адрес = Record.АдресФактический; fi;
-      if (Record.ЮрАдрес <> nil) then          Record.Адрес = Record.ЮрАдрес; fi;
+      if (Record.РђРґСЂРµСЃРџРѕС‡С‚РѕРІС‹Р№ <> nil) then    Record.РђРґСЂРµСЃ = Record.РђРґСЂРµСЃРџРѕС‡С‚РѕРІС‹Р№; fi;
+      if (Record.РђРґСЂРµСЃР¤Р°РєС‚РёС‡РµСЃРєРёР№ <> nil) then Record.РђРґСЂРµСЃ = Record.РђРґСЂРµСЃР¤Р°РєС‚РёС‡РµСЃРєРёР№; fi;
+      if (Record.Р®СЂРђРґСЂРµСЃ <> nil) then          Record.РђРґСЂРµСЃ = Record.Р®СЂРђРґСЂРµСЃ; fi;
     fi;
-    if (Record.КраткоеИмя = nil) and (Record.ПолнИмя = nil) then
-      Record.Имя = nil;
+    if (Record.РљСЂР°С‚РєРѕРµРРјСЏ = nil) and (Record.РџРѕР»РЅРРјСЏ = nil) then
+      Record.РРјСЏ = nil;
     else
-      if (Record.КраткоеИмя <> nil) then Record.Имя = Record.КраткоеИмя; fi;
-      if (Record.ПолнИмя <> nil) then    Record.Имя = Record.ПолнИмя; fi;
+      if (Record.РљСЂР°С‚РєРѕРµРРјСЏ <> nil) then Record.РРјСЏ = Record.РљСЂР°С‚РєРѕРµРРјСЏ; fi;
+      if (Record.РџРѕР»РЅРРјСЏ <> nil) then    Record.РРјСЏ = Record.РџРѕР»РЅРРјСЏ; fi;
     fi;
     extended Post;
   end;

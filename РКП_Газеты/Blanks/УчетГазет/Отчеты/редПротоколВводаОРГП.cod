@@ -1,152 +1,152 @@
-class inherited РКП_СИС.редОтчетОРаботеБазовый "Сводный отчет по вводу данных", editor ПротоколВводаОРГП;
+п»їclass inherited Р РљРџ_РЎРРЎ.СЂРµРґРћС‚С‡РµС‚РћР Р°Р±РѕС‚РµР‘Р°Р·РѕРІС‹Р№ "РЎРІРѕРґРЅС‹Р№ РѕС‚С‡РµС‚ РїРѕ РІРІРѕРґСѓ РґР°РЅРЅС‹С…", editor РџСЂРѕС‚РѕРєРѕР»Р’РІРѕРґР°РћР Р“Рџ;
 
-import РКП_СИС classes StdCode, Recs, Functions, FilterMaker, Def, StringsFunctions, RI.intBase;
+import Р РљРџ_РЎРРЎ classes StdCode, Recs, Functions, FilterMaker, Def, StringsFunctions, RI.intBase;
 
 inobject private
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 
-  var Интерфейс :РКП_Газеты.RI.ПротоколВводаОРГП;
+  var РРЅС‚РµСЂС„РµР№СЃ :Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РџСЂРѕС‚РѕРєРѕР»Р’РІРѕРґР°РћР Р“Рџ;
 
-  var КомпетенцииВОтчете :tCompetence[] := [кмпОРГПзав, кмпОРГПсотр];
+  var РљРѕРјРїРµС‚РµРЅС†РёРёР’РћС‚С‡РµС‚Рµ :tCompetence[] := [РєРјРїРћР Р“РџР·Р°РІ, РєРјРїРћР Р“РџСЃРѕС‚СЂ];
 
-  var секцНомера      :TemplateSection;
-  var секцГазеты      :TemplateSection;
+  var СЃРµРєС†РќРѕРјРµСЂР°      :TemplateSection;
+  var СЃРµРєС†Р“Р°Р·РµС‚С‹      :TemplateSection;
 
 --}}
 
--- 2_Конструкторы, визуализаторы0. --
+-- 2_РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹, РІРёР·СѓР°Р»РёР·Р°С‚РѕСЂС‹0. --
 
 inclass public
 
 inobject private
 
--- 2_Обработчики событий шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ С€Р°Р±Р»РѕРЅР°0. --
 
 
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
-  func Поле_ПриВыводе_ЗаголовокОкнаФормы(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
-    Result = 'Протокол ввода данных ОРГП' + Br +
-             '№ ' + Str(НомерОтчета) + ' / ' + Str(ЗаГод) + Br +
-             '<s-><s->за период с ' + Str(ДатаН) + ' по  ' + Str(ДатаК) + ' включительно';
+  func РџРѕР»Рµ_РџСЂРёР’С‹РІРѕРґРµ_Р—Р°РіРѕР»РѕРІРѕРєРћРєРЅР°Р¤РѕСЂРјС‹(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    Result = 'РџСЂРѕС‚РѕРєРѕР» РІРІРѕРґР° РґР°РЅРЅС‹С… РћР Р“Рџ' + Br +
+             'в„– ' + Str(РќРѕРјРµСЂРћС‚С‡РµС‚Р°) + ' / ' + Str(Р—Р°Р“РѕРґ) + Br +
+             '<s-><s->Р·Р° РїРµСЂРёРѕРґ СЃ ' + Str(Р”Р°С‚Р°Рќ) + ' РїРѕ  ' + Str(Р”Р°С‚Р°Рљ) + ' РІРєР»СЋС‡РёС‚РµР»СЊРЅРѕ';
   end;
 
 
--- 2_Обработчики событий прочих объектов шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РїСЂРѕС‡РёС… РѕР±СЉРµРєС‚РѕРІ С€Р°Р±Р»РѕРЅР°0. --
 
 
--- 2_Дополнительные команды0. --
+-- 2_Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ РєРѕРјР°РЅРґС‹0. --
 
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
-  proc НовыйНомер;
+  proc РќРѕРІС‹Р№РќРѕРјРµСЂ;
     if (Self.Record.State = Kernel.Record.Created) then
-      ЗаГод = Year(today);
-      with Query.Create([РКП_Газеты.ПротоколВводаОРГП]) do
-        Filter = 'ЗаГод=' + Str(Year(today)) +' and DocID<>' + Str(Record.DocID);
-        Order  = 'НомерОтчета-';
+      Р—Р°Р“РѕРґ = Year(today);
+      with Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.РџСЂРѕС‚РѕРєРѕР»Р’РІРѕРґР°РћР Р“Рџ]) do
+        Filter = 'Р—Р°Р“РѕРґ=' + Str(Year(today)) +' and DocID<>' + Str(Record.DocID);
+        Order  = 'РќРѕРјРµСЂРћС‚С‡РµС‚Р°-';
         Select;
         if not (RecordsExists) then
-          НомерОтчета = 1;
+          РќРѕРјРµСЂРћС‚С‡РµС‚Р° = 1;
         else
-          НомерОтчета = (Current.НомерОтчета + 1);
+          РќРѕРјРµСЂРћС‚С‡РµС‚Р° = (Current.РќРѕРјРµСЂРћС‚С‡РµС‚Р° + 1);
         fi;
       end;
     fi;
   end;
 
-  func ПостроитьОтчет :Logical;
+  func РџРѕСЃС‚СЂРѕРёС‚СЊРћС‚С‡РµС‚ :Logical;
     var aUserName :String[];
     var aUserFullName :String[2];
     var aResult :Variant[2]; --[[UserName, FullName, vCreateCount, vUpdateCount]]
     var i :Integer;
-    Result = inherited ПостроитьОтчет;
+    Result = inherited РџРѕСЃС‚СЂРѕРёС‚СЊРћС‚С‡РµС‚;
     if Result then
-      Газеты.Clear;
-      Номера.Clear;
-      Поступления.Clear;
-      УчДок.Clear;
-      ВсегоВведеноГазет         = nil;
-      ВсегоРедактированоГазет   = nil;
-      ВсегоВведеноНомеров       = nil;
-      ВсегоРедактированоНомеров = nil;
-      ВсегоВведеноПоступлений       = nil;
-      ВсегоРедактированоПоступлений = nil;
-      ВсегоВведеноУчДок             = nil;
-      ВсегоРедактированоУчДок       = nil;
-      aUserFullName = ПолучитьПолныеИменаПользователей;
-      aUserName = ПолучитьИменаПользователей('Газета');
+      Р“Р°Р·РµС‚С‹.Clear;
+      РќРѕРјРµСЂР°.Clear;
+      РџРѕСЃС‚СѓРїР»РµРЅРёСЏ.Clear;
+      РЈС‡Р”РѕРє.Clear;
+      Р’СЃРµРіРѕР’РІРµРґРµРЅРѕР“Р°Р·РµС‚         = nil;
+      Р’СЃРµРіРѕР РµРґР°РєС‚РёСЂРѕРІР°РЅРѕР“Р°Р·РµС‚   = nil;
+      Р’СЃРµРіРѕР’РІРµРґРµРЅРѕРќРѕРјРµСЂРѕРІ       = nil;
+      Р’СЃРµРіРѕР РµРґР°РєС‚РёСЂРѕРІР°РЅРѕРќРѕРјРµСЂРѕРІ = nil;
+      Р’СЃРµРіРѕР’РІРµРґРµРЅРѕРџРѕСЃС‚СѓРїР»РµРЅРёР№       = nil;
+      Р’СЃРµРіРѕР РµРґР°РєС‚РёСЂРѕРІР°РЅРѕРџРѕСЃС‚СѓРїР»РµРЅРёР№ = nil;
+      Р’СЃРµРіРѕР’РІРµРґРµРЅРѕРЈС‡Р”РѕРє             = nil;
+      Р’СЃРµРіРѕР РµРґР°РєС‚РёСЂРѕРІР°РЅРѕРЈС‡Р”РѕРє       = nil;
+      aUserFullName = РџРѕР»СѓС‡РёС‚СЊРџРѕР»РЅС‹РµРРјРµРЅР°РџРѕР»СЊР·РѕРІР°С‚РµР»РµР№;
+      aUserName = РџРѕР»СѓС‡РёС‚СЊРРјРµРЅР°РџРѕР»СЊР·РѕРІР°С‚РµР»РµР№('Р“Р°Р·РµС‚Р°');
       if (aUserName <> nil) then
-        aResult = ПолучитьВыборку(aUserName, 'Газета');
-        РасшифроватьИмена(aResult, aUserFullName);
+        aResult = РџРѕР»СѓС‡РёС‚СЊР’С‹Р±РѕСЂРєСѓ(aUserName, 'Р“Р°Р·РµС‚Р°');
+        Р Р°СЃС€РёС„СЂРѕРІР°С‚СЊРРјРµРЅР°(aResult, aUserFullName);
         for i = 1 .. LengthOfArray(aResult) do
-          with Self.Record.Газеты.AddEx do
-            ОператорИмя   = aResult[i,1] as String;
-            Оператор      = aResult[i,2] as String;
-            Введено       = aResult[i,3] as Integer;
-            Редактировано = aResult[i,4] as Integer;
-            ВсегоВведеноГазет       = ВсегоВведеноГазет       + aResult[i,3] as Integer;
-            ВсегоРедактированоГазет = ВсегоРедактированоГазет + aResult[i,4] as Integer;
+          with Self.Record.Р“Р°Р·РµС‚С‹.AddEx do
+            РћРїРµСЂР°С‚РѕСЂРРјСЏ   = aResult[i,1] as String;
+            РћРїРµСЂР°С‚РѕСЂ      = aResult[i,2] as String;
+            Р’РІРµРґРµРЅРѕ       = aResult[i,3] as Integer;
+            Р РµРґР°РєС‚РёСЂРѕРІР°РЅРѕ = aResult[i,4] as Integer;
+            Р’СЃРµРіРѕР’РІРµРґРµРЅРѕР“Р°Р·РµС‚       = Р’СЃРµРіРѕР’РІРµРґРµРЅРѕР“Р°Р·РµС‚       + aResult[i,3] as Integer;
+            Р’СЃРµРіРѕР РµРґР°РєС‚РёСЂРѕРІР°РЅРѕР“Р°Р·РµС‚ = Р’СЃРµРіРѕР РµРґР°РєС‚РёСЂРѕРІР°РЅРѕР“Р°Р·РµС‚ + aResult[i,4] as Integer;
           end;
         od;
       fi;
       --
-      aUserName = ПолучитьИменаПользователей('НомерГазеты');
+      aUserName = РџРѕР»СѓС‡РёС‚СЊРРјРµРЅР°РџРѕР»СЊР·РѕРІР°С‚РµР»РµР№('РќРѕРјРµСЂР“Р°Р·РµС‚С‹');
       if (aUserName <> nil) then
-        aResult = ПолучитьВыборку(aUserName, 'НомерГазеты');
-        РасшифроватьИмена(aResult, aUserFullName);
+        aResult = РџРѕР»СѓС‡РёС‚СЊР’С‹Р±РѕСЂРєСѓ(aUserName, 'РќРѕРјРµСЂР“Р°Р·РµС‚С‹');
+        Р Р°СЃС€РёС„СЂРѕРІР°С‚СЊРРјРµРЅР°(aResult, aUserFullName);
         for i = 1 .. LengthOfArray(aResult) do
-          with Self.Record.Номера.AddEx do
-            ОператорИмя   = aResult[i,1] as String;
-            Оператор      = aResult[i,2] as String;
-            Введено       = aResult[i,3] as Integer;
-            Редактировано = aResult[i,4] as Integer;
-            ВсегоВведеноНомеров       = ВсегоВведеноНомеров       + aResult[i,3] as Integer;
-            ВсегоРедактированоНомеров = ВсегоРедактированоНомеров + aResult[i,4] as Integer;
+          with Self.Record.РќРѕРјРµСЂР°.AddEx do
+            РћРїРµСЂР°С‚РѕСЂРРјСЏ   = aResult[i,1] as String;
+            РћРїРµСЂР°С‚РѕСЂ      = aResult[i,2] as String;
+            Р’РІРµРґРµРЅРѕ       = aResult[i,3] as Integer;
+            Р РµРґР°РєС‚РёСЂРѕРІР°РЅРѕ = aResult[i,4] as Integer;
+            Р’СЃРµРіРѕР’РІРµРґРµРЅРѕРќРѕРјРµСЂРѕРІ       = Р’СЃРµРіРѕР’РІРµРґРµРЅРѕРќРѕРјРµСЂРѕРІ       + aResult[i,3] as Integer;
+            Р’СЃРµРіРѕР РµРґР°РєС‚РёСЂРѕРІР°РЅРѕРќРѕРјРµСЂРѕРІ = Р’СЃРµРіРѕР РµРґР°РєС‚РёСЂРѕРІР°РЅРѕРќРѕРјРµСЂРѕРІ + aResult[i,4] as Integer;
           end;
         od;
       fi;
       --
-      aUserName = ПолучитьИменаПользователей('ЕдиницаХранения');
+      aUserName = РџРѕР»СѓС‡РёС‚СЊРРјРµРЅР°РџРѕР»СЊР·РѕРІР°С‚РµР»РµР№('Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ');
       if (aUserName <> nil) then
-        aResult = ПолучитьВыборку(aUserName, 'ЕдиницаХранения');
-        РасшифроватьИмена(aResult, aUserFullName);
+        aResult = РџРѕР»СѓС‡РёС‚СЊР’С‹Р±РѕСЂРєСѓ(aUserName, 'Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ');
+        Р Р°СЃС€РёС„СЂРѕРІР°С‚СЊРРјРµРЅР°(aResult, aUserFullName);
         for i = 1 .. LengthOfArray(aResult) do
-          with Self.Record.Поступления.AddEx do
-            ОператорИмя   = aResult[i,1] as String;
-            Оператор      = aResult[i,2] as String;
-            Введено       = aResult[i,3] as Integer;
-            Редактировано = aResult[i,4] as Integer;
-            ВсегоВведеноПоступлений       = ВсегоВведеноПоступлений       + aResult[i,3] as Integer;
-            ВсегоРедактированоПоступлений = ВсегоРедактированоПоступлений + aResult[i,4] as Integer;
+          with Self.Record.РџРѕСЃС‚СѓРїР»РµРЅРёСЏ.AddEx do
+            РћРїРµСЂР°С‚РѕСЂРРјСЏ   = aResult[i,1] as String;
+            РћРїРµСЂР°С‚РѕСЂ      = aResult[i,2] as String;
+            Р’РІРµРґРµРЅРѕ       = aResult[i,3] as Integer;
+            Р РµРґР°РєС‚РёСЂРѕРІР°РЅРѕ = aResult[i,4] as Integer;
+            Р’СЃРµРіРѕР’РІРµРґРµРЅРѕРџРѕСЃС‚СѓРїР»РµРЅРёР№       = Р’СЃРµРіРѕР’РІРµРґРµРЅРѕРџРѕСЃС‚СѓРїР»РµРЅРёР№       + aResult[i,3] as Integer;
+            Р’СЃРµРіРѕР РµРґР°РєС‚РёСЂРѕРІР°РЅРѕРџРѕСЃС‚СѓРїР»РµРЅРёР№ = Р’СЃРµРіРѕР РµРґР°РєС‚РёСЂРѕРІР°РЅРѕРџРѕСЃС‚СѓРїР»РµРЅРёР№ + aResult[i,4] as Integer;
           end;
         od;
       fi;
       --
-      aUserName = ПолучитьИменаПользователей('УчетныйДокумент');
+      aUserName = РџРѕР»СѓС‡РёС‚СЊРРјРµРЅР°РџРѕР»СЊР·РѕРІР°С‚РµР»РµР№('РЈС‡РµС‚РЅС‹Р№Р”РѕРєСѓРјРµРЅС‚');
       if (aUserName <> nil) then
-        aResult = ПолучитьВыборку(aUserName, 'УчетныйДокумент');
-        РасшифроватьИмена(aResult, aUserFullName);
+        aResult = РџРѕР»СѓС‡РёС‚СЊР’С‹Р±РѕСЂРєСѓ(aUserName, 'РЈС‡РµС‚РЅС‹Р№Р”РѕРєСѓРјРµРЅС‚');
+        Р Р°СЃС€РёС„СЂРѕРІР°С‚СЊРРјРµРЅР°(aResult, aUserFullName);
         for i = 1 .. LengthOfArray(aResult) do
-          with Self.Record.УчДок.AddEx do
-            ОператорИмя   = aResult[i,1] as String;
-            Оператор      = aResult[i,2] as String;
-            Введено       = aResult[i,3] as Integer;
-            Редактировано = aResult[i,4] as Integer;
-            ВсегоВведеноУчДок       = ВсегоВведеноУчДок       + aResult[i,3] as Integer;
-            ВсегоРедактированоУчДок = ВсегоРедактированоУчДок + aResult[i,4] as Integer;
+          with Self.Record.РЈС‡Р”РѕРє.AddEx do
+            РћРїРµСЂР°С‚РѕСЂРРјСЏ   = aResult[i,1] as String;
+            РћРїРµСЂР°С‚РѕСЂ      = aResult[i,2] as String;
+            Р’РІРµРґРµРЅРѕ       = aResult[i,3] as Integer;
+            Р РµРґР°РєС‚РёСЂРѕРІР°РЅРѕ = aResult[i,4] as Integer;
+            Р’СЃРµРіРѕР’РІРµРґРµРЅРѕРЈС‡Р”РѕРє       = Р’СЃРµРіРѕР’РІРµРґРµРЅРѕРЈС‡Р”РѕРє       + aResult[i,3] as Integer;
+            Р’СЃРµРіРѕР РµРґР°РєС‚РёСЂРѕРІР°РЅРѕРЈС‡Р”РѕРє = Р’СЃРµРіРѕР РµРґР°РєС‚РёСЂРѕРІР°РЅРѕРЈС‡Р”РѕРє + aResult[i,4] as Integer;
           end;
         od;
       fi;
     fi;
   end;
 
-  func ПолучитьИменаПользователей( КорИмяКлассаЗаписей :String ) :String[];
+  func РџРѕР»СѓС‡РёС‚СЊРРјРµРЅР°РџРѕР»СЊР·РѕРІР°С‚РµР»РµР№( РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№ :String ) :String[];
     var QResult :Variant[2];
-    with Query.Create([РКП_СИС.ЛогРабот]) do
-      Filter = ПолучитьФильтрЗапросаЛога(КорИмяКлассаЗаписей);
+    with Query.Create([Р РљРџ_РЎРРЎ.Р›РѕРіР Р°Р±РѕС‚]) do
+      Filter = РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂР—Р°РїСЂРѕСЃР°Р›РѕРіР°(РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№);
       QResult = CalcAggregates('GroupBy(CreateUser)') as Variant[2];
     end;
     if (QResult <> nil) then
@@ -155,7 +155,7 @@ inobject private
     fi;
   end;
 
-  func ПолучитьПолныеИменаПользователей :String[2];
+  func РџРѕР»СѓС‡РёС‚СЊРџРѕР»РЅС‹РµРРјРµРЅР°РџРѕР»СЊР·РѕРІР°С‚РµР»РµР№ :String[2];
     var cResult :String[];
     with Query.Create([Kernel.Settings.User]) do
       Filter = 'isGroup=0';
@@ -169,74 +169,74 @@ inobject private
     SortArray(Result, [1]);
   end;
 
-  func ПолучитьФильтрЗапросаЛога( КорИмяКлассаЗаписей :String ) :String;
+  func РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂР—Р°РїСЂРѕСЃР°Р›РѕРіР°( РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№ :String ) :String;
     var aFlt :String[];
-    AddInArray( aFlt, ПолучитьФильтрКомпетенций );
-    AddInArray( aFlt, ПолучитьФильтрДат );
-    AddInArray( aFlt, ПолучитьФильтрКлассаЗаписей(КорИмяКлассаЗаписей) );
+    AddInArray( aFlt, РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРљРѕРјРїРµС‚РµРЅС†РёР№ );
+    AddInArray( aFlt, РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂР”Р°С‚ );
+    AddInArray( aFlt, РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№(РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№) );
     Result = MakeFilter( aFlt );
   end;
 
-  func ПолучитьФильтрКомпетенций :String;
+  func РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРљРѕРјРїРµС‚РµРЅС†РёР№ :String;
     var i :Integer;
     var aFlt :String[];
-    for i = 1 .. LengthOfArray(КомпетенцииВОтчете) do
-      AddInArray( aFlt, 'Match(Competencies, "*|' + Str(КомпетенцииВОтчете[i]) + '|*")' );
+    for i = 1 .. LengthOfArray(РљРѕРјРїРµС‚РµРЅС†РёРёР’РћС‚С‡РµС‚Рµ) do
+      AddInArray( aFlt, 'Match(Competencies, "*|' + Str(РљРѕРјРїРµС‚РµРЅС†РёРёР’РћС‚С‡РµС‚Рµ[i]) + '|*")' );
     od;
     Result = MakeFilter( aFlt, byOr );
   end;
 
-  func ПолучитьФильтрДат :String;
+  func РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂР”Р°С‚ :String;
     var aFlt :String[];
-    AddInArray( aFlt, 'CreateDate>=' + Str(ДатаН) );
-    AddInArray( aFlt, 'CreateDate<' + Str(ДатаК + 1) );
+    AddInArray( aFlt, 'CreateDate>=' + Str(Р”Р°С‚Р°Рќ) );
+    AddInArray( aFlt, 'CreateDate<' + Str(Р”Р°С‚Р°Рљ + 1) );
     Result = MakeFilter( aFlt );
   end;
 
-  func ПолучитьФильтрКлассаЗаписей( КорИмяКлассаЗаписей :String ) :String;
-    if (КорИмяКлассаЗаписей = 'Газета')             then Result = 'RClass="РКП_Газеты.Газета"';
-    elsif (КорИмяКлассаЗаписей = 'НомерГазеты')     then Result = 'RClass="РКП_Газеты.НомерГазеты"';
-    elsif (КорИмяКлассаЗаписей = 'ЕдиницаХранения') then Result = 'RClass="РКП_Газеты.ЕдиницаХранения"';
-    elsif (КорИмяКлассаЗаписей = 'УчетныйДокумент') then Result = 'RClass="РКП_Газеты.УчетныйДокумент"';
+  func РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№( РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№ :String ) :String;
+    if (РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№ = 'Р“Р°Р·РµС‚Р°')             then Result = 'RClass="Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°"';
+    elsif (РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№ = 'РќРѕРјРµСЂР“Р°Р·РµС‚С‹')     then Result = 'RClass="Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹"';
+    elsif (РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№ = 'Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ') then Result = 'RClass="Р РљРџ_Р“Р°Р·РµС‚С‹.Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ"';
+    elsif (РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№ = 'РЈС‡РµС‚РЅС‹Р№Р”РѕРєСѓРјРµРЅС‚') then Result = 'RClass="Р РљРџ_Р“Р°Р·РµС‚С‹.РЈС‡РµС‚РЅС‹Р№Р”РѕРєСѓРјРµРЅС‚"';
     fi;
   end;
 
-  func ПолучитьВыборку(aUserName :String[]; КорИмяКлассаЗаписей :String ) :Variant[2];  --[[UserName, nil, vCreateCount, vUpdateCount]]
+  func РџРѕР»СѓС‡РёС‚СЊР’С‹Р±РѕСЂРєСѓ(aUserName :String[]; РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№ :String ) :Variant[2];  --[[UserName, nil, vCreateCount, vUpdateCount]]
     var vCreateCount, vUpdateCount :Integer;
     var cResult :Variant[];
-    var cRec :РКП_СИС.ЛогРабот;
+    var cRec :Р РљРџ_РЎРРЎ.Р›РѕРіР Р°Р±РѕС‚;
     var i :Integer;
-    var rNsp :РКП_Газеты.Газета;
+    var rNsp :Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°;
     if (aUserName <> nil) then
-      with Query.Create([РКП_СИС.ЛогРабот]) do
-        Filter = ПолучитьФильтрЗапросаЛога(КорИмяКлассаЗаписей);
+      with Query.Create([Р РљРџ_РЎРРЎ.Р›РѕРіР Р°Р±РѕС‚]) do
+        Filter = РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂР—Р°РїСЂРѕСЃР°Р›РѕРіР°(РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№);
         Select;
         while not Eof do
-          cRec = Current as РКП_СИС.ЛогРабот;
+          cRec = Current as Р РљРџ_РЎРРЎ.Р›РѕРіР Р°Р±РѕС‚;
           i = SearchInArray(aUserName, cRec.CreateUser,,true);
           if (i > 0) then
             cResult = Result[i] as Variant[];
             vCreateCount = cResult[3] as Integer;
             vUpdateCount = cResult[4] as Integer;
-            if (КорИмяКлассаЗаписей = 'Газета')             then
+            if (РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№ = 'Р“Р°Р·РµС‚Р°')             then
               if (cRec.ActionType = wsRecCreated) and (cRec.StoredValL = false) then
                 vCreateCount = vCreateCount + 1;
               fi;
               if (cRec.ActionType = wsRecUpdated) then
                 vUpdateCount = vUpdateCount + 1;
               fi;
-            elsif (КорИмяКлассаЗаписей = 'НомерГазеты')     then
+            elsif (РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№ = 'РќРѕРјРµСЂР“Р°Р·РµС‚С‹')     then
               if (cRec.ActionType = wsAccepted) then
                 vCreateCount = vCreateCount + 1;
               fi;
               if (cRec.ActionType = wsAcpUpdated) then
                 vUpdateCount = vUpdateCount + 1;
               fi;
-            elsif (КорИмяКлассаЗаписей = 'ЕдиницаХранения') then
+            elsif (РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№ = 'Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ') then
               if (cRec.ActionType = wsAccepted) then
-                vCreateCount = vCreateCount + cRec.StoredValI; -- суммируется количество номеров
+                vCreateCount = vCreateCount + cRec.StoredValI; -- СЃСѓРјРјРёСЂСѓРµС‚СЃСЏ РєРѕР»РёС‡РµСЃС‚РІРѕ РЅРѕРјРµСЂРѕРІ
               fi;
-            elsif (КорИмяКлассаЗаписей = 'УчетныйДокумент') then
+            elsif (РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№ = 'РЈС‡РµС‚РЅС‹Р№Р”РѕРєСѓРјРµРЅС‚') then
               if (cRec.ActionType = wsRecCreated) then
                 vCreateCount = vCreateCount + 1;
               fi;
@@ -253,7 +253,7 @@ inobject private
     end;
   end;
 
-  proc РасшифроватьИмена(var aResult :Variant[2]; aUserFullName :String[2]);
+  proc Р Р°СЃС€РёС„СЂРѕРІР°С‚СЊРРјРµРЅР°(var aResult :Variant[2]; aUserFullName :String[2]);
     var vUserFullName :String;
     var i, j :Integer;
     for i = 1 .. LengthOfArray(aResult) do

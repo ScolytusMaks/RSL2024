@@ -1,45 +1,45 @@
-Class inherited МашинаРеквизитов.Базовые.блРедакторСИнтерфейсом "Единица хранения" , editor ЕдиницаХранения;
+п»їClass inherited РњР°С€РёРЅР°Р РµРєРІРёР·РёС‚РѕРІ.Р‘Р°Р·РѕРІС‹Рµ.Р±Р»Р РµРґР°РєС‚РѕСЂРЎРРЅС‚РµСЂС„РµР№СЃРѕРј "Р•РґРёРЅРёС†Р° С…СЂР°РЅРµРЅРёСЏ" , editor Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ;
 
-import РКП_СИС classes StdCode, Recs, Functions, FilterMaker, StringsFunctions;
-import classes Константы;
+import Р РљРџ_РЎРРЎ classes StdCode, Recs, Functions, FilterMaker, StringsFunctions;
+import classes РљРѕРЅСЃС‚Р°РЅС‚С‹;
 
 inclass public
 
 inobject private
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 
-  var Интерфейс :РКП_Газеты.RI.ЕдиницаХранения;
-  var ПроверкаПередЗакрытиемВкл :Logical;
+  var РРЅС‚РµСЂС„РµР№СЃ :Р РљРџ_Р“Р°Р·РµС‚С‹.RI.Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ;
+  var РџСЂРѕРІРµСЂРєР°РџРµСЂРµРґР—Р°РєСЂС‹С‚РёРµРјР’РєР» :Logical;
 
 --}}
 
--- 2_Конструкторы, визуализаторы0. --
+-- 2_РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹, РІРёР·СѓР°Р»РёР·Р°С‚РѕСЂС‹0. --
 
 inclass public
 
 inobject private
 
--- 2_Обработчики событий шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ С€Р°Р±Р»РѕРЅР°0. --
 
-  proc шаблон_ПриСчитывании;
-    inherited шаблон_ПриСчитывании;
-    ПроверкаПередЗакрытиемВкл = true;
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёРЎС‡РёС‚С‹РІР°РЅРёРё;
+    inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРЎС‡РёС‚С‹РІР°РЅРёРё;
+    РџСЂРѕРІРµСЂРєР°РџРµСЂРµРґР—Р°РєСЂС‹С‚РёРµРјР’РєР» = true;
   end;
 
-  func шаблон_ПередЗакрытием(ModalResult :Integer) :Logical;
+  func С€Р°Р±Р»РѕРЅ_РџРµСЂРµРґР—Р°РєСЂС‹С‚РёРµРј(ModalResult :Integer) :Logical;
     var vCount :Integer;
-    if ПроверкаПередЗакрытиемВкл then
+    if РџСЂРѕРІРµСЂРєР°РџРµСЂРµРґР—Р°РєСЂС‹С‚РёРµРјР’РєР» then
       try
-        vCount = Int(Template.CellByField['Количество'].Text);
+        vCount = Int(Template.CellByField['РљРѕР»РёС‡РµСЃС‚РІРѕ'].Text);
       except
       end;
-      if (Template.CellByField['ДатаПоступления'].Text <> nil) and (vCount > 0) then
+      if (Template.CellByField['Р”Р°С‚Р°РџРѕСЃС‚СѓРїР»РµРЅРёСЏ'].Text <> nil) and (vCount > 0) then
         Template.EndEdit(true);
         Result = True;
       else
-        Message('Для завершения работы с формой необходимо, чтобы поле "Дата поступления" было заполнено.' + Br +
-        'Кол-во экземпляров должно быть ненулевым неотрицательным значением.');
+        Message('Р”Р»СЏ Р·Р°РІРµСЂС€РµРЅРёСЏ СЂР°Р±РѕС‚С‹ СЃ С„РѕСЂРјРѕР№ РЅРµРѕР±С…РѕРґРёРјРѕ, С‡С‚РѕР±С‹ РїРѕР»Рµ "Р”Р°С‚Р° РїРѕСЃС‚СѓРїР»РµРЅРёСЏ" Р±С‹Р»Рѕ Р·Р°РїРѕР»РЅРµРЅРѕ.' + Br +
+        'РљРѕР»-РІРѕ СЌРєР·РµРјРїР»СЏСЂРѕРІ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РЅРµРЅСѓР»РµРІС‹Рј РЅРµРѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Рј Р·РЅР°С‡РµРЅРёРµРј.');
       fi;
     else
       Return true;
@@ -47,59 +47,59 @@ inobject private
   end;
 
 
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
-  func Поле_ПриВыводе_ЗаголовокОкнаФормы(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
-    if (НомерГазеты <> nil) and ((НомерГазеты.Газета <> nil)) then
-      Result = НомерГазеты.Газета.НазваниеОсн;
+  func РџРѕР»Рµ_РџСЂРёР’С‹РІРѕРґРµ_Р—Р°РіРѕР»РѕРІРѕРєРћРєРЅР°Р¤РѕСЂРјС‹(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    if (РќРѕРјРµСЂР“Р°Р·РµС‚С‹ <> nil) and ((РќРѕРјРµСЂР“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р° <> nil)) then
+      Result = РќРѕРјРµСЂР“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°.РќР°Р·РІР°РЅРёРµРћСЃРЅ;
       Result = Result + Br;
-      if (НомерГазеты.Номер <> nil) then
-        if (НомерГазеты.Номер = UnnumberedIssue) then
-          Result = Result + BiblioRecord.ОписаниеНомера(НомерГазеты);
+      if (РќРѕРјРµСЂР“Р°Р·РµС‚С‹.РќРѕРјРµСЂ <> nil) then
+        if (РќРѕРјРµСЂР“Р°Р·РµС‚С‹.РќРѕРјРµСЂ = UnnumberedIssue) then
+          Result = Result + BiblioRecord.РћРїРёСЃР°РЅРёРµРќРѕРјРµСЂР°(РќРѕРјРµСЂР“Р°Р·РµС‚С‹);
         else
-          Result = Result + '№ ' + BiblioRecord.ОписаниеНомера(НомерГазеты);
+          Result = Result + 'в„– ' + BiblioRecord.РћРїРёСЃР°РЅРёРµРќРѕРјРµСЂР°(РќРѕРјРµСЂР“Р°Р·РµС‚С‹);
         fi;
       else
-        Result = Result + '<cf:red>Номер не указан';
+        Result = Result + '<cf:red>РќРѕРјРµСЂ РЅРµ СѓРєР°Р·Р°РЅ';
       fi;
     fi;
   end;
 
-  func Поле_ПриПроверке_ДатаПоступления(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+  func РџРѕР»Рµ_РџСЂРёРџСЂРѕРІРµСЂРєРµ_Р”Р°С‚Р°РџРѕСЃС‚СѓРїР»РµРЅРёСЏ(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
     Result = (Value as Date <> nil);
     if (not Result) then
-      Message('Поле обязательно для заполнения!');
+      Message('РџРѕР»Рµ РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РґР»СЏ Р·Р°РїРѕР»РЅРµРЅРёСЏ!');
     fi;
   end;
 
-  func Поле_ПриПроверке_Количество(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
+  func РџРѕР»Рµ_РџСЂРёРџСЂРѕРІРµСЂРєРµ_РљРѕР»РёС‡РµСЃС‚РІРѕ(Cell :TemplateCell; Index :Integer; var Value :Variant) :Logical;
     Result = (Value as Integer > 0);
     if (not Result) then
-      Message('Количество экземпляров газеты не может быть нулевым или отрицательным!');
+      Message('РљРѕР»РёС‡РµСЃС‚РІРѕ СЌРєР·РµРјРїР»СЏСЂРѕРІ РіР°Р·РµС‚С‹ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РЅСѓР»РµРІС‹Рј РёР»Рё РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Рј!');
     fi;
   end;
 
 
-  func Поле_ПриВыводе_Цена(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
-    if (НомерГазеты <> nil) then
-      Result = НомерГазеты.Цена as Numeric;
+  func РџРѕР»Рµ_РџСЂРёР’С‹РІРѕРґРµ_Р¦РµРЅР°(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    if (РќРѕРјРµСЂР“Р°Р·РµС‚С‹ <> nil) then
+      Result = РќРѕРјРµСЂР“Р°Р·РµС‚С‹.Р¦РµРЅР° as Numeric;
     fi;
   end;
 
--- 2_Обработчики событий прочих объектов шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РїСЂРѕС‡РёС… РѕР±СЉРµРєС‚РѕРІ С€Р°Р±Р»РѕРЅР°0. --
 
-  proc кнОтменить_ПриНажатии(Sender :Button);
-    ПроверкаПередЗакрытиемВкл = false;
-    inherited кнОтменить_ПриНажатии(Sender);
+  proc РєРЅРћС‚РјРµРЅРёС‚СЊ_РџСЂРёРќР°Р¶Р°С‚РёРё(Sender :Button);
+    РџСЂРѕРІРµСЂРєР°РџРµСЂРµРґР—Р°РєСЂС‹С‚РёРµРјР’РєР» = false;
+    inherited РєРЅРћС‚РјРµРЅРёС‚СЊ_РџСЂРёРќР°Р¶Р°С‚РёРё(Sender);
   end;
 
--- 2_Дополнительные команды0. --
+-- 2_Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ РєРѕРјР°РЅРґС‹0. --
 
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
-  proc УстановитьФокусНаПервоеПолеВвода;
-    Template.CellByField['Количество'].SetFocus;
+  proc РЈСЃС‚Р°РЅРѕРІРёС‚СЊР¤РѕРєСѓСЃРќР°РџРµСЂРІРѕРµРџРѕР»РµР’РІРѕРґР°;
+    Template.CellByField['РљРѕР»РёС‡РµСЃС‚РІРѕ'].SetFocus;
   end;
 
 end

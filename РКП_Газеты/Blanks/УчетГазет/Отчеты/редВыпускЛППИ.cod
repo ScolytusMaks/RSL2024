@@ -1,37 +1,37 @@
-class inherited УчетГазет.Отчеты.РедВыпускЛППИ_03 "выпуск ЛППИ", editor ВыпускЛППИ;
+п»їclass inherited РЈС‡РµС‚Р“Р°Р·РµС‚.РћС‚С‡РµС‚С‹.Р РµРґР’С‹РїСѓСЃРєР›РџРџР_03 "РІС‹РїСѓСЃРє Р›РџРџР", editor Р’С‹РїСѓСЃРєР›РџРџР;
 
 inobject private
 
---{{ 2_Свойства
-  var секцУказательТематик :TemplateSection;
-  var секцМестаИздания     :TemplateSection;
-  var секцУказательМест    :TemplateSection;
-  var секцУказательАдм     :TemplateSection;
-  var секцИерархияРФ       :TemplateSection;
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
+  var СЃРµРєС†РЈРєР°Р·Р°С‚РµР»СЊРўРµРјР°С‚РёРє :TemplateSection;
+  var СЃРµРєС†РњРµСЃС‚Р°РР·РґР°РЅРёСЏ     :TemplateSection;
+  var СЃРµРєС†РЈРєР°Р·Р°С‚РµР»СЊРњРµСЃС‚    :TemplateSection;
+  var СЃРµРєС†РЈРєР°Р·Р°С‚РµР»СЊРђРґРј     :TemplateSection;
+  var СЃРµРєС†РРµСЂР°СЂС…РёСЏР Р¤       :TemplateSection;
 --}}
 
 
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
-  func ОбновитьНумерацию(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
-    РКП_Газеты.ЛППИ.НумерацияСтатей.Выполнение(ГодЛетописи);
+  func РћР±РЅРѕРІРёС‚СЊРќСѓРјРµСЂР°С†РёСЋ(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    Р РљРџ_Р“Р°Р·РµС‚С‹.Р›РџРџР.РќСѓРјРµСЂР°С†РёСЏРЎС‚Р°С‚РµР№.Р’С‹РїРѕР»РЅРµРЅРёРµ(Р“РѕРґР›РµС‚РѕРїРёСЃРё);
     Result = True; 
   end;
 
-  func ОбновитьОписание (Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+  func РћР±РЅРѕРІРёС‚СЊРћРїРёСЃР°РЅРёРµ (Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
     var Q : Query;
     var k : integer;
-    var Заголовок_      : string;
-    var ОписаниеГазеты_ : string;
-        Q               = Query.Create([РКП_Газеты.Газета]);
-        Q.Filter        = "ГодЛетописи="+Str(ГодЛетописи);
+    var Р—Р°РіРѕР»РѕРІРѕРє_      : string;
+    var РћРїРёСЃР°РЅРёРµР“Р°Р·РµС‚С‹_ : string;
+        Q               = Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°]);
+        Q.Filter        = "Р“РѕРґР›РµС‚РѕРїРёСЃРё="+Str(Р“РѕРґР›РµС‚РѕРїРёСЃРё);
         Q.Select;
         Q.First;
         for k = 1..Q.Count      do
           Hint("",k,Q.Count);
-          if CmOk=РКП_Газеты.ЛППИ.БибСтатья.2Создание0(Q.Current,Заголовок_,ОписаниеГазеты_)       then
-            Q.Current.Заголовок         = Заголовок_;
-            Q.Current.ОписаниеГазеты    = ОписаниеГазеты_;
+          if CmOk=Р РљРџ_Р“Р°Р·РµС‚С‹.Р›РџРџР.Р‘РёР±РЎС‚Р°С‚СЊСЏ.2РЎРѕР·РґР°РЅРёРµ0(Q.Current,Р—Р°РіРѕР»РѕРІРѕРє_,РћРїРёСЃР°РЅРёРµР“Р°Р·РµС‚С‹_)       then
+            Q.Current.Р—Р°РіРѕР»РѕРІРѕРє         = Р—Р°РіРѕР»РѕРІРѕРє_;
+            Q.Current.РћРїРёСЃР°РЅРёРµР“Р°Р·РµС‚С‹    = РћРїРёСЃР°РЅРёРµР“Р°Р·РµС‚С‹_;
             if Q.Current.State = Record.Edited                  then
               Q.Current.Post;
             end;
@@ -42,38 +42,38 @@ inobject private
     Result = True; 
   end;
 
-  func СоздатьВыпуск(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
-    var ЛППИ :TextFile;
-    ----Создание файла-----
-    РКП_Газеты.ЛППИ.Текст_01_Файл.Создание(ПапкаЛППИ, ФайлЛППИ, ЛППИ);
-    РКП_Газеты.ЛППИ.Текст_02_ОсновнойТекст.Создание(ЛППИ, Record);
-    СозданиеСистУказателя;
-    СозданиеМестУказателя;
-    СозданиеАдмУказателя;
-    СозданиеЯзУказателя;
+  func РЎРѕР·РґР°С‚СЊР’С‹РїСѓСЃРє(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var Р›РџРџР :TextFile;
+    ----РЎРѕР·РґР°РЅРёРµ С„Р°Р№Р»Р°-----
+    Р РљРџ_Р“Р°Р·РµС‚С‹.Р›РџРџР.РўРµРєСЃС‚_01_Р¤Р°Р№Р».РЎРѕР·РґР°РЅРёРµ(РџР°РїРєР°Р›РџРџР, Р¤Р°Р№Р»Р›РџРџР, Р›РџРџР);
+    Р РљРџ_Р“Р°Р·РµС‚С‹.Р›РџРџР.РўРµРєСЃС‚_02_РћСЃРЅРѕРІРЅРѕР№РўРµРєСЃС‚.РЎРѕР·РґР°РЅРёРµ(Р›РџРџР, Record);
+    РЎРѕР·РґР°РЅРёРµРЎРёСЃС‚РЈРєР°Р·Р°С‚РµР»СЏ;
+    РЎРѕР·РґР°РЅРёРµРњРµСЃС‚РЈРєР°Р·Р°С‚РµР»СЏ;
+    РЎРѕР·РґР°РЅРёРµРђРґРјРЈРєР°Р·Р°С‚РµР»СЏ;
+    РЎРѕР·РґР°РЅРёРµРЇР·РЈРєР°Р·Р°С‚РµР»СЏ;
     Result = True; 
   end;
 
-  func ПросмотрКарточек(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
-    РКП_Газеты.УчетГазет.блкартГазетыЛППИ.ПоказатьСоставЛППИ(ГодЛетописи);
+  func РџСЂРѕСЃРјРѕС‚СЂРљР°СЂС‚РѕС‡РµРє(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    Р РљРџ_Р“Р°Р·РµС‚С‹.РЈС‡РµС‚Р“Р°Р·РµС‚.Р±Р»РєР°СЂС‚Р“Р°Р·РµС‚С‹Р›РџРџР.РџРѕРєР°Р·Р°С‚СЊРЎРѕСЃС‚Р°РІР›РџРџР(Р“РѕРґР›РµС‚РѕРїРёСЃРё);
   end;
 
-  func ОткрытьОригиналМакетIn(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
-    OpenEditor(ФайлЛППИ);--отладка
+  func РћС‚РєСЂС‹С‚СЊРћСЂРёРіРёРЅР°Р»РњР°РєРµС‚In(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    OpenEditor(Р¤Р°Р№Р»Р›РџРџР);--РѕС‚Р»Р°РґРєР°
     Result = True; 
   end;
 
-  func ОткрытьОригиналМакетOut(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
-    ExecuteProgram(ФайлЛППИ);
+  func РћС‚РєСЂС‹С‚СЊРћСЂРёРіРёРЅР°Р»РњР°РєРµС‚Out(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    ExecuteProgram(Р¤Р°Р№Р»Р›РџРџР);
     Result = True; 
   end;
 
-  func ОткрытьОригиналМакетFold(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
-    ExecuteProgram(ПапкаЛППИ);
+  func РћС‚РєСЂС‹С‚СЊРћСЂРёРіРёРЅР°Р»РњР°РєРµС‚Fold(Cell :TemplateCell; Action :Template.ClickTypes):Logical;
+    ExecuteProgram(РџР°РїРєР°Р›РџРџР);
     Result = True; 
   end;
 
-  proc ПолеВыпускСверстанПриВыходе(Cell :TemplateCell; Index :Integer);
+  proc РџРѕР»РµР’С‹РїСѓСЃРєРЎРІРµСЂСЃС‚Р°РЅРџСЂРёР’С‹С…РѕРґРµ(Cell :TemplateCell; Index :Integer);
   end;
 
 

@@ -1,26 +1,26 @@
-class inherited РКП_СИС.блОтчетОРаботеБазовый "Отчет о работе библиографа (ОППИ)";
+п»їclass inherited Р РљРџ_РЎРРЎ.Р±Р»РћС‚С‡РµС‚РћР Р°Р±РѕС‚РµР‘Р°Р·РѕРІС‹Р№ "РћС‚С‡РµС‚ Рѕ СЂР°Р±РѕС‚Рµ Р±РёР±Р»РёРѕРіСЂР°С„Р° (РћРџРџР)";
 
-import РКП_СИС classes StdCode, Recs, Functions, FilterMaker, Def, StringsFunctions, RI.intBase;
+import Р РљРџ_РЎРРЎ classes StdCode, Recs, Functions, FilterMaker, Def, StringsFunctions, RI.intBase;
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 
 inobject private
 
-  var КомпетенцииВОтчете :tCompetence[] := [кмпОППИзав, кмпОППИсотр];
+  var РљРѕРјРїРµС‚РµРЅС†РёРёР’РћС‚С‡РµС‚Рµ :tCompetence[] := [РєРјРїРћРџРџРР·Р°РІ, РєРјРїРћРџРџРСЃРѕС‚СЂ];
 
-  var НомерСменыЕдХрн      :Integer[];
-  var ДатаСменыЕдХрн       :Date[];
-  var ПринятоЕдХрн         :Integer[];
-  var ВсегоВведеноЕдХрн    :Integer;
+  var РќРѕРјРµСЂРЎРјРµРЅС‹Р•РґРҐСЂРЅ      :Integer[];
+  var Р”Р°С‚Р°РЎРјРµРЅС‹Р•РґРҐСЂРЅ       :Date[];
+  var РџСЂРёРЅСЏС‚РѕР•РґРҐСЂРЅ         :Integer[];
+  var Р’СЃРµРіРѕР’РІРµРґРµРЅРѕР•РґРҐСЂРЅ    :Integer;
 
-  var секцЕдХрн            :TemplateSection;
+  var СЃРµРєС†Р•РґРҐСЂРЅ            :TemplateSection;
 
-  var Сотрудник synonym UserName :String := SessionInfo.UserName;
-  var СотрудникПолнИмя           :String := if((SessionInfo.UserRecord <> nil), (SessionInfo.UserRecord as Kernel.Settings.User).FullName, Self.UserName);
+  var РЎРѕС‚СЂСѓРґРЅРёРє synonym UserName :String := SessionInfo.UserName;
+  var РЎРѕС‚СЂСѓРґРЅРёРєРџРѕР»РЅРРјСЏ           :String := if((SessionInfo.UserRecord <> nil), (SessionInfo.UserRecord as Kernel.Settings.User).FullName, Self.UserName);
 
 --}}
 
--- 2_Конструкторы, визуализаторы0. --
+-- 2_РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹, РІРёР·СѓР°Р»РёР·Р°С‚РѕСЂС‹0. --
 
 inclass public
 
@@ -28,74 +28,74 @@ inclass public
 
 inobject private
 
--- 2_Обработчики событий шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ С€Р°Р±Р»РѕРЅР°0. --
 
-  proc шаблон_ПриОткрытии(Create :Logical);
-    inherited шаблон_ПриОткрытии(Create);
-    ПостроитьОтчет;
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(Create :Logical);
+    inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(Create);
+    РџРѕСЃС‚СЂРѕРёС‚СЊРћС‚С‡РµС‚;
   end;
 
 
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
-  func Поле_ПриВыводе_ЗаголовокОкнаФормы(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
-    Result = 'Протокол ввода данных сотрудника' + Br +
-             СотрудникПолнИмя + Br +
-             '<s-><s->за период с ' + Str(ДатаН) + ' по  ' + Str(ДатаК) + ' включительно';
+  func РџРѕР»Рµ_РџСЂРёР’С‹РІРѕРґРµ_Р—Р°РіРѕР»РѕРІРѕРєРћРєРЅР°Р¤РѕСЂРјС‹(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    Result = 'РџСЂРѕС‚РѕРєРѕР» РІРІРѕРґР° РґР°РЅРЅС‹С… СЃРѕС‚СЂСѓРґРЅРёРєР°' + Br +
+             РЎРѕС‚СЂСѓРґРЅРёРєРџРѕР»РЅРРјСЏ + Br +
+             '<s-><s->Р·Р° РїРµСЂРёРѕРґ СЃ ' + Str(Р”Р°С‚Р°Рќ) + ' РїРѕ  ' + Str(Р”Р°С‚Р°Рљ) + ' РІРєР»СЋС‡РёС‚РµР»СЊРЅРѕ';
   end;
 
 
--- 2_Обработчики событий прочих объектов шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РїСЂРѕС‡РёС… РѕР±СЉРµРєС‚РѕРІ С€Р°Р±Р»РѕРЅР°0. --
 
 
--- 2_Дополнительные команды0. --
+-- 2_Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ РєРѕРјР°РЅРґС‹0. --
 
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
-  func ПостроитьОтчет :Logical;
+  func РџРѕСЃС‚СЂРѕРёС‚СЊРћС‚С‡РµС‚ :Logical;
     var aUserName :String[];
     var aResult :Variant[2]; --[[UserName, FullName, vCreateCount, vUpdateCount]]
-    var aWorkShift :Variant[2]; -- номера смен [[vDate, vNumber]]
+    var aWorkShift :Variant[2]; -- РЅРѕРјРµСЂР° СЃРјРµРЅ [[vDate, vNumber]]
     var i :Integer;
-    Result = inherited ПостроитьОтчет;
+    Result = inherited РџРѕСЃС‚СЂРѕРёС‚СЊРћС‚С‡РµС‚;
     if Result then
-      ДатаСменыЕдХрн         = nil;
-      ПринятоЕдХрн           = nil;
-      ВсегоВведеноЕдХрн      = nil;
-      секцЕдХрн.FramesCount  = nil;
+      Р”Р°С‚Р°РЎРјРµРЅС‹Р•РґРҐСЂРЅ         = nil;
+      РџСЂРёРЅСЏС‚РѕР•РґРҐСЂРЅ           = nil;
+      Р’СЃРµРіРѕР’РІРµРґРµРЅРѕР•РґРҐСЂРЅ      = nil;
+      СЃРµРєС†Р•РґРҐСЂРЅ.FramesCount  = nil;
       if (Self.UserName <> nil) then
-        aWorkShift = ПолучитьНомераСмен;
+        aWorkShift = РџРѕР»СѓС‡РёС‚СЊРќРѕРјРµСЂР°РЎРјРµРЅ;
         --
-        aResult = ПолучитьВыборку(aUserName, 'ЕдиницаХранения');
-        ПроставитьНомераСмен(aResult, aWorkShift);
+        aResult = РџРѕР»СѓС‡РёС‚СЊР’С‹Р±РѕСЂРєСѓ(aUserName, 'Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ');
+        РџСЂРѕСЃС‚Р°РІРёС‚СЊРќРѕРјРµСЂР°РЎРјРµРЅ(aResult, aWorkShift);
         for i = 1 .. LengthOfArray(aResult) do
-          НомерСменыЕдХрн[i] = aResult[i,2] as Integer;
-          ДатаСменыЕдХрн[i]  = aResult[i,1] as Date;
-          ПринятоЕдХрн[i]    = aResult[i,3] as Integer;
-          ВсегоВведеноЕдХрн  = ВсегоВведеноЕдХрн + ПринятоЕдХрн[i];
+          РќРѕРјРµСЂРЎРјРµРЅС‹Р•РґРҐСЂРЅ[i] = aResult[i,2] as Integer;
+          Р”Р°С‚Р°РЎРјРµРЅС‹Р•РґРҐСЂРЅ[i]  = aResult[i,1] as Date;
+          РџСЂРёРЅСЏС‚РѕР•РґРҐСЂРЅ[i]    = aResult[i,3] as Integer;
+          Р’СЃРµРіРѕР’РІРµРґРµРЅРѕР•РґРҐСЂРЅ  = Р’СЃРµРіРѕР’РІРµРґРµРЅРѕР•РґРҐСЂРЅ + РџСЂРёРЅСЏС‚РѕР•РґРҐСЂРЅ[i];
         od;
-        секцЕдХрн.FramesCount = LengthOfArray(aResult);
+        СЃРµРєС†Р•РґРҐСЂРЅ.FramesCount = LengthOfArray(aResult);
         --
       fi;
     fi;
   end;
 
-  func ПолучитьНомераСмен :Variant[2]; --[[vDate, vNumber]]
+  func РџРѕР»СѓС‡РёС‚СЊРќРѕРјРµСЂР°РЎРјРµРЅ :Variant[2]; --[[vDate, vNumber]]
     var aFlt :String[];
     var cResult :Variant[];
-    var cRec :РКП_СИС.Смена;
+    var cRec :Р РљРџ_РЎРРЎ.РЎРјРµРЅР°;
     var vActionDate  :Date;
-    with Query.Create([РКП_СИС.Смена]) do
-      AddInArray( aFlt, ПолучитьФильтрДат );
-      AddInArray( aFlt, ПолучитьФильтрПользователя );
+    with Query.Create([Р РљРџ_РЎРРЎ.РЎРјРµРЅР°]) do
+      AddInArray( aFlt, РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂР”Р°С‚ );
+      AddInArray( aFlt, РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРџРѕР»СЊР·РѕРІР°С‚РµР»СЏ );
       Filter = MakeFilter(aFlt);
       Select;
       while not Eof do
-        cRec = Current as РКП_СИС.Смена;
+        cRec = Current as Р РљРџ_РЎРРЎ.РЎРјРµРЅР°;
         vActionDate = cRec.CreateDate;
         vActionDate = Dat(Day(vActionDate), Mon(vActionDate), Year(vActionDate));
-        cResult = [vActionDate, cRec.НомерСменыВГоду] as Variant[];
+        cResult = [vActionDate, cRec.РќРѕРјРµСЂРЎРјРµРЅС‹Р’Р“РѕРґСѓ] as Variant[];
         AddInArray( Result, cResult);
         Next;
       od;
@@ -103,52 +103,52 @@ inobject private
     SortArray(Result, [1]);
   end;
 
-  func ПолучитьФильтрЗапросаЛога( КорИмяКлассаЗаписей :String ) :String;
+  func РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂР—Р°РїСЂРѕСЃР°Р›РѕРіР°( РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№ :String ) :String;
     var aFlt :String[];
-    AddInArray( aFlt, ПолучитьФильтрПользователя );
-    AddInArray( aFlt, ПолучитьФильтрКомпетенций );
-    AddInArray( aFlt, ПолучитьФильтрДат );
-    AddInArray( aFlt, ПолучитьФильтрКлассаЗаписей(КорИмяКлассаЗаписей) );
+    AddInArray( aFlt, РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРџРѕР»СЊР·РѕРІР°С‚РµР»СЏ );
+    AddInArray( aFlt, РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРљРѕРјРїРµС‚РµРЅС†РёР№ );
+    AddInArray( aFlt, РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂР”Р°С‚ );
+    AddInArray( aFlt, РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№(РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№) );
     Result = MakeFilter( aFlt );
   end;
 
-  func ПолучитьФильтрКомпетенций :String;
+  func РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРљРѕРјРїРµС‚РµРЅС†РёР№ :String;
     var i :Integer;
     var aFlt :String[];
-    for i = 1 .. LengthOfArray(КомпетенцииВОтчете) do
-      AddInArray( aFlt, 'Match(Competencies, "*|' + Str(КомпетенцииВОтчете[i]) + '|*")' );
+    for i = 1 .. LengthOfArray(РљРѕРјРїРµС‚РµРЅС†РёРёР’РћС‚С‡РµС‚Рµ) do
+      AddInArray( aFlt, 'Match(Competencies, "*|' + Str(РљРѕРјРїРµС‚РµРЅС†РёРёР’РћС‚С‡РµС‚Рµ[i]) + '|*")' );
     od;
     Result = MakeFilter( aFlt, byOr );
   end;
 
-  func ПолучитьФильтрДат :String;
+  func РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂР”Р°С‚ :String;
     var aFlt :String[];
-    AddInArray( aFlt, 'CreateDate>=' + Str(ДатаН) );
-    AddInArray( aFlt, 'CreateDate<' + Str(ДатаК + 1) );
+    AddInArray( aFlt, 'CreateDate>=' + Str(Р”Р°С‚Р°Рќ) );
+    AddInArray( aFlt, 'CreateDate<' + Str(Р”Р°С‚Р°Рљ + 1) );
     Result = MakeFilter( aFlt );
   end;
 
-  func ПолучитьФильтрПользователя :String;
+  func РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРџРѕР»СЊР·РѕРІР°С‚РµР»СЏ :String;
     Return 'CreateUser="' + Self.UserName + '"';
   end;
 
-  func ПолучитьФильтрКлассаЗаписей( КорИмяКлассаЗаписей :String ) :String;
-    if (КорИмяКлассаЗаписей = 'ЕдиницаХранения') then
-      Result = 'RClass="РКП_Газеты.ЕдиницаХранения"';
+  func РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№( РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№ :String ) :String;
+    if (РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№ = 'Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ') then
+      Result = 'RClass="Р РљРџ_Р“Р°Р·РµС‚С‹.Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ"';
     fi;
   end;
 
-  func ПолучитьВыборку(aUserName :String[]; КорИмяКлассаЗаписей :String ) :Variant[2];  --[[vActionDate, nil, vCreateCount]]
+  func РџРѕР»СѓС‡РёС‚СЊР’С‹Р±РѕСЂРєСѓ(aUserName :String[]; РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№ :String ) :Variant[2];  --[[vActionDate, nil, vCreateCount]]
     var vActionDate  :Date;
     var vCreateCount, i :Integer;
     var cResult :Variant[];
-    var cRec :РКП_СИС.ЛогРабот;
+    var cRec :Р РљРџ_РЎРРЎ.Р›РѕРіР Р°Р±РѕС‚;
     if (Self.UserName <> nil) then
-      with Query.Create([РКП_СИС.ЛогРабот]) do
-        Filter = ПолучитьФильтрЗапросаЛога(КорИмяКлассаЗаписей);
+      with Query.Create([Р РљРџ_РЎРРЎ.Р›РѕРіР Р°Р±РѕС‚]) do
+        Filter = РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂР—Р°РїСЂРѕСЃР°Р›РѕРіР°(РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№);
         Select;
         while not Eof do
-          cRec = Current as РКП_СИС.ЛогРабот;
+          cRec = Current as Р РљРџ_РЎРРЎ.Р›РѕРіР Р°Р±РѕС‚;
           vActionDate = cRec.CreateDate;
           vActionDate = Dat(Day(vActionDate), Mon(vActionDate), Year(vActionDate));
           i = SearchInArray(Result, vActionDate, [1], false);
@@ -158,9 +158,9 @@ inobject private
             i = LengthOfArray(Result) + 1;
             cResult = [vActionDate, 0, 0];
           fi;
-          if (КорИмяКлассаЗаписей = 'ЕдиницаХранения') then
+          if (РљРѕСЂРРјСЏРљР»Р°СЃСЃР°Р—Р°РїРёСЃРµР№ = 'Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ') then
             if (cRec.ActionType = wsRecCreated) then
-              vCreateCount = (cResult[3] as Integer) + cRec.StoredValI; -- суммируется количество номеров
+              vCreateCount = (cResult[3] as Integer) + cRec.StoredValI; -- СЃСѓРјРјРёСЂСѓРµС‚СЃСЏ РєРѕР»РёС‡РµСЃС‚РІРѕ РЅРѕРјРµСЂРѕРІ
               Result[i] = [vActionDate, 0, vCreateCount];
             fi;
           fi;
@@ -171,12 +171,12 @@ inobject private
     fi;
   end;
 
-  proc ПроставитьНомераСмен(var aResult :Variant[2]; aWorkShift :Variant[2]);
-    --var aWorkShift :Variant[2]; -- номера смен [[vDate, vNumber]]
+  proc РџСЂРѕСЃС‚Р°РІРёС‚СЊРќРѕРјРµСЂР°РЎРјРµРЅ(var aResult :Variant[2]; aWorkShift :Variant[2]);
+    --var aWorkShift :Variant[2]; -- РЅРѕРјРµСЂР° СЃРјРµРЅ [[vDate, vNumber]]
     var i, j :Integer;
     var cResult :Variant[];
     var vActionDate  :Date;
-    aWorkShift = ПолучитьНомераСмен;
+    aWorkShift = РџРѕР»СѓС‡РёС‚СЊРќРѕРјРµСЂР°РЎРјРµРЅ;
     for i = 1 .. LengthOfArray(aResult) do
       cResult = aResult[i] as Variant[];
       vActionDate = cResult[1] as Date;

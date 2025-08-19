@@ -1,116 +1,116 @@
-class inherited РКП_СИС.FalseCardBase "Состав ЛППИ";
+п»їclass inherited Р РљРџ_РЎРРЎ.FalseCardBase "РЎРѕСЃС‚Р°РІ Р›РџРџР";
 
-import СИС2 classes Константы;
-import РКП_СИС classes StringsFunctions, Functions, FilterMaker, Recs;
+import РЎРРЎ2 classes РљРѕРЅСЃС‚Р°РЅС‚С‹;
+import Р РљРџ_РЎРРЎ classes StringsFunctions, Functions, FilterMaker, Recs;
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 
 inclass private
 
-  var КлассИнтерфейса :Class RI.Газета := RI.Газета;
+  var РљР»Р°СЃСЃРРЅС‚РµСЂС„РµР№СЃР° :Class RI.Р“Р°Р·РµС‚Р° := RI.Р“Р°Р·РµС‚Р°;
 
 inobject private
 
-  var ГодЛППИ    :Integer;
-  var ВсегоГазет :Integer;
+  var Р“РѕРґР›РџРџР    :Integer;
+  var Р’СЃРµРіРѕР“Р°Р·РµС‚ :Integer;
   var PageDef    :Image;
   var PageBlack  :Image;
   var PageYellow :Image;
   var PageBlue   :Image;
-  var фреймИнфо3 :TemplateFrame;
+  var С„СЂРµР№РјРРЅС„Рѕ3 :TemplateFrame;
 
 
 
 --}}
 
--- 2_Конструкторы, визуализаторы0. --
+-- 2_РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹, РІРёР·СѓР°Р»РёР·Р°С‚РѕСЂС‹0. --
 
 inclass public
 
-  proc ПоказатьСоставЛППИ (локГодЛППИ :Integer);
-    var locForm: УчетГазет.блкартГазетыЛППИ;
-    locForm = УчетГазет.блкартГазетыЛППИ.Create;
-    locForm.ГодЛППИ = локГодЛППИ;
+  proc РџРѕРєР°Р·Р°С‚СЊРЎРѕСЃС‚Р°РІР›РџРџР (Р»РѕРєР“РѕРґР›РџРџР :Integer);
+    var locForm: РЈС‡РµС‚Р“Р°Р·РµС‚.Р±Р»РєР°СЂС‚Р“Р°Р·РµС‚С‹Р›РџРџР;
+    locForm = РЈС‡РµС‚Р“Р°Р·РµС‚.Р±Р»РєР°СЂС‚Р“Р°Р·РµС‚С‹Р›РџРџР.Create;
+    locForm.Р“РѕРґР›РџРџР = Р»РѕРєР“РѕРґР›РџРџР;
     #NoWarning;
     locForm.ShowEx(nil, Kernel.Window.ChildWindow);
   end;
 
 inobject private
 
--- 2_Обработчики событий шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ С€Р°Р±Р»РѕРЅР°0. --
 
-  proc шаблон_ПриСоздании(Context :Variant);
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёРЎРѕР·РґР°РЅРёРё(Context :Variant);
     crdBuiltIn.CanInsert = false;
     crdBuiltIn.CanCopy = false;
     crdBuiltIn.CanDelete = false;
-    inherited шаблон_ПриСоздании(Context);
-    PageDef    = Image.Create; PageDef.LoadFromFile('%Projects%\РКП_СИС\Attachments\Icons\PageDef.ico');
-    PageBlack  = Image.Create; PageBlack.LoadFromFile('%Projects%\РКП_СИС\Attachments\Icons\PageBlack.ico');
-    PageYellow = Image.Create; PageYellow.LoadFromFile('%Projects%\РКП_СИС\Attachments\Icons\PageYellow.ico');
-    PageBlue   = Image.Create; PageBlue.LoadFromFile('%Projects%\РКП_СИС\Attachments\Icons\PageBlue.ico');
+    inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРЎРѕР·РґР°РЅРёРё(Context);
+    PageDef    = Image.Create; PageDef.LoadFromFile('%Projects%\Р РљРџ_РЎРРЎ\Attachments\Icons\PageDef.ico');
+    PageBlack  = Image.Create; PageBlack.LoadFromFile('%Projects%\Р РљРџ_РЎРРЎ\Attachments\Icons\PageBlack.ico');
+    PageYellow = Image.Create; PageYellow.LoadFromFile('%Projects%\Р РљРџ_РЎРРЎ\Attachments\Icons\PageYellow.ico');
+    PageBlue   = Image.Create; PageBlue.LoadFromFile('%Projects%\Р РљРџ_РЎРРЎ\Attachments\Icons\PageBlue.ico');
   end;
 
-  proc шаблон_ПриОткрытии(Create :Logical);
-    inherited шаблон_ПриОткрытии(Create);
-    ВсегоГазет = crdBuiltIn.Query.Count;
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(Create :Logical);
+    inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(Create);
+    Р’СЃРµРіРѕР“Р°Р·РµС‚ = crdBuiltIn.Query.Count;
   end;
 
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
-  func Поле_ПриВыводе_ГодЛППИ(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
-    if (ГодЛППИ <> nil) then
-      Return 'ЛППИ зи ' + Str(ГодЛППИ) + ' год';
+  func РџРѕР»Рµ_РџСЂРёР’С‹РІРѕРґРµ_Р“РѕРґР›РџРџР(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    if (Р“РѕРґР›РџРџР <> nil) then
+      Return 'Р›РџРџР Р·Рё ' + Str(Р“РѕРґР›РџРџР) + ' РіРѕРґ';
     fi;
   end;
 
-  func Поле_ПриВыводе_БибОписание(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
-    var cRec :РКП_Газеты.Газета;
+  func РџРѕР»Рµ_РџСЂРёР’С‹РІРѕРґРµ_Р‘РёР±РћРїРёСЃР°РЅРёРµ(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    var cRec :Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°;
     if (crdBuiltIn.Current <> nil) then
-      cRec = crdBuiltIn.Current as РКП_Газеты.Газета;
-      Result = cRec.Заголовок + Br + cRec.ОписаниеГазеты;
+      cRec = crdBuiltIn.Current as Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°;
+      Result = cRec.Р—Р°РіРѕР»РѕРІРѕРє + Br + cRec.РћРїРёСЃР°РЅРёРµР“Р°Р·РµС‚С‹;
     fi;
   end;
 
--- 2_Обработчики событий прочих объектов шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РїСЂРѕС‡РёС… РѕР±СЉРµРєС‚РѕРІ С€Р°Р±Р»РѕРЅР°0. --
 
 
-  func картШаблона_ПриНажатии(Sender :TemplateCardfile; Action :Template.ClickTypes; Column :CardfileColumn; Rec :Record) :Logical;
+  func РєР°СЂС‚РЁР°Р±Р»РѕРЅР°_РџСЂРёРќР°Р¶Р°С‚РёРё(Sender :TemplateCardfile; Action :Template.ClickTypes; Column :CardfileColumn; Rec :Record) :Logical;
     Result = inherited crdBuiltIn_OnClick(Sender, Action, Column, Rec);
   end;
 
-  func картШаблона_ПриЗаписи(Sender :TemplateCardfile; Rec :Record) :Logical;
+  func РєР°СЂС‚РЁР°Р±Р»РѕРЅР°_РџСЂРёР—Р°РїРёСЃРё(Sender :TemplateCardfile; Rec :Record) :Logical;
     Result = inherited crdBuiltIn_OnPost(Sender, Rec);
   end;
 
-  proc картШаблона_ПриПеремещении(Sender :TemplateCardfile; Rec :Record);
-    фреймИнфо3.Update;
+  proc РєР°СЂС‚РЁР°Р±Р»РѕРЅР°_РџСЂРёРџРµСЂРµРјРµС‰РµРЅРёРё(Sender :TemplateCardfile; Rec :Record);
+    С„СЂРµР№РјРРЅС„Рѕ3.Update;
   end;
 
-  proc Столбец_ПриРисовании (Column :CardfileColumn; Rec :Record; Selected :Logical; var Color :Integer; Font :Font);
+  proc РЎС‚РѕР»Р±РµС†_РџСЂРёР РёСЃРѕРІР°РЅРёРё (Column :CardfileColumn; Rec :Record; Selected :Logical; var Color :Integer; Font :Font);
     --var vFieldNameRecDeprecated :String;
-    if (Column.FieldName in ИменаСлужебныхПолей) then
+    if (Column.FieldName in РРјРµРЅР°РЎР»СѓР¶РµР±РЅС‹С…РџРѕР»РµР№) then
       Font.Color = COLOR_GRAYTEXT;
     fi;
   end;
 
-  proc картШаблона_ПриРисованииСтроки(Rec :Record; Selected :Logical; var Color :Integer; Image :Image);
-    Rec = Rec as РКП_Газеты.Газета;
-    if Rec.Прекращено        then Image.Assign(PageBlack);
-    elsif Rec.ПризнакОтсылки then Image.Assign(PageYellow);
-    elsif Rec.КомплектРГБ    then Image.Assign(PageBlue);
+  proc РєР°СЂС‚РЁР°Р±Р»РѕРЅР°_РџСЂРёР РёСЃРѕРІР°РЅРёРёРЎС‚СЂРѕРєРё(Rec :Record; Selected :Logical; var Color :Integer; Image :Image);
+    Rec = Rec as Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°;
+    if Rec.РџСЂРµРєСЂР°С‰РµРЅРѕ        then Image.Assign(PageBlack);
+    elsif Rec.РџСЂРёР·РЅР°РєРћС‚СЃС‹Р»РєРё then Image.Assign(PageYellow);
+    elsif Rec.РљРѕРјРїР»РµРєС‚Р Р“Р‘    then Image.Assign(PageBlue);
     else                          Image.Assign(PageDef);
     fi;
   end;
 
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
-  proc ИнициализироватьСтолбцыКартотеки;
-    inherited ИнициализироватьСтолбцыКартотеки;
+  proc РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊРЎС‚РѕР»Р±С†С‹РљР°СЂС‚РѕС‚РµРєРё;
+    inherited РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊРЎС‚РѕР»Р±С†С‹РљР°СЂС‚РѕС‚РµРєРё;
     with crdBuiltIn.AddColumn do
-      FieldName = 'ГодЛетописи';
-      Caption = 'Год вкл. в летопись';
-      Hint = 'Год включения в летопись';
+      FieldName = 'Р“РѕРґР›РµС‚РѕРїРёСЃРё';
+      Caption = 'Р“РѕРґ РІРєР». РІ Р»РµС‚РѕРїРёСЃСЊ';
+      Hint = 'Р“РѕРґ РІРєР»СЋС‡РµРЅРёСЏ РІ Р»РµС‚РѕРїРёСЃСЊ';
       FieldType = Template.NumericField;
       Alignment = Template.CenterAlign;
       Font.Size = crdBuiltIn.Font.Size;
@@ -121,9 +121,9 @@ inobject private
       CanEdit = false;
     end;
     with crdBuiltIn.AddColumn do
-      FieldName = 'НомерВЛетописи';
-      Caption = '№ в ежегоднике';
-      Hint = 'Номер в ежегоднике';
+      FieldName = 'РќРѕРјРµСЂР’Р›РµС‚РѕРїРёСЃРё';
+      Caption = 'в„– РІ РµР¶РµРіРѕРґРЅРёРєРµ';
+      Hint = 'РќРѕРјРµСЂ РІ РµР¶РµРіРѕРґРЅРёРєРµ';
       FieldType = Template.NumericField;
       Alignment = Template.CenterAlign;
       Font.Size = crdBuiltIn.Font.Size;
@@ -134,9 +134,9 @@ inobject private
       CanEdit = false;
     end;
     with crdBuiltIn.AddColumn do
-      FieldName = 'ЗаписьВЛетописи';
-      Caption = '№ записи';
-      Hint = 'Запись (по порядку) в ежегоднике';
+      FieldName = 'Р—Р°РїРёСЃСЊР’Р›РµС‚РѕРїРёСЃРё';
+      Caption = 'в„– Р·Р°РїРёСЃРё';
+      Hint = 'Р—Р°РїРёСЃСЊ (РїРѕ РїРѕСЂСЏРґРєСѓ) РІ РµР¶РµРіРѕРґРЅРёРєРµ';
       FieldType = Template.NumericField;
       Alignment = Template.CenterAlign;
       Font.Size = crdBuiltIn.Font.Size;
@@ -147,8 +147,8 @@ inobject private
       CanEdit = false;
     end;
     with crdBuiltIn.AddColumn do
-      FieldName = 'РегНомер';
-      Caption = 'Номер ' + Chr(13) + 'гос. регистрации';
+      FieldName = 'Р РµРіРќРѕРјРµСЂ';
+      Caption = 'РќРѕРјРµСЂ ' + Chr(13) + 'РіРѕСЃ. СЂРµРіРёСЃС‚СЂР°С†РёРё';
       FieldType = Template.StringField;
       Alignment = Template.CenterAlign;
       Font.Size = crdBuiltIn.Font.Size;
@@ -158,8 +158,8 @@ inobject private
       CanEdit = false;
     end;
     with crdBuiltIn.AddColumn do
-      FieldName = 'НазваниеОсн';
-      Caption = 'Название (основное)';
+      FieldName = 'РќР°Р·РІР°РЅРёРµРћСЃРЅ';
+      Caption = 'РќР°Р·РІР°РЅРёРµ (РѕСЃРЅРѕРІРЅРѕРµ)';
       FieldType = Template.StringField;
       Alignment = Template.LeftAlign;
       Font.Size = crdBuiltIn.Font.Size;
@@ -169,8 +169,8 @@ inobject private
       CanEdit = false;
     end;
     with crdBuiltIn.AddColumn do
-      FieldName = 'НазваниеНацЯз';
-      Caption = 'Название на национальном языке';
+      FieldName = 'РќР°Р·РІР°РЅРёРµРќР°С†РЇР·';
+      Caption = 'РќР°Р·РІР°РЅРёРµ РЅР° РЅР°С†РёРѕРЅР°Р»СЊРЅРѕРј СЏР·С‹РєРµ';
       FieldType = Template.StringField;
       Alignment = Template.LeftAlign;
       Font.Size = crdBuiltIn.Font.Size;
@@ -180,8 +180,8 @@ inobject private
       CanEdit = false;
     end;
     with crdBuiltIn.AddColumn do
-      FieldName = 'НазваниеИнЯз';
-      Caption = 'Название на иностранном языке';
+      FieldName = 'РќР°Р·РІР°РЅРёРµРРЅРЇР·';
+      Caption = 'РќР°Р·РІР°РЅРёРµ РЅР° РёРЅРѕСЃС‚СЂР°РЅРЅРѕРј СЏР·С‹РєРµ';
       FieldType = Template.StringField;
       Alignment = Template.LeftAlign;
       Font.Size = crdBuiltIn.Font.Size;
@@ -191,8 +191,8 @@ inobject private
       CanEdit = false;
     end;
     with crdBuiltIn.AddColumn do
-      FieldName = 'Подзаголовок';
-      Caption = 'Подзаголовок';
+      FieldName = 'РџРѕРґР·Р°РіРѕР»РѕРІРѕРє';
+      Caption = 'РџРѕРґР·Р°РіРѕР»РѕРІРѕРє';
       FieldType = Template.StringField;
       Alignment = Template.LeftAlign;
       Font.Size = crdBuiltIn.Font.Size;
@@ -203,22 +203,22 @@ inobject private
     end;
   end;
 
-  func СоздатьФильтр :String;
+  func РЎРѕР·РґР°С‚СЊР¤РёР»СЊС‚СЂ :String;
     var aFlt :String[];
-    AddInArray( aFlt, 'ГодЛетописи=' + Str(Self.ГодЛППИ) );
+    AddInArray( aFlt, 'Р“РѕРґР›РµС‚РѕРїРёСЃРё=' + Str(Self.Р“РѕРґР›РџРџР) );
     Result = MakeFilter(aFlt);
   end;
 
-  proc УстановитьДоступностьОбъектовШаблона;
-    кнЗакрыть.Enabled       = true;
-    кнЗакрыть.Caption       = if(SelectMode, 'Отмена', 'Закрыть');
-    кнВыбрать.Enabled       = SelectMode;
-    кнДобавить.Enabled      = crdBuiltIn.CanInsert;
-    кнДублировать.Enabled   = crdBuiltIn.CanCopy;
-    кнНоваяГруппа.Enabled   = crdBuiltIn.Hierarchical;
-    кнПреобразовать.Enabled = crdBuiltIn.CanGroupSignModify;
-    кнРедактировать.Enabled = crdBuiltIn.CanEdit ;
-    кнУдалить.Enabled       = crdBuiltIn.CanDelete;
+  proc РЈСЃС‚Р°РЅРѕРІРёС‚СЊР”РѕСЃС‚СѓРїРЅРѕСЃС‚СЊРћР±СЉРµРєС‚РѕРІРЁР°Р±Р»РѕРЅР°;
+    РєРЅР—Р°РєСЂС‹С‚СЊ.Enabled       = true;
+    РєРЅР—Р°РєСЂС‹С‚СЊ.Caption       = if(SelectMode, 'РћС‚РјРµРЅР°', 'Р—Р°РєСЂС‹С‚СЊ');
+    РєРЅР’С‹Р±СЂР°С‚СЊ.Enabled       = SelectMode;
+    РєРЅР”РѕР±Р°РІРёС‚СЊ.Enabled      = crdBuiltIn.CanInsert;
+    РєРЅР”СѓР±Р»РёСЂРѕРІР°С‚СЊ.Enabled   = crdBuiltIn.CanCopy;
+    РєРЅРќРѕРІР°СЏР“СЂСѓРїРїР°.Enabled   = crdBuiltIn.Hierarchical;
+    РєРЅРџСЂРµРѕР±СЂР°Р·РѕРІР°С‚СЊ.Enabled = crdBuiltIn.CanGroupSignModify;
+    РєРЅР РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ.Enabled = crdBuiltIn.CanEdit ;
+    РєРЅРЈРґР°Р»РёС‚СЊ.Enabled       = crdBuiltIn.CanDelete;
   end;
 
 

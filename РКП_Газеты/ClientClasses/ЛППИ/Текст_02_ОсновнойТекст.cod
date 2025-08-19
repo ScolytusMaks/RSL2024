@@ -1,50 +1,50 @@
-class "";
+п»їclass "";
 
 inclass
 
 
 
-  proc Создание(ЛППИ            : TextFile;
-                ЗаписьЛППИ      : Record);
+  proc РЎРѕР·РґР°РЅРёРµ(Р›РџРџР            : TextFile;
+                Р—Р°РїРёСЃСЊР›РџРџР      : Record);
     var k,j                     : integer;
     var txt,sim                 : string;
     var Q                       : Query;
-      Q                         = Query.Create([РКП_Газеты.Газета]);
-      Q.Filter                  = "ГодЛетописи="+Str(ЗаписьЛППИ.ГодЛетописи);
-      Q.Order                   = "ЗаписьВЛетописи";
+      Q                         = Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°]);
+      Q.Filter                  = "Р“РѕРґР›РµС‚РѕРїРёСЃРё="+Str(Р—Р°РїРёСЃСЊР›РџРџР.Р“РѕРґР›РµС‚РѕРїРёСЃРё);
+      Q.Order                   = "Р—Р°РїРёСЃСЊР’Р›РµС‚РѕРїРёСЃРё";
       Q.Select;
       Q.First;
       for k = 1..Q.Count                        do
-        Hint("Создание текста...",k,Q.Count);
+        Hint("РЎРѕР·РґР°РЅРёРµ С‚РµРєСЃС‚Р°...",k,Q.Count);
 ----------------------------------------------------------------------------
-        if Q.Current.ОписаниеГазеты<>nil        then
-          if Q.Current.НомерВЛетописи>0         then
-            ЛППИ.Write  (Str(Q.Current.НомерВЛетописи)+". ");
-            ЛППИ.Write  ("/*"+Q.Current.Заголовок+"*/");
-            txt = Q.Current.ОписаниеГазеты;
+        if Q.Current.РћРїРёСЃР°РЅРёРµР“Р°Р·РµС‚С‹<>nil        then
+          if Q.Current.РќРѕРјРµСЂР’Р›РµС‚РѕРїРёСЃРё>0         then
+            Р›РџРџР.Write  (Str(Q.Current.РќРѕРјРµСЂР’Р›РµС‚РѕРїРёСЃРё)+". ");
+            Р›РџРџР.Write  ("/*"+Q.Current.Р—Р°РіРѕР»РѕРІРѕРє+"*/");
+            txt = Q.Current.РћРїРёСЃР°РЅРёРµР“Р°Р·РµС‚С‹;
               for j=1..Length(txt)              do
                 sim = SubStr(txt,j,1);
                 if Ord(sim)<>13                 then
-            ЛППИ.Write  (sim);
+            Р›РџРџР.Write  (sim);
                 else
-            ЛППИ.WriteLn("");
+            Р›РџРџР.WriteLn("");
                 end;
               if j=Length(txt)                  then
-            ЛППИ.WriteLn("");
+            Р›РџРџР.WriteLn("");
               end;
             end;
           else
-            ЛППИ.Write  ("/*"+Q.Current.Заголовок+"*/");
-            txt = Q.Current.ОписаниеГазеты;
+            Р›РџРџР.Write  ("/*"+Q.Current.Р—Р°РіРѕР»РѕРІРѕРє+"*/");
+            txt = Q.Current.РћРїРёСЃР°РЅРёРµР“Р°Р·РµС‚С‹;
             for j=1..Length(txt)                do
               sim = SubStr(txt,j,1);
               if Ord(sim)<>13                   then
-            ЛППИ.Write  (sim);
+            Р›РџРџР.Write  (sim);
               else
-            ЛППИ.WriteLn("");
+            Р›РџРџР.WriteLn("");
               end;
               if j=Length(txt)                  then
-            ЛППИ.WriteLn("");
+            Р›РџРџР.WriteLn("");
               end;
             end;
           end;

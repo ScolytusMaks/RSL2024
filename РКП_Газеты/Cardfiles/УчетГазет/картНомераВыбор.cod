@@ -1,34 +1,34 @@
-class inherited МашинаРеквизитов.Базовые.картСИнтерфейсом "Выбор номера";
--- Урезанный интерфейс, не предполагающий наследование от полного
+п»їclass inherited РњР°С€РёРЅР°Р РµРєРІРёР·РёС‚РѕРІ.Р‘Р°Р·РѕРІС‹Рµ.РєР°СЂС‚РЎРРЅС‚РµСЂС„РµР№СЃРѕРј "Р’С‹Р±РѕСЂ РЅРѕРјРµСЂР°";
+-- РЈСЂРµР·Р°РЅРЅС‹Р№ РёРЅС‚РµСЂС„РµР№СЃ, РЅРµ РїСЂРµРґРїРѕР»Р°РіР°СЋС‰РёР№ РЅР°СЃР»РµРґРѕРІР°РЅРёРµ РѕС‚ РїРѕР»РЅРѕРіРѕ
 
-import РКП_СИС classes Functions, FilterMaker;
+import Р РљРџ_РЎРРЎ classes Functions, FilterMaker;
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 
 inclass public
 
-  var КлассИнтерфейса :Class МашинаРеквизитов.Базовые.интЗапись = RI.НомерГазеты;
+  var РљР»Р°СЃСЃРРЅС‚РµСЂС„РµР№СЃР° :Class РњР°С€РёРЅР°Р РµРєРІРёР·РёС‚РѕРІ.Р‘Р°Р·РѕРІС‹Рµ.РёРЅС‚Р—Р°РїРёСЃСЊ = RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
 
 inobject private
 
-  var Издание :Газета;
-  var ФильтрГазеты :String;
-  var ФильтрНомеров :String;
+  var РР·РґР°РЅРёРµ :Р“Р°Р·РµС‚Р°;
+  var Р¤РёР»СЊС‚СЂР“Р°Р·РµС‚С‹ :String;
+  var Р¤РёР»СЊС‚СЂРќРѕРјРµСЂРѕРІ :String;
   var PageDef    :Image;
   var PageBlue   :Image;
 --}}
 
--- 2_Конструкторы, визуализаторы0. --
+-- 2_РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹, РІРёР·СѓР°Р»РёР·Р°С‚РѕСЂС‹0. --
 
 inclass public
 
-  func ВыполнитьВыбор (rNsp :Газета; vIssueFilter :String; var vRec :НомерГазеты) :Integer;
-    var vCrdForm :УчетГазет.картНомераВыбор;
-    vCrdForm = УчетГазет.картНомераВыбор.Create;
-    vCrdForm.Издание = rNsp;
-    vCrdForm.УстФильтрГазеты(rNsp, vIssueFilter);
-    vCrdForm.УстФильтрНомеров(rNsp, vIssueFilter);
-    --vCrdForm.ФильтрНомеров = vIssueFilter;
+  func Р’С‹РїРѕР»РЅРёС‚СЊР’С‹Р±РѕСЂ (rNsp :Р“Р°Р·РµС‚Р°; vIssueFilter :String; var vRec :РќРѕРјРµСЂР“Р°Р·РµС‚С‹) :Integer;
+    var vCrdForm :РЈС‡РµС‚Р“Р°Р·РµС‚.РєР°СЂС‚РќРѕРјРµСЂР°Р’С‹Р±РѕСЂ;
+    vCrdForm = РЈС‡РµС‚Р“Р°Р·РµС‚.РєР°СЂС‚РќРѕРјРµСЂР°Р’С‹Р±РѕСЂ.Create;
+    vCrdForm.РР·РґР°РЅРёРµ = rNsp;
+    vCrdForm.РЈСЃС‚Р¤РёР»СЊС‚СЂР“Р°Р·РµС‚С‹(rNsp, vIssueFilter);
+    vCrdForm.РЈСЃС‚Р¤РёР»СЊС‚СЂРќРѕРјРµСЂРѕРІ(rNsp, vIssueFilter);
+    --vCrdForm.Р¤РёР»СЊС‚СЂРќРѕРјРµСЂРѕРІ = vIssueFilter;
     if (cmOk = vCrdForm.ShowEx(vRec, , Kernel.Window.ModalWindow)) then
       Result = cmOk;
     fi;
@@ -36,83 +36,83 @@ inclass public
 
 inobject private
 
--- 2_Обработчики событий шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ С€Р°Р±Р»РѕРЅР°0. --
 
-  proc шаблон_ПриСоздании(Context :Variant);
-    inherited шаблон_ПриСоздании(Context);
-    PageDef    = Image.Create; PageDef.LoadFromFile('%Projects%\РКП_СИС\Attachments\Icons\PageDef.ico');
-    PageBlue   = Image.Create; PageBlue.LoadFromFile('%Projects%\РКП_СИС\Attachments\Icons\PageBlue.ico');
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёРЎРѕР·РґР°РЅРёРё(Context :Variant);
+    inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРЎРѕР·РґР°РЅРёРё(Context);
+    PageDef    = Image.Create; PageDef.LoadFromFile('%Projects%\Р РљРџ_РЎРРЎ\Attachments\Icons\PageDef.ico');
+    PageBlue   = Image.Create; PageBlue.LoadFromFile('%Projects%\Р РљРџ_РЎРРЎ\Attachments\Icons\PageBlue.ico');
   end;
 
-  proc шаблон_ПриОткрытии(Create :Logical);
-    Запретить_Преобразование = true;
-    inherited шаблон_ПриОткрытии(Create);
-    CardFile.TreeRoot = "Газета/год";
-    if (Издание <> nil) then
-      РКП_Газеты.ГруппаНомеров.ПоГодам.CreateGroupsByYears(Издание);
-      РКП_Газеты.ГруппаНомеров.ПоГазете.CreateGroupsByNsp(Издание);
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(Create :Logical);
+    Р—Р°РїСЂРµС‚РёС‚СЊ_РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ = true;
+    inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(Create);
+    CardFile.TreeRoot = "Р“Р°Р·РµС‚Р°/РіРѕРґ";
+    if (РР·РґР°РЅРёРµ <> nil) then
+      Р РљРџ_Р“Р°Р·РµС‚С‹.Р“СЂСѓРїРїР°РќРѕРјРµСЂРѕРІ.РџРѕР“РѕРґР°Рј.CreateGroupsByYears(РР·РґР°РЅРёРµ);
+      Р РљРџ_Р“Р°Р·РµС‚С‹.Р“СЂСѓРїРїР°РќРѕРјРµСЂРѕРІ.РџРѕР“Р°Р·РµС‚Рµ.CreateGroupsByNsp(РР·РґР°РЅРёРµ);
       CardFile.ShowHierarchy = true;
-      CardFile.TreeFilter = ФильтрГазеты;
-      CardFile.Filter     = ФильтрНомеров;
+      CardFile.TreeFilter = Р¤РёР»СЊС‚СЂР“Р°Р·РµС‚С‹;
+      CardFile.Filter     = Р¤РёР»СЊС‚СЂРќРѕРјРµСЂРѕРІ;
     else
-      Message('Картотека открыта без фильтра!');
+      Message('РљР°СЂС‚РѕС‚РµРєР° РѕС‚РєСЂС‹С‚Р° Р±РµР· С„РёР»СЊС‚СЂР°!');
     fi;
   end;
 
 
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
 
--- 2_Обработчики событий прочих объектов шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РїСЂРѕС‡РёС… РѕР±СЉРµРєС‚РѕРІ С€Р°Р±Р»РѕРЅР°0. --
 
 
--- 2_Обработчики событий картотеки0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР°СЂС‚РѕС‚РµРєРё0. --
 
-  proc картотека_ПриРисованииСтроки(Rec :Record; Selected :Logical; var Color :Integer; Image :Image);
-    var cRec :РКП_Газеты.НомерГазеты;
-    cRec = Rec as РКП_Газеты.НомерГазеты;
-    if cRec.СозданОЛГС then
+  proc РєР°СЂС‚РѕС‚РµРєР°_РџСЂРёР РёСЃРѕРІР°РЅРёРёРЎС‚СЂРѕРєРё(Rec :Record; Selected :Logical; var Color :Integer; Image :Image);
+    var cRec :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+    cRec = Rec as Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+    if cRec.РЎРѕР·РґР°РЅРћР›Р“РЎ then
       Image.Assign(PageBlue);
     else
       Image.Assign(PageDef);
     fi;
   end;
 
--- 2_Обработчики столбцов (полей) картотеки0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃС‚РѕР»Р±С†РѕРІ (РїРѕР»РµР№) РєР°СЂС‚РѕС‚РµРєРё0. --
 
 
--- 2_Дополнительные команды0. --
+-- 2_Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ РєРѕРјР°РЅРґС‹0. --
 
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
 inobject private
 
-  proc УстФильтрГазеты(rNsp :Газета; vIssueFilter :String);
+  proc РЈСЃС‚Р¤РёР»СЊС‚СЂР“Р°Р·РµС‚С‹(rNsp :Р“Р°Р·РµС‚Р°; vIssueFilter :String);
     var aFlt :String[];
     var vFltMaker :FilterMaker;
     if (vIssueFilter = nil) then
-      AddInArray( aFlt, 'Газета=' + rNsp.DocIDStr );
-      AddInArray( aFlt, 'ФункцияГруппы=-2' );
+      AddInArray( aFlt, 'Р“Р°Р·РµС‚Р°=' + rNsp.DocIDStr );
+      AddInArray( aFlt, 'Р¤СѓРЅРєС†РёСЏР“СЂСѓРїРїС‹=-2' );
       AddInArray( aFlt, 'isGroup=-1' );
-      ФильтрГазеты = MakeFilter(aFlt);
+      Р¤РёР»СЊС‚СЂР“Р°Р·РµС‚С‹ = MakeFilter(aFlt);
     else
-      vFltMaker = FilterMaker.CreateExt(['Газета=' + rNsp.DocIDStr, vIssueFilter]);
-      ФильтрГазеты = vFltMaker.ПолучитьФильтрГрупп([НомерГазеты]);
+      vFltMaker = FilterMaker.CreateExt(['Р“Р°Р·РµС‚Р°=' + rNsp.DocIDStr, vIssueFilter]);
+      Р¤РёР»СЊС‚СЂР“Р°Р·РµС‚С‹ = vFltMaker.РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂР“СЂСѓРїРї([РќРѕРјРµСЂР“Р°Р·РµС‚С‹]);
     fi;
   end;
 
-  proc УстФильтрНомеров(rNsp :Газета; vIssueFilter :String);
+  proc РЈСЃС‚Р¤РёР»СЊС‚СЂРќРѕРјРµСЂРѕРІ(rNsp :Р“Р°Р·РµС‚Р°; vIssueFilter :String);
     var aFlt :String[];
     if (vIssueFilter = nil) then
-      AddInArray( aFlt, 'Газета=' + rNsp.DocIDStr );
-      AddInArray( aFlt, 'ФункцияГруппы in [0,-1]' );
-      ФильтрНомеров = MakeFilter(aFlt);
+      AddInArray( aFlt, 'Р“Р°Р·РµС‚Р°=' + rNsp.DocIDStr );
+      AddInArray( aFlt, 'Р¤СѓРЅРєС†РёСЏР“СЂСѓРїРїС‹ in [0,-1]' );
+      Р¤РёР»СЊС‚СЂРќРѕРјРµСЂРѕРІ = MakeFilter(aFlt);
     else
-      AddInArray( aFlt, 'Газета=' + rNsp.DocIDStr );
-      AddInArray( aFlt, 'ФункцияГруппы in [0,-1]' );
+      AddInArray( aFlt, 'Р“Р°Р·РµС‚Р°=' + rNsp.DocIDStr );
+      AddInArray( aFlt, 'Р¤СѓРЅРєС†РёСЏР“СЂСѓРїРїС‹ in [0,-1]' );
       AddInArray( aFlt, vIssueFilter );
-      ФильтрНомеров = FltMaker.MakeFilter(aFlt);
+      Р¤РёР»СЊС‚СЂРќРѕРјРµСЂРѕРІ = FltMaker.MakeFilter(aFlt);
     fi;
   end;
 

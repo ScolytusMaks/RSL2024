@@ -1,23 +1,23 @@
-class "";
+п»їclass "";
 
-import РКП_СИС classes Functions, FilterMaker;
+import Р РљРџ_РЎРРЎ classes Functions, FilterMaker;
 
 inclass public
 
-  -- По записи газеты rNsp в таблице РКП_Газеты.ВыпускГазеты
-  -- создает группы первого уровня для каждого издания.
-  -- Группа должна быть единственной.
-  -- После создания (или идентификации ранее созданной группы)
-  -- выполняется включение групп (по годам) в эту группу
-  proc CreateGroupsByNsp (rNsp :РКП_Газеты.Газета);
+  -- РџРѕ Р·Р°РїРёСЃРё РіР°Р·РµС‚С‹ rNsp РІ С‚Р°Р±Р»РёС†Рµ Р РљРџ_Р“Р°Р·РµС‚С‹.Р’С‹РїСѓСЃРєР“Р°Р·РµС‚С‹
+  -- СЃРѕР·РґР°РµС‚ РіСЂСѓРїРїС‹ РїРµСЂРІРѕРіРѕ СѓСЂРѕРІРЅСЏ РґР»СЏ РєР°Р¶РґРѕРіРѕ РёР·РґР°РЅРёСЏ.
+  -- Р“СЂСѓРїРїР° РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РµРґРёРЅСЃС‚РІРµРЅРЅРѕР№.
+  -- РџРѕСЃР»Рµ СЃРѕР·РґР°РЅРёСЏ (РёР»Рё РёРґРµРЅС‚РёС„РёРєР°С†РёРё СЂР°РЅРµРµ СЃРѕР·РґР°РЅРЅРѕР№ РіСЂСѓРїРїС‹)
+  -- РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ РІРєР»СЋС‡РµРЅРёРµ РіСЂСѓРїРї (РїРѕ РіРѕРґР°Рј) РІ СЌС‚Сѓ РіСЂСѓРїРїСѓ
+  proc CreateGroupsByNsp (rNsp :Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°);
     var aFlt :String[];
-    var vNspIssueAllGroup :РКП_Газеты.НомерГазеты[];
-    var vNspIssueGroup :РКП_Газеты.НомерГазеты;
+    var vNspIssueAllGroup :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹[];
+    var vNspIssueGroup :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
     var vName :String;
-    AddInArray( aFlt, 'Газета=' + rNsp.DocIDStr );
-    AddInArray( aFlt, 'ФункцияГруппы=-2' );
+    AddInArray( aFlt, 'Р“Р°Р·РµС‚Р°=' + rNsp.DocIDStr );
+    AddInArray( aFlt, 'Р¤СѓРЅРєС†РёСЏР“СЂСѓРїРїС‹=-2' );
     AddInArray( aFlt, 'isGroup=-1' );
-    with Query.Create([РКП_Газеты.НомерГазеты]) do
+    with Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹]) do
       Filter = MakeFilter(aFlt);
       Select;
       while not Eof do
@@ -26,41 +26,41 @@ inclass public
       od;
     end;
     if (vNspIssueAllGroup = nil) then
-      vNspIssueGroup = РКП_Газеты.НомерГазеты.Create;
+      vNspIssueGroup = Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹.Create;
     else
       vNspIssueGroup = vNspIssueAllGroup[1];
     fi;
     try
-      vName = rNsp.GetField('НазваниеЛГС');
+      vName = rNsp.GetField('РќР°Р·РІР°РЅРёРµР›Р“РЎ');
     finally
       if (vName = nil) then
-        vName = rNsp.НазваниеОсн;
+        vName = rNsp.РќР°Р·РІР°РЅРёРµРћСЃРЅ;
       fi;
     end;
-    vNspIssueGroup.Номер   = vName;
-    vNspIssueGroup.Газета  = rNsp;
+    vNspIssueGroup.РќРѕРјРµСЂ   = vName;
+    vNspIssueGroup.Р“Р°Р·РµС‚Р°  = rNsp;
     vNspIssueGroup.isGroup = true;
-    vNspIssueGroup.ФункцияГруппы = -2;
-    РКП_СИС.Recs.RecordPostIfNeed(vNspIssueGroup);
+    vNspIssueGroup.Р¤СѓРЅРєС†РёСЏР“СЂСѓРїРїС‹ = -2;
+    Р РљРџ_РЎРРЎ.Recs.RecordPostIfNeed(vNspIssueGroup);
     FillNspGroup (rNsp, vNspIssueGroup);
     DelExcessNspGroup (vNspIssueGroup, vNspIssueAllGroup);
   end;
 
 
-  proc FillNspGroup (rNsp :РКП_Газеты.Газета; vGroup :РКП_Газеты.НомерГазеты);
+  proc FillNspGroup (rNsp :Р РљРџ_Р“Р°Р·РµС‚С‹.Р“Р°Р·РµС‚Р°; vGroup :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹);
     var aFlt :String[];
-    var ST :СИС2.УмнаяТранзакция;
-    AddInArray( aFlt, 'Газета=' + rNsp.DocIDStr );
-    AddInArray( aFlt, 'ФункцияГруппы=-1' );
+    var ST :РЎРРЎ2.РЈРјРЅР°СЏРўСЂР°РЅР·Р°РєС†РёСЏ;
+    AddInArray( aFlt, 'Р“Р°Р·РµС‚Р°=' + rNsp.DocIDStr );
+    AddInArray( aFlt, 'Р¤СѓРЅРєС†РёСЏР“СЂСѓРїРїС‹=-1' );
     AddInArray( aFlt, 'isGroup=-1' );
-    with Query.Create([РКП_Газеты.НомерГазеты]) do
+    with Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹]) do
       Filter = MakeFilter(aFlt);
       Select;
-      ST = СИС2.SmartTransaction.CreateEx([РКП_Газеты.НомерГазеты], 900);
+      ST = РЎРРЎ2.SmartTransaction.CreateEx([Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹], 900);
       while not Eof do
         try
           Current.GroupDoc = vGroup;
-          РКП_СИС.Recs.RecordPostIfNeed(Current);
+          Р РљРџ_РЎРРЎ.Recs.RecordPostIfNeed(Current);
         except
         end;
         ST.NextStep;
@@ -70,12 +70,12 @@ inclass public
     end;
   end;
 
-  proc DelExcessNspGroup (vGroup :РКП_Газеты.НомерГазеты; aGroup :РКП_Газеты.НомерГазеты[]);
+  proc DelExcessNspGroup (vGroup :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹; aGroup :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹[]);
     var i, ii :Integer;
     ii = LengthOfArray(aGroup);
     for i = 1 .. ii do
       if (aGroup[i] <> vGroup) then
-        РКП_СИС.Recs.RecordDeleteEx(aGroup[i], false);
+        Р РљРџ_РЎРРЎ.Recs.RecordDeleteEx(aGroup[i], false);
       fi;
     od;
   end;
@@ -83,65 +83,65 @@ inclass public
 
 
 
---  proc СоздатьГруппу(ФильтрГазеты:string);
+--  proc РЎРѕР·РґР°С‚СЊР“СЂСѓРїРїСѓ(Р¤РёР»СЊС‚СЂР“Р°Р·РµС‚С‹:string);
 --  var srecord        :string;
---  var ЗаписьГазеты,r :record;
+--  var Р—Р°РїРёСЃСЊР“Р°Р·РµС‚С‹,r :record;
 --  var Q2             :Query;
 --  var k2             :integer;
---      srecord                           = SubStr(ФильтрГазеты,
---                                                 Pos("{",ФильтрГазеты),
---                                                 Pos("}",ФильтрГазеты)-
---                                                 Pos("{",ФильтрГазеты)
---                                                 +1);  --вычисление строкового представления ссылки на запись газеты
---      ЗаписьГазеты                      = Газета.Open(srecord);--Превращение строки в запись
---      --Собственно проверка наличия группы
---      Q2          = Query.Create([РКП_Газеты.НомерГазеты]);
---      Q2.Filter   = ФильтрГазеты+
---                    " and ФункцияГруппы=-2"+
+--      srecord                           = SubStr(Р¤РёР»СЊС‚СЂР“Р°Р·РµС‚С‹,
+--                                                 Pos("{",Р¤РёР»СЊС‚СЂР“Р°Р·РµС‚С‹),
+--                                                 Pos("}",Р¤РёР»СЊС‚СЂР“Р°Р·РµС‚С‹)-
+--                                                 Pos("{",Р¤РёР»СЊС‚СЂР“Р°Р·РµС‚С‹)
+--                                                 +1);  --РІС‹С‡РёСЃР»РµРЅРёРµ СЃС‚СЂРѕРєРѕРІРѕРіРѕ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёСЏ СЃСЃС‹Р»РєРё РЅР° Р·Р°РїРёСЃСЊ РіР°Р·РµС‚С‹
+--      Р—Р°РїРёСЃСЊР“Р°Р·РµС‚С‹                      = Р“Р°Р·РµС‚Р°.Open(srecord);--РџСЂРµРІСЂР°С‰РµРЅРёРµ СЃС‚СЂРѕРєРё РІ Р·Р°РїРёСЃСЊ
+--      --РЎРѕР±СЃС‚РІРµРЅРЅРѕ РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РіСЂСѓРїРїС‹
+--      Q2          = Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹]);
+--      Q2.Filter   = Р¤РёР»СЊС‚СЂР“Р°Р·РµС‚С‹+
+--                    " and Р¤СѓРЅРєС†РёСЏР“СЂСѓРїРїС‹=-2"+
 --                    " and isGroup=-1";
 --      Q2.Select;
---        if Q2.Count>1 then -- то удаление лишних без проверки ссылочной целостности???
+--        if Q2.Count>1 then -- С‚Рѕ СѓРґР°Р»РµРЅРёРµ Р»РёС€РЅРёС… Р±РµР· РїСЂРѕРІРµСЂРєРё СЃСЃС‹Р»РѕС‡РЅРѕР№ С†РµР»РѕСЃС‚РЅРѕСЃС‚Рё???
 --        Q2.First;
 --          for k2 = 1..Q2.Count do
---             BeginTransaction([РКП_Газеты.НомерГазеты]);
+--             BeginTransaction([Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹]);
 --             Q2.Current.Delete(false);
 --             EndTransaction;
 --             Q2.Next;
 --          end;
 --        end;
 --      Q2.Close;
---      -- Создание группы
---      Q2          = Query.Create([РКП_Газеты.НомерГазеты]);
---      Q2.Filter   = ФильтрГазеты+
---                    " and ФункцияГруппы=-2"+
+--      -- РЎРѕР·РґР°РЅРёРµ РіСЂСѓРїРїС‹
+--      Q2          = Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹]);
+--      Q2.Filter   = Р¤РёР»СЊС‚СЂР“Р°Р·РµС‚С‹+
+--                    " and Р¤СѓРЅРєС†РёСЏР“СЂСѓРїРїС‹=-2"+
 --                    " and isGroup=-1";
 --      Q2.Select;
---        if Q2.Count=0 then -- то создание такой группы
+--        if Q2.Count=0 then -- С‚Рѕ СЃРѕР·РґР°РЅРёРµ С‚Р°РєРѕР№ РіСЂСѓРїРїС‹
 --        Q2.First;
---               BeginTransaction([РКП_Газеты.НомерГазеты]);
---               r = РКП_Газеты.НомерГазеты.Create;
---               r.Номер          = ЗаписьГазеты.НазваниеОсн;
---               r.Газета         = ЗаписьГазеты;
+--               BeginTransaction([Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹]);
+--               r = Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹.Create;
+--               r.РќРѕРјРµСЂ          = Р—Р°РїРёСЃСЊР“Р°Р·РµС‚С‹.РќР°Р·РІР°РЅРёРµРћСЃРЅ;
+--               r.Р“Р°Р·РµС‚Р°         = Р—Р°РїРёСЃСЊР“Р°Р·РµС‚С‹;
 --               r.isGroup        = true;
---               r.ФункцияГруппы  = -2;
+--               r.Р¤СѓРЅРєС†РёСЏР“СЂСѓРїРїС‹  = -2;
 --               if (r.State = r.Edited) or (r.State = r.Created) then
 --                 r.Post;
 --               end;
 --               EndTransaction;
 --        end;
 --      Q2.Close;
---      -- Корректировка названия
---      Q2          = Query.Create([РКП_Газеты.НомерГазеты]);
---      Q2.Filter   = ФильтрГазеты+
---                    " and ФункцияГруппы=-2"+
+--      -- РљРѕСЂСЂРµРєС‚РёСЂРѕРІРєР° РЅР°Р·РІР°РЅРёСЏ
+--      Q2          = Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹]);
+--      Q2.Filter   = Р¤РёР»СЊС‚СЂР“Р°Р·РµС‚С‹+
+--                    " and Р¤СѓРЅРєС†РёСЏР“СЂСѓРїРїС‹=-2"+
 --                    " and isGroup=-1";
 --      Q2.Select;
 --        if Q2.Count=1 then
 --           Q2.First;
 --           r = Q2.Current;
---           if r.Номер<>ЗаписьГазеты.НазваниеЛГС then
---             BeginTransaction([РКП_Газеты.НомерГазеты]);
---             r.Номер          = ЗаписьГазеты.НазваниеЛГС;
+--           if r.РќРѕРјРµСЂ<>Р—Р°РїРёСЃСЊР“Р°Р·РµС‚С‹.РќР°Р·РІР°РЅРёРµР›Р“РЎ then
+--             BeginTransaction([Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹]);
+--             r.РќРѕРјРµСЂ          = Р—Р°РїРёСЃСЊР“Р°Р·РµС‚С‹.РќР°Р·РІР°РЅРёРµР›Р“РЎ;
 --             if (r.State = r.Edited) or (r.State = r.Created) then
 --               r.Post;
 --             end;
@@ -151,17 +151,17 @@ inclass public
 --          r = nil;
 --        end;
 --      Q2.Close;
---      --Корректировка ссылок
+--      --РљРѕСЂСЂРµРєС‚РёСЂРѕРІРєР° СЃСЃС‹Р»РѕРє
 --      if r<>nil then
---      Q2          = Query.Create([РКП_Газеты.НомерГазеты]);
---      Q2.Filter   = ФильтрГазеты+
---                    " and ФункцияГруппы=-1"+
+--      Q2          = Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹]);
+--      Q2.Filter   = Р¤РёР»СЊС‚СЂР“Р°Р·РµС‚С‹+
+--                    " and Р¤СѓРЅРєС†РёСЏР“СЂСѓРїРїС‹=-1"+
 --                    " and isGroup=-1";
 --      Q2.Select;
 --        for k2 = 1..Q2.Count do
---          --Hint("Обработка номеров...",k2,Q2.Count);
+--          --Hint("РћР±СЂР°Р±РѕС‚РєР° РЅРѕРјРµСЂРѕРІ...",k2,Q2.Count);
 --          if Q2.Current.GroupDoc <> r then
---            BeginTransaction([РКП_Газеты.НомерГазеты]);
+--            BeginTransaction([Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹]);
 --            Q2.Current.GroupDoc = r;
 --               if (Q2.Current.State = Q2.Current.Edited) or (Q2.Current.State = Q2.Current.Created) then
 --                 Q2.Current.Post;

@@ -1,15 +1,15 @@
-class "";
+п»їclass "";
 
 inclass
 --~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  proc Создание(ПапкаЛетописи:string;ФайлЛетописи:string;var ЛППИ:TextFile);
-    if    ExistFolder(ПапкаЛетописи) = false    then
-      CreateFolder(ПапкаЛетописи);
+  proc РЎРѕР·РґР°РЅРёРµ(РџР°РїРєР°Р›РµС‚РѕРїРёСЃРё:string;Р¤Р°Р№Р»Р›РµС‚РѕРїРёСЃРё:string;var Р›РџРџР:TextFile);
+    if    ExistFolder(РџР°РїРєР°Р›РµС‚РѕРїРёСЃРё) = false    then
+      CreateFolder(РџР°РїРєР°Р›РµС‚РѕРїРёСЃРё);
     end;
-    if  ExistFile(ФайлЛетописи) = true          then
-      RemoveFile(ФайлЛетописи);
+    if  ExistFile(Р¤Р°Р№Р»Р›РµС‚РѕРїРёСЃРё) = true          then
+      RemoveFile(Р¤Р°Р№Р»Р›РµС‚РѕРїРёСЃРё);
     end;
-    ЛППИ        = TextFile.Create(ФайлЛетописи,fmCreate);
+    Р›РџРџР        = TextFile.Create(Р¤Р°Р№Р»Р›РµС‚РѕРїРёСЃРё,fmCreate);
   end;
 --~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

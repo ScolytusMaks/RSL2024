@@ -1,26 +1,26 @@
-class "";
+п»їclass "";
 
 inclass public
 
-  --Проверка наличия группы в картотеке "Выпуск ЛППИ"
-  --При отсутствии - добавление
-  func Создание (vYearMemo :Integer) :logical;
+  --РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РіСЂСѓРїРїС‹ РІ РєР°СЂС‚РѕС‚РµРєРµ "Р’С‹РїСѓСЃРє Р›РџРџР"
+  --РџСЂРё РѕС‚СЃСѓС‚СЃС‚РІРёРё - РґРѕР±Р°РІР»РµРЅРёРµ
+  func РЎРѕР·РґР°РЅРёРµ (vYearMemo :Integer) :logical;
     var vMemoExists :Logical;
     if (vYearMemo > 1901) and (vYearMemo < 3000) then
-      with Query.Create([РКП_Газеты.ВыпускЛППИ]) do
-        Filter = 'ГодЛетописи=' + Str(vYearMemo);
+      with Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.Р’С‹РїСѓСЃРєР›РџРџР]) do
+        Filter = 'Р“РѕРґР›РµС‚РѕРїРёСЃРё=' + Str(vYearMemo);
         vMemoExists = RecordsExists;
       end;
       if (not vMemoExists) then
-        with РКП_Газеты.ВыпускЛППИ.Create do
-          ГодЛетописи = vYearMemo;
+        with Р РљРџ_Р“Р°Р·РµС‚С‹.Р’С‹РїСѓСЃРєР›РџРџР.Create do
+          Р“РѕРґР›РµС‚РѕРїРёСЃРё = vYearMemo;
           Post;
         end;
       fi;
       Return true;
     else
       if (vYearMemo > 0) then
-        Message('Пожалуйста, проверьте правильность введенного значения!');
+        Message('РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РїСЂРѕРІРµСЂСЊС‚Рµ РїСЂР°РІРёР»СЊРЅРѕСЃС‚СЊ РІРІРµРґРµРЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ!');
       else
         Return true;
       fi;

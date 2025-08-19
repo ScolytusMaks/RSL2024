@@ -1,61 +1,61 @@
-class inherited РКП_СИС.RI.intBase 'Интерфейс записи';
+п»їclass inherited Р РљРџ_РЎРРЎ.RI.intBase 'РРЅС‚РµСЂС„РµР№СЃ Р·Р°РїРёСЃРё';
 
-import РКП_СИС Classes Functions, StringsFunctions, Recs;
+import Р РљРџ_РЎРРЎ Classes Functions, StringsFunctions, Recs;
 
 inclass public
 
-  var ИмяПоляНеПрименяется :String = '';
-  var ИмяПоляНаим          :String = 'Номер';
+  var РРјСЏРџРѕР»СЏРќРµРџСЂРёРјРµРЅСЏРµС‚СЃСЏ :String = '';
+  var РРјСЏРџРѕР»СЏРќР°РёРј          :String = 'РќРѕРјРµСЂ';
 
-  func СвязанныйКлассЗаписей: Class СИС2.Базовая.БазоваяЗапись;
-    Result = РКП_Газеты.НомерГазеты;
+  func РЎРІСЏР·Р°РЅРЅС‹Р№РљР»Р°СЃСЃР—Р°РїРёСЃРµР№: Class РЎРРЎ2.Р‘Р°Р·РѕРІР°СЏ.Р‘Р°Р·РѕРІР°СЏР—Р°РїРёСЃСЊ;
+    Result = Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
   end;
 
-  func Create: РКП_Газеты.RI.НомерГазеты;
+  func Create: Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
     Result = inherited Create;
-    Result.Record = РКП_Газеты.НомерГазеты.Create;
+    Result.Record = Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹.Create;
   end;
 
-  func ОткрытьПоЗаписи synonym OpenRecord(locRecord: РКП_Газеты.НомерГазеты): РКП_Газеты.RI.НомерГазеты;
+  func РћС‚РєСЂС‹С‚СЊРџРѕР—Р°РїРёСЃРё synonym OpenRecord(locRecord: Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹): Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
     Result = inherited Create;
     Result.Record = locRecord;
   end;
 
-  func БланкРедакторПоУмолчанию: Class BlankForm;
-    Result = УчетГазет.редНомерГазеты;
+  func Р‘Р»Р°РЅРєР РµРґР°РєС‚РѕСЂРџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class BlankForm;
+    Result = РЈС‡РµС‚Р“Р°Р·РµС‚.СЂРµРґРќРѕРјРµСЂР“Р°Р·РµС‚С‹;
   end;
 
-  func КартотекаПоУмолчанию: Class CardForm;
+  func РљР°СЂС‚РѕС‚РµРєР°РџРѕРЈРјРѕР»С‡Р°РЅРёСЋ: Class CardForm;
     Result = nil;
   end;
 
-  proc ИнициализироватьИнтерфейс synonym InitInterface;
-    var локПолнИмя :String;
-    var локМетод :MethodInfo;
+  proc РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊРРЅС‚РµСЂС„РµР№СЃ synonym InitInterface;
+    var Р»РѕРєРџРѕР»РЅРРјСЏ :String;
+    var Р»РѕРєРњРµС‚РѕРґ :MethodInfo;
     inherited InitInterface;
-    локПолнИмя = 'РКП_Газеты.RI.НомерГазеты.УдалениеИстории';
-    локМетод = СИС2.ФункцииРТТИ.ПолучитьИнфоМетодаПоПолномуИмениМетода(локПолнИмя);
-    СобытиеПередУдалением.AddMethod(локМетод);
-    локПолнИмя = 'РКП_Газеты.RI.НомерГазеты.КоррЛог';
-    локМетод = СИС2.ФункцииРТТИ.ПолучитьИнфоМетодаПоПолномуИмениМетода(локПолнИмя);
-    СобытиеПередУдалением.AddMethod(локМетод);
+    Р»РѕРєРџРѕР»РЅРРјСЏ = 'Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹.РЈРґР°Р»РµРЅРёРµРСЃС‚РѕСЂРёРё';
+    Р»РѕРєРњРµС‚РѕРґ = РЎРРЎ2.Р¤СѓРЅРєС†РёРёР РўРўР.РџРѕР»СѓС‡РёС‚СЊРРЅС„РѕРњРµС‚РѕРґР°РџРѕРџРѕР»РЅРѕРјСѓРРјРµРЅРёРњРµС‚РѕРґР°(Р»РѕРєРџРѕР»РЅРРјСЏ);
+    РЎРѕР±С‹С‚РёРµРџРµСЂРµРґРЈРґР°Р»РµРЅРёРµРј.AddMethod(Р»РѕРєРњРµС‚РѕРґ);
+    Р»РѕРєРџРѕР»РЅРРјСЏ = 'Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РќРѕРјРµСЂР“Р°Р·РµС‚С‹.РљРѕСЂСЂР›РѕРі';
+    Р»РѕРєРњРµС‚РѕРґ = РЎРРЎ2.Р¤СѓРЅРєС†РёРёР РўРўР.РџРѕР»СѓС‡РёС‚СЊРРЅС„РѕРњРµС‚РѕРґР°РџРѕРџРѕР»РЅРѕРјСѓРРјРµРЅРёРњРµС‚РѕРґР°(Р»РѕРєРџРѕР»РЅРРјСЏ);
+    РЎРѕР±С‹С‚РёРµРџРµСЂРµРґРЈРґР°Р»РµРЅРёРµРј.AddMethod(Р»РѕРєРњРµС‚РѕРґ);
   end;
 
-  func УдалениеИстории(локПарам[] :Variant) :Logical;
-    var vRec :РКП_Газеты.НомерГазеты;
+  func РЈРґР°Р»РµРЅРёРµРСЃС‚РѕСЂРёРё(Р»РѕРєРџР°СЂР°Рј[] :Variant) :Logical;
+    var vRec :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
     var Q :Query;
-    vRec = локПарам[2] as РКП_Газеты.НомерГазеты;
+    vRec = Р»РѕРєРџР°СЂР°Рј[2] as Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
     if (vRec <> nil) then
-      Q = Query.Create([РКП_Газеты.ИсторияГазеты]);
-      Q.Filter = 'СНомера=' + vRec.DocIDStr;
+      Q = Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.РСЃС‚РѕСЂРёСЏР“Р°Р·РµС‚С‹]);
+      Q.Filter = 'РЎРќРѕРјРµСЂР°=' + vRec.DocIDStr;
       Q.Select;
-      РКП_СИС.Recs.DeleteAllRecords(Q);
+      Р РљРџ_РЎРРЎ.Recs.DeleteAllRecords(Q);
     fi;
   end;
 
-  func КоррЛог(локПарам[] :Variant) :Logical; -- удаление записей из лога
-    var vRec :РКП_Газеты.НомерГазеты;
-    vRec = локПарам[2] as РКП_Газеты.НомерГазеты;
+  func РљРѕСЂСЂР›РѕРі(Р»РѕРєРџР°СЂР°Рј[] :Variant) :Logical; -- СѓРґР°Р»РµРЅРёРµ Р·Р°РїРёСЃРµР№ РёР· Р»РѕРіР°
+    var vRec :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
+    vRec = Р»РѕРєРџР°СЂР°Рј[2] as Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
     if (vRec <> nil) then
       Self.ClearWorkLogExt(vRec, false, wsRecCreated);
     fi;
@@ -63,46 +63,46 @@ inclass public
 
 inobject public
 
-  Record: РКП_Газеты.НомерГазеты;
+  Record: Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
 
-  proc ИнициализироватьПоУмолчанию synonym InitByDefault;
+  proc РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊРџРѕРЈРјРѕР»С‡Р°РЅРёСЋ synonym InitByDefault;
     Init;
   end;
 
-  proc Инициализировать synonym Init;
+  proc РРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊ synonym Init;
     Assert(Record.State = Kernel.Record.Created);
   end;
 
 
-  proc Записать synonym Post( аДиалоговыйРежим :Logical = False );
-    if ПроверитьУникальность then
-      РегистрацияНомера;
+  proc Р—Р°РїРёСЃР°С‚СЊ synonym Post( Р°Р”РёР°Р»РѕРіРѕРІС‹Р№Р РµР¶РёРј :Logical = False );
+    if РџСЂРѕРІРµСЂРёС‚СЊРЈРЅРёРєР°Р»СЊРЅРѕСЃС‚СЊ then
+      Р РµРіРёСЃС‚СЂР°С†РёСЏРќРѕРјРµСЂР°;
       SetWorkLog(wsRecCreated, wsRecUpdated);
       SetWorkLog(wsAccepted, wsAcpUpdated);
-     inherited Post(аДиалоговыйРежим);
-      if (Record.Газета.Прекращено <> Record.ПрекращениеИздания) then
-        Record.Газета.Прекращено = Record.ПрекращениеИздания;
-        if (Record.ПрекращениеИздания) then
-          Record.Газета.НомерПоследнегоНомера        = Record.Номер;
-          Record.Газета.ВалПоследнегоНомера          = Record.ВаловыйНомер;
-          Record.Газета.ДатаВыходаПоследнегоНомера   = Record.ДатаВыхода;
-          Record.Газета.ТочностьДатыПоследнегоНомера = Record.ТочностьДатыВыхода;
+     inherited Post(Р°Р”РёР°Р»РѕРіРѕРІС‹Р№Р РµР¶РёРј);
+      if (Record.Р“Р°Р·РµС‚Р°.РџСЂРµРєСЂР°С‰РµРЅРѕ <> Record.РџСЂРµРєСЂР°С‰РµРЅРёРµРР·РґР°РЅРёСЏ) then
+        Record.Р“Р°Р·РµС‚Р°.РџСЂРµРєСЂР°С‰РµРЅРѕ = Record.РџСЂРµРєСЂР°С‰РµРЅРёРµРР·РґР°РЅРёСЏ;
+        if (Record.РџСЂРµРєСЂР°С‰РµРЅРёРµРР·РґР°РЅРёСЏ) then
+          Record.Р“Р°Р·РµС‚Р°.РќРѕРјРµСЂРџРѕСЃР»РµРґРЅРµРіРѕРќРѕРјРµСЂР°        = Record.РќРѕРјРµСЂ;
+          Record.Р“Р°Р·РµС‚Р°.Р’Р°Р»РџРѕСЃР»РµРґРЅРµРіРѕРќРѕРјРµСЂР°          = Record.Р’Р°Р»РѕРІС‹Р№РќРѕРјРµСЂ;
+          Record.Р“Р°Р·РµС‚Р°.Р”Р°С‚Р°Р’С‹С…РѕРґР°РџРѕСЃР»РµРґРЅРµРіРѕРќРѕРјРµСЂР°   = Record.Р”Р°С‚Р°Р’С‹С…РѕРґР°;
+          Record.Р“Р°Р·РµС‚Р°.РўРѕС‡РЅРѕСЃС‚СЊР”Р°С‚С‹РџРѕСЃР»РµРґРЅРµРіРѕРќРѕРјРµСЂР° = Record.РўРѕС‡РЅРѕСЃС‚СЊР”Р°С‚С‹Р’С‹С…РѕРґР°;
         else
-          Record.Газета.НомерПоследнегоНомера        = nil;
-          Record.Газета.ВалПоследнегоНомера          = nil;
-          Record.Газета.ДатаВыходаПоследнегоНомера   = nil;
-          Record.Газета.ТочностьДатыПоследнегоНомера = nil;
+          Record.Р“Р°Р·РµС‚Р°.РќРѕРјРµСЂРџРѕСЃР»РµРґРЅРµРіРѕРќРѕРјРµСЂР°        = nil;
+          Record.Р“Р°Р·РµС‚Р°.Р’Р°Р»РџРѕСЃР»РµРґРЅРµРіРѕРќРѕРјРµСЂР°          = nil;
+          Record.Р“Р°Р·РµС‚Р°.Р”Р°С‚Р°Р’С‹С…РѕРґР°РџРѕСЃР»РµРґРЅРµРіРѕРќРѕРјРµСЂР°   = nil;
+          Record.Р“Р°Р·РµС‚Р°.РўРѕС‡РЅРѕСЃС‚СЊР”Р°С‚С‹РџРѕСЃР»РµРґРЅРµРіРѕРќРѕРјРµСЂР° = nil;
         fi;
       fi;
-      RecordPostIfNeed(Record.Газета);
-      if (Record.ПрекращениеИздания) then
-        -- снятие признака прекращения с ранее прекращенных номеров
-        with Query.Create([РКП_Газеты.НомерГазеты])  do
-          Filter = 'Газета=' + Record.Газета.DocIDStr + ' and isGroup=0 and DocId<>' + Str(Record.DocId);
+      RecordPostIfNeed(Record.Р“Р°Р·РµС‚Р°);
+      if (Record.РџСЂРµРєСЂР°С‰РµРЅРёРµРР·РґР°РЅРёСЏ) then
+        -- СЃРЅСЏС‚РёРµ РїСЂРёР·РЅР°РєР° РїСЂРµРєСЂР°С‰РµРЅРёСЏ СЃ СЂР°РЅРµРµ РїСЂРµРєСЂР°С‰РµРЅРЅС‹С… РЅРѕРјРµСЂРѕРІ
+        with Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹])  do
+          Filter = 'Р“Р°Р·РµС‚Р°=' + Record.Р“Р°Р·РµС‚Р°.DocIDStr + ' and isGroup=0 and DocId<>' + Str(Record.DocId);
           Select;
           while not Eof do
-            if Current.ПрекращениеИздания then
-              Current.ПрекращениеИздания = false;
+            if Current.РџСЂРµРєСЂР°С‰РµРЅРёРµРР·РґР°РЅРёСЏ then
+              Current.РџСЂРµРєСЂР°С‰РµРЅРёРµРР·РґР°РЅРёСЏ = false;
               RecordPostIfNeed(Current);
             fi;
             Next;
@@ -113,28 +113,28 @@ inobject public
     fi;
   end;
 
-  --= InObject методы для реализации функционала сохранения данных в WorkLog =--
+  --= InObject РјРµС‚РѕРґС‹ РґР»СЏ СЂРµР°Р»РёР·Р°С†РёРё С„СѓРЅРєС†РёРѕРЅР°Р»Р° СЃРѕС…СЂР°РЅРµРЅРёСЏ РґР°РЅРЅС‹С… РІ WorkLog =--
 
-  func ContentValidToWorkLog(byWorkState :tWorkState) :Logical; -- Содержимое записи валидно для принятия к учету как единица рабочего процесса
+  func ContentValidToWorkLog(byWorkState :tWorkState) :Logical; -- РЎРѕРґРµСЂР¶РёРјРѕРµ Р·Р°РїРёСЃРё РІР°Р»РёРґРЅРѕ РґР»СЏ РїСЂРёРЅСЏС‚РёСЏ Рє СѓС‡РµС‚Сѓ РєР°Рє РµРґРёРЅРёС†Р° СЂР°Р±РѕС‡РµРіРѕ РїСЂРѕС†РµСЃСЃР°
     if (byWorkState in [wsRecCreated, wsRecUpdated]) then
-      Result = (Record.ФункцияГруппы = 0);
+      Result = (Record.Р¤СѓРЅРєС†РёСЏР“СЂСѓРїРїС‹ = 0);
     elsif (byWorkState in [wsAccepted, wsAcpUpdated]) then
-      Result = (not Record.НеПолучен) and (Record.ФункцияГруппы = 0);
+      Result = (not Record.РќРµРџРѕР»СѓС‡РµРЅ) and (Record.Р¤СѓРЅРєС†РёСЏР“СЂСѓРїРїС‹ = 0);
     fi;
   end;
 
-  func CreateDateForWorkLog (WorkState :tWorkState; byCurrentUsers :Logical) :Date; -- Дата, когда запись считается созданной и принимается к учету как единица рабочего процесса
+  func CreateDateForWorkLog (WorkState :tWorkState; byCurrentUsers :Logical) :Date; -- Р”Р°С‚Р°, РєРѕРіРґР° Р·Р°РїРёСЃСЊ СЃС‡РёС‚Р°РµС‚СЃСЏ СЃРѕР·РґР°РЅРЅРѕР№ Рё РїСЂРёРЅРёРјР°РµС‚СЃСЏ Рє СѓС‡РµС‚Сѓ РєР°Рє РµРґРёРЅРёС†Р° СЂР°Р±РѕС‡РµРіРѕ РїСЂРѕС†РµСЃСЃР°
     var dt :Date;
     if (WorkState in [wsRecCreated, wsRecUpdated]) then
       Result = inherited CreateDateForWorkLog (WorkState, byCurrentUsers);
     elsif (WorkState in [wsAccepted, wsAcpUpdated]) then
       if byCurrentUsers then
         if (Self.Record.UpdateUser = SessionInfo.UserName) then
-          dt = Self.Record.ДатаПринятияНаХранение;
+          dt = Self.Record.Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ;
           Result = CreateDate(Day(dt), Mon(dt), Year(dt));
         fi;
       else
-        dt = Self.Record.ДатаПринятияНаХранение;
+        dt = Self.Record.Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ;
         Result = CreateDate(Day(dt), Mon(dt), Year(dt));
       fi;
     fi;
@@ -142,189 +142,189 @@ inobject public
 
   ----------------------------------------------------------------------------
 
-  proc РегистрацияНомера;
-   if (Record.ПринялНаХранение = nil) and (Record.ДатаПринятияНаХранение = nil) then
-     if not (Record.НеПолучен) then
-       Record.ПринялНаХранение = SessionInfo.UserRecord.Name;
-       Record.ДатаПринятияНаХранение = Today;
+  proc Р РµРіРёСЃС‚СЂР°С†РёСЏРќРѕРјРµСЂР°;
+   if (Record.РџСЂРёРЅСЏР»РќР°РҐСЂР°РЅРµРЅРёРµ = nil) and (Record.Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ = nil) then
+     if not (Record.РќРµРџРѕР»СѓС‡РµРЅ) then
+       Record.РџСЂРёРЅСЏР»РќР°РҐСЂР°РЅРµРЅРёРµ = SessionInfo.UserRecord.Name;
+       Record.Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ = Today;
      fi;
    fi;
-   if (Record.НеПолучен) then
-     Record.ПринялНаХранение = nil;
-     Record.ДатаПринятияНаХранение = nil;
-     Record.Тираж = nil;
+   if (Record.РќРµРџРѕР»СѓС‡РµРЅ) then
+     Record.РџСЂРёРЅСЏР»РќР°РҐСЂР°РЅРµРЅРёРµ = nil;
+     Record.Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ = nil;
+     Record.РўРёСЂР°Р¶ = nil;
    fi;
   end;
 
-  func ПроверитьУникальность: Logical;
-    Return ПроверитьУникальностьВыпуска(Record);
+  func РџСЂРѕРІРµСЂРёС‚СЊРЈРЅРёРєР°Р»СЊРЅРѕСЃС‚СЊ: Logical;
+    Return РџСЂРѕРІРµСЂРёС‚СЊРЈРЅРёРєР°Р»СЊРЅРѕСЃС‚СЊР’С‹РїСѓСЃРєР°(Record);
   end;
 
-  proc ВыполнитьУдаление synonym DoDelete( const aCheckRefs :Logical );
+  proc Р’С‹РїРѕР»РЅРёС‚СЊРЈРґР°Р»РµРЅРёРµ synonym DoDelete( const aCheckRefs :Logical );
     ClearWorkLog(wsRecCreated, false);
     inherited DoDelete(aCheckRefs);
   end;
 
 inclass public
 
-  func ПроверитьУникальностьВыпуска (R :РКП_Газеты.НомерГазеты; ModFieldName :String = nil; Value :Variant = nil): Logical;
+  func РџСЂРѕРІРµСЂРёС‚СЊРЈРЅРёРєР°Р»СЊРЅРѕСЃС‚СЊР’С‹РїСѓСЃРєР° (R :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹; ModFieldName :String = nil; Value :Variant = nil): Logical;
     var vFlt :String;
-    var ТекстСообщения :String;
-    var vFoundRecord :РКП_Газеты.НомерГазеты;
+    var РўРµРєСЃС‚РЎРѕРѕР±С‰РµРЅРёСЏ :String;
+    var vFoundRecord :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹;
     var vChoice :Integer;
-    if (ModFieldName <> nil) and not (ModFieldName in ['СерияНумерации', 'Номер', 'НеПолучен','ЛожныйНомер']) then -- проверка не имеет смысла
+    if (ModFieldName <> nil) and not (ModFieldName in ['РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё', 'РќРѕРјРµСЂ', 'РќРµРџРѕР»СѓС‡РµРЅ','Р›РѕР¶РЅС‹Р№РќРѕРјРµСЂ']) then -- РїСЂРѕРІРµСЂРєР° РЅРµ РёРјРµРµС‚ СЃРјС‹СЃР»Р°
       Return true;
-    elsif (ModFieldName = nil) then -- проверка перед сохранением (все значения введены)
+    elsif (ModFieldName = nil) then -- РїСЂРѕРІРµСЂРєР° РїРµСЂРµРґ СЃРѕС…СЂР°РЅРµРЅРёРµРј (РІСЃРµ Р·РЅР°С‡РµРЅРёСЏ РІРІРµРґРµРЅС‹)
       with FltMaker.CreateExt do
         AddCondition( 'isGroup=0' );
         AddCondition( 'DocId<>' + Str(R.DocId) );
-        AddCondition( 'Газета=' + R.Газета.DocIDStr );
-        AddCondition( 'ГодВыпуска=' + Str(R.ГодВыпуска) );
-        AddCondition( 'not ЛожныйНомер' );
-        AddCondition( 'СерияНумерации=' + Str(R.СерияНумерации) );
-        AddCondition( 'Номер="' + Str(R.Номер) + '"' );
+        AddCondition( 'Р“Р°Р·РµС‚Р°=' + R.Р“Р°Р·РµС‚Р°.DocIDStr );
+        AddCondition( 'Р“РѕРґР’С‹РїСѓСЃРєР°=' + Str(R.Р“РѕРґР’С‹РїСѓСЃРєР°) );
+        AddCondition( 'not Р›РѕР¶РЅС‹Р№РќРѕРјРµСЂ' );
+        AddCondition( 'РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё=' + Str(R.РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё) );
+        AddCondition( 'РќРѕРјРµСЂ="' + Str(R.РќРѕРјРµСЂ) + '"' );
         CompressConditionsToOne;
-        AddCondition( 'not(СозданОЛГС and НеПолучен)' );
+        AddCondition( 'not(РЎРѕР·РґР°РЅРћР›Р“РЎ and РќРµРџРѕР»СѓС‡РµРЅ)' );
         vFlt = GetFilter;
       end;
-      vFoundRecord = РКП_СИС.Recs.FindRecord(РКП_Газеты.НомерГазеты, vFlt);
+      vFoundRecord = Р РљРџ_РЎРРЎ.Recs.FindRecord(Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹, vFlt);
       Result = (vFoundRecord  = nil);
-    elsif (ModFieldName <> nil) and (ModFieldName in ['СерияНумерации', 'Номер', 'НеПолучен','ЛожныйНомер']) then -- проверка имеет смысл для проверяемого значения
-      if (ModFieldName = 'СерияНумерации') then
+    elsif (ModFieldName <> nil) and (ModFieldName in ['РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё', 'РќРѕРјРµСЂ', 'РќРµРџРѕР»СѓС‡РµРЅ','Р›РѕР¶РЅС‹Р№РќРѕРјРµСЂ']) then -- РїСЂРѕРІРµСЂРєР° РёРјРµРµС‚ СЃРјС‹СЃР» РґР»СЏ РїСЂРѕРІРµСЂСЏРµРјРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
+      if (ModFieldName = 'РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё') then
         with FltMaker.CreateExt do
           AddCondition( 'isGroup=0' );
           AddCondition( 'DocId<>' + Str(R.DocId) );
-          AddCondition( 'Газета=' + R.Газета.DocIDStr );
-          AddCondition( 'ГодВыпуска=' + Str(R.ГодВыпуска) );
-          AddCondition( 'not ЛожныйНомер' );
-          AddCondition( 'СерияНумерации=' + Str(Value as Integer) );
-          AddCondition( 'Номер="' + Str(R.Номер) + '"' );
+          AddCondition( 'Р“Р°Р·РµС‚Р°=' + R.Р“Р°Р·РµС‚Р°.DocIDStr );
+          AddCondition( 'Р“РѕРґР’С‹РїСѓСЃРєР°=' + Str(R.Р“РѕРґР’С‹РїСѓСЃРєР°) );
+          AddCondition( 'not Р›РѕР¶РЅС‹Р№РќРѕРјРµСЂ' );
+          AddCondition( 'РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё=' + Str(Value as Integer) );
+          AddCondition( 'РќРѕРјРµСЂ="' + Str(R.РќРѕРјРµСЂ) + '"' );
           CompressConditionsToOne;
-          AddCondition( 'not(СозданОЛГС and НеПолучен)' );
+          AddCondition( 'not(РЎРѕР·РґР°РЅРћР›Р“РЎ and РќРµРџРѕР»СѓС‡РµРЅ)' );
           vFlt = GetFilter;
         end;
-        vFoundRecord = РКП_СИС.Recs.FindRecord(РКП_Газеты.НомерГазеты, vFlt);
+        vFoundRecord = Р РљРџ_РЎРРЎ.Recs.FindRecord(Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹, vFlt);
         Result = (vFoundRecord  = nil);
-      elsif (ModFieldName = 'Номер') then
+      elsif (ModFieldName = 'РќРѕРјРµСЂ') then
         with FltMaker.CreateExt do
           AddCondition( 'isGroup=0' );
           AddCondition( 'DocId<>' + Str(R.DocId) );
-          AddCondition( 'Газета=' + R.Газета.DocIDStr );
-          AddCondition( 'ГодВыпуска=' + Str(R.ГодВыпуска) );
-          AddCondition( 'not ЛожныйНомер' );
-          AddCondition( 'СерияНумерации=' + Str(R.СерияНумерации) );
-          AddCondition( 'Номер="' + (Value as String) + '"' );
+          AddCondition( 'Р“Р°Р·РµС‚Р°=' + R.Р“Р°Р·РµС‚Р°.DocIDStr );
+          AddCondition( 'Р“РѕРґР’С‹РїСѓСЃРєР°=' + Str(R.Р“РѕРґР’С‹РїСѓСЃРєР°) );
+          AddCondition( 'not Р›РѕР¶РЅС‹Р№РќРѕРјРµСЂ' );
+          AddCondition( 'РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё=' + Str(R.РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё) );
+          AddCondition( 'РќРѕРјРµСЂ="' + (Value as String) + '"' );
           CompressConditionsToOne;
-          AddCondition( 'not(СозданОЛГС and НеПолучен)' );
+          AddCondition( 'not(РЎРѕР·РґР°РЅРћР›Р“РЎ and РќРµРџРѕР»СѓС‡РµРЅ)' );
           vFlt = GetFilter;
         end;
-        vFoundRecord = РКП_СИС.Recs.FindRecord(РКП_Газеты.НомерГазеты, vFlt);
+        vFoundRecord = Р РљРџ_РЎРРЎ.Recs.FindRecord(Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹, vFlt);
         Result = (vFoundRecord  = nil);
-      elsif (ModFieldName = 'НеПолучен') then
+      elsif (ModFieldName = 'РќРµРџРѕР»СѓС‡РµРЅ') then
         with FltMaker.CreateExt do
           AddCondition( 'isGroup=0' );
           AddCondition( 'DocId<>' + Str(R.DocId) );
-          AddCondition( 'Газета=' + R.Газета.DocIDStr );
-          AddCondition( 'ГодВыпуска=' + Str(R.ГодВыпуска) );
-          AddCondition( 'not ЛожныйНомер' );
-          AddCondition( 'СерияНумерации=' + Str(R.СерияНумерации) );
-          AddCondition( 'Номер="' + Str(R.Номер) + '"' );
+          AddCondition( 'Р“Р°Р·РµС‚Р°=' + R.Р“Р°Р·РµС‚Р°.DocIDStr );
+          AddCondition( 'Р“РѕРґР’С‹РїСѓСЃРєР°=' + Str(R.Р“РѕРґР’С‹РїСѓСЃРєР°) );
+          AddCondition( 'not Р›РѕР¶РЅС‹Р№РќРѕРјРµСЂ' );
+          AddCondition( 'РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё=' + Str(R.РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё) );
+          AddCondition( 'РќРѕРјРµСЂ="' + Str(R.РќРѕРјРµСЂ) + '"' );
           CompressConditionsToOne;
-          AddCondition( 'not(СозданОЛГС and ' + Str(Value as Logical) + ')' );
+          AddCondition( 'not(РЎРѕР·РґР°РЅРћР›Р“РЎ and ' + Str(Value as Logical) + ')' );
           vFlt = GetFilter;
         end;
-        vFoundRecord = РКП_СИС.Recs.FindRecord(РКП_Газеты.НомерГазеты, vFlt);
+        vFoundRecord = Р РљРџ_РЎРРЎ.Recs.FindRecord(Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹, vFlt);
         Result = (vFoundRecord  = nil);
-      elsif (ModFieldName = 'ЛожныйНомер') then
+      elsif (ModFieldName = 'Р›РѕР¶РЅС‹Р№РќРѕРјРµСЂ') then
         with FltMaker.CreateExt do
           AddCondition( 'isGroup=0' );
           AddCondition( 'DocId<>' + Str(R.DocId) );
-          AddCondition( 'Газета=' + R.Газета.DocIDStr );
-          AddCondition( 'ГодВыпуска=' + Str(R.ГодВыпуска) );
+          AddCondition( 'Р“Р°Р·РµС‚Р°=' + R.Р“Р°Р·РµС‚Р°.DocIDStr );
+          AddCondition( 'Р“РѕРґР’С‹РїСѓСЃРєР°=' + Str(R.Р“РѕРґР’С‹РїСѓСЃРєР°) );
           AddCondition( 'not ' + Str(Value as Logical) );
-          AddCondition( 'СерияНумерации=' + Str(R.СерияНумерации) );
-          AddCondition( 'Номер="' + Str(R.Номер) + '"' );
+          AddCondition( 'РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё=' + Str(R.РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё) );
+          AddCondition( 'РќРѕРјРµСЂ="' + Str(R.РќРѕРјРµСЂ) + '"' );
           CompressConditionsToOne;
-          AddCondition( 'not(СозданОЛГС and НеПолучен)' );
+          AddCondition( 'not(РЎРѕР·РґР°РЅРћР›Р“РЎ and РќРµРџРѕР»СѓС‡РµРЅ)' );
           vFlt = GetFilter;
         end;
-        vFoundRecord = РКП_СИС.Recs.FindRecord(РКП_Газеты.НомерГазеты, vFlt);
+        vFoundRecord = Р РљРџ_РЎРРЎ.Recs.FindRecord(Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹, vFlt);
         Result = (vFoundRecord  = nil);
       fi;
     fi;
     if (not Result) then
-      if (ModFieldName = 'СерияНумерации') then
+      if (ModFieldName = 'РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё') then
         if ((Value as Integer) = 0) then
-          ТекстСообщения = Trim(R.Номер) + ' [' + Str(R.ГодВыпуска) + ']';
+          РўРµРєСЃС‚РЎРѕРѕР±С‰РµРЅРёСЏ = Trim(R.РќРѕРјРµСЂ) + ' [' + Str(R.Р“РѕРґР’С‹РїСѓСЃРєР°) + ']';
         else
-          ТекстСообщения = Trim(R.Номер) + '(' + Str((Value as Integer)) + ') [' + Str(R.ГодВыпуска) + ']';
+          РўРµРєСЃС‚РЎРѕРѕР±С‰РµРЅРёСЏ = Trim(R.РќРѕРјРµСЂ) + '(' + Str((Value as Integer)) + ') [' + Str(R.Р“РѕРґР’С‹РїСѓСЃРєР°) + ']';
         fi;
-      elsif (ModFieldName = 'Номер') then
-        if (R.СерияНумерации = 0) then
-          ТекстСообщения = Trim((Value as String)) + ' [' + Str(R.ГодВыпуска) + ']';
+      elsif (ModFieldName = 'РќРѕРјРµСЂ') then
+        if (R.РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё = 0) then
+          РўРµРєСЃС‚РЎРѕРѕР±С‰РµРЅРёСЏ = Trim((Value as String)) + ' [' + Str(R.Р“РѕРґР’С‹РїСѓСЃРєР°) + ']';
         else
-          ТекстСообщения = Trim((Value as String)) + '(' + Str(R.СерияНумерации) + ') [' + Str(R.ГодВыпуска) + ']';
+          РўРµРєСЃС‚РЎРѕРѕР±С‰РµРЅРёСЏ = Trim((Value as String)) + '(' + Str(R.РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё) + ') [' + Str(R.Р“РѕРґР’С‹РїСѓСЃРєР°) + ']';
         fi;
-      elsif (ModFieldName = nil) then -- проверка перед сохранением (все значения введены)
-        if (R.СерияНумерации = 0) then
-          ТекстСообщения = Trim(R.Номер) + ' [' + Str(R.ГодВыпуска) + ']';
+      elsif (ModFieldName = nil) then -- РїСЂРѕРІРµСЂРєР° РїРµСЂРµРґ СЃРѕС…СЂР°РЅРµРЅРёРµРј (РІСЃРµ Р·РЅР°С‡РµРЅРёСЏ РІРІРµРґРµРЅС‹)
+        if (R.РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё = 0) then
+          РўРµРєСЃС‚РЎРѕРѕР±С‰РµРЅРёСЏ = Trim(R.РќРѕРјРµСЂ) + ' [' + Str(R.Р“РѕРґР’С‹РїСѓСЃРєР°) + ']';
         else
-          ТекстСообщения = Trim(R.Номер) + '(' + Str(R.СерияНумерации) + ') [' + Str(R.ГодВыпуска) + ']';
+          РўРµРєСЃС‚РЎРѕРѕР±С‰РµРЅРёСЏ = Trim(R.РќРѕРјРµСЂ) + '(' + Str(R.РЎРµСЂРёСЏРќСѓРјРµСЂР°С†РёРё) + ') [' + Str(R.Р“РѕРґР’С‹РїСѓСЃРєР°) + ']';
         fi;
       fi;
-      if vFoundRecord.СозданОЛГС then
-        ТекстСообщения = ТекстСообщения + ' (Л Г С)';
+      if vFoundRecord.РЎРѕР·РґР°РЅРћР›Р“РЎ then
+        РўРµРєСЃС‚РЎРѕРѕР±С‰РµРЅРёСЏ = РўРµРєСЃС‚РЎРѕРѕР±С‰РµРЅРёСЏ + ' (Р› Р“ РЎ)';
       fi;
-      if R.ЛожныйНомер then
-        if (vFoundRecord.ДатаПринятияНаХранение <> nil) then
-          ТекстСообщения = 'Номер газеты ' + ТекстСообщения + ' был внесен в базу данных ранее (' + Str(vFoundRecord.ДатаПринятияНаХранение) + ').';
+      if R.Р›РѕР¶РЅС‹Р№РќРѕРјРµСЂ then
+        if (vFoundRecord.Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ <> nil) then
+          РўРµРєСЃС‚РЎРѕРѕР±С‰РµРЅРёСЏ = 'РќРѕРјРµСЂ РіР°Р·РµС‚С‹ ' + РўРµРєСЃС‚РЎРѕРѕР±С‰РµРЅРёСЏ + ' Р±С‹Р» РІРЅРµСЃРµРЅ РІ Р±Р°Р·Сѓ РґР°РЅРЅС‹С… СЂР°РЅРµРµ (' + Str(vFoundRecord.Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ) + ').';
         else
-          ТекстСообщения = 'Номер газеты ' + ТекстСообщения + ' был внесен в базу данных ранее.';
+          РўРµРєСЃС‚РЎРѕРѕР±С‰РµРЅРёСЏ = 'РќРѕРјРµСЂ РіР°Р·РµС‚С‹ ' + РўРµРєСЃС‚РЎРѕРѕР±С‰РµРЅРёСЏ + ' Р±С‹Р» РІРЅРµСЃРµРЅ РІ Р±Р°Р·Сѓ РґР°РЅРЅС‹С… СЂР°РЅРµРµ.';
         fi;
-        vChoice = Enquiry('Подтверждение',
-                          ТекстСообщения + Br +
-                          'Всё равно сохранть?',
-                          ['Да', 'Нет']);
+        vChoice = Enquiry('РџРѕРґС‚РІРµСЂР¶РґРµРЅРёРµ',
+                          РўРµРєСЃС‚РЎРѕРѕР±С‰РµРЅРёСЏ + Br +
+                          'Р’СЃС‘ СЂР°РІРЅРѕ СЃРѕС…СЂР°РЅС‚СЊ?',
+                          ['Р”Р°', 'РќРµС‚']);
 
 
         if (vChoice = 1) then
           Return true;
         fi;
       else
-        if (vFoundRecord.ДатаПринятияНаХранение <> nil) then
-          ТекстСообщения = 'Номер газеты ' + ТекстСообщения + ' был внесен в базу данных ранее (' + Str(vFoundRecord.ДатаПринятияНаХранение) + ').';
+        if (vFoundRecord.Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ <> nil) then
+          РўРµРєСЃС‚РЎРѕРѕР±С‰РµРЅРёСЏ = 'РќРѕРјРµСЂ РіР°Р·РµС‚С‹ ' + РўРµРєСЃС‚РЎРѕРѕР±С‰РµРЅРёСЏ + ' Р±С‹Р» РІРЅРµСЃРµРЅ РІ Р±Р°Р·Сѓ РґР°РЅРЅС‹С… СЂР°РЅРµРµ (' + Str(vFoundRecord.Р”Р°С‚Р°РџСЂРёРЅСЏС‚РёСЏРќР°РҐСЂР°РЅРµРЅРёРµ) + ').';
         else
-          ТекстСообщения = 'Номер газеты ' + ТекстСообщения + ' был внесен в базу данных ранее.';
+          РўРµРєСЃС‚РЎРѕРѕР±С‰РµРЅРёСЏ = 'РќРѕРјРµСЂ РіР°Р·РµС‚С‹ ' + РўРµРєСЃС‚РЎРѕРѕР±С‰РµРЅРёСЏ + ' Р±С‹Р» РІРЅРµСЃРµРЅ РІ Р±Р°Р·Сѓ РґР°РЅРЅС‹С… СЂР°РЅРµРµ.';
         fi;
-        Message(ТекстСообщения);
+        Message(РўРµРєСЃС‚РЎРѕРѕР±С‰РµРЅРёСЏ);
       fi;
     fi;
   end;
 
-  func ПолученоЕдХран (R :РКП_Газеты.НомерГазеты) :Integer;
-    with Query.Create([РКП_Газеты.ЕдиницаХранения]) do
-      Filter = 'НомерГазеты=' + Str(R.DocIDStr);
-      Return Int(CalcAggregates('Sum(Количество)'));
+  func РџРѕР»СѓС‡РµРЅРѕР•РґРҐСЂР°РЅ (R :Р РљРџ_Р“Р°Р·РµС‚С‹.РќРѕРјРµСЂР“Р°Р·РµС‚С‹) :Integer;
+    with Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ]) do
+      Filter = 'РќРѕРјРµСЂР“Р°Р·РµС‚С‹=' + Str(R.DocIDStr);
+      Return Int(CalcAggregates('Sum(РљРѕР»РёС‡РµСЃС‚РІРѕ)'));
     end;
   end;
 
 inobject public
 
-  proc ОбновитьКоличествоЕдХран;
-    Record.ПринятоЭкземпляров = ПолученоЕдХран(Record);
+  proc РћР±РЅРѕРІРёС‚СЊРљРѕР»РёС‡РµСЃС‚РІРѕР•РґРҐСЂР°РЅ;
+    Record.РџСЂРёРЅСЏС‚РѕР­РєР·РµРјРїР»СЏСЂРѕРІ = РџРѕР»СѓС‡РµРЅРѕР•РґРҐСЂР°РЅ(Record);
     Post;
   end;
 
-  func ПолучитьЕдХран (var КолЭкзВсего :Integer) :РКП_Газеты.ЕдиницаХранения[];
-    var cRec :РКП_Газеты.ЕдиницаХранения;
-    with Query.Create([РКП_Газеты.ЕдиницаХранения]) do
-      Filter = 'НомерГазеты=' + Str(Self.Record.DocIDStr);
-      Order = 'ДатаПоступления';
+  func РџРѕР»СѓС‡РёС‚СЊР•РґРҐСЂР°РЅ (var РљРѕР»Р­РєР·Р’СЃРµРіРѕ :Integer) :Р РљРџ_Р“Р°Р·РµС‚С‹.Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ[];
+    var cRec :Р РљРџ_Р“Р°Р·РµС‚С‹.Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ;
+    with Query.Create([Р РљРџ_Р“Р°Р·РµС‚С‹.Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ]) do
+      Filter = 'РќРѕРјРµСЂР“Р°Р·РµС‚С‹=' + Str(Self.Record.DocIDStr);
+      Order = 'Р”Р°С‚Р°РџРѕСЃС‚СѓРїР»РµРЅРёСЏ';
       Select;
       while not Eof do
-        cRec =  Current as РКП_Газеты.ЕдиницаХранения;
+        cRec =  Current as Р РљРџ_Р“Р°Р·РµС‚С‹.Р•РґРёРЅРёС†Р°РҐСЂР°РЅРµРЅРёСЏ;
         AddInArray( Result, cRec );
-        КолЭкзВсего = КолЭкзВсего + cRec.Количество;
+        РљРѕР»Р­РєР·Р’СЃРµРіРѕ = РљРѕР»Р­РєР·Р’СЃРµРіРѕ + cRec.РљРѕР»РёС‡РµСЃС‚РІРѕ;
         Next;
       od;
     end;

@@ -1,33 +1,33 @@
-class inherited МашинаРеквизитов.Базовые.картСИнтерфейсом "Учетные документы";
+п»їclass inherited РњР°С€РёРЅР°Р РµРєРІРёР·РёС‚РѕРІ.Р‘Р°Р·РѕРІС‹Рµ.РєР°СЂС‚РЎРРЅС‚РµСЂС„РµР№СЃРѕРј "РЈС‡РµС‚РЅС‹Рµ РґРѕРєСѓРјРµРЅС‚С‹";
 
---{{ 2_Свойства
+--{{ 2_РЎРІРѕР№СЃС‚РІР°
 
 inclass private
 
-  var КлассИнтерфейса :Class МашинаРеквизитов.Базовые.интЗапись = РКП_Газеты.RI.УчетныйДокумент;
+  var РљР»Р°СЃСЃРРЅС‚РµСЂС„РµР№СЃР° :Class РњР°С€РёРЅР°Р РµРєРІРёР·РёС‚РѕРІ.Р‘Р°Р·РѕРІС‹Рµ.РёРЅС‚Р—Р°РїРёСЃСЊ = Р РљРџ_Р“Р°Р·РµС‚С‹.RI.РЈС‡РµС‚РЅС‹Р№Р”РѕРєСѓРјРµРЅС‚;
 
-  stored var Завершенные :Integer;
-  stored var МоиЗаписи :Integer;
+  stored var Р—Р°РІРµСЂС€РµРЅРЅС‹Рµ :Integer;
+  stored var РњРѕРёР—Р°РїРёСЃРё :Integer;
 --}}
 
 
--- 2_Конструкторы, визуализаторы0. --
+-- 2_РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹, РІРёР·СѓР°Р»РёР·Р°С‚РѕСЂС‹0. --
 
 inclass public
 
-  func ВыполнитьВыбор (var локРезультатВыбора: РКП_Газеты.УчетныйДокумент; локДопФильтр: string = ''; локТолькоВыбор: logical = true): Integer;
-    var locForm: УчетГазет.картУчетныйДокумент;
-    locForm = УчетГазет.картУчетныйДокумент.Create;
-    if локТолькоВыбор:
-      locForm.SetField('Запретить_Добавление', true);
-      locForm.SetField('Запретить_ДобавлениеГрупп', true);
-      locForm.SetField('Запретить_Дублирование', true);
-      locForm.SetField('Запретить_Удаление', true);
-      locForm.SetField('Запретить_Перенос', true);
-      locForm.SetField('Запретить_Копирование', true);
-      locForm.SetField('Запретить_Преобразование', true);
+  func Р’С‹РїРѕР»РЅРёС‚СЊР’С‹Р±РѕСЂ (var Р»РѕРєР РµР·СѓР»СЊС‚Р°С‚Р’С‹Р±РѕСЂР°: Р РљРџ_Р“Р°Р·РµС‚С‹.РЈС‡РµС‚РЅС‹Р№Р”РѕРєСѓРјРµРЅС‚; Р»РѕРєР”РѕРїР¤РёР»СЊС‚СЂ: string = ''; Р»РѕРєРўРѕР»СЊРєРѕР’С‹Р±РѕСЂ: logical = true): Integer;
+    var locForm: РЈС‡РµС‚Р“Р°Р·РµС‚.РєР°СЂС‚РЈС‡РµС‚РЅС‹Р№Р”РѕРєСѓРјРµРЅС‚;
+    locForm = РЈС‡РµС‚Р“Р°Р·РµС‚.РєР°СЂС‚РЈС‡РµС‚РЅС‹Р№Р”РѕРєСѓРјРµРЅС‚.Create;
+    if Р»РѕРєРўРѕР»СЊРєРѕР’С‹Р±РѕСЂ:
+      locForm.SetField('Р—Р°РїСЂРµС‚РёС‚СЊ_Р”РѕР±Р°РІР»РµРЅРёРµ', true);
+      locForm.SetField('Р—Р°РїСЂРµС‚РёС‚СЊ_Р”РѕР±Р°РІР»РµРЅРёРµР“СЂСѓРїРї', true);
+      locForm.SetField('Р—Р°РїСЂРµС‚РёС‚СЊ_Р”СѓР±Р»РёСЂРѕРІР°РЅРёРµ', true);
+      locForm.SetField('Р—Р°РїСЂРµС‚РёС‚СЊ_РЈРґР°Р»РµРЅРёРµ', true);
+      locForm.SetField('Р—Р°РїСЂРµС‚РёС‚СЊ_РџРµСЂРµРЅРѕСЃ', true);
+      locForm.SetField('Р—Р°РїСЂРµС‚РёС‚СЊ_РљРѕРїРёСЂРѕРІР°РЅРёРµ', true);
+      locForm.SetField('Р—Р°РїСЂРµС‚РёС‚СЊ_РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ', true);
     fi;
-    if CmOk = locForm.ShowEx(локРезультатВыбора, локДопФильтр, Kernel.Window.ModalWindow):
+    if CmOk = locForm.ShowEx(Р»РѕРєР РµР·СѓР»СЊС‚Р°С‚Р’С‹Р±РѕСЂР°, Р»РѕРєР”РѕРїР¤РёР»СЊС‚СЂ, Kernel.Window.ModalWindow):
       Return CmOk;
     fi;
   end;
@@ -35,72 +35,72 @@ inclass public
 
 inobject private
 
-import РКП_СИС Classes Functions, FilterMaker;
+import Р РљРџ_РЎРРЎ Classes Functions, FilterMaker;
 
--- 2_Обработчики событий шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ С€Р°Р±Р»РѕРЅР°0. --
 
-  proc шаблон_ПриОткрытии(Create :Logical);
-    inherited шаблон_ПриОткрытии(Create);
+  proc С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(Create :Logical);
+    inherited С€Р°Р±Р»РѕРЅ_РџСЂРёРћС‚РєСЂС‹С‚РёРё(Create);
     Self.Window.Icon.LoadFromFile(BaseInfo.ProjectByName[Self.ClassProject].Folder + 'Attachments\Icons\inbox_document_text.ico');
   end;
 
--- 2_Обработчики событий клеток шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР»РµС‚РѕРє С€Р°Р±Р»РѕРЅР°0. --
 
 
-  func Поле_ПриВыводе_Завершенные(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
-    Return (Завершенные in [1]);
+  func РџРѕР»Рµ_РџСЂРёР’С‹РІРѕРґРµ_Р—Р°РІРµСЂС€РµРЅРЅС‹Рµ(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    Return (Р—Р°РІРµСЂС€РµРЅРЅС‹Рµ in [1]);
   end;
 
-  func Поле_ПриВыводе_МоиЗаписи(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
-    Return (МоиЗаписи in [0,1]);
+  func РџРѕР»Рµ_РџСЂРёР’С‹РІРѕРґРµ_РњРѕРёР—Р°РїРёСЃРё(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    Return (РњРѕРёР—Р°РїРёСЃРё in [0,1]);
   end;
 
-  func Поле_ПриНажатии_Завершенные(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
-    if (Завершенные in [-1,0]) then
-      Завершенные = 1;
+  func РџРѕР»Рµ_РџСЂРёРќР°Р¶Р°С‚РёРё_Р—Р°РІРµСЂС€РµРЅРЅС‹Рµ(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    if (Р—Р°РІРµСЂС€РµРЅРЅС‹Рµ in [-1,0]) then
+      Р—Р°РІРµСЂС€РµРЅРЅС‹Рµ = 1;
     else
-      Завершенные = -1;
+      Р—Р°РІРµСЂС€РµРЅРЅС‹Рµ = -1;
     fi;
-    ОбновитьФильтр;
+    РћР±РЅРѕРІРёС‚СЊР¤РёР»СЊС‚СЂ;
   end;
 
-  func Поле_ПриНажатии_МоиЗаписи(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
-    if (МоиЗаписи in [0,1]) then
-      МоиЗаписи = -1;
+  func РџРѕР»Рµ_РџСЂРёРќР°Р¶Р°С‚РёРё_РњРѕРёР—Р°РїРёСЃРё(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    if (РњРѕРёР—Р°РїРёСЃРё in [0,1]) then
+      РњРѕРёР—Р°РїРёСЃРё = -1;
     else
-      МоиЗаписи = 1;
+      РњРѕРёР—Р°РїРёСЃРё = 1;
     fi;
-    ОбновитьФильтр;
+    РћР±РЅРѕРІРёС‚СЊР¤РёР»СЊС‚СЂ;
   end;
 
 
--- 2_Обработчики событий прочих объектов шаблона0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РїСЂРѕС‡РёС… РѕР±СЉРµРєС‚РѕРІ С€Р°Р±Р»РѕРЅР°0. --
 
 
--- 2_Обработчики событий картотеки0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєР°СЂС‚РѕС‚РµРєРё0. --
 
 
--- 2_Обработчики столбцов (полей) картотеки0. --
+-- 2_РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃС‚РѕР»Р±С†РѕРІ (РїРѕР»РµР№) РєР°СЂС‚РѕС‚РµРєРё0. --
 
 
--- 2_Дополнительные команды0. --
+-- 2_Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ РєРѕРјР°РЅРґС‹0. --
 
 
--- 2_Вспомогательные методы0. --
+-- 2_Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹0. --
 
-  func ПолучитьФильтрКартотеки (var locTreeFilter :String = nil) :String;
+  func РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРљР°СЂС‚РѕС‚РµРєРё (var locTreeFilter :String = nil) :String;
     var aFlt :String[];
-    AddInArray( aFlt, ПолучитьФильтрПоказатьЗавершенные );
-    AddInArray( aFlt, ПолучитьФильтрТолькоМоиЗаписи );
+    AddInArray( aFlt, РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРџРѕРєР°Р·Р°С‚СЊР—Р°РІРµСЂС€РµРЅРЅС‹Рµ );
+    AddInArray( aFlt, РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРўРѕР»СЊРєРѕРњРѕРёР—Р°РїРёСЃРё );
     Result = MakeFilter(aFlt);
   end;
 
-  func ПолучитьФильтрПоказатьЗавершенные :String;
-    Result = if(Завершенные in [1], nil, 'not Завершен');
+  func РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРџРѕРєР°Р·Р°С‚СЊР—Р°РІРµСЂС€РµРЅРЅС‹Рµ :String;
+    Result = if(Р—Р°РІРµСЂС€РµРЅРЅС‹Рµ in [1], nil, 'not Р—Р°РІРµСЂС€РµРЅ');
   end;
 
-  func ПолучитьФильтрТолькоМоиЗаписи :String;
-    Result = if(МоиЗаписи in [0,1], 'CreateUser="' + SessionInfo.UserRecord.Name + '"', nil);
+  func РџРѕР»СѓС‡РёС‚СЊР¤РёР»СЊС‚СЂРўРѕР»СЊРєРѕРњРѕРёР—Р°РїРёСЃРё :String;
+    Result = if(РњРѕРёР—Р°РїРёСЃРё in [0,1], 'CreateUser="' + SessionInfo.UserRecord.Name + '"', nil);
   end;
 
 
