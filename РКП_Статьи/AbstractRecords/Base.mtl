@@ -1,6 +1,6 @@
-group "Базовые";
+п»їgroup "Р‘Р°Р·РѕРІС‹Рµ";
 
-  abstract record BaseRecord inherited СИС2.Базовая.БазоваяЗапись  title "";
+  abstract record BaseRecord inherited РЎРРЎ2.Р‘Р°Р·РѕРІР°СЏ.Р‘Р°Р·РѕРІР°СЏР—Р°РїРёСЃСЊ  title "";
   end;
 
   abstract hierarchical record BaseHierarchicalRecord inherited BaseRecord title "";
