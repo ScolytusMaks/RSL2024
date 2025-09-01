@@ -1,4 +1,4 @@
-﻿class inherited СИС2.БазовыйБланкРедактор "Отчет о пополнении БД", editor СправкаПополненияБД;
+﻿ class inherited СИС2.БазовыйБланкРедактор "Отчет о пополнении БД", editor СправкаПополненияБД;
 
 import СИС2 classes Функции, ФункцииДокумента, Математика;
 
@@ -16,6 +16,9 @@ inobject private
   var мНомераГазет    :String[];
   var мЕдиницХранения :Integer[];
 
+  var секцСотрудники      :TemplateSection;
+  var мСотрудник          :String[];
+  var мЕдиницХраненияСотр :Integer[];
 --}}
 
 -- 2_Обработчики событий шаблона0. --
@@ -159,6 +162,7 @@ inobject private
       ПостроитьОтчет_ОчисткаРезультатов;
       Q = ПостроитьОтчет_ЗапросКНомерам;
       ПостроитьОтчет_ПолучениеОбщейСтатистики(Q);
+      ПостроитьОтчет_ПоСотрудникам(Q);
       if CmOk = EnqOkCancel('Построить список газет?') then
         ПостроитьОтчет_РасшифровкаПоИзданиям(Q);
         Hint('Закрытие запроса к БД...');
@@ -179,7 +183,10 @@ inobject private
 
   func ПостроитьОтчет_ПроверкаУсловий :Logical;
     if  not (false in [(ДатаН <> nil), (ДатаК <> nil), (ДатаН <= ДатаК)]) then --проверка корректности условий
-      СИС2.ФункцииДокумента.RecordPostIfNeed(Record);
+      if (not Self.Record.Modified) then
+        Self.Record.Modified = true;
+      fi;
+      СИС2.ФункцииДокумента.RecordPostIfNeed(Self.Record);
       Return true;
     else
       Message('Неверно заданы даты построения отчета!');
@@ -229,6 +236,18 @@ inobject private
       ВсегоЕдиницИзданий = vNspCount;
       First;
     end;
+  end;
+
+  proc ПостроитьОтчет_ПоСотрудникам(Q :Query);
+    var aRsl :Variant[2];
+    мСотрудник = nil;
+    мЕдиницХраненияСотр = nil;
+    секцСотрудники.Count = 0;
+    aRsl = Q.CalcAggregates('GroupBy(ПринялНаХранение),Count') as variant[2];
+    мСотрудник = aRsl[1] as String[];
+    мЕдиницХраненияСотр = aRsl[2] as Integer[];
+    секцСотрудники.Count = LengthOfArray(мСотрудник);
+    секцСотрудники.SortBy('мСотрудник');
   end;
 
   var DataCache :Variant[];

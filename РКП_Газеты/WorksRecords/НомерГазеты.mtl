@@ -30,6 +30,7 @@
   Indexed indIssuesPublishedTotal By Газета,ГодВыпуска,isGroup,СозданОЛГС,НеПолучен;
   Indexed indStatBySafe By Газета,ДатаПринятияНаХранение,Тираж;
   Indexed indStatByRelease By Газета,ГодВыпуска,Тираж;
+  Indexed indStatWork By ПринялНаХранение;
   --Indexed indStatByUser1 By ФункцияГруппы,НеПолучен,ПринялНаХранение,ДатаПринятияНаХранение;
   --Indexed indStatByUser2 By ФункцияГруппы,НеПолучен,UpdateUser,UpdateDate;
   --Indexed indStatLastFirs By Газета,НеПолучен,isGroup,СозданОЛГС;

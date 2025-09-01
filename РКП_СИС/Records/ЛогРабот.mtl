@@ -6,4 +6,5 @@
     field Competencies :String title ""; -- Коды компетенций пользователя на момент формирования записи
     field StoredValI   :Integer title "";
     field StoredValL   :Logical title "";
+    Indexed indRClassRID By RClass,RID;
   end;

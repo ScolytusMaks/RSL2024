@@ -2,61 +2,79 @@
 
 inobject private
 
+--{{ _Свойства
   var секцШапка     :Section;
   var секцПозиции   :Section;
   var секцПозиции_  :Section;
   var секцСПО       :Section;
   var секцВарианты  :Section;
   var CheckBox1     :CheckBox;
+  var клЗаДату1     :TemplateCell := секцВарианты.CellByField['ЗаДату1'];
+  var клЗаДату2     :TemplateCell := секцВарианты.CellByField['ЗаДату2'];
+  var клЗаДату3     :TemplateCell := секцВарианты.CellByField['ЗаДату3'];
+  var клЗаДату4     :TemplateCell := секцВарианты.CellByField['ЗаДату4'];
+  var клЗаДату5     :TemplateCell := секцВарианты.CellByField['ЗаДату5'];
   var Газета_       :РКП_Газеты.Газета[];
   var NomGazet_     :String[];
   var KolGazet_     :Integer[];
   var Nom           :Integer[];
+--}}
 
-  func СменаВариантаПериода(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+-- _Конструкторы, визуализаторы. --
+
+inclass public
+
+inobject private
+
+-- _Обработчики событий шаблона. --
+
+
+
+-- _Обработчики событий клеток шаблона. --
+
+  func СменаВариантаПериода(Cell :TemplateCell; Action :Template.ClickTypes) :Logical; -- ПриНажатии
     if (ЗаГод > 1801) and (ЗаГод < 2999) then
       УстНачальноеСостояниеФормы;
-      if (Cell.Contents = 'ЗаДату1') then
-        ЗаДату                   = 0;
-        ЗаДату1                  = true;
-        секцВарианты.CellByField["ЗаДату1"].Font.Bold = true;
-        ДатаН                    = РКП_СИС.СтандартныйПериод.НачалоГода(today);
-        ДатаК                    = today;
-        ПериодЗапроса            = "в I квартале "+str(ЗаГод)+" г.";
+      if (Cell = клЗаДату1) then
+        ЗаДату        = 0;
+        ЗаДату1       = true;
+        ДатаН         = РКП_СИС.СтандартныйПериод.НачалоГода(Today);
+        ДатаК         = Today;
+        ПериодЗапроса = 'в I квартале ' + Str(ЗаГод) + ' г.';
+        клЗаДату1.Font.Bold = true;
         ОчиститьРезультатыРасчета;
-      elsif (Cell.Contents = 'ЗаДату2') then
-        ЗаДату                   = 1;
-        ЗаДату2                  = true;
-        секцВарианты.CellByField["ЗаДату2"].Font.Bold = true;
-        ДатаН                    = РКП_СИС.СтандартныйПериод.НачалоМесяца(today);
-        ДатаК                    = today;
-        ПериодЗапроса            = "в I-II квартале "+str(ЗаГод)+" г.";
+      elsif (Cell = клЗаДату2) then
+        ЗаДату        = 1;
+        ЗаДату2       = true;
+        ДатаН         = РКП_СИС.СтандартныйПериод.НачалоМесяца(Today);
+        ДатаК         = Today;
+        ПериодЗапроса = 'в I-II квартале ' + Str(ЗаГод) + ' г.';
+        клЗаДату2.Font.Bold = true;
         ОчиститьРезультатыРасчета;
-      elsif (Cell.Contents = 'ЗаДату3') then
-        ЗаДату                   = 2;
-        ЗаДату3                  = true;
-        секцВарианты.CellByField["ЗаДату3"].Font.Bold = true;
-        ДатаН                    = РКП_СИС.СтандартныйПериод.НачалоКвартала(today);
-        ДатаК                    = today;
-        ПериодЗапроса            = "в I-III квартале "+str(ЗаГод)+" г.";
+      elsif (Cell = клЗаДату3) then
+        ЗаДату        = 2;
+        ЗаДату3       = true;
+        ДатаН         = РКП_СИС.СтандартныйПериод.НачалоКвартала(Today);
+        ДатаК         = Today;
+        ПериодЗапроса = 'в I-III квартале ' + Str(ЗаГод) + ' г.';
+        клЗаДату3.Font.Bold = true;
         ОчиститьРезультатыРасчета;
-      elsif (Cell.Contents = 'ЗаДату4') then
-        ЗаДату                   = 3;
-        ЗаДату4                  = true;
-        секцВарианты.CellByField["ЗаДату4"].Font.Bold = true;
-        ДатаН                    = РКП_СИС.СтандартныйПериод.НачалоГода(today);
-        ДатаК                    = today;
-        ПериодЗапроса            = "в "+str(ЗаГод)+" г.";
+      elsif (Cell = клЗаДату4) then
+        ЗаДату        = 3;
+        ЗаДату4       = true;
+        ДатаН         = РКП_СИС.СтандартныйПериод.НачалоГода(Today);
+        ДатаК         = Today;
+        ПериодЗапроса = 'в ' + Str(ЗаГод) + ' г.';
+        клЗаДату4.Font.Bold = true;
         ОчиститьРезультатыРасчета;
-      elsif (Cell.Contents = 'ЗаДату5') then
-        секцСПО.Row[1].Visible   = true;
-        секцСПО.Row[2].Visible   = true;
-        ЗаДату                   = 4;
-        ЗаДату5                  = true;
-        секцВарианты.CellByField["ЗаДату5"].Font.Bold = true;
-          ДатаН                  = Dat(Day(ДатаН),Mon(ДатаН),ЗаГод);
-          ДатаК                  = Dat(Day(ДатаК),Mon(ДатаК),ЗаГод);
-        ПериодЗапроса            = "с "+str(ДатаН)+" по "+str(ДатаК);
+      elsif (Cell = клЗаДату5) then
+        ЗаДату        = 4;
+        ЗаДату5       = true;
+        ДатаН         = Dat(Day(ДатаН), Mon(ДатаН), ЗаГод);
+        ДатаК         = Dat(Day(ДатаК), Mon(ДатаК), ЗаГод);
+        ПериодЗапроса = 'с ' + Str(ДатаН) + ' по ' + Str(ДатаК);
+        клЗаДату5.Font.Bold = true;
+        секцСПО.Visible   = true;
         ОчиститьРезультатыРасчета;
       fi;
     else
@@ -71,8 +89,7 @@ inobject private
     ЗаДату4 = false;
     ЗаДату5 = false;
     ЗаДату  = nil;
-    секцСПО.Row[1].Visible = false;
-    секцСПО.Row[2].Visible = false;
+    секцСПО.Visible = false;
     секцВарианты.CellByField['ЗаДату1'].Font.Bold = false;
     секцВарианты.CellByField['ЗаДату2'].Font.Bold = false;
     секцВарианты.CellByField['ЗаДату3'].Font.Bold = false;

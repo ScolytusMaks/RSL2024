@@ -11,7 +11,7 @@ OnCancel=картотека_ПриОтмене
 OrderBy=ЗаГод,НомерОтчета
 CaptionRows=2
 CanMove=0
-ColumnCount=7
+ColumnCount=8
 Column:0=ЗаГод
 Column:1=НомерОтчета
 Column:2=ИзмененияЗапрещены
@@ -19,6 +19,7 @@ Column:3=ДатаН
 Column:4=ДатаК
 Column:5=ВсегоВведеноГазет
 Column:6=ВсегоВведеноНомеров
+Column:7=Комментарий
 TreeWidth=120
 SubTableWidth=100
 SubTableHeight=100
@@ -75,3 +76,8 @@ Width=120
 Alignment=1
 ColumnFormat=2
 Format=,##0;;-
+
+[.Column.Комментарий]
+Caption=Комментарий
+Width=100
+MinWidth=100

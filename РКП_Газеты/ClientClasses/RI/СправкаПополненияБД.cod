@@ -29,7 +29,7 @@ inclass public
   end;
 
   func КартотекаПоУмолчанию: Class CardForm;
-    Result = РКП_Газеты.УчетГазет.Отчеты.картОтчетыКолХран;
+    Result = РКП_Газеты.УчетГазет.Отчеты.картСправкиКолХран;
   end;
 
 inobject public

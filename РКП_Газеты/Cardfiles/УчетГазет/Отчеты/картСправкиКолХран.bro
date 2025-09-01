@@ -4,12 +4,13 @@ Query=.СправкаПополненияБД
 MBlank=.УчетГазет.Отчеты.блСправкаОПополненииБД
 HierarchicalField=UpdateDate
 CanHGroupModify=0
-ColumnCount=5
+ColumnCount=6
 Column:0=UpdateDate
-Column:1=ДатаН
-Column:2=ДатаК
-Column:3=ВсегоЕдиницИзданий
-Column:4=ВсегоЕдиницХранения
+Column:1=ЗаГод
+Column:2=ДатаН
+Column:3=ДатаК
+Column:4=ВсегоЕдиницИзданий
+Column:5=ВсегоЕдиницХранения
 TreeWidth=120
 SubTableWidth=100
 SubTableHeight=80
@@ -17,6 +18,11 @@ SubTableHeight=80
 [.Column.UpdateDate]
 Caption=Дата изменения
 Width=160
+Alignment=2
+
+[.Column.ЗаГод]
+Caption=Год
+Width=100
 Alignment=2
 
 [.Column.ДатаН]
