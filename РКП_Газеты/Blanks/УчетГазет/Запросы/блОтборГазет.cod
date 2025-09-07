@@ -13,6 +13,8 @@ inobject public
   ВариантПростогоФильтра2   :Integer;
   ФрагментПодзаголовка      :String;
   ФрагментРегНомера         :String;
+  FrgIdInLibrarySystem      :String;
+  FrgIdInUSSRNewspapers     :String;
   Прекращение_Все           :Logical;
   Прекращение_Ложь          :Logical;
   Прекращение_Истина        :Logical;
@@ -412,6 +414,7 @@ inobject private
     Frm = УчетГазет.картГазеты.Create;
     Frm.ИгнорироватьХранимыеСвойства = true;
     Frm.РежимСложногоФильтра = true;
+    -- Название, подзаголовок, регномер передаются в картотеку и обрабатываются для фильтра там, т.к. составляют элементы быстрого пользовательского фильтра
     Frm.SetField('ВариантПростогоФильтра',  Self.ВариантПростогоФильтра);
     Frm.SetField('ФрагментНазвания',        Self.ФрагментНазвания);
     Frm.SetField('ВариантПростогоФильтра2', Self.ВариантПростогоФильтра2);
@@ -440,9 +443,9 @@ inobject public
   func ПолучитьУсловиеОтбораГазет :String;
     var aFlt :String[];
     Hint('Вычисление условий отбора...');
-    --AddInArray(aFlt, ПолучитьУсловие_Название);
-    --AddInArray(aFlt, ПолучитьУсловие_Подзаголовок);
-    --AddInArray(aFlt, ПолучитьУсловие_РегНомер);
+    -- Название, подзаголовок, регномер передаются в картотеку и обрабатываются для фильтра там, т.к. составляют элементы быстрого пользовательского фильтра
+    AddInArray(aFlt, ПолучитьФильтр_ПоНомеруВБибСистеме);
+    AddInArray(aFlt, ПолучитьФильтр_ПоУказателюСССР);
     AddInArray(aFlt, ПолучитьУсловие_Прекращение);
     AddInArray(aFlt, ПолучитьУсловие_Отсылка);
     AddInArray(aFlt, ПолучитьУсловие_МестоИздания);
@@ -462,41 +465,15 @@ inobject public
 
 inobject private
 
-  func ПолучитьУсловие_Название :String;
-    var aFlt :String[];
-    if (ФрагментНазвания <> nil) then
-      if (ВариантПростогоФильтра = 0) then
-        AddInArray(aFlt, 'Match(НазваниеОсн,"' + ФрагментНазвания + '*")');
-        if ВклИнЯз then
-          AddInArray(aFlt, 'Match(НазваниеИнЯз,"' + ФрагментНазвания + '*")');
-          AddInArray(aFlt, 'Match(НазваниеНацЯз,"' + ФрагментНазвания + '*")');
-        fi;
-      else
-        AddInArray(aFlt,          'Match(НазваниеОсн,"*' + ФрагментНазвания + '*")');
-        if ВклИнЯз then
-          AddInArray(aFlt, 'Match(НазваниеИнЯз,"*' + ФрагментНазвания + '*")');
-          AddInArray(aFlt, 'Match(НазваниеНацЯз,"*' + ФрагментНазвания + '*")');
-        fi;
-      fi;
+  func GetFilter_ByFrgIdInLibrarySystem synonym ПолучитьФильтр_ПоНомеруВБибСистеме :String;
+    if (FrgIdInLibrarySystem <> nil) then
+      Return 'Match(IdInLibrarySystem,"*' + FrgIdInLibrarySystem + '*")';
     fi;
-    Return СложитьСтрокиФильтраПоИли(aFlt);
   end;
 
-  func ПолучитьУсловие_Подзаголовок :String;
-    var aFlt :String[];
-    if (ФрагментПодзаголовка <> nil) then
-      if (ВариантПростогоФильтра2 = 0) then
-        AddInArray(aFlt, 'Match(Подзаголовок,"' + ФрагментПодзаголовка + '*")');
-      else
-        AddInArray(aFlt, 'Match(Подзаголовок,"*' + ФрагментПодзаголовка + '*")');
-      fi;
-    fi;
-    Return СложитьСтрокиФильтраПоИли(aFlt);
-  end;
-
-  func ПолучитьУсловие_РегНомер :String;
-    if (ФрагментРегНомера <> nil) then
-      Return 'Match(РегНомер,"*' + ФрагментРегНомера + '*")';
+  func GetFilter_ByFrgIdInUSSRNewspapers synonym ПолучитьФильтр_ПоУказателюСССР :String;
+    if (FrgIdInUSSRNewspapers <> nil) then
+      Return 'Match(IdInUSSRNewspapers,"*' + FrgIdInUSSRNewspapers + '*")';
     fi;
   end;
 

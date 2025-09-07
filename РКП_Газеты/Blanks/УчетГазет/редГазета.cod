@@ -1439,8 +1439,12 @@ inobject private
     ---
     фреймРегистрация.CellByField['РегНомер'].Enabled = not (OPPIAccess or GLGSAccess);
     фреймРегистрация.CellByField['ISSN'].Enabled = not (OPPIAccess or GLGSAccess);
+    фреймРегистрация.CellByField['IdInLibrarySystem'].Enabled = not (OPPIAccess or GLGSAccess);
+    фреймРегистрация.CellByField['IdInUSSRNewspapers'].Enabled = not (OPPIAccess or GLGSAccess);
+
     CellRow(фреймРегистрация.CellByField['ГодЛетописи']).Visible = not OPPIAccess;
     фреймРегистрация.CellByField['ГодЛетописи'].Enabled = not (OPPIAccess or GLGSAccess);
+
     флОтсылка.Enabled = (not OPPIAccess) and (not GLGSAccess);
     фреймНазвания.CellByField['НазваниеОсн'].Enabled = not GLGSAccess;
     фреймНазвания.CellByField['НазваниеИнЯз'].Enabled = not GLGSAccess;
