@@ -1,0 +1,609 @@
+﻿class inherited РКП_СИС.блОтчетОРаботеБазовый "Уточняющий отчет по вводу данных";
+
+import СИС2 classes Константы;
+import РКП_СИС classes StdCode, Recs, Functions, FilterMaker, Def, StringsFunctions, RI.intBase;
+
+inobject private
+
+--{{ 2_Свойства
+
+  var КомпетенцииВОтчете :tCompetence[];-- := [кмпОРГПзав, кмпОРГПсотр];
+
+  var фреймОтчет   :TemplateFrame;
+  var секцГазеты   :TemplateSection;
+
+  var Отдел        :String;
+  var РазделОснОтч :String;
+  var ТипДействия  :RI.intBase.tWorkState;
+  var ОператорИмя  :String;
+
+  var мДанные :Variant[2];
+  var ВсегоГазет :Integer;
+
+  var стлбГазетаЗгл        :TemplateColumn;
+  var стлбГазета           :TemplateColumn;
+  var стлбГазетаИтог       :TemplateColumn;
+  var стлбГазетаДатаСздЗгл :TemplateColumn;
+  var стлбГазетаДатаСзд    :TemplateColumn;
+  var стлбГазетаДатаИзмЗгл :TemplateColumn;
+  var стлбГазетаДатаИзм    :TemplateColumn;
+
+--}}
+
+-- 2_Конструкторы, визуализаторы0. --
+
+inclass public
+
+  proc ПоГазетам (локОтдел, локРазделОснОтч :String;
+                  локОператорИмя, локОператорПолнИмя :String;
+                  локДатаН, локДатаК:Date;
+                  локТипДействия :RI.intBase.tWorkState);
+    var vFrm :УчетГазет.Отчеты.блПротоколВвода_Детализация;
+    vFrm = УчетГазет.Отчеты.блПротоколВвода_Детализация.Create;
+    vFrm.Отдел        = локОтдел;
+    vFrm.РазделОснОтч = локРазделОснОтч;
+    vFrm.ОператорИмя  = локОператорИмя;
+    vFrm.Библиограф   = локОператорПолнИмя;
+    vFrm.ДатаН        = локДатаН;
+    vFrm.ДатаК        = локДатаК;
+    vFrm.ТипДействия  = локТипДействия;
+    if (локОтдел = 'ОРГП') then
+      vFrm.КомпетенцииВОтчете = [кмпОРГПзав, кмпОРГПсотр];
+    fi;
+    vFrm.ShowEx(,Kernel.Window.PopupWindow);
+  end;
+
+
+inobject private
+
+-- 2_Обработчики событий шаблона0. --
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    var j :Integer;
+    inherited шаблон_ПриОткрытии(Create);
+    ПостроитьОтчет;
+    j = УчетГазет.Отчеты.блПротоколВвода_Детализация.ObjectsCount;
+    if (j > 1) then
+      Self.Window.Left = УчетГазет.Отчеты.блПротоколВвода_Детализация.Objects[j - 1].Window.Left + 40;
+      Self.Window.Top = УчетГазет.Отчеты.блПротоколВвода_Детализация.Objects[j - 1].Window.Top + 40;
+    fi;
+    стлбГазетаДатаСздЗгл.Visible = (ТипДействия = wsRecCreated);
+    стлбГазетаДатаСзд.Visible    = (ТипДействия = wsRecCreated);
+    стлбГазетаДатаИзмЗгл.Visible = (ТипДействия = wsRecUpdated);
+    стлбГазетаДатаИзм.Visible    = (ТипДействия = wsRecUpdated);
+    фреймОтчет.FreezeArea(0, 0, 0, 6.5);
+  end;
+
+
+-- 2_Обработчики событий клеток шаблона0. --
+
+  func Поле_ПриВыводе_ЗаголовокОкнаФормы(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    var vTitleBeg, vTitleEnd :String;
+    vTitleBeg = Библиограф  + Br;
+    if true in [Hour(ДатаК) > 0, Minute(ДатаК) > 0, Second(ДатаК) > 0] then
+      vTitleEnd = Br + '<s-><s->за период с ' + Str(ДатаН) + ' по  ' + Str(ДатаК, 'dd mmmm yyyy г. (hh:mm:ss)') + ' включительно';
+    else
+      vTitleEnd = Br + '<s-><s->за период с ' + Str(ДатаН) + ' по  ' + Str(ДатаК) + ' включительно';
+    fi;
+    if (Отдел = 'ОРГП') then
+      if (РазделОснОтч = 'Газеты') and (ТипДействия = wsRecCreated) then    Result = vTitleBeg + 'зарегистрировано новых изданий, кроме отсылок'     + vTitleEnd;
+      elsif (РазделОснОтч = 'Газеты') and (ТипДействия = wsRecUpdated) then Result = vTitleBeg + 'изменено ранее созданных записей, включая отсылки' + vTitleEnd;
+      fi;
+    fi;
+  end;
+
+  func Поле_ПриВыводе_мГазета(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    var vIndex :Integer;
+    var cData :Variant[];
+    vIndex = Cell.Frame;
+    try
+      if (РазделОснОтч = 'Газеты') then
+        cData = мДанные[vIndex] as Variant[];
+        Result = cData[4] as String;
+      fi;
+    finally
+    end;
+  end;
+
+  func Поле_ПриВыводе_мГазетаДата(Cell :TemplateCell; Value :Variant; Action :Template.OutputTypes; var Format :String) :Variant;
+    var vIndex :Integer;
+    var cData :Variant[];
+    var vDate :Date;
+    vIndex = Cell.Frame;
+    try
+      if (РазделОснОтч = 'Газеты') then
+        cData = мДанные[vIndex] as Variant[];
+        vDate = (cData[3] as Date);
+        if (vDate <> nil) then
+          Result = vDate;
+        fi;
+      fi;
+    finally
+    end;
+  end;
+
+
+-- 2_Обработчики событий прочих объектов шаблона0. --
+
+
+-- 2_Дополнительные команды0. --
+
+
+-- 2_Вспомогательные методы0. --
+
+  proc ЗагрузитьФреймУправление;
+    -- здесь ничего не должно выполняться
+  end;
+
+  proc УсловияОтбораНовогоОтчета;
+    -- здесь ничего не должно выполняться
+  end;
+
+  func ПостроитьОтчет :Logical;
+    --var aResult :Variant[2]; --[[vRecord, vCount]]
+    if (not nil in [ДатаН,ДатаК]) and (ДатаН<=ДатаК) then
+      УдалитьРезультатыРасчета;
+      мДанные = ПолучитьВыборку;
+      секцГазеты.FramesCount = LengthOfArray(мДанные);
+      Return true;
+    else
+      Message('Введен некорректный период! Перестроение отчета невозможно.');
+    fi;
+
+
+
+--    var aUserName :String[];
+--    var aResult :Variant[2]; --[[UserName, FullName, vCreateCount, vUpdateCount]]
+--    var i :Integer;
+--    Result = inherited ПостроитьОтчет; -- проверка корректности условий
+--    if Result then
+--      УдалитьРезультатыРасчета;
+--      aUserFullName = ПолучитьПолныеИменаПользователей;
+--      aUserName = ПолучитьИменаПользователей('Газета');
+--      if (aUserName <> nil) then
+--        aResult = ПолучитьВыборку(aUserName, 'Газета');
+--        РасшифроватьИмена(aResult, aUserFullName);
+--        for i = 1 .. LengthOfArray(aResult) do
+--          with Self.Record.Газеты.AddEx do
+--            ОператорИмя   = aResult[i,1] as String;
+--            Оператор      = aResult[i,2] as String;
+--            Введено       = aResult[i,3] as Integer;
+--            Редактировано = aResult[i,4] as Integer;
+--            ВсегоВведеноГазет       = ВсегоВведеноГазет       + aResult[i,3] as Integer;
+--            ВсегоРедактированоГазет = ВсегоРедактированоГазет + aResult[i,4] as Integer;
+--          end;
+--        od;
+--      fi;
+--      --
+--      aUserName = ПолучитьИменаПользователей('НомерГазеты');
+--      if (aUserName <> nil) then
+--        aResult = ПолучитьВыборку(aUserName, 'НомерГазеты');
+--        РасшифроватьИмена(aResult, aUserFullName);
+--        for i = 1 .. LengthOfArray(aResult) do
+--          with Self.Record.Номера.AddEx do
+--            ОператорИмя   = aResult[i,1] as String;
+--            Оператор      = aResult[i,2] as String;
+--            Введено       = aResult[i,3] as Integer;
+--            Редактировано = aResult[i,4] as Integer;
+--            ВсегоВведеноНомеров       = ВсегоВведеноНомеров       + aResult[i,3] as Integer;
+--            ВсегоРедактированоНомеров = ВсегоРедактированоНомеров + aResult[i,4] as Integer;
+--          end;
+--        od;
+--      fi;
+--      --
+--      aUserName = ПолучитьИменаПользователей('ЕдиницаХранения');
+--      if (aUserName <> nil) then
+--        aResult = ПолучитьВыборку(aUserName, 'ЕдиницаХранения');
+--        РасшифроватьИмена(aResult, aUserFullName);
+--        for i = 1 .. LengthOfArray(aResult) do
+--          with Self.Record.Поступления.AddEx do
+--            ОператорИмя   = aResult[i,1] as String;
+--            Оператор      = aResult[i,2] as String;
+--            Введено       = aResult[i,3] as Integer;
+--            Редактировано = aResult[i,4] as Integer;
+--            ВсегоВведеноПоступлений       = ВсегоВведеноПоступлений       + aResult[i,3] as Integer;
+--            ВсегоРедактированоПоступлений = ВсегоРедактированоПоступлений + aResult[i,4] as Integer;
+--          end;
+--        od;
+--      fi;
+--      --
+--      aUserName = ПолучитьИменаПользователей('УчетныйДокумент');
+--      if (aUserName <> nil) then
+--        aResult = ПолучитьВыборку(aUserName, 'УчетныйДокумент');
+--        РасшифроватьИмена(aResult, aUserFullName);
+--        for i = 1 .. LengthOfArray(aResult) do
+--          with Self.Record.УчДок.AddEx do
+--            ОператорИмя   = aResult[i,1] as String;
+--            Оператор      = aResult[i,2] as String;
+--            Введено       = aResult[i,3] as Integer;
+--            Редактировано = aResult[i,4] as Integer;
+--            ВсегоВведеноУчДок       = ВсегоВведеноУчДок       + aResult[i,3] as Integer;
+--            ВсегоРедактированоУчДок = ВсегоРедактированоУчДок + aResult[i,4] as Integer;
+--          end;
+--        od;
+--      fi;
+--    fi;
+  end;
+
+  proc УдалитьРезультатыРасчета;
+    мДанные = nil;
+    ВсегоГазет = 0;
+    секцГазеты.FramesCount = 0;
+  end;
+
+
+--  func ПолучитьИменаПользователей( КорИмяКлассаЗаписей :String ) :String[];
+--    var QResult :Variant[2];
+--    with Query.Create([РКП_СИС.ЛогРабот]) do
+--      Filter = ПолучитьФильтрЗапросаЛога(КорИмяКлассаЗаписей);
+--      QResult = CalcAggregates('GroupBy(CreateUser)') as Variant[2];
+--    end;
+--    if (QResult <> nil) then
+--      Result = QResult[1] as String[];
+--      SortArray(Result);
+--    fi;
+--  end;
+--
+--  func ПолучитьПолныеИменаПользователей :String[2];
+--    var cResult :String[];
+--    with Query.Create([Kernel.Settings.User]) do
+--      Filter = 'isGroup=0';
+--      Select;
+--      while not Eof do
+--        cResult = [Current.Name, Current.FullName] as String[];
+--        AddInArray( Result, cResult);
+--        Next;
+--      od;
+--    end;
+--    SortArray(Result, [1]);
+--  end;
+
+
+  func ПолучитьВыборку :Variant[2];  -- [[vRecord, vCount]]
+    if (Отдел = 'ОРГП') then
+      if (РазделОснОтч = 'Газеты') then
+        Result = ПолучитьВыборку_Газет;
+      fi;
+    fi;
+
+
+--    if (КорИмяКлассаЗаписей = 'Газета')             then Result = ПолучитьВыборку_Газет   (КорИмяКлассаЗаписей);
+--    elsif (КорИмяКлассаЗаписей = 'НомерГазеты')     then Result = ПолучитьВыборку_Номеров (aUserName, КорИмяКлассаЗаписей);
+--    elsif (КорИмяКлассаЗаписей = 'ЕдиницаХранения') then Result = ПолучитьВыборку_ЕХ (aUserName, КорИмяКлассаЗаписей);
+--    elsif (КорИмяКлассаЗаписей = 'УчетныйДокумент') then Result = ПолучитьВыборку_УД (aUserName, КорИмяКлассаЗаписей);
+--    fi;
+  end;
+
+  func ПолучитьВыборку_Газет :Variant[2];  --[[vRecord, vCount]]
+    var КорИмяКлассаЗаписей :String;
+    var vFlt :String;
+    var aRIDDeleted, aRIDCreated, aRIDUpdated :Integer[];
+    var j, jj, i :Integer;
+    var cRec :РКП_СИС.ЛогРабот;
+    --var cResult :Variant[];
+    --var vCreateCount, vUpdateCount, cRID :Integer;
+    var cRID :Integer;
+    КорИмяКлассаЗаписей = 'Газета';
+    vFlt = ПолучитьФильтрЗапросаЛога(КорИмяКлассаЗаписей);
+    aRIDDeleted = ПолучитьУдаленныеЗаписи(vFlt, КорИмяКлассаЗаписей);
+    with Query.Create([РКП_СИС.ЛогРабот]) do
+      Filter = vFlt;
+      Order = 'DocId-';
+      Select;
+      jj = Count;
+      while not Eof do
+        j = j + 1;
+        Hint('Извлечение данных... [' + КорИмяКлассаЗаписей + ']', j, jj);
+        cRec = Current as РКП_СИС.ЛогРабот;
+        cRID = cRec.RID;
+        if (ТипДействия = wsRecCreated) then
+          if (SearchInArray(aRIDDeleted, cRID, ,true) < 0) then
+            if not (cRID in aRIDCreated) then
+              i = i + 1;
+              Result[i, 1] = GetRecordByRef('{РКП_Газеты.Газета:' + Str(cRID) + '}');
+              Result[i, 2] = 1;
+              Result[i, 3] = cRec.CreateDate;
+              if (Result[i, 1] is РКП_Газеты.Газета) then
+                Result[i, 4] = (Result[i, 1] as РКП_Газеты.Газета).НазваниеОсн;
+              fi;
+              AddInArray(aRIDCreated, cRID);
+            fi;
+          fi;
+        elsif (ТипДействия = wsRecUpdated) then
+          if (SearchInArray(aRIDDeleted, cRID, ,true) < 0) then
+            if not (cRID in aRIDUpdated) then
+              i = i + 1;
+              Result[i, 1] = GetRecordByRef('{РКП_Газеты.Газета:' + Str(cRID) + '}');
+              Result[i, 2] = 1;
+              Result[i, 3] = cRec.UpdateDate;
+              if (Result[i, 1] is РКП_Газеты.Газета) then
+                Result[i, 4] = (Result[i, 1] as РКП_Газеты.Газета).НазваниеОсн;
+              fi;
+              AddInArray(aRIDUpdated, cRID);
+            fi;
+          fi;
+        fi;
+        Next;
+      od;
+    end;
+    ВсегоГазет = i;
+    SortArray(Result, [4]);
+    Hint(' ');
+  end;
+
+--  func ПолучитьВыборку_Номеров(aUserName :String[]; КорИмяКлассаЗаписей :String ) :Variant[2];  --[[UserName, nil, vCreateCount, vUpdateCount]]
+--    var aFlt :String[];
+--    var vFlt :String;
+--    var aRIDDeleted, aRIDCreated, aRIDUpdated :Integer[];
+--    var j, jj, i :Integer;
+--    var cRec :РКП_СИС.ЛогРабот;
+--    var cResult :Variant[];
+--    var vCreateCount, vUpdateCount, cRID :Integer;
+--    -- 1 Зарегистрированные - по алгоритму справки о пополнении БД
+--    AddInArray( aFlt, 'Газета<>nil' );
+--    AddInArray( aFlt, 'ФункцияГруппы=0' );
+--    AddInArray( aFlt, 'НеПолучен=false' );
+--    AddInArray( aFlt, 'ПринялНаХранение<>"Администратор"' );
+--    AddInArray( aFlt, 'ДатаПринятияНаХранение>=' + Str(ДатаН) );
+--    AddInArray( aFlt, 'ДатаПринятияНаХранение<'  + Str(ДатаК + 1) );
+--    with Query.Create([РКП_Газеты.НомерГазеты]) do
+--      OpenHint[Query.Interrupted] = true;
+--      Filter = MakeFilter( aFlt );
+--      Order = 'ПринялНаХранение';
+--      LoadingFieldsMode = СИС2.Константы.mdNone;
+--      LoadingFields = 'DocId;ПринялНаХранение';
+--      Select;
+--      jj = Count;
+--      while not Eof do
+--        j = j + 1;
+--        Hint('Извлечение данных (1)... [' + КорИмяКлассаЗаписей + ']', j, jj);
+--        i = SearchInArray(aUserName, Current.ПринялНаХранение, , true);
+--        if (i > 0) then
+--          cResult = Result[i] as Variant[];
+--          vCreateCount = cResult[3] as Integer;
+--          cRID = Current.DocID;
+--          if not (cRID in aRIDCreated) then
+--            vCreateCount = vCreateCount + 1;
+--            AddInArray(aRIDCreated, cRID);
+--          fi;
+--          cResult = [aUserName[i],nil,vCreateCount, vUpdateCount];
+--          Result[i] = cResult;
+--        fi;
+--        Next;
+--      od;
+--    end;
+--    -- 2 Измененные - по логу
+--    vFlt = ПолучитьФильтрЗапросаЛога(КорИмяКлассаЗаписей);
+--    aRIDDeleted = ПолучитьУдаленныеЗаписи(vFlt, КорИмяКлассаЗаписей);
+--    with Query.Create([РКП_СИС.ЛогРабот]) do
+--      OpenHint[Query.Interrupted] = true;
+--      Filter = vFlt;
+--      Order = 'DocId-';
+--      Select;
+--      jj = Count;
+--      j = 0;
+--      while not Eof do
+--        j = j + 1;
+--        Hint('Извлечение данных (2)... [' + КорИмяКлассаЗаписей + ']', j, jj);
+--        cRec = Current as РКП_СИС.ЛогРабот;
+--        if (SearchInArray(aRIDDeleted, cRec.RID, ,true) < 0) then
+--          i = SearchInArray(aUserName, cRec.CreateUser, , true);
+--          if (i > 0) then
+--            cResult = Result[i] as Variant[];
+--            vCreateCount = cResult[3] as Integer;
+--            vUpdateCount = cResult[4] as Integer;
+--            cRID = cRec.RID;
+--            if not (cRID in aRIDCreated) and not (cRID in aRIDUpdated) then
+--              if (cRec.ActionType = wsRecUpdated) then
+--                vUpdateCount = vUpdateCount + 1;
+--                AddInArray(aRIDUpdated, cRID);
+--              fi;
+--            fi;
+--            cResult = [aUserName[i],nil,vCreateCount, vUpdateCount];
+--            Result[i] = cResult;
+--          fi;
+--        fi;
+--        Next;
+--      od;
+--    end;
+--    Hint(' ');
+--  end;
+
+--  func ПолучитьВыборку_ЕХ(aUserName :String[]; КорИмяКлассаЗаписей :String ) :Variant[2];  --[[UserName, nil, vCreateCount, vUpdateCount]]
+--    var vFlt :String;
+--    var aRIDDeleted, aRIDAccepted :Integer[];
+--    var j, jj, i :Integer;
+--    var cRec :РКП_СИС.ЛогРабот;
+--    var cResult :Variant[];
+--    var vCreateCount, vUpdateCount, cRID :Integer;
+--    vFlt = ПолучитьФильтрЗапросаЛога(КорИмяКлассаЗаписей);
+--    aRIDDeleted = ПолучитьУдаленныеЗаписи(vFlt, КорИмяКлассаЗаписей);
+--    with Query.Create([РКП_СИС.ЛогРабот]) do
+--      OpenHint[Query.Interrupted] = true;
+--      Filter = vFlt;
+--      Order = 'DocId-';
+--      Select;
+--      jj = Count;
+--      while not Eof do
+--        j = j + 1;
+--        Hint('Извлечение данных... [' + КорИмяКлассаЗаписей + ']', j, jj);
+--        cRec = Current as РКП_СИС.ЛогРабот;
+--        if (SearchInArray(aRIDDeleted, cRec.RID, ,true) < 0) then
+--          i = SearchInArray(aUserName, cRec.CreateUser, , true);
+--          if (i > 0) then
+--            cResult = Result[i] as Variant[];
+--            vCreateCount = cResult[3] as Integer;
+--            cRID = cRec.RID;
+--            if not (cRID in aRIDAccepted) then
+--              if (cRec.ActionType = wsAccepted) then
+--                vCreateCount = vCreateCount + cRec.StoredValI; -- суммируется количество номеров
+--                AddInArray(aRIDAccepted, cRID);
+--              fi;
+--            fi;
+--            cResult = [aUserName[i],nil,vCreateCount, vUpdateCount];
+--            Result[i] = cResult;
+--          fi;
+--        fi;
+--        Next;
+--      od;
+--    end;
+--    Hint(' ');
+--  end;
+
+--  func ПолучитьВыборку_УД(aUserName :String[]; КорИмяКлассаЗаписей :String ) :Variant[2];  --[[UserName, nil, vCreateCount, vUpdateCount]]
+--    var vFlt :String;
+--    var aRIDDeleted, aRIDCreated, aRIDUpdated :Integer[];
+--    var j, jj, i :Integer;
+--    var cRec :РКП_СИС.ЛогРабот;
+--    var cResult :Variant[];
+--    var vCreateCount, vUpdateCount, cRID :Integer;
+--    vFlt = ПолучитьФильтрЗапросаЛога(КорИмяКлассаЗаписей);
+--    aRIDDeleted = ПолучитьУдаленныеЗаписи(vFlt, КорИмяКлассаЗаписей);
+--    with Query.Create([РКП_СИС.ЛогРабот]) do
+--      OpenHint[Query.Interrupted] = true;
+--      Filter = vFlt;
+--      Order = 'DocId-';
+--      Select;
+--      jj = Count;
+--      while not Eof do
+--        j = j + 1;
+--        Hint('Извлечение данных... [' + КорИмяКлассаЗаписей + ']', j, jj);
+--        cRec = Current as РКП_СИС.ЛогРабот;
+--        if (SearchInArray(aRIDDeleted, cRec.RID, ,true) < 0) then
+--          i = SearchInArray(aUserName, cRec.CreateUser, , true);
+--          if (i > 0) then
+--            cResult = Result[i] as Variant[];
+--            vCreateCount = cResult[3] as Integer;
+--            vUpdateCount = cResult[4] as Integer;
+--            cRID = cRec.RID;
+--            if not (cRID in aRIDCreated) then
+--              if (cRec.ActionType = wsRecCreated) then
+--                vCreateCount = vCreateCount + 1;
+--                AddInArray(aRIDCreated, cRID);
+--              fi;
+--            fi;
+--            if not (cRID in aRIDCreated) and not (cRID in aRIDUpdated) then
+--              if (cRec.ActionType = wsRecUpdated) then
+--                vUpdateCount = vUpdateCount + 1;
+--                AddInArray(aRIDUpdated, cRID);
+--              fi;
+--            fi;
+--            cResult = [aUserName[i],nil,vCreateCount, vUpdateCount];
+--            Result[i] = cResult;
+--          fi;
+--        fi;
+--        Next;
+--      od;
+--    end;
+--    Hint(' ');
+--  end;
+
+--  proc РасшифроватьИмена(var aResult :Variant[2]; aUserFullName :String[2]);
+--    var vUserFullName :String;
+--    var i, j :Integer;
+--    for i = 1 .. LengthOfArray(aResult) do
+--      j = SearchInArray(aUserFullName, aResult[i,1] as String, [1], true);
+--      if (j > 0) then
+--        vUserFullName = aUserFullName[j,2];
+--      fi;
+--      if (vUserFullName <> nil) then
+--        aResult[i]  = [aResult[i,1], vUserFullName, aResult[i,3], aResult[i,4]];
+--      else
+--        aResult[i]  = [aResult[i,1], aResult[i,1], aResult[i,3], aResult[i,4]];
+--      fi;
+--    od;
+--  end;
+
+  func ПолучитьУдаленныеЗаписи( ОснФильтр, КорИмяКлассаЗаписей :String ) :Integer[];
+    var aRslt: variant[2]; -- вспомогательная переменная для хранения результатов, возвращаемых агрегирующими функциями
+    var aIdFromLog :Integer[];
+    var rClass :Class Record;
+    var i, ii :Integer;
+    var Q :Query;
+    -- Получение массива DocId записей, оставивших следы в логе
+    with Query.Create([РКП_СИС.ЛогРабот]) do
+      Order = 'RID';
+      Filter = ОснФильтр;
+      LoadingFieldsMode = mdNone;
+      LoadingFields = 'RID';
+      aRslt = CalcAggregates('GroupBy(RID)') as variant[2];
+      aIdFromLog = aRslt[1] as Integer[];
+      SortArray(aIdFromLog);
+    end;
+    if (aIdFromLog <> nil) then
+      -- Определение класса записей с исходными данными
+      if (КорИмяКлассаЗаписей = 'Газета')             then rClass = FindClass( 'РКП_Газеты.Газета' );
+      elsif (КорИмяКлассаЗаписей = 'НомерГазеты')     then rClass = FindClass( 'РКП_Газеты.НомерГазеты' );
+      elsif (КорИмяКлассаЗаписей = 'ЕдиницаХранения') then rClass = FindClass( 'РКП_Газеты.ЕдиницаХранения' );
+      elsif (КорИмяКлассаЗаписей = 'УчетныйДокумент') then rClass = FindClass( 'РКП_Газеты.УчетныйДокумент' );
+      fi;
+      Q = Query.Create([rClass]);
+      Q.LoadingFieldsMode = mdNone;
+      Q.LoadingFields = 'DocId';
+      Q.Order = 'DocId';
+      Q.Select;
+      -- Получение массива DocId записей, не найденных в источнике (удаленных)
+      ii = LengthOfArray(aIdFromLog);
+      for i = 1 .. ii do
+        Hint('Исключение из отчета удаленных данных... [' + КорИмяКлассаЗаписей + ']', i, ii);
+        if not Q.Find(aIdFromLog[i]) then
+          AddInArray(Result, aIdFromLog[i]);
+        fi;
+      od;
+      Hint(' ');
+      SortArray(Result);
+    fi;
+  end;
+
+
+  func ПолучитьФильтрЗапросаЛога( КорИмяКлассаЗаписей :String ) :String;
+    var aFlt :String[];
+    AddInArray( aFlt, ПолучитьФильтрКомпетенций );
+    AddInArray( aFlt, ПолучитьФильтрДат );
+    AddInArray( aFlt, ПолучитьФильтрКлассаЗаписей(КорИмяКлассаЗаписей) );
+    AddInArray( aFlt, ПолучитьФильтрДействия );
+    AddInArray( aFlt, ПолучитьФильтрОператора );
+    AddInArray( aFlt, ПолучитьДопУсловие );
+    Result = MakeFilter( aFlt );
+  end;
+
+  func ПолучитьФильтрКомпетенций :String;
+    var i :Integer;
+    var aFlt :String[];
+    for i = 1 .. LengthOfArray(КомпетенцииВОтчете) do
+      AddInArray( aFlt, 'Match(Competencies, "*|' + Str(КомпетенцииВОтчете[i]) + '|*")' );
+    od;
+    Result = MakeFilter( aFlt, byOr );
+  end;
+
+  func ПолучитьФильтрДат :String;
+    var aFlt :String[];
+    AddInArray( aFlt, 'CreateDate>=' + Str(ДатаН) );
+    AddInArray( aFlt, 'CreateDate<'  + Str(ДатаК) );
+    Result = MakeFilter( aFlt );
+  end;
+
+  func ПолучитьФильтрКлассаЗаписей( КорИмяКлассаЗаписей :String ) :String;
+    if (КорИмяКлассаЗаписей = 'Газета')             then Result = 'RClass="РКП_Газеты.Газета"';
+    elsif (КорИмяКлассаЗаписей = 'НомерГазеты')     then Result = 'RClass="РКП_Газеты.НомерГазеты"';
+    elsif (КорИмяКлассаЗаписей = 'ЕдиницаХранения') then Result = 'RClass="РКП_Газеты.ЕдиницаХранения"';
+    elsif (КорИмяКлассаЗаписей = 'УчетныйДокумент') then Result = 'RClass="РКП_Газеты.УчетныйДокумент"';
+    fi;
+  end;
+
+  func ПолучитьФильтрДействия :String;
+    Result = 'ActionType=' + Str(ТипДействия);
+  end;
+
+  func ПолучитьФильтрОператора :String;
+    Result = 'CreateUser="' + ОператорИмя + '"';
+  end;
+
+  func ПолучитьДопУсловие :String;
+    if (Отдел = 'ОРГП') and (РазделОснОтч = 'Газеты') and (ТипДействия = wsRecCreated) then
+      Result = 'not StoredValL';
+    fi;
+  end;
+
+
+end

@@ -14,6 +14,7 @@ inobject private
   var секцНомера      :TemplateSection;
   var секцГазеты      :TemplateSection;
 
+
 --}}
 
 -- 2_Конструкторы, визуализаторы0. --
@@ -31,6 +32,29 @@ inobject private
     Result = 'Протокол ввода данных ОРГП' + Br +
              '№ ' + Str(НомерОтчета) + ' / ' + Str(ЗаГод) + Br +
              '<s-><s->за период с ' + Str(ДатаН) + ' по  ' + Str(ДатаК) + ' включительно';
+  end;
+
+  func Поле_ПриНажатии_Уточнение(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    var локФактДатаК :Date;
+    if Dat(Day(UpdateDate), Mon(UpdateDate), Day(UpdateDate)) = Dat(Day(ДатаК), Mon(ДатаК), Day(ДатаК)) then
+      локФактДатаК = AddSec(UpdateDate, 10);
+    else
+      локФактДатаК = ДатаК + 1;
+    fi;
+    if (Cell.Owner = секцГазеты) then
+      if (Cell.Contents = 'Введено') then
+        УчетГазет.Отчеты.блПротоколВвода_Детализация.ПоГазетам('ОРГП', 'Газеты', Газеты[Cell.Frame].ОператорИмя, Газеты[Cell.Frame].Оператор, ДатаН, локФактДатаК, RI.intBase.wsRecCreated );
+      elsif (Cell.Contents = 'Редактировано') then
+        УчетГазет.Отчеты.блПротоколВвода_Детализация.ПоГазетам('ОРГП', 'Газеты', Газеты[Cell.Frame].ОператорИмя, Газеты[Cell.Frame].Оператор, ДатаН, локФактДатаК, RI.intBase.wsRecUpdated );
+      fi;
+    fi;
+  end;
+
+  proc Поле_ПриВыходе_Комментарий(Cell :TemplateCell; Index :Integer);
+    var locUpdateDate : Date;
+    locUpdateDate = Record.UpdateDate;
+    РКП_СИС.Recs.RecordPostIfNeed(Record);
+    Record.UpdateDate = locUpdateDate;
   end;
 
 
@@ -63,9 +87,14 @@ inobject private
     var aUserFullName :String[2];
     var aResult :Variant[2]; --[[UserName, FullName, vCreateCount, vUpdateCount]]
     var i :Integer;
+    var locUpdateDate : Date;
+    if DebugMode then
+      locUpdateDate = Record.UpdateDate;
+    fi;
     Result = inherited ПостроитьОтчет; -- проверка корректности условий
     if Result then
       УдалитьРезультатыРасчета;
+      РКП_СИС.Recs.RecordPostIfNeed(Record);
       aUserFullName = ПолучитьПолныеИменаПользователей;
       aUserName = ПолучитьИменаПользователей('Газета');
       if (aUserName <> nil) then
@@ -130,6 +159,10 @@ inobject private
           end;
         od;
       fi;
+      РКП_СИС.Recs.RecordPostIfNeed(Record);
+      if DebugMode then
+        Record.UpdateDate = locUpdateDate;
+      fi;
     fi;
   end;
 
@@ -193,8 +226,14 @@ inobject private
 
   func ПолучитьФильтрДат :String;
     var aFlt :String[];
+    var локФактДатаК :Date;
     AddInArray( aFlt, 'CreateDate>=' + Str(ДатаН) );
-    AddInArray( aFlt, 'CreateDate<' + Str(ДатаК + 1) );
+    if Dat(Day(UpdateDate), Mon(UpdateDate), Day(UpdateDate)) = Dat(Day(ДатаК), Mon(ДатаК), Day(ДатаК)) then
+      локФактДатаК = AddSec(UpdateDate, 10);
+    else
+      локФактДатаК = ДатаК + 1;
+    fi;
+    AddInArray( aFlt, 'CreateDate<' + Str(локФактДатаК) );
     Result = MakeFilter( aFlt );
   end;
 
@@ -228,7 +267,7 @@ inobject private
     with Query.Create([РКП_СИС.ЛогРабот]) do
       OpenHint[Query.Interrupted] = true;
       Filter = vFlt;
-      Order = 'DocId-';
+      Order = 'RID';
       Select;
       jj = Count;
       while not Eof do
@@ -242,19 +281,22 @@ inobject private
             vCreateCount = cResult[3] as Integer;
             vUpdateCount = cResult[4] as Integer;
             cRID = cRec.RID;
+            aRIDUpdated = cResult[5] as Integer[];
             if not (cRID in aRIDCreated) then
               if (cRec.ActionType = wsRecCreated) and (cRec.StoredValL = false) then
                 vCreateCount = vCreateCount + 1;
                 AddInArray(aRIDCreated, cRID);
               fi;
             fi;
-            if not (cRID in aRIDCreated) and not (cRID in aRIDUpdated) then
+            aRIDUpdated = cResult[6] as Integer[];
+            if not (cRID in aRIDUpdated) then       --not (cRID in aRIDCreated) and
               if (cRec.ActionType = wsRecUpdated) then
                 vUpdateCount = vUpdateCount + 1;
                 AddInArray(aRIDUpdated, cRID);
+                cResult[5] = aRIDUpdated;
               fi;
             fi;
-            cResult = [aUserName[i],nil,vCreateCount, vUpdateCount];
+            cResult = [aUserName[i] ,nil, vCreateCount, vUpdateCount, aRIDUpdated, aRIDUpdated];
             Result[i] = cResult;
           fi;
         fi;
@@ -272,13 +314,19 @@ inobject private
     var cRec :РКП_СИС.ЛогРабот;
     var cResult :Variant[];
     var vCreateCount, vUpdateCount, cRID :Integer;
+    var локФактДатаК :Date;
     -- 1 Зарегистрированные - по алгоритму справки о пополнении БД
     AddInArray( aFlt, 'Газета<>nil' );
     AddInArray( aFlt, 'ФункцияГруппы=0' );
     AddInArray( aFlt, 'НеПолучен=false' );
     AddInArray( aFlt, 'ПринялНаХранение<>"Администратор"' );
     AddInArray( aFlt, 'ДатаПринятияНаХранение>=' + Str(ДатаН) );
-    AddInArray( aFlt, 'ДатаПринятияНаХранение<'  + Str(ДатаК + 1) );
+    if Dat(Day(UpdateDate), Mon(UpdateDate), Day(UpdateDate)) = Dat(Day(ДатаК), Mon(ДатаК), Day(ДатаК)) then
+      локФактДатаК = AddSec(UpdateDate, 10);
+    else
+      локФактДатаК = ДатаК + 1;
+    fi;
+    AddInArray( aFlt, 'ДатаПринятияНаХранение<'  + Str(локФактДатаК) );
     with Query.Create([РКП_Газеты.НомерГазеты]) do
       OpenHint[Query.Interrupted] = true;
       Filter = MakeFilter( aFlt );
