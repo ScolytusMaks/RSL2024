@@ -1,5 +1,7 @@
 ﻿record ПротоколВводаОРГП inherited РКП_СИС.AbstractRecord.StoredReport title "Сводная статистика ввода данных ОРГП";
 
+  field ИзмененныеЗаписи              :Logical title "Включить в отчет сведения об измененных записях";
+
   struct Газеты array Integer title "Статистика ввода газет";
     field ОператорИмя                 :String  title "";
     field Оператор                    :String  title "Оператор";

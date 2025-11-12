@@ -7,13 +7,15 @@ import – ѕ_—»— classes StringsFunctions;
 
 inobject public
   var фрейм”правление :TemplateFrame;
+  var фрейм»нформаци€ :TemplateFrame;
+  var фрейм нопки2    :TemplateFrame;
+  var фрейм«ащита     :TemplateFrame;
 
 inobject private
-  var фреймЌадпись :TemplateFrame;
+  var фреймЌадпись    :TemplateFrame;
   var секцѕозиции     :TemplateSection;
   var секц—ѕќ         :TemplateSection;
   var секц¬арианты    :TemplateSection;
-  var фрейм«ащита     :TemplateFrame;
 --}}
 
 -- 2_ онструкторы, визуализаторы0. --
@@ -159,6 +161,19 @@ inobject private
     locFrmDonor = – ѕ_—»—.блќтчетќ–аботеЅазовый.Create;
     Self.фрейм”правление.Clear;
     Self.фрейм”правление.Assign(locFrmDonor.фрейм”правление);
+    Self.фрейм”правление.Name = 'фрейм”правление';
+    Self.фрейм”правление.Frame[1].Clear;
+    Self.фрейм”правление.Frame[1].Assign(locFrmDonor.фрейм»нформаци€);
+    Self.фрейм”правление.Frame[1].Name = 'фрейм»нформаци€';
+    фрейм»нформаци€ = Self.фрейм”правление.Frame[1];
+    Self.фрейм”правление.Frame[2].Clear;
+    Self.фрейм”правление.Frame[2].Assign(locFrmDonor.фрейм нопки2);
+    Self.фрейм”правление.Frame[2].Name = 'фрейм нопки2';
+    фрейм нопки2    = Self.фрейм”правление.Frame[2];
+    Self.фрейм”правление.Frame[3].Clear;
+    Self.фрейм”правление.Frame[3].Assign(locFrmDonor.фрейм«ащита);
+    Self.фрейм”правление.Frame[3].Name = 'фрейм«ащита';
+    фрейм«ащита     = Self.фрейм”правление.Frame[3];
     Self.фрейм«ащита.Visible = true;
   end;
 

@@ -6,14 +6,17 @@ import РКП_СИС classes StringsFunctions;
 
 inobject public
   var фреймУправление :TemplateFrame;
+  var фреймИнформация :TemplateFrame;
+  var фреймКнопки2    :TemplateFrame;
+  var фреймЗащита     :TemplateFrame;
 
 inobject private
 
-  var фреймНадпись    :TemplateFrame;
-  var секцПозиции     :TemplateSection;
-  var секцСПО         :TemplateSection;
-  var секцВарианты    :TemplateSection;
-  var фреймЗащита     :TemplateFrame;
+  var фреймНадпись         :TemplateFrame;
+  var секцИзмененныеЗаписи :TemplateSection;
+  var секцПозиции          :TemplateSection;
+  var секцСПО              :TemplateSection;
+  var секцВарианты         :TemplateSection;
   var ЗаДату1 :Logical;
   var ЗаДату2 :Logical;
   var ЗаДату3 :Logical;
@@ -25,6 +28,7 @@ inobject private
   var ДатаК :Date;
   var Библиограф :String;
   var ИзмененияЗапрещены :Logical;
+  var ИзмененныеЗаписи :Logical;
 
 --}}
 
@@ -68,6 +72,10 @@ inobject private
     if (Cell.Contents = 'ДатаН') then
       Template.CellByField['ДатаК'].SetFocus;
     fi;
+  end;
+
+  func Поле_ПриНажатии_ИзмененныеЗаписи(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    Result = True; 
   end;
 
 

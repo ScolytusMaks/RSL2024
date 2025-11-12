@@ -7,4 +7,5 @@
     field StoredValI   :Integer title "";
     field StoredValL   :Logical title "";
     Indexed indRClassRID By RClass,RID;
+    Indexed indCreateUser By CreateUser;
   end;

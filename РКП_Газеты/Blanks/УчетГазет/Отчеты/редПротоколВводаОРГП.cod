@@ -11,8 +11,18 @@ inobject private
 
   var КомпетенцииВОтчете :tCompetence[] := [кмпОРГПзав, кмпОРГПсотр];
 
-  var секцНомера      :TemplateSection;
-  var секцГазеты      :TemplateSection;
+  var секцГазетыЗаголовок      :TemplateSection;
+  var секцГазеты               :TemplateSection;
+  var секцГазетыИтоги          :TemplateSection;
+  var секцНомераЗаголовок      :TemplateSection;
+  var секцНомера               :TemplateSection;
+  var секцНомераИтоги          :TemplateSection;
+  var секцПоступленияЗаголовок :TemplateSection;
+  var секцПоступления          :TemplateSection;
+  var секцПоступленияИтоги     :TemplateSection;
+  var секцУчДокЗаголовок       :TemplateSection;
+  var секцУчДок                :TemplateSection;
+  var секцУчДокИтоги           :TemplateSection;
 
 
 --}}
@@ -25,6 +35,29 @@ inobject private
 
 -- 2_Обработчики событий шаблона0. --
 
+  proc шаблон_ПриСоздании(Context :Variant);
+    inherited шаблон_ПриСоздании(Context);
+  end;
+
+  proc шаблон_ПриОткрытии(Create :Logical);
+    var locCell :TemplateCell;
+    inherited шаблон_ПриОткрытии(Create);
+    locCell = фреймКнопки2.CellByField['ИзмененныеЗаписи'];
+    if locCell <> nil then
+      if (Record.ClassInfo as RecordClassInfo).MemberByName('ИзмененныеЗаписи') = nil then
+        locCell.Owner.Row[locCell.Row].Visible = false;
+      else
+        locCell.Owner.ParentFrame.Visible = true;
+        locCell.Owner.Visible = true;
+        locCell.Owner.Row[locCell.Row].Visible = true;
+      fi;
+    fi;
+  end;
+
+  proc шаблон_ПриСчитывании;
+    inherited шаблон_ПриСчитывании;
+    МодифицироватьШаблон;
+  end;
 
 -- 2_Обработчики событий клеток шаблона0. --
 
@@ -36,16 +69,23 @@ inobject private
 
   func Поле_ПриНажатии_Уточнение(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
     var локФактДатаК :Date;
+    var локОператорИмя, локОператор :String;
     if Dat(Day(UpdateDate), Mon(UpdateDate), Day(UpdateDate)) = Dat(Day(ДатаК), Mon(ДатаК), Day(ДатаК)) then
       локФактДатаК = AddSec(UpdateDate, 10);
     else
       локФактДатаК = ДатаК + 1;
     fi;
     if (Cell.Owner = секцГазеты) then
-      if (Cell.Contents = 'Введено') then
-        УчетГазет.Отчеты.блПротоколВвода_Детализация.ПоГазетам('ОРГП', 'Газеты', Газеты[Cell.Frame].ОператорИмя, Газеты[Cell.Frame].Оператор, ДатаН, локФактДатаК, RI.intBase.wsRecCreated );
-      elsif (Cell.Contents = 'Редактировано') then
-        УчетГазет.Отчеты.блПротоколВвода_Детализация.ПоГазетам('ОРГП', 'Газеты', Газеты[Cell.Frame].ОператорИмя, Газеты[Cell.Frame].Оператор, ДатаН, локФактДатаК, RI.intBase.wsRecUpdated );
+      локОператорИмя = Газеты[Cell.Frame].ОператорИмя;
+      локОператор    = Газеты[Cell.Frame].Оператор;
+      if (Cell.Contents = 'Введено') then          УчетГазет.Отчеты.блПротоколВвода_Детализация.ПоГазетам( 'ОРГП', 'Газеты', локОператорИмя, локОператор, ДатаН, локФактДатаК, wsRecCreated );
+      elsif (Cell.Contents = 'Редактировано') then УчетГазет.Отчеты.блПротоколВвода_Детализация.ПоГазетам( 'ОРГП', 'Газеты', локОператорИмя, локОператор, ДатаН, локФактДатаК, wsRecUpdated );
+      fi;
+    elsif (Cell.Owner = секцНомера) then
+      локОператорИмя = Номера[Cell.Frame].ОператорИмя;
+      локОператор    = Номера[Cell.Frame].Оператор;
+      if (Cell.Contents = 'Введено') then          УчетГазет.Отчеты.блПротоколВвода_Детализация.ПоГазетам( 'ОРГП', 'Номера', локОператорИмя, локОператор, ДатаН, локФактДатаК, wsRecCreated );
+      elsif (Cell.Contents = 'Редактировано') then УчетГазет.Отчеты.блПротоколВвода_Детализация.ПоГазетам( 'ОРГП', 'Номера', локОператорИмя, локОператор, ДатаН, локФактДатаК, wsRecUpdated );
       fi;
     fi;
   end;
@@ -55,6 +95,11 @@ inobject private
     locUpdateDate = Record.UpdateDate;
     РКП_СИС.Recs.RecordPostIfNeed(Record);
     Record.UpdateDate = locUpdateDate;
+  end;
+
+  func Поле_ПриНажатии_ИзмененныеЗаписи(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    ИзмененныеЗаписи = not ИзмененныеЗаписи;
+    МодифицироватьШаблон;
   end;
 
 
@@ -274,29 +319,32 @@ inobject private
         j = j + 1;
         Hint('Извлечение данных... [' + КорИмяКлассаЗаписей + ']', j, jj);
         cRec = Current as РКП_СИС.ЛогРабот;
-        if (SearchInArray(aRIDDeleted, cRec.RID, ,true) < 0) then
+        if not (cRec.RID in aRIDDeleted) then
           i = SearchInArray(aUserName, cRec.CreateUser, , true);
           if (i > 0) then
             cResult = Result[i] as Variant[];
             vCreateCount = cResult[3] as Integer;
             vUpdateCount = cResult[4] as Integer;
+            aRIDCreated  = cResult[5] as Integer[];
             cRID = cRec.RID;
-            aRIDUpdated = cResult[5] as Integer[];
             if not (cRID in aRIDCreated) then
               if (cRec.ActionType = wsRecCreated) and (cRec.StoredValL = false) then
                 vCreateCount = vCreateCount + 1;
                 AddInArray(aRIDCreated, cRID);
+                cResult[5] = aRIDCreated;
               fi;
             fi;
             aRIDUpdated = cResult[6] as Integer[];
-            if not (cRID in aRIDUpdated) then       --not (cRID in aRIDCreated) and
-              if (cRec.ActionType = wsRecUpdated) then
-                vUpdateCount = vUpdateCount + 1;
-                AddInArray(aRIDUpdated, cRID);
-                cResult[5] = aRIDUpdated;
+            if ИзмененныеЗаписи then
+              if not (cRID in aRIDUpdated) then
+                if (cRec.ActionType = wsRecUpdated) then
+                  vUpdateCount = vUpdateCount + 1;
+                  AddInArray(aRIDUpdated, cRID);
+                  cResult[6] = aRIDUpdated;
+                fi;
               fi;
             fi;
-            cResult = [aUserName[i] ,nil, vCreateCount, vUpdateCount, aRIDUpdated, aRIDUpdated];
+            cResult = [aUserName[i] ,nil, vCreateCount, vUpdateCount, aRIDCreated, aRIDUpdated];
             Result[i] = cResult;
           fi;
         fi;
@@ -321,11 +369,7 @@ inobject private
     AddInArray( aFlt, 'НеПолучен=false' );
     AddInArray( aFlt, 'ПринялНаХранение<>"Администратор"' );
     AddInArray( aFlt, 'ДатаПринятияНаХранение>=' + Str(ДатаН) );
-    if Dat(Day(UpdateDate), Mon(UpdateDate), Day(UpdateDate)) = Dat(Day(ДатаК), Mon(ДатаК), Day(ДатаК)) then
-      локФактДатаК = AddSec(UpdateDate, 10);
-    else
-      локФактДатаК = ДатаК + 1;
-    fi;
+    локФактДатаК = ДатаК + 1;
     AddInArray( aFlt, 'ДатаПринятияНаХранение<'  + Str(локФактДатаК) );
     with Query.Create([РКП_Газеты.НомерГазеты]) do
       OpenHint[Query.Interrupted] = true;
@@ -337,56 +381,62 @@ inobject private
       jj = Count;
       while not Eof do
         j = j + 1;
-        Hint('Извлечение данных (1)... [' + КорИмяКлассаЗаписей + ']', j, jj);
+        Hint('Извлечение данных (зарегистрированные номера)... [' + КорИмяКлассаЗаписей + ']', j, jj);
         i = SearchInArray(aUserName, Current.ПринялНаХранение, , true);
         if (i > 0) then
           cResult = Result[i] as Variant[];
           vCreateCount = cResult[3] as Integer;
+          aRIDCreated  = cResult[5] as Integer[];
           cRID = Current.DocID;
           if not (cRID in aRIDCreated) then
             vCreateCount = vCreateCount + 1;
             AddInArray(aRIDCreated, cRID);
           fi;
-          cResult = [aUserName[i],nil,vCreateCount, vUpdateCount];
+          cResult = [aUserName[i], nil, vCreateCount, vUpdateCount, aRIDCreated, nil];
           Result[i] = cResult;
         fi;
         Next;
       od;
     end;
     -- 2 Измененные - по логу
-    vFlt = ПолучитьФильтрЗапросаЛога(КорИмяКлассаЗаписей);
-    aRIDDeleted = ПолучитьУдаленныеЗаписи(vFlt, КорИмяКлассаЗаписей);
-    with Query.Create([РКП_СИС.ЛогРабот]) do
-      OpenHint[Query.Interrupted] = true;
-      Filter = vFlt;
-      Order = 'DocId-';
-      Select;
-      jj = Count;
-      j = 0;
-      while not Eof do
-        j = j + 1;
-        Hint('Извлечение данных (2)... [' + КорИмяКлассаЗаписей + ']', j, jj);
-        cRec = Current as РКП_СИС.ЛогРабот;
-        if (SearchInArray(aRIDDeleted, cRec.RID, ,true) < 0) then
-          i = SearchInArray(aUserName, cRec.CreateUser, , true);
-          if (i > 0) then
-            cResult = Result[i] as Variant[];
-            vCreateCount = cResult[3] as Integer;
-            vUpdateCount = cResult[4] as Integer;
-            cRID = cRec.RID;
-            if not (cRID in aRIDCreated) and not (cRID in aRIDUpdated) then
-              if (cRec.ActionType = wsRecUpdated) then
-                vUpdateCount = vUpdateCount + 1;
-                AddInArray(aRIDUpdated, cRID);
+    if ИзмененныеЗаписи then
+      vFlt = ПолучитьФильтрЗапросаЛога(КорИмяКлассаЗаписей);
+      aRIDDeleted = ПолучитьУдаленныеЗаписи(vFlt, КорИмяКлассаЗаписей);
+      with Query.Create([РКП_СИС.ЛогРабот]) do
+        OpenHint[Query.Interrupted] = true;
+        Filter = vFlt;
+        Order = 'DocId-';
+        Select;
+        jj = Count;
+        j = 0;
+        while not Eof do
+          j = j + 1;
+          Hint('Извлечение данных (измененные номера)... [' + КорИмяКлассаЗаписей + ']', j, jj);
+          cRec = Current as РКП_СИС.ЛогРабот;
+          if not (cRec.RID in aRIDDeleted) then
+            i = SearchInArray(aUserName, cRec.CreateUser, , true);
+            if (i > 0) then
+              cResult = Result[i] as Variant[];
+              vCreateCount = cResult[3] as Integer;
+              vUpdateCount = cResult[4] as Integer;
+              aRIDCreated  = cResult[5] as Integer[];
+              aRIDUpdated  = cResult[6] as Integer[];
+              cRID = cRec.RID;
+              if  not (cRID in aRIDUpdated) then
+                if (cRec.ActionType = wsRecUpdated) then
+                  vUpdateCount = vUpdateCount + 1;
+                  AddInArray(aRIDUpdated, cRID);
+                  cResult[6] = aRIDUpdated;
+                fi;
               fi;
+              cResult = [aUserName[i], nil, vCreateCount, vUpdateCount, aRIDCreated, aRIDUpdated];
+              Result[i] = cResult;
             fi;
-            cResult = [aUserName[i],nil,vCreateCount, vUpdateCount];
-            Result[i] = cResult;
           fi;
-        fi;
-        Next;
-      od;
-    end;
+          Next;
+        od;
+      end;
+    fi;
     Hint(' ');
   end;
 
@@ -409,7 +459,7 @@ inobject private
         j = j + 1;
         Hint('Извлечение данных... [' + КорИмяКлассаЗаписей + ']', j, jj);
         cRec = Current as РКП_СИС.ЛогРабот;
-        if (SearchInArray(aRIDDeleted, cRec.RID, ,true) < 0) then
+        if not (cRec.RID in aRIDDeleted) then
           i = SearchInArray(aUserName, cRec.CreateUser, , true);
           if (i > 0) then
             cResult = Result[i] as Variant[];
@@ -450,7 +500,7 @@ inobject private
         j = j + 1;
         Hint('Извлечение данных... [' + КорИмяКлассаЗаписей + ']', j, jj);
         cRec = Current as РКП_СИС.ЛогРабот;
-        if (SearchInArray(aRIDDeleted, cRec.RID, ,true) < 0) then
+        if not (cRec.RID in aRIDDeleted) then
           i = SearchInArray(aUserName, cRec.CreateUser, , true);
           if (i > 0) then
             cResult = Result[i] as Variant[];
@@ -497,10 +547,9 @@ inobject private
 
   func ПолучитьУдаленныеЗаписи( ОснФильтр, КорИмяКлассаЗаписей :String ) :Integer[];
     var aRslt: variant[2]; -- вспомогательная переменная для хранения результатов, возвращаемых агрегирующими функциями
-    var aIdFromLog :Integer[];
+    var aIdFromLog, aIdFromSource :Integer[];
     var rClass :Class Record;
     var i, ii :Integer;
-    var Q :Query;
     -- Получение массива DocId записей, оставивших следы в логе
     with Query.Create([РКП_СИС.ЛогРабот]) do
       Order = 'RID';
@@ -518,21 +567,133 @@ inobject private
       elsif (КорИмяКлассаЗаписей = 'ЕдиницаХранения') then rClass = FindClass( 'РКП_Газеты.ЕдиницаХранения' );
       elsif (КорИмяКлассаЗаписей = 'УчетныйДокумент') then rClass = FindClass( 'РКП_Газеты.УчетныйДокумент' );
       fi;
-      Q = Query.Create([rClass]);
-      Q.LoadingFieldsMode = mdNone;
-      Q.LoadingFields = 'DocId';
-      Q.Order = 'DocId';
-      Q.Select;
       -- Получение массива DocId записей, не найденных в источнике (удаленных)
+      with Query.Create([rClass]) do
+        Order = 'DocId';
+        Filter = 'DocId in ' + ToStr(aIdFromLog);
+        LoadingFieldsMode = mdNone;
+        LoadingFields = 'DocId';
+        aRslt = CalcAggregates('GroupBy(DocId)') as variant[2];
+        aIdFromSource = aRslt[1] as Integer[];
+        SortArray(aIdFromSource);
+      end;
+      -- Получение массива удаленных записей
       ii = LengthOfArray(aIdFromLog);
       for i = 1 .. ii do
         Hint('Исключение из отчета удаленных данных... [' + КорИмяКлассаЗаписей + ']', i, ii);
-        if not Q.Find(aIdFromLog[i]) then
+        if not aIdFromLog[i] in aIdFromSource then
           AddInArray(Result, aIdFromLog[i]);
         fi;
       od;
       Hint(' ');
       SortArray(Result);
+    fi;
+  end;
+
+  proc ЗагрузитьФреймУправление;
+    inherited ЗагрузитьФреймУправление;
+  end;
+
+  proc МодифицироватьШаблон;
+    var locWidthStd :Numeric;
+    locWidthStd = 37;
+    if ИзмененныеЗаписи then
+      --
+      секцГазетыЗаголовок      .Column[2].Width = locWidthStd;
+      секцГазетыЗаголовок      .Column[3].Width = locWidthStd;
+      секцГазетыЗаголовок      .Column[3].Visible = true;
+      секцГазеты               .Column[2].Width = locWidthStd;
+      секцГазеты               .Column[3].Width = locWidthStd;
+      секцГазеты               .Column[3].Visible = true;
+      секцГазетыИтоги          .Column[3].Width = locWidthStd - 1;
+      секцГазетыИтоги          .Column[4].Width = 1;
+      секцГазетыИтоги          .Column[5].Width = locWidthStd - 1;
+      секцГазетыИтоги          .Column[4].Visible = true;
+      секцГазетыИтоги          .Column[5].Visible = true;
+      --
+      секцНомераЗаголовок      .Column[2].Width = locWidthStd;
+      секцНомераЗаголовок      .Column[3].Width = locWidthStd;
+      секцНомераЗаголовок      .Column[3].Visible = true;
+      секцНомера               .Column[2].Width = locWidthStd;
+      секцНомера               .Column[3].Width = locWidthStd;
+      секцНомера               .Column[3].Visible = true;
+      секцНомераИтоги          .Column[3].Width = locWidthStd - 1;
+      секцНомераИтоги          .Column[4].Width = 1;
+      секцНомераИтоги          .Column[5].Width = locWidthStd - 1;
+      секцНомераИтоги          .Column[4].Visible = true;
+      секцНомераИтоги          .Column[5].Visible = true;
+      --
+      секцПоступленияЗаголовок .Column[2].Width = locWidthStd;
+      секцПоступленияЗаголовок .Column[3].Width = locWidthStd;
+      секцПоступленияЗаголовок .Column[3].Visible = true;
+      секцПоступления          .Column[2].Width = locWidthStd;
+      секцПоступления          .Column[3].Width = locWidthStd;
+      секцПоступления          .Column[3].Visible = true;
+      секцПоступленияИтоги     .Column[3].Width = locWidthStd - 1;
+      секцПоступленияИтоги     .Column[4].Width = 1;
+      секцПоступленияИтоги     .Column[5].Width = locWidthStd - 1;
+      секцПоступленияИтоги     .Column[4].Visible = true;
+      секцПоступленияИтоги     .Column[5].Visible = true;
+      --
+      секцУчДокЗаголовок       .Column[2].Width = locWidthStd;
+      секцУчДокЗаголовок       .Column[3].Width = locWidthStd;
+      секцУчДокЗаголовок       .Column[3].Visible = true;
+      секцУчДок                .Column[2].Width = locWidthStd;
+      секцУчДок                .Column[3].Width = locWidthStd;
+      секцУчДок                .Column[3].Visible = true;
+      секцУчДокИтоги           .Column[3].Width = locWidthStd - 1;
+      секцУчДокИтоги           .Column[4].Width = 1;
+      секцУчДокИтоги           .Column[5].Width = locWidthStd - 1;
+      секцУчДокИтоги           .Column[4].Visible = true;
+      секцУчДокИтоги           .Column[5].Visible = true;
+    else
+      секцГазетыЗаголовок      .Column[2].Width = locWidthStd * 2;
+      секцГазетыЗаголовок      .Column[3].Width = locWidthStd * 2;
+      секцГазетыЗаголовок      .Column[3].Visible = false;
+      секцГазеты               .Column[2].Width = locWidthStd * 2;
+      секцГазеты               .Column[3].Width = locWidthStd * 2;
+      секцГазеты               .Column[3].Visible = false;
+      секцГазетыИтоги          .Column[3].Width = (locWidthStd * 2) - 1;
+      --секцГазетыИтоги          .Column[4].Width = 1;
+      --секцГазетыИтоги          .Column[5].Width = locWidthStd - 1;
+      секцГазетыИтоги          .Column[4].Visible = false;
+      секцГазетыИтоги          .Column[5].Visible = false;
+      --
+      секцНомераЗаголовок      .Column[2].Width = locWidthStd * 2;
+      секцНомераЗаголовок      .Column[3].Width = locWidthStd * 2;
+      секцНомераЗаголовок      .Column[3].Visible = false;
+      секцНомера               .Column[2].Width = locWidthStd * 2;
+      секцНомера               .Column[3].Width = locWidthStd * 2;
+      секцНомера               .Column[3].Visible = false;
+      секцНомераИтоги          .Column[3].Width = (locWidthStd * 2) - 1;
+      --секцНомераИтоги          .Column[4].Width = 1;
+      --секцНомераИтоги          .Column[5].Width = locWidthStd - 1;
+      секцНомераИтоги          .Column[4].Visible = false;
+      секцНомераИтоги          .Column[5].Visible = false;
+      --
+      секцПоступленияЗаголовок .Column[2].Width = locWidthStd * 2;
+      секцПоступленияЗаголовок .Column[3].Width = locWidthStd * 2;
+      секцПоступленияЗаголовок .Column[3].Visible = false;
+      секцПоступления          .Column[2].Width = locWidthStd * 2;
+      секцПоступления          .Column[3].Width = locWidthStd * 2;
+      секцПоступления          .Column[3].Visible = false;
+      секцПоступленияИтоги     .Column[3].Width = (locWidthStd * 2) - 1;
+      --секцПоступленияИтоги     .Column[4].Width = 1;
+      --секцПоступленияИтоги     .Column[5].Width = locWidthStd - 1;
+      секцПоступленияИтоги     .Column[4].Visible = false;
+      секцПоступленияИтоги     .Column[5].Visible = false;
+      --
+      секцУчДокЗаголовок       .Column[2].Width = locWidthStd * 2;
+      секцУчДокЗаголовок       .Column[3].Width = locWidthStd * 2;
+      секцУчДокЗаголовок       .Column[3].Visible = false;
+      секцУчДок                .Column[2].Width = locWidthStd * 2;
+      секцУчДок                .Column[3].Width = locWidthStd * 2;
+      секцУчДок                .Column[3].Visible = false;
+      секцУчДокИтоги           .Column[3].Width = (locWidthStd * 2) - 1;
+      --секцУчДокИтоги           .Column[4].Width = 1;
+      --секцУчДокИтоги           .Column[5].Width = locWidthStd - 1;
+      секцУчДокИтоги           .Column[4].Visible = false;
+      секцУчДокИтоги           .Column[5].Visible = false;
     fi;
   end;
 
