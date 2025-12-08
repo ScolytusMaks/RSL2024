@@ -27,7 +27,7 @@
 
   struct УказательВТР array Integer title "Указатель временных тематических рубрик";
     field Рубрика :РКП_Справочники.СпрТематикаСтатьи title "Временная тем. рубрика";
-    field НомераЛГС :String title "Номера ЛГС";
+    field НомераЛГС :String(MaxStr) title "Номера ЛГС";
   end;
 
   struct Содержание array Integer title "Содержание";
