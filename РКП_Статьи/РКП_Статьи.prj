@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Project Version="1">
-  <Options Caption="Газетные статьи" Comment="Аналитическая рспись газетных статей #3" Version="001" Author="Copyright © 2008-2023 ООО &quot;Арго&quot;, Самсоненко М.А." Code="0" SubCode="0" WebCode="0" WebSubCode="0" Frontal="True"/>
+  <Options Caption="Газетные статьи" Comment="Аналитическая рспись газетных статей #4" Version="001" Author="Copyright © 2008-2023 ООО &quot;Арго&quot;, Самсоненко М.А." Code="0" SubCode="0" WebCode="0" WebSubCode="0" Frontal="True"/>
   <Usage>
     <Project Name="СИС2"/>
     <Project Name="РКП_Газеты"/>
