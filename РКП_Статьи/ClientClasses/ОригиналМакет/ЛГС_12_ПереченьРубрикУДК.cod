@@ -19,7 +19,7 @@ inclass
                 ЛГС.WriteLn("\ds2");
     Q                   = Query.Create([РКП_Справочники.СпрТематикаСтатьи]);
     Q.Filter            = "ВклОгл=true";
-    Q.Order             = "КодУДК";
+    Q.Order             = "Код";
     Q.Select;
     for k = 1..Q.Count                                                  do
       КодОгл            = Q.Current.Код;
