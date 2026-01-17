@@ -744,7 +744,7 @@ inobject private
     if (Cell.Contents = 'МестоИздания.Наим') then
       aParam[1] = ['ТипФрагмента', 0];
       aParam[2] = ['Фрагмент', Value];
-      if (МестаИздания[index].МестоИздания = nil) then
+      if (МестаИздания[index].МестоИздания <> nil) then
         aParam[3] = ['CurrentExternal', МестаИздания[index].МестоИздания];
       else
         vFindFlt  = 'Match(Наим,"' + Value + '*")';
