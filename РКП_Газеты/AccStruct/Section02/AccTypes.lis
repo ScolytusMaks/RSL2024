@@ -1,0 +1,29 @@
+﻿Domain RGB NotAccumulated, Bytrans, Closeable;
+
+  Type AccTypeIssue;
+    Visible
+    parameter Newspaper          synonym Газета          :refNewspapers = nil title "Газета";
+    parameter IssueNumber        synonym НомерВыпуска    :String = nil        title "Номер газеты";
+    parameter AcceptedForStorage synonym Зарегистрировал :String = nil        title "Принял на хранение (зарегистрировал)";
+    parameter StorageUnit        synonym ЕдиницаХранения :Unit спрЕдИзм = nil title "Единиц хранения (выпусков газет)";
+    parameter Comment            synonym Комментарий     :String = nil        title "Комментарий";
+  end;
+
+  Type AccTypeIssueStat;
+    Visible
+    parameter Newspaper           synonym Газета                   :refNewspapers = nil title "Газета";
+    parameter RegistrationYear    synonym ГодПоступления           :Integer = nil       title "Год поступления";
+    parameter PeriodicityCategory synonym КатегорияПериодичности   :Integer = nil       title "Категория периодичности";
+    parameter Quantity            synonym КоличествоВПериоде       :Integer = nil       title "Количество номеров в периоде";
+    parameter PeriodicityName     synonym Периодичность            :String = nil        title "Периодичность"; -- Наименование периодичности
+    parameter AnnualCirculation   synonym ГодовойТираж             :Unit спрЕдИзм = nil title "Годовой тираж"; -- в тысячах экз. с точностью до 1 зн.
+    parameter ReceivedsIssues     synonym НомеровПолучено          :Unit спрЕдИзм = nil title "Получено номеров с начала года"; -- в выпусках
+    parameter AverageSingleCirculation synonym СреднийРазовыйТираж :Unit спрЕдИзм = nil title "Средний разовый тираж"; -- в тысячах экз. с точностью до 1 зн.
+    --  field Тематика                  :РКП_Справочники.СпрТематика    title "Тематика";
+    --  field МестоИздания              :РКП_Справочники.СпрГеография   title "Место издания";
+    --  field ТерриторияРаспространения :РКП_Справочники.СпрТерриторияРаспространения title "Территория распространения";
+    --  field ТипИздания                :Integer                        title "Тип издания";
+    --  field Язык                      :РКП_Справочники.СпрЯзыкИздания title "Язык издания";
+    --  field ЧАЦН                      :РКП_Справочники.СпрТематика    title "Читательский адрес";
+    parameter Comment             synonym Комментарий              :String = nil        title "Комментарий";
+  end;

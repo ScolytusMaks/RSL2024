@@ -1,0 +1,29 @@
+﻿class inherited СИС2.БазовыйБланк "Параметры выполнения процедуры";
+
+inclass public
+
+  func CreateExt :УчетГазет.Запросы.блСервис_ЗаполнитьРегистратора;
+    Result = УчетГазет.Запросы.блСервис_ЗаполнитьРегистратора.Create;
+    Result.ГодПоступления = Year(today);
+    Result.ПравилаОбработки = 0;
+  end;
+
+inobject public
+
+  var ГодПоступления   :Integer;
+  var ПравилаОбработки :Integer;
+
+inobject private
+
+  func Поле_ПриОбзоре(Cell :TemplateCell; Value :Variant; var NewValue :Variant) :Logical;
+    var vYear :Integer;
+    vYear = ГодПоступления;
+    if (cmOk = РКП_СИС.Сервис.блВыборГода.ВыполнитьВыбор(vYear) ) then
+      NewValue         = vYear;
+      ГодПоступления   = vYear;
+      Template.EndEdit(true);
+    fi;
+    Return;
+  end;
+
+end

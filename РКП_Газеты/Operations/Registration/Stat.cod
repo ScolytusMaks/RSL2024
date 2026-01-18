@@ -1,0 +1,27 @@
+﻿class "Статистика годовых поступлений (регистраций) номеров газет" from РКП_Газеты.ПоступлениеГазеты;
+
+inobject private
+
+  --{ fields
+  field Газета              :refNewspapers from Газета;
+  field ГодПоступления      :Integer       from ГодПоступления;
+  field ГодовойТираж        :Numeric       from ГодовойТираж;
+  field НомеровПолучено     :Integer       from НомеровПолучено;
+  field СреднийРазовыйТираж :Numeric       from СреднийРазовыйТираж;
+  --}
+
+
+inobject public
+--
+  oper Accepted = "Статистика годового поступления номеров газет";
+    Debit NSPSTAT.AcceptedStat,
+    Newspaper                = Газета,
+    RegistrationYear         = ГодПоступления,
+    AnnualCirculation        = ГодовойТираж^Базовый.спрЕдИзм.thIssue,
+    ReceivedsIssues          = НомеровПолучено^Базовый.спрЕдИзм.Issue,
+    AverageSingleCirculation = СреднийРазовыйТираж^Базовый.спрЕдИзм.thIssue;
+  end;
+
+
+
+end

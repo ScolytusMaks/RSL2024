@@ -12,11 +12,13 @@
     <Group Name="ClientClasses" Type="Classes" Disabled="False"/>
     <Group Name="Cardfiles" Type="Cards" Disabled="False"/>
     <Group Name="FalseCardfiles" Type="Blanks" Disabled="False"/>
-    <Group Name="Blanks" Type="Blanks" Disabled="False"/>
-    <Group Name="Attachments" Type="Other" Disabled="False"/>
-    <Group Name="Help" Type="Helps" Disabled="False"/>
     <Group Name="PrintSettings" Type="Other" Disabled="False"/>
+    <Group Name="Blanks" Type="Blanks" Disabled="False"/>
+    <Group Name="Operations" Type="CalcClasses" Disabled="True"/>
+    <Group Name="AccStruct" Type="CalcStructs" Disabled="True"/>
+    <Group Name="Help" Type="Helps" Disabled="False"/>
     <Group Name="Icons" Type="Other" Disabled="False"/>
+    <Group Name="Attachments" Type="Other" Disabled="False"/>
     <Group Name="OldDocs" Type="Other" Disabled="True"/>
   </Groups>
 </Project>

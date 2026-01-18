@@ -122,6 +122,7 @@
         <Item Command="Kernel.Service.InfobaseExplorer" Caption="Проcмотр записей"/>
         <Item Caption="-"/>
         <Item Command="Infobase.РКП.ОРГП.Сервис.УдалениеНулевыхПоступлений"/>
+        <Item Command="Infobase.РКП.ОРГП.Сервис.ЗаполнитьРегистратора"/>
         <Item Command="Infobase.РКП.ОРГП.Сервис.ПересчетСтатистикаЗаГод"/>
         <Item Caption="-"/>
         <Item Command="Kernel.File.Import"/>

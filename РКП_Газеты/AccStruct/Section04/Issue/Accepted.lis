@@ -1,0 +1,19 @@
+﻿Domain RGB NotAccumulated, Bytrans, Closeable;
+
+  journal РегистрацияНомеров title "Принятые (зарегистрированные) номера газет": version2;
+    Records РКП_Газеты.НомерГазеты;
+    Card УчетГазет.картНомераЖурнал;
+    DateField ДатаПринятияНаХранение;
+    Filter 'ДатаПринятияНаХранение<>nil and isGroup=0 and not(СозданОЛГС and НеПолучен)';
+    LoadingFields Номер, Газета, ПринялНаХранение;
+    Operation Registration.Issues.Accepted;
+  end;
+
+  journal СтатистикаПоступлений title "Статистические данные о поступлении номеров газет за год": version2;
+    Records РКП_Газеты.ПоступлениеГазеты;
+    Card УчетГазет.картПоступлениеГазетЖурнал;
+    DateField ДатаУчета;
+    Filter 'ДатаУчета<>nil';
+    LoadingFields Газета,ГодПоступления,ГодовойТираж, НомеровПолучено,СреднийРазовыйТираж;
+    Operation Registration.Stat.Accepted;
+  end;

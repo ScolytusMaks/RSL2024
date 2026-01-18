@@ -61,7 +61,7 @@ inclass public
         with FltMaker.CreateExt do
           AddCondition( 'isGroup=0' );
           AddCondition( 'Газета=' + vNsp.DocIDStr );
-          AddCondition( 'Year(ДатаПринятияНаХранение) in ' + ToStr([(vYear),(vYear - 1)]) );
+          AddCondition( 'Year(ДатаПринятияНаХранение)=' + Str(vYear) );
           CompressConditionsToOne;
           AddCondition( 'not(СозданОЛГС and НеПолучен)' );
           Filter = GetFilter;
@@ -97,6 +97,10 @@ inclass public
         RecordPostIfNeed(rStat);
       fi;
     fi;
+    if (rStat.ДатаУчета = nil) and (vYear>=0) then
+      rStat.ДатаУчета = Dat(31, 12, vYear);
+      RecordPostIfNeed(rStat);
+    fi;
   end;
 
   func ПолучитьЗаписьСтат(vNsp :РКП_Газеты.Газета; vYear :Integer) :РКП_Газеты.ПоступлениеГазеты;
@@ -108,6 +112,7 @@ inclass public
       rStat = РКП_Газеты.ПоступлениеГазеты.Create;
       rStat.Газета = vNsp;
       rStat.ГодПоступления = vYear;
+      rStat.ДатаУчета = Dat(31, 12, vYear);
       rStat.Post;
       Return rStat;
     fi;

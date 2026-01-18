@@ -1,0 +1,61 @@
+﻿class inherited СИС2.БазовыйБланк "Принятые номера без сведения о регистраторе";
+
+inclass
+
+inobject public
+
+  var ReferrerForm :УчетГазет.Запросы.блСервис_ЗаполнитьРегистратора;
+
+inobject private
+
+  ДатаНачалаПериода :Date;
+  ДатаКонцаПериода  :Date;
+  Номер             :РКП_Газеты.НомерГазеты[];
+  Всего             :Integer = LengthOfArray(Номер);
+  секцНомера        :TemplateSection;
+
+  proc Blank_OnOpen(Create :Logical);
+    UpdateReport;
+  end;
+
+  func Cells_OnClick(Cell :TemplateCell; Action :Template.ClickTypes) :Logical;
+    if (Action = Template.ButtonPressed) then
+      if (Cell.Contents = 'Номер') and (Action = Template.ButtonPressed) then
+        УчетГазет.редГазета.ShowFormEx(Номер[Cell.Frame].Газета);
+      elsif (Cell.Contents = 'Номер.Номер') and (Action = Template.ButtonPressed) then
+        УчетГазет.редНомерГазеты.ShowFormEx(Номер[Cell.Frame]);
+      fi;
+    fi;
+  end;
+
+  proc ПостроитьОтчет(Sender :Button);
+    UpdateReport;
+  end;
+
+  proc UpdateReport;
+    var aFlt :String[];
+    if (ReferrerForm <> nil) and (ReferrerForm.ГодПоступления >= 1917) then
+      ДатаНачалаПериода = Dat(1, 1, ReferrerForm.ГодПоступления);
+      ДатаКонцаПериода  = Dat(31, 12, ReferrerForm.ГодПоступления);
+      Номер = nil;
+      with Query.Create([РКП_Газеты.НомерГазеты]) do
+        СИС2.Функции.AddInArray( aFlt, 'isGroup=0' );
+        СИС2.Функции.AddInArray( aFlt, 'ДатаПринятияНаХранение<>nil' );
+        СИС2.Функции.AddInArray( aFlt, 'ДатаПринятияНаХранение<=' + Str(ДатаКонцаПериода) );
+        СИС2.Функции.AddInArray( aFlt, 'ДатаПринятияНаХранение>=' + Str(ДатаНачалаПериода) );
+        СИС2.Функции.AddInArray( aFlt, 'not(СозданОЛГС and НеПолучен)' );
+        СИС2.Функции.AddInArray( aFlt, 'ПринялНаХранение=nil' );
+        Filter = СИС2.СтроковыеФункции.СложитьСтрокиФильтраПоИ(aFlt);
+        Order = 'Газета.НазваниеОсн;Номер';
+        Select;
+        while not Eof do
+          СИС2.Функции.AddInArray(Номер, Current);
+          Next;
+        od;
+      end;
+      секцНомера.FramesCount = Всего;
+    fi;
+  end;
+
+
+end

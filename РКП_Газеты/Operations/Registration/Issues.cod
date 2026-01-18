@@ -1,0 +1,25 @@
+﻿class "Принятые (зарегистрированные) номера газет" from РКП_Газеты.НомерГазеты;
+
+inobject private
+
+  --{ fields
+  field Номер            :String             from Номер;
+  field Газета           :refNewspapers      from Газета;
+  field ПринялНаХранение :String             from ПринялНаХранение;
+  --}
+
+
+inobject public
+--
+  oper Accepted = "Принятые (зарегистрированные) номера газет";
+    Debit NSPSTAT.AcceptedIssue,
+    Newspaper          = Газета,
+    IssueNumber        = Номер,
+    StorageUnit        = 1^Базовый.спрЕдИзм.Issue,
+    AcceptedForStorage = ПринялНаХранение,
+    Comment         = Номер;
+  end;
+
+
+
+end

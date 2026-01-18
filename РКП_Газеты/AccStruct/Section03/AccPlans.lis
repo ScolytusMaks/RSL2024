@@ -1,0 +1,5 @@
+﻿Domain RGB NotAccumulated, Bytrans, Closeable;
+  accounts NSPSTAT;
+  acc AcceptedIssue: AccTypeIssue title "Принятые (зарегистрированные) номера";
+  acc AcceptedStat : AccTypeIssueStat title "Готовая статистика поступлений";
+end;

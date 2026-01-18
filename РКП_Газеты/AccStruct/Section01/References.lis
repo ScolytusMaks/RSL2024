@@ -1,0 +1,18 @@
+﻿  extends reference спрЕдИзм;
+    necessary Issue;thIssue;
+  end;
+
+  Reference refNewspapers, from РКП_Газеты.Газета, card УчетГазет.картГазеты, title 'Газеты';
+    field Name synonym Code :String,             from ExtId;
+    field Description       :String, notrefresh, from НазваниеОсн;
+  end;
+
+  --Reference refIssue, from РКП_Газеты.НомерГазеты, card УчетГазет.картНомера, title 'Номера';
+  --  field Name synonym Code      :String,             from ExtId;
+  --  field Description            :String, notrefresh, from Номер;
+  --  field Newspaper              :refNewspapers,      from Газета;
+  --  field GroupFunction          :Integer,            from ФункцияГруппы;
+  --  field NotReceived            :Logical,            from НеПолучен;
+  --  field AcceptedForStorage     :String,             from ПринялНаХранение;
+  --  field AcceptedForStorageDate :Date                from ДатаПринятияНаХранение;
+  --end;

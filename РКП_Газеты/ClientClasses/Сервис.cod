@@ -511,6 +511,8 @@ inclass
     var cRes, vFlt :String;
     var aRes :String[];
     var i, j, jj :Integer;
+    var arDocId :Integer[];
+    var QDel :Query;
     if not (FullAccess) then -- условие выполнения по правам доступа
       Message('Выполнение этой процедуры доступно только пользователям с правами администратора!');
     else
@@ -552,11 +554,103 @@ inclass
           РКП_Газеты.RI.ВыпускГазеты.ОбновитьСтатистику(rNsp, Int(ExtractValue(cRes, 2, '#')), РКП_Газеты.RI.Газета.опОбновитьКэшСтатАн );
           РКП_Газеты.RI.ПоступлениеГазеты.ОбновитьСтатистику(rNsp, vYearIn, РКП_Газеты.RI.Газета.опОбновитьКэшСтатАн );
         od;
+        --- Обратная проверка: ненулевая статистика есть, а введенных номеров - нет
+        with Query.Create([РКП_Газеты.ПоступлениеГазеты]) do
+          Filter = 'ГодПоступления=' + Str(vYearIn);
+          Select;
+          jj = Count;
+          while not Eof do
+            j = j + 1;
+            Hint('Выполнение обратной проверки...', j, jj);
+            if not ЕстьМатериалДляСтатистикиПоступлений(Current.Газета, vYearIn) then
+              AddInArray(arDocId, Current.DocId);
+            fi;
+            Next;
+          od;
+        end;
+        ---
+        QDel = Query.Create([РКП_Газеты.ПоступлениеГазеты]);
+        QDel.Filter = 'DocId in ' + ToStr(arDocId);
+        QDel.Select;
+        Recs.DeleteAllRecords(QDel);
         ---
         Message('Выполнение завершено.');
       fi;
     fi;
   end;
+
+inclass private
+
+  func ЕстьМатериалДляСтатистикиПоступлений(vNsp :РКП_Газеты.Газета; vYearIn :Integer) :Logical;
+    var vFlt :String;
+    with Query.Create([РКП_Газеты.НомерГазеты]) do
+      with FltMaker.CreateExt do
+        AddCondition( 'Газета=' + vNsp.DocIDStr );
+        AddCondition( 'isGroup=0' );
+        AddCondition( 'Year(ДатаПринятияНаХранение)=' + Str(vYearIn) );
+        CompressConditionsToOne;
+        AddCondition( 'not(СозданОЛГС and НеПолучен)' );
+        vFlt = GetFilter;
+        Filter = vFlt;
+      end;
+      Result = RecordsExists;
+    end;
+  end;
+
+inclass public
+
+  proc ЗаполнитьРегистратора;
+    var локФорма :УчетГазет.Запросы.блСервис_ЗаполнитьРегистратора;
+    var локОтчет :УчетГазет.Отчеты.блНомераБезРегистратора;
+    var локДатаНачалаПериода, локДатаКонцаПериода :Date;
+    var aFlt :String[];
+    var arDocId :Integer[];
+    локФорма  = УчетГазет.Запросы.блСервис_ЗаполнитьРегистратора.CreateExt;
+    if CmOk = локФорма.Show(Window.ModalWindow) then
+      if (локФорма.ПравилаОбработки = 0) then
+        локОтчет = УчетГазет.Отчеты.блНомераБезРегистратора.Create;
+        локОтчет.ReferrerForm = локФорма;
+        локОтчет.ShowEx;
+      elsif (локФорма.ПравилаОбработки in [1,2]) and (локФорма.ГодПоступления >= 1917) then
+        локДатаНачалаПериода = Dat(1, 1, локФорма.ГодПоступления);
+        локДатаКонцаПериода  = Dat(31, 12, локФорма.ГодПоступления);
+        with Query.Create([РКП_Газеты.НомерГазеты]) do
+          СИС2.Функции.AddInArray( aFlt, 'isGroup=0' );
+          СИС2.Функции.AddInArray( aFlt, 'ДатаПринятияНаХранение<>nil' );
+          СИС2.Функции.AddInArray( aFlt, 'ДатаПринятияНаХранение<=' + Str(локДатаКонцаПериода) );
+          СИС2.Функции.AddInArray( aFlt, 'ДатаПринятияНаХранение>=' + Str(локДатаНачалаПериода) );
+          СИС2.Функции.AddInArray( aFlt, 'not(СозданОЛГС and НеПолучен)' );
+          СИС2.Функции.AddInArray( aFlt, 'ПринялНаХранение=nil' );
+          Filter = СИС2.СтроковыеФункции.СложитьСтрокиФильтраПоИ(aFlt);
+          Order = 'Газета.НазваниеОсн;Номер';
+          Select;
+          while not Eof do
+            СИС2.Функции.AddInArray(arDocId, Current.DocId);
+            Next;
+          od;
+        end;
+        with Query.Create([РКП_Газеты.НомерГазеты]) do
+          Filter = 'DocId in ' + ToStr(arDocId);
+          Select;
+          BeginTransaction([РКП_Газеты.НомерГазеты]);
+          while not Eof do
+            СИС2.Функции.AddInArray(arDocId, Current.DocId);
+            if (локФорма.ПравилаОбработки = 1) then
+              Current.ПринялНаХранение = Current.UpdateUser;
+            elsif (локФорма.ПравилаОбработки = 1) then
+              Current.ПринялНаХранение = Current.CreateUser;
+            fi;
+            СИС2.ФункцииДокумента.RecordPostIfNeed(Current);
+            Next;
+          od;
+          EndTransaction;
+        end;
+      fi;
+    fi;
+  end;
+
+
+
 
 
 end

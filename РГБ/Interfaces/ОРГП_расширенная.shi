@@ -80,6 +80,8 @@
         <Item Command="Kernel.Service.Administration"/>
         <Item Caption="-"/>
         <Item Command="Infobase.РКП.ОРГП.Сервис.УдалениеНулевыхПоступлений"/>
+        <Item Command="Infobase.РКП.ОРГП.Сервис.ЗаполнитьРегистратора"/>
+        <Item Command="Infobase.РКП.ОРГП.Сервис.ПересчетСтатистикаЗаГод"/>
         <Item Caption="-"/>
         <Item Command="Kernel.Service.ImportRec"/>
         <Item Command="Kernel.Service.ExportRec"/>
