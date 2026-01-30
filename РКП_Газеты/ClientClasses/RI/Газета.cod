@@ -335,7 +335,7 @@ inclass public
     end;
     -- поступление
     with Query.Create([РКП_Газеты.ПоступлениеГазеты]) do
-      Filter = 'not ИзмененияЗапрещены and Газета=' + vNsp.DocIDStr + ' and ГодПоступления=' + Str(Year(Today));
+      Filter = 'not ИзмененияЗапрещены and Газета=' + vNsp.DocIDStr + ' and ГодПоступления>=' + Str(Year(Today) - 1);  --Изменению подлежат не закрытые от редактирования записи, которые, кроме того, описывают только текущий ИЛИ предыдущий год
       Select;
       while not Eof do
         rStatIn = Current as РКП_Газеты.ПоступлениеГазеты;

@@ -290,22 +290,25 @@ inobject private
         Газета.Тематики.Add;
       end;
       if Справ[k]<>nil                          then
-      Газета.Тематики.Items[1].Тематика         = Справ[k];
-      end;
+        Газета.Тематики.Items[1].Тематика = Справ[k];
+        РКП_СИС.Recs.RecordModify(Газета);
+      fi;
     elsif НомерРежима                   =11     then
       if Газета.ЧАЦН.Count = 0                  then
         Газета.ЧАЦН.Add;
       end;
       if Справ[k]<>nil                          then
-      Газета.ЧАЦН.Items[1].ЧАЦН                 = Справ[k];
-      end;
+        Газета.ЧАЦН.Items[1].ЧАЦН = Справ[k];
+        РКП_СИС.Recs.RecordModify(Газета);
+      fi;
     elsif НомерРежима                   =12     then
       if Газета.Языки.Count = 0                 then
         Газета.Языки.Add;
       end;
       if Справ[k]<>nil                          then
-      Газета.Языки.Items[1].Язык                 = Справ[k];
-      end;
+        Газета.Языки.Items[1].Язык = Справ[k];
+        РКП_СИС.Recs.RecordModify(Газета);
+      fi;
     elsif НомерРежима                   =13     then
       Газета.Периодичность              = ЗначениеПоказателя[k];
       Газета.КатегорияПериодичности     = РКП_Справочники.BiblioRecord.PeriodicityCategory(ЗначениеПоказателя[k]);
