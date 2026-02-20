@@ -124,6 +124,7 @@
         <Item Command="Infobase.РКП.ОРГП.Сервис.УдалениеНулевыхПоступлений"/>
         <Item Command="Infobase.РКП.ОРГП.Сервис.ЗаполнитьРегистратора"/>
         <Item Command="Infobase.РКП.ОРГП.Сервис.ПересчетСтатистикаЗаГод"/>
+		<Item Command="Infobase.РКП.ОРГП.Сервис.ТипИзданияГазета"/>
         <Item Caption="-"/>
         <Item Command="Kernel.File.Import"/>
         <Item Command="Kernel.File.Export"/>
