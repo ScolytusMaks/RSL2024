@@ -656,12 +656,11 @@ inclass public
     var i, ii, vLastMdf :Integer;
     var vLastIss :РКП_Газеты.НомерГазеты;
     var vHistory :РКП_Газеты.ИсторияГазеты;
+    var vRecordsExists :Logical;
     ClearTrace;
     -- создание массива записей для изменения
     with Query.Create([РКП_Газеты.Газета]) do
       Filter = 'ТипИздания=1';
-      LoadingFieldsMode = СИС2.Константы.mdNone;
-      PacketSize = 100;
       Select;
       ii = Count;
       while not Eof do
@@ -674,23 +673,28 @@ inclass public
     Hint(' ');
     -- Изменение записей
     i = 0;
-    Trace('Замена категории издания: "МПГ" -> "Газета"');
-    Trace('Дата: ' + Str(Now));
-    Trace('');
+    Trace( 'Замена категории издания: "МПГ" -> "Газета"' );
+    Trace( 'Дата: ' + Str(Now) );
+    Trace( '' );
+    Trace( RepStr('=', 50) );
+    Trace( '' );
+    ii = LengthOfArray(arNsp);
     for i = 1 .. ii do
       Hint('Внесение изменений : ' + Str(i) + ' из ' + Str(ii), i, ii);
       arNsp[i].ТипИздания = 0;
       RecordPostIfNeed(arNsp[i]);
       vLastIss = Стат.ПоследнийВыпущенныйНомер(arNsp[i]);
-      vLastMdf = ПоследнееИзменениеТипГазеты(arNsp[i]);
-      vHistory = РКП_Газеты.ИсторияГазеты.Create;
-      vHistory.Газета            = arNsp[i];
-      vHistory.НомерПоля         = 8;
-      vHistory.НомерИзменений    = vLastMdf + 1;
-      vHistory.СНомера           = vLastIss;
-      vHistory.Значение          = 'Газета';
-      vHistory.ТипИздания        = 0;
-      vHistory.Post;
+      vLastMdf = ПоследнееИзменениеТипГазеты(arNsp[i], vRecordsExists);
+      if vRecordsExists then
+        vHistory = РКП_Газеты.ИсторияГазеты.Create;
+        vHistory.Газета            = arNsp[i];
+        vHistory.НомерПоля         = 8;
+        vHistory.НомерИзменений    = vLastMdf + 1;
+        vHistory.СНомера           = vLastIss;
+        vHistory.Значение          = 'Газета';
+        vHistory.ТипИздания        = 0;
+        vHistory.Post;
+      fi;
       if (vLastIss <> nil) then
         if (Year(vLastIss.ДатаПринятияНаХранение) = Year(Today)) then
           РКП_Газеты.RI.ПоступлениеГазеты.ОбновитьСтатистику(arNsp[i], Year(vLastIss.ДатаПринятияНаХранение), РКП_Газеты.RI.Газета.опОбновитьКэшСтатАн );
@@ -704,19 +708,40 @@ inclass public
         Trace( arNsp[i].НазваниеОсн + ' (без номеров)' );
       fi;
     od;
-    Trace('');
+    Trace( '' );
+    Trace( RepStr('=', 50) );
+    Trace( '' );
     Trace('Всего обработано изданий: ' + Chr(09) + Chr(09) + Str(ii));
   end;
 
 inclass private
 
-  func ПоследнееИзменениеТипГазеты(Nsp :РКП_Газеты.Газета) :Integer;
+  func ПоследнееИзменениеТипГазеты(Nsp :РКП_Газеты.Газета; var vRecordsExists :Logical) :Integer;
+    var vFirstIss :РКП_Газеты.НомерГазеты;
+    var vHistory :РКП_Газеты.ИсторияГазеты;
     with Query.Create([РКП_Газеты.ИсторияГазеты]) do
       Filter = 'НомерПоля=8 and Газета=' + Nsp.DocIDStr;
       Order = 'НомерИзменений-';
       Select;
-      if RecordsExists then
+      vRecordsExists = RecordsExists;
+      if vRecordsExists then
+        Current.Значение   = 'МПГ';
+        Current.ТипИздания = 1;
+        СИС2.ФункцииДокумента.RecordPostIfNeed(Current);
         Return Current.НомерИзменений;
+      else
+        vFirstIss = Стат.ПервыйВыпущенныйНомер(Nsp);
+        if (vFirstIss <> nil) then
+          vHistory = РКП_Газеты.ИсторияГазеты.Create;
+          vHistory.Газета            = Nsp;
+          vHistory.НомерПоля         = 8;
+          vHistory.НомерИзменений    = 1;
+          vHistory.СНомера           = vFirstIss;
+          vHistory.Значение          = 'МПГ';
+          vHistory.ТипИздания        = 1;
+          vHistory.Post;
+          Return ПоследнееИзменениеТипГазеты(Nsp, vRecordsExists);
+        fi;
       fi;
     end;
   end;
