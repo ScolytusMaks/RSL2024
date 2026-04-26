@@ -190,11 +190,12 @@ inobject private
 
   func ПолучитьВыборку(aUserName :String[]; КорИмяКлассаЗаписей :String ) :Variant[2];  --[[vActionDate, nil, vCreateCount]]
     var vActionDate  :Date;
-    var vCreateCount, i :Integer;
+    var vCreateCount, i, d :Integer;
     var cResult :Variant[];
     var cRec :РКП_СИС.ЛогРабот;
     var rNsp :РКП_Газеты.Газета;
     if (Self.UserName <> nil) then
+      -- алгоритм извлечения данных по логу
       with Query.Create([РКП_СИС.ЛогРабот]) do
         Filter = ПолучитьФильтрЗапросаЛога(КорИмяКлассаЗаписей);
         Select;
@@ -216,8 +217,9 @@ inobject private
             fi;
           elsif (КорИмяКлассаЗаписей = 'НомерГазеты') then -- только "принятые номера"
             if (cRec.ActionType = wsAccepted) then
-              vCreateCount = (cResult[3] as Integer) + 1;
-              Result[i] = [vActionDate, 0, vCreateCount];
+              --vCreateCount = (cResult[3] as Integer) + 1;
+              --Result[i] = [vActionDate, 0, vCreateCount];
+              Result[i] = [vActionDate, 0, 0];
             fi;
           elsif (КорИмяКлассаЗаписей = 'ЕдиницаХранения') then -- только "подшитые" в учетный документ
             if (cRec.ActionType = wsAccepted) then
@@ -234,8 +236,31 @@ inobject private
         od;
       end;
       SortArray(Result, [1]);
+      -- "принятые номера" по алгоритму справки о пополнении БД
+      if (КорИмяКлассаЗаписей = 'НомерГазеты') then
+        for  d = 1 .. LengthOfArray(Result) do -- цикл по дням
+          cResult = Result[d];
+          cResult[3] = ПолучитьВыборку_Номеров(cResult[1] as Date);
+          Result[d] = cResult;
+        od;
+      fi;
     fi;
   end;
+
+  -- выборка зарегистрированных номеров по алгоритму справки о пополнении БД
+  func ПолучитьВыборку_Номеров(ДатаЗапроса :Date) :Integer;
+    var aFlt :String[];
+    AddInArray( aFlt, 'Газета<>nil' );
+    AddInArray( aFlt, 'ФункцияГруппы=0' );
+    AddInArray( aFlt, 'НеПолучен=false' );
+    AddInArray( aFlt, 'ПринялНаХранение="' + Self.UserName + '"' );
+    AddInArray( aFlt, 'ДатаПринятияНаХранение=' + Str(ДатаЗапроса) );
+    with Query.Create([РКП_Газеты.НомерГазеты]) do
+      Filter = MakeFilter( aFlt );
+      Return Count;
+    end;
+  end;
+
 
   proc ПроставитьНомераСмен(var aResult :Variant[2]; aWorkShift :Variant[2]);
     --var aWorkShift :Variant[2]; -- номера смен [[vDate, vNumber]]

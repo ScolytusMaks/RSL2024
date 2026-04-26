@@ -102,24 +102,24 @@ inclass public
 
   func ПринятоНомеровЗаСмену(Оператор :String; ДатаСмены :Date) :Integer;
     var aFlt :String[];
-    AddInArray( aFlt, 'RClass="РКП_Газеты.НомерГазеты"' );
-    AddInArray( aFlt, 'CreateUser="' + Оператор + '"' );
-    AddInArray( aFlt, 'CreateDate>=' +  Str(ДатаСмены) );
-    AddInArray( aFlt, 'CreateDate<' +  Str(ДатаСмены + 1) );
-    AddInArray( aFlt, 'ActionType=' + Str(RI.intBase.wsAccepted) );
-    with Query.Create([РКП_СИС.ЛогРабот]) do
-      Filter = MakeFilter(aFlt);
-      Return Count;
-    end;
-    --AddInArray( aFlt, 'ФункцияГруппы=0' );
-    --AddInArray( aFlt, 'not НеПолучен' );
-    --AddInArray( aFlt, 'ПринялНаХранение="' + Оператор + '"' );
-    --AddInArray( aFlt, 'ДатаПринятияНаХранение>=' + Str(ДатаСмены) );
-    --AddInArray( aFlt, 'ДатаПринятияНаХранение<' + Str(ДатаСмены + 1) );
-    --with Query.Create([РКП_Газеты.НомерГазеты]) do
+    --AddInArray( aFlt, 'RClass="РКП_Газеты.НомерГазеты"' );
+    --AddInArray( aFlt, 'CreateUser="' + Оператор + '"' );
+    --AddInArray( aFlt, 'CreateDate>=' +  Str(ДатаСмены) );
+    --AddInArray( aFlt, 'CreateDate<' +  Str(ДатаСмены + 1) );
+    --AddInArray( aFlt, 'ActionType=' + Str(RI.intBase.wsAccepted) );
+    --with Query.Create([РКП_СИС.ЛогРабот]) do
     --  Filter = MakeFilter(aFlt);
     --  Return Count;
     --end;
+    AddInArray( aFlt, 'ФункцияГруппы=0' );
+    AddInArray( aFlt, 'not НеПолучен' );
+    AddInArray( aFlt, 'ПринялНаХранение="' + Оператор + '"' );
+    AddInArray( aFlt, 'ДатаПринятияНаХранение>=' + Str(ДатаСмены) );
+    AddInArray( aFlt, 'ДатаПринятияНаХранение<' + Str(ДатаСмены + 1) );
+    with Query.Create([РКП_Газеты.НомерГазеты]) do
+      Filter = MakeFilter(aFlt);
+      Return Count;
+    end;
   end;
 
   func ПринятоНомеровЗаПериод(Оператор :String; ДатаНачала :Date; ДатаОкончания :Date) :Integer; -- (включительно)
