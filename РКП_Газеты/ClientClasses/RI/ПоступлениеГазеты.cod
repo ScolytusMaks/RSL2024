@@ -29,11 +29,11 @@ inclass public
   end;
 
   func БланкРедакторПоУмолчанию: Class BlankForm;
-    Result = nil;
+    Result = УчетГазет.редПоступлениеГазеты;
   end;
 
   func КартотекаПоУмолчанию: Class CardForm;
-    Result = nil;
+    Result = УчетГазет.картПоступлениеГазет;
   end;
 
 inobject public

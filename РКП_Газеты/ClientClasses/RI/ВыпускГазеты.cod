@@ -4,6 +4,9 @@ import РКП_СИС Classes Functions, Recs;
 
 inclass public
 
+  var ИмяПоляНеПрименяется :String = 'Газета.Прекращено';
+  var ИмяПоляНаим          :String = 'Газета.НазваниеОсн';
+
   func СвязанныйКлассЗаписей: Class СИС2.Базовая.БазоваяЗапись;
     Result = РКП_Газеты.ВыпускГазеты;
   end;
@@ -29,11 +32,11 @@ inclass public
   end;
 
   func БланкРедакторПоУмолчанию: Class BlankForm;
-    Result = nil;
+    Result = УчетГазет.редВыпускГазеты;
   end;
 
   func КартотекаПоУмолчанию: Class CardForm;
-    Result = nil;
+    Result = УчетГазет.картВыпускГазет;
   end;
 
 inobject public
