@@ -1,0 +1,356 @@
+﻿extends РКП_Справочники.RI.Справочники.География;
+import РКП_СИС Classes StringsFunctions;
+
+ inclass public
+
+  var СохранятьИОтменятьВТранзакции :Logical := true;
+
+
+  proc ИнициализироватьИнтерфейс synonym InitInterface;
+    var локМетод : MethodInfo;
+    var локПолнИмя : string;
+    inherited InitInterface;
+    локПолнИмя = "РКП_Справочники.RI.Справочники.География.ПроверкаДоУдаления";
+    локМетод = СИС2.ФункцииРТТИ.ПолучитьИнфоМетодаПоПолномуИмениМетода(локПолнИмя);
+    СобытиеПередУдалением.AddMethod(локМетод);
+  end;
+
+ inclass private
+
+  func ПроверкаДоУдаления(локПарам :Variant[]) :Logical;
+    var vDelRec :РКП_Справочники.спрГеография;
+    var vCountNsp, MinYear, MaxYear, vCount:Integer;
+    var vFlt :String;
+    var vNsp :РКП_Газеты.Газета;
+    var arNsp :РКП_Газеты.Газета[];
+    var vEdtAddress :РКП_Справочники.спрРедакция;
+    var arAgrResult :Variant[2];
+    var Q :Query;
+    var vGeoName :String;
+    vDelRec = локПарам[2] as РКП_Справочники.спрГеография;
+    if (vDelRec <> nil) then
+      vGeoName = MaskChar(Trim(vDelRec.Наим), '"');
+      -- проверка реестра изданий
+      vFlt = 'МестаИздания.Exists(МестоИздания=' + vDelRec.DocIDStr + ')';
+      vNsp = РКП_СИС.Recs.FindRecordExt(РКП_Газеты.Газета, vFlt, , vCountNsp) as РКП_Газеты.Газета;
+      if vCountNsp = 1 then
+        Message('Удаление невозможно: ссылка на удаляемую запись ' + vGeoName + br +
+                'содержится в описании издания ' + MaskChar(Trim(vNsp.НазваниеОсн), '"') + '.');
+        Return;
+      elsif vCountNsp > 1 then
+        Message('Удаление невозможно: ссылка на удаляемую запись ' + vGeoName + br +
+                'содержится в описании нескольких изданий' + br +
+                '(кол-во изданий: ' + Str(vCountNsp) + ')');
+        Return;
+      fi;
+      -- безусловное удаление стат. записей выпуска газеты по годам с неопределенным изданием
+      Q = Query.Create([РКП_Газеты.ВыпускГазеты]);
+      Q.Filter = 'Газета=nil and МестоИздания=' + vDelRec.DocIDStr;
+      Q.Select;
+      vCount = Q.Count;
+      if (vCount > 0) then
+        try
+          РКП_СИС.Recs.DeleteAllRecords(Q);
+          Message('Удалено записей статистики выпусков по годам с местом издания ' +vGeoName + ': ' + Str(vCount) + '.' + br +
+                  'Эти записи не содержали сведений о газете.');
+        except
+          Message('Не удалось удалить одну или несколько записей статистики выпусков по годам с местом издания ' + vGeoName + ',' + br +
+                  'но без сведений о газете.');
+        end;
+      fi;
+      -- проверка стат. записей выпуска газеты по годам
+      with Query.Create([РКП_Газеты.ВыпускГазеты]) do
+        Filter = 'МестоИздания=' + vDelRec.DocIDStr;
+        Order = 'Газета,ГодВыпуска';
+        arAgrResult = CalcAggregates('GroupBy(Газета)') as Variant[2];
+        arNsp = arAgrResult[1] as РКП_Газеты.Газета[];
+        vCountNsp = LengthOfArray(arNsp);
+        if vCountNsp = 1 then
+          vNsp = arNsp[1];
+          MinYear = CalcAggregates('Min(ГодВыпуска)') as Integer;
+          MaxYear = CalcAggregates('Max(ГодВыпуска)') as Integer;
+          if (MinYear = MaxYear) then
+            Message('Удаление невозможно: ссылка на удаляемую запись ' + vGeoName + br +
+                    'содержится в данных статистики выпусков издания ' + MaskChar(Trim(vNsp.НазваниеОсн), '"') + br +
+                    'за ' + Str(MinYear) + ' г.');
+            Return;
+          else
+            Message('Удаление невозможно: ссылка на удаляемую запись ' + vGeoName + br +
+                    'содержится в данных статистики выпусков издания ' + MaskChar(Trim(vNsp.НазваниеОсн), '"') + br +
+                    'за ' + Str(MinYear) + '-' + Str(MaxYear) + ' гг.');
+            Return;
+          fi;
+          Return;
+        elsif vCountNsp > 1 then
+          Message('Удаление невозможно: ссылка на удаляемую запись ' + vGeoName + br +
+                  'содержится в данных статистики выпусков нескольких изданий' + br +
+                  '(кол-во изданий: ' + Str(vCountNsp) + ')');
+          Return;
+        fi;
+      end;
+      -- безусловное удаление стат. записей выпуска газеты по годам с неопределенным изданием
+      Q = Query.Create([РКП_Газеты.ПоступлениеГазеты]);
+      Q.Filter = 'Газета=nil and МестоИздания=' + vDelRec.DocIDStr;
+      Q.Select;
+      vCount = Q.Count;
+      if (vCount > 0) then
+        try
+          РКП_СИС.Recs.DeleteAllRecords(Q);
+          Message('Удалено записей статистики поступлений по годам с местом издания ' + vGeoName + ': ' + Str(vCount) + '.' + br +
+                  'Эти записи не содержали сведений о газете.');
+        except
+          Message('Не удалось удалить одну или несколько записей статистики поступлений по годам с местом издания ' + vGeoName + ',' + br +
+                  'но без сведений о газете.');
+        end;
+      fi;
+      -- проверка стат. записей поступлений газеты по годам
+      with Query.Create([РКП_Газеты.ПоступлениеГазеты]) do
+        Filter = 'МестоИздания=' + vDelRec.DocIDStr;
+        Order = 'Газета,ГодПоступления';
+        arAgrResult = CalcAggregates('GroupBy(Газета)') as Variant[2];
+        arNsp = arAgrResult[1] as РКП_Газеты.Газета[];
+        vCountNsp = LengthOfArray(arNsp);
+        if vCountNsp = 1 then
+          vNsp = arNsp[1];
+          MinYear = CalcAggregates('Min(ГодПоступления)') as Integer;
+          MaxYear = CalcAggregates('Max(ГодПоступления)') as Integer;
+          if (MinYear = MaxYear) then
+            Message('Удаление невозможно: ссылка на удаляемую запись ' + vGeoName + br +
+                    'содержится в данных статистики поступлений издания ' + MaskChar(Trim(vNsp.НазваниеОсн), '"') + br +
+                    'за ' + Str(MinYear) + ' г.');
+            Return;
+          else
+            Message('Удаление невозможно: ссылка на удаляемую запись ' + vGeoName + br +
+                    'содержится в данных статистики поступлений издания ' + MaskChar(Trim(vNsp.НазваниеОсн), '"') + br +
+                    'за ' + Str(MinYear) + '-' + Str(MaxYear) + ' гг.');
+            Return;
+          fi;
+          Return;
+        elsif vCountNsp > 1 then
+          Message('Удаление невозможно: ссылка на удаляемую запись ' + vGeoName + br +
+                  'содержится в данных статистики поступлений нескольких изданий' + br +
+                  '(кол-во изданий: ' + Str(vCountNsp) + ')');
+          Return;
+        fi;
+      end;
+      -- проверка справочника редакций
+      vFlt = 'НаселенныйПункт=' + vDelRec.DocIDStr;
+      vEdtAddress = РКП_СИС.Recs.FindRecordExt(РКП_Справочники.спрРедакция, vFlt, , vCount) as РКП_Справочники.спрРедакция;
+      if vCount = 1 then
+        Message('Удаление невозможно: ссылка на удаляемую запись ' + vGeoName + br +
+                'содержится в описании адреса редакции ' + MaskChar(Trim(vEdtAddress.Наим), '"') + '.');
+        Return;
+      elsif vCount > 1 then
+        Message('Удаление невозможно: ссылка на удаляемую запись ' + vGeoName + br +
+                'содержится в описании нескольких адресов редакций' + br +
+                '(кол-во: ' + Str(vCount) + ')');
+        Return;
+      fi;
+      -- удаление истории газеты со ссылкой на удаляемую запись, если код удалось выполнить до этого места
+      Q = Query.Create([РКП_Газеты.ИсторияГазеты]);
+      Q.Filter = 'Справ=' + vDelRec.DocIDStr;
+      Q.Select;
+      vCount = Q.Count;
+      if (vCount > 0) then
+        try
+          РКП_СИС.Recs.DeleteAllRecords(Q);
+          Message('Удалено записей "История издания" с местом издания ' + vGeoName + ': ' + Str(vCount) + '.');
+        except
+          Message('Не удалось удалить одну или несколько записей "История издания" с местом издания ' + vGeoName + br +  '.' );
+          Return;
+        end;
+      fi;
+      -- удаление записи, если код удалось выполнить до этого места
+      return true;
+
+      --try
+      --  inherited DoDelete(aCheckRefs);
+      --except
+      --end;
+
+      --if vDelRec.Deleted then
+      --  Message('Запись ' + vGeoName + ' удалена.' );
+      --else
+      --  Message('Не удалось удалить запись ' + vGeoName + '.' );
+      --fi;
+    fi;
+
+
+
+
+    --Message(Str(локПарам));
+  end;
+
+inobject public
+
+  proc АлгоритмУдаления ( const aAsk, aCheckRefs :Logical );
+    if aAsk then
+      ЗапросПередИзменениемЗаписи(Cardfile.DeleteRecord, Record);
+    fi;
+    СИС2.ФункцииДокумента.RecordCancel(Record); -- если отменять интерфейс, то отменяются все действия, сделанные в событии при удалении
+    if СобытиеПередУдалением.ЧислоОбработчиков > 0 then
+      with Transaction.Create do
+        if СобытиеПередУдалением.Execute([Self, Record, aCheckRefs]) then
+          ВыполнитьУдаление(aCheckRefs);
+          Apply;
+        fi;
+      end;
+    else
+      ВыполнитьУдаление(aCheckRefs);
+    fi;
+  end;
+
+--  proc АлгоритмУдаления ( const aAsk, aCheckRefs :Logical );
+--    var vCountNsp, MinYear, MaxYear, vCount:Integer;
+--    var vFlt :String;
+--    var vNsp :РКП_Газеты.Газета;
+--    var arNsp :РКП_Газеты.Газета[];
+--    var vEdtAddress :РКП_Справочники.спрРедакция;
+--    var arAgrResult :Variant[2];
+--    var Q :Query;
+--    var vGeoName :String;
+--    if (Record <> nil) then
+--      vGeoName = MaskChar(Trim(Self.Record.Наим), '"');
+--      -- проверка реестра изданий
+--      vFlt = 'МестаИздания.Exists(МестоИздания=' + Self.Record.DocIDStr + ')';
+--      vNsp = РКП_СИС.Recs.FindRecordExt(РКП_Газеты.Газета, vFlt, , vCountNsp) as РКП_Газеты.Газета;
+--      if vCountNsp = 1 then
+--        Message('Удаление невозможно: ссылка на удаляемую запись ' + vGeoName + br +
+--                'содержится в описании издания ' + MaskChar(Trim(vNsp.НазваниеОсн), '"') + '.');
+--        Return;
+--      elsif vCountNsp > 1 then
+--        Message('Удаление невозможно: ссылка на удаляемую запись ' + vGeoName + br +
+--                'содержится в описании нескольких изданий' + br +
+--                '(кол-во изданий: ' + Str(vCountNsp) + ')');
+--        Return;
+--      fi;
+--      -- безусловное удаление стат. записей выпуска газеты по годам с неопределенным изданием
+--      Q = Query.Create([РКП_Газеты.ВыпускГазеты]);
+--      Q.Filter = 'Газета=nil and МестоИздания=' + Self.Record.DocIDStr;
+--      Q.Select;
+--      vCount = Q.Count;
+--      if (vCount > 0) then
+--        try
+--          РКП_СИС.Recs.DeleteAllRecords(Q);
+--          Message('Удалено записей статистики выпусков по годам с местом издания ' +vGeoName + ': ' + Str(vCount) + '.' + br +
+--                  'Эти записи не содержали сведений о газете.');
+--        except
+--          Message('Не удалось удалить одну или несколько записей статистики выпусков по годам с местом издания ' + vGeoName + ',' + br +
+--                  'но без сведений о газете.');
+--        end;
+--      fi;
+--      -- проверка стат. записей выпуска газеты по годам
+--      with Query.Create([РКП_Газеты.ВыпускГазеты]) do
+--        Filter = 'МестоИздания=' + Self.Record.DocIDStr;
+--        Order = 'Газета,ГодВыпуска';
+--        arAgrResult = CalcAggregates('GroupBy(Газета)') as Variant[2];
+--        arNsp = arAgrResult[1] as РКП_Газеты.Газета[];
+--        vCountNsp = LengthOfArray(arNsp);
+--        if vCountNsp = 1 then
+--          vNsp = arNsp[1];
+--          MinYear = CalcAggregates('Min(ГодВыпуска)') as Integer;
+--          MaxYear = CalcAggregates('Max(ГодВыпуска)') as Integer;
+--          if (MinYear = MaxYear) then
+--            Message('Удаление невозможно: ссылка на удаляемую запись ' + vGeoName + br +
+--                    'содержится в данных статистики выпусков издания ' + MaskChar(Trim(vNsp.НазваниеОсн), '"') + br +
+--                    'за ' + Str(MinYear) + ' г.');
+--            Return;
+--          else
+--            Message('Удаление невозможно: ссылка на удаляемую запись ' + vGeoName + br +
+--                    'содержится в данных статистики выпусков издания ' + MaskChar(Trim(vNsp.НазваниеОсн), '"') + br +
+--                    'за ' + Str(MinYear) + '-' + Str(MaxYear) + ' гг.');
+--            Return;
+--          fi;
+--          Return;
+--        elsif vCountNsp > 1 then
+--          Message('Удаление невозможно: ссылка на удаляемую запись ' + vGeoName + br +
+--                  'содержится в данных статистики выпусков нескольких изданий' + br +
+--                  '(кол-во изданий: ' + Str(vCountNsp) + ')');
+--          Return;
+--        fi;
+--      end;
+--      -- безусловное удаление стат. записей выпуска газеты по годам с неопределенным изданием
+--      Q = Query.Create([РКП_Газеты.ПоступлениеГазеты]);
+--      Q.Filter = 'Газета=nil and МестоИздания=' + Self.Record.DocIDStr;
+--      Q.Select;
+--      vCount = Q.Count;
+--      if (vCount > 0) then
+--        try
+--          РКП_СИС.Recs.DeleteAllRecords(Q);
+--          Message('Удалено записей статистики поступлений по годам с местом издания ' + vGeoName + ': ' + Str(vCount) + '.' + br +
+--                  'Эти записи не содержали сведений о газете.');
+--        except
+--          Message('Не удалось удалить одну или несколько записей статистики поступлений по годам с местом издания ' + vGeoName + ',' + br +
+--                  'но без сведений о газете.');
+--        end;
+--      fi;
+--      -- проверка стат. записей поступлений газеты по годам
+--      with Query.Create([РКП_Газеты.ПоступлениеГазеты]) do
+--        Filter = 'МестоИздания=' + Self.Record.DocIDStr;
+--        Order = 'Газета,ГодПоступления';
+--        arAgrResult = CalcAggregates('GroupBy(Газета)') as Variant[2];
+--        arNsp = arAgrResult[1] as РКП_Газеты.Газета[];
+--        vCountNsp = LengthOfArray(arNsp);
+--        if vCountNsp = 1 then
+--          vNsp = arNsp[1];
+--          MinYear = CalcAggregates('Min(ГодПоступления)') as Integer;
+--          MaxYear = CalcAggregates('Max(ГодПоступления)') as Integer;
+--          if (MinYear = MaxYear) then
+--            Message('Удаление невозможно: ссылка на удаляемую запись ' + vGeoName + br +
+--                    'содержится в данных статистики поступлений издания ' + MaskChar(Trim(vNsp.НазваниеОсн), '"') + br +
+--                    'за ' + Str(MinYear) + ' г.');
+--            Return;
+--          else
+--            Message('Удаление невозможно: ссылка на удаляемую запись ' + vGeoName + br +
+--                    'содержится в данных статистики поступлений издания ' + MaskChar(Trim(vNsp.НазваниеОсн), '"') + br +
+--                    'за ' + Str(MinYear) + '-' + Str(MaxYear) + ' гг.');
+--            Return;
+--          fi;
+--          Return;
+--        elsif vCountNsp > 1 then
+--          Message('Удаление невозможно: ссылка на удаляемую запись ' + vGeoName + br +
+--                  'содержится в данных статистики поступлений нескольких изданий' + br +
+--                  '(кол-во изданий: ' + Str(vCountNsp) + ')');
+--          Return;
+--        fi;
+--      end;
+--      -- проверка справочника редакций
+--      vFlt = 'НаселенныйПункт=' + Self.Record.DocIDStr;
+--      vEdtAddress = РКП_СИС.Recs.FindRecordExt(РКП_Справочники.спрРедакция, vFlt, , vCount) as РКП_Справочники.спрРедакция;
+--      if vCount = 1 then
+--        Message('Удаление невозможно: ссылка на удаляемую запись ' + vGeoName + br +
+--                'содержится в описании адреса редакции ' + MaskChar(Trim(vEdtAddress.Наим), '"') + '.');
+--        Return;
+--      elsif vCount > 1 then
+--        Message('Удаление невозможно: ссылка на удаляемую запись ' + vGeoName + br +
+--                'содержится в описании нескольких адресов редакций' + br +
+--                '(кол-во: ' + Str(vCount) + ')');
+--        Return;
+--      fi;
+--      -- удаление истории газеты со ссылкой на удаляемую запись, если код удалось выполнить до этого места
+--      Q = Query.Create([РКП_Газеты.ИсторияГазеты]);
+--      Q.Filter = 'Справ=' + Self.Record.DocIDStr;
+--      Q.Select;
+--      vCount = Q.Count;
+--      if (vCount > 0) then
+--        try
+--          РКП_СИС.Recs.DeleteAllRecords(Q);
+--          Message('Удалено записей "История издания" с местом издания ' + vGeoName + ': ' + Str(vCount) + '.');
+--        except
+--          Message('Не удалось удалить одну или несколько записей "История издания" с местом издания ' + vGeoName + br +  '.' );
+--        end;
+--      fi;
+--      -- удаление записи, если код удалось выполнить до этого места
+--      try
+--        inherited DoDelete(aCheckRefs);
+--      except
+--      end;
+--      --if Record.Deleted then
+--      --  Message('Запись ' + vGeoName + ' удалена.' );
+--      --else
+--      --  Message('Не удалось удалить запись ' + vGeoName + '.' );
+--      --fi;
+--    fi;
+--  end;
+
+end

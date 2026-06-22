@@ -59,7 +59,12 @@ inobject private
   func картотека_ПриИзменении(Action :Cardfile.ModifyActions; cRecord :Record; Group :Record) :Logical;
     var aRes :Integer[];
     var i :Integer;
-    Result = inherited картотека_ПриИзменении(Action, cRecord, Group);
+    if (Action = Cardfile.DeleteRecord) then
+      КлассИнтерфейса.OpenRecord(cRecord).Delete(true);
+      Result = False;
+    else
+      Result = inherited картотека_ПриИзменении(Action, cRecord, Group);
+    fi;
     if (Action = Cardfile.RecordGroupOn) then
       ПолучитьПутьГруппы(cRecord, aRes);
       for i = 1 .. LengthOfArray(aRes) do
@@ -68,7 +73,6 @@ inobject private
       ОбновитьФильтр;
     fi;
   end;
-
 
   func картотека_ПриОткрытииБланка(Action :Integer; newRec :Record) :Logical;
     var aRes :Integer[];
@@ -98,6 +102,7 @@ inobject private
       Color = (R + G * 256 + B * 256 * 256);
     fi;
   end;
+
 
 
 -- _Прочие методы. --
